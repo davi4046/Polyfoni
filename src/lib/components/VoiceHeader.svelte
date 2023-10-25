@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Track from "./Track.svelte";
+    import TrackHeader from "./TrackHeader.svelte";
 
     import { VoiceModel } from "../models";
 
@@ -8,6 +8,6 @@
 
 <div class="space-y-2">
     {#each data.children as track}
-        <Track data={track}></Track>
+        <TrackHeader data={track}></TrackHeader>
     {/each}
 </div>

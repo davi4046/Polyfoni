@@ -8,30 +8,26 @@
         ItemModel,
     } from "./lib/models";
 
-    const timeline = new TimelineModel([
-        new VoiceModel([
-            new TrackModel([
-                new ItemModel(0, 2),
-                new ItemModel(2, 4),
-                new ItemModel(4, 6),
-                new ItemModel(6, 8),
-            ]),
-            new TrackModel([new ItemModel(0, 4), new ItemModel(4, 8)]),
-            new TrackModel([new ItemModel(0, 8)]),
+    const timeline = new TimelineModel(64, [
+        new VoiceModel("Piano 1", [
+            new TrackModel(0),
+            new TrackModel(1),
+            new TrackModel(2),
+            new TrackModel(3),
+            new TrackModel(4),
+            new TrackModel(5),
         ]),
-        new VoiceModel([
-            new TrackModel([
-                new ItemModel(0, 2),
-                new ItemModel(2, 4),
-                new ItemModel(4, 6),
-                new ItemModel(6, 8),
-            ]),
-            new TrackModel([new ItemModel(0, 4), new ItemModel(4, 8)]),
-            new TrackModel([new ItemModel(0, 8)]),
+        new VoiceModel("Piano 2", [
+            new TrackModel(0),
+            new TrackModel(1),
+            new TrackModel(2),
+            new TrackModel(3),
+            new TrackModel(4),
+            new TrackModel(5),
         ]),
     ]);
 </script>
 
-<main>
+<main class="h-full">
     <Timeline data={timeline}></Timeline>
 </main>
