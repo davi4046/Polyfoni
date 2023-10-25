@@ -2,10 +2,10 @@
   import Greet from "./lib/Greet.svelte";
 </script>
 
-<main class="container">
+<main>
   <h1>Welcome to Tauri!</h1>
 
-  <div class="row">
+  <div>
     <a href="https://vitejs.dev" target="_blank">
       <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
     </a>
@@ -19,7 +19,7 @@
 
   <p>Click on the Tauri, Vite, and Svelte logos to learn more.</p>
 
-  <div class="row">
+  <div>
     <Greet />
   </div>
 </main>
