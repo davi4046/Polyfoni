@@ -53,11 +53,41 @@ abstract class TreeNode<
     }
 }
 
-export class TimelineModel extends TreeNode<null, VoiceModel> {}
+export class TimelineModel extends TreeNode<null, VoiceModel> {
+    constructor(
+        public length: number,
+        children: VoiceModel[] = []
+    ) {
+        super(children);
+    }
+}
 
-export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {}
+export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
+    constructor(
+        public name: string,
+        children: TrackModel[] = []
+    ) {
+        super(children);
+    }
+}
 
-export class TrackModel extends TreeNode<VoiceModel, ItemModel> {}
+enum TrackType {
+    Pitch,
+    Duration,
+    Rest,
+    Velocity,
+    Harmony,
+    Output,
+}
+
+export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
+    constructor(
+        public type: TrackType,
+        children: ItemModel[] = []
+    ) {
+        super(children);
+    }
+}
 
 export class ItemModel extends TreeNode<TrackModel, null> {
     constructor(
