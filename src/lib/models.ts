@@ -65,7 +65,8 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
 export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
     constructor(
         public name: string,
-        children: TrackModel[] = []
+        children: TrackModel[] = [],
+        public isCollapsed = false
     ) {
         super(children);
     }

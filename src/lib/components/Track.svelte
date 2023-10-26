@@ -9,6 +9,6 @@
 
 <TrackShell>
     {#each data.children as item}
-        <Item data={item}></Item>
+        <Item bind:data={item}></Item>
     {/each}
 </TrackShell>

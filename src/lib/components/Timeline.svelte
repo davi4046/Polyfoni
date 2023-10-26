@@ -10,7 +10,7 @@
 <div class="flex h-full p-4 space-x-1 bg-gray-500">
     <div class="space-y-4">
         {#each data.children as voice}
-            <VoiceHeader data={voice}></VoiceHeader>
+            <VoiceHeader bind:data={voice}></VoiceHeader>
         {/each}
     </div>
     <div class="h-full overflow-scroll">
@@ -23,7 +23,7 @@
             {/each}
             <div class="space-y-4">
                 {#each data.children as voice}
-                    <Voice data={voice}></Voice>
+                    <Voice bind:data={voice}></Voice>
                 {/each}
             </div>
         </div>
