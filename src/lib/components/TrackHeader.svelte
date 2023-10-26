@@ -1,4 +1,6 @@
 <script lang="ts">
+    import TrackShell from "./TrackShell.svelte";
+
     import { TrackModel } from "../models";
 
     export let data: TrackModel;
@@ -27,6 +29,8 @@
     }
 </script>
 
-<div class="flex h-12 p-2 bg-gray-400 place-items-center">
-    {label}
-</div>
+<TrackShell>
+    <div class="flex items-center p-2">
+        {label}
+    </div>
+</TrackShell>

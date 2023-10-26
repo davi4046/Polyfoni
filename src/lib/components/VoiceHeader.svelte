@@ -1,4 +1,5 @@
 <script lang="ts">
+    import VoiceShell from "./VoiceShell.svelte";
     import TrackHeader from "./TrackHeader.svelte";
 
     import { VoiceModel } from "../models";
@@ -6,8 +7,8 @@
     export let data: VoiceModel;
 </script>
 
-<div class="space-y-2">
+<VoiceShell>
     {#each data.children as track}
         <TrackHeader data={track}></TrackHeader>
     {/each}
-</div>
+</VoiceShell>
