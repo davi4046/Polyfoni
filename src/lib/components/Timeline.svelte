@@ -17,7 +17,7 @@
         <div class="relative" style="width: {data.length * 64}px">
             {#each Array(data.length - 1) as _, index}
                 <div
-                    class="absolute top-0 w-0.5 h-full bg-gray-500"
+                    class="absolute z-10 top-0 w-0.5 h-full bg-gray-500"
                     style="left: {index * 64 + 64}px"
                 />
             {/each}
