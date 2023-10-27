@@ -29,7 +29,7 @@
 </script>
 
 <TrackShell>
-    <div class="flex items-center w-32 p-2 space-x-2">
+    <div class="flex items-center p-2 space-x-2">
         <svg class="w-6 h-6 text-gray-500" viewBox="0 0 100 100">
             <g stroke="currentColor" stroke-width="8">
                 <path d="M 50 50 L 100 50 Z" />
