@@ -1,5 +1,7 @@
 <script lang="ts">
     import TrackShell from "./TrackShell.svelte";
+    import Pipe from "./svg/Pipe.svelte";
+    import EndPipe from "./svg/EndPipe.svelte";
 
     import { TrackModel } from "../models";
 
@@ -30,16 +32,13 @@
 
 <TrackShell>
     <div class="flex items-center p-2 space-x-2">
-        <svg class="w-6 h-6 text-gray-500" viewBox="0 0 100 100">
-            <g stroke="currentColor" stroke-width="8">
-                <path d="M 50 50 L 100 50 Z" />
-                {#if position == 4}
-                    <path d="M 50 0 L 50 50 Z" />
-                {:else}
-                    <path d="M 50 0 L 50 100 Z" />
-                {/if}
-            </g>
-        </svg>
+        <div class="w-6 h-6 text-gray-500">
+            {#if position == 4}
+                <EndPipe />
+            {:else}
+                <Pipe />
+            {/if}
+        </div>
         <p class="font-semibold text-gray-700">{label}</p>
     </div>
 </TrackShell>
