@@ -8,11 +8,7 @@
 </script>
 
 <VoiceShell>
-    {#if data.isCollapsed}
-        <Track bind:data={data.children[0]}></Track>
-    {:else}
-        {#each data.children as track}
-            <Track bind:data={track}></Track>
-        {/each}
-    {/if}
+    {#each data.children as track}
+        <Track bind:data={track}></Track>
+    {/each}
 </VoiceShell>

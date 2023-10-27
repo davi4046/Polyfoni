@@ -73,7 +73,6 @@ export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
 }
 
 enum TrackType {
-    Output,
     Pitch,
     Duration,
     Rest,

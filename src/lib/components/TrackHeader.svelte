@@ -9,28 +9,23 @@
 
     switch (data.type) {
         case 0:
-            label = data.parent!.name;
-            break;
-        case 1:
             label = "Pitch";
             break;
-        case 2:
+        case 1:
             label = "Duration";
             break;
-        case 3:
+        case 2:
             label = "Rest";
             break;
-        case 4:
+        case 3:
             label = "Velocity";
             break;
-        case 5:
+        case 4:
             label = "Harmony";
             break;
     }
 
-    function toggleCollapsed() {
-        data.parent!.isCollapsed = !data.parent!.isCollapsed;
-    }
+    let position = data.parent!.children.indexOf(data);
 </script>
 
 <TrackShell>

@@ -29,7 +29,6 @@
                 new TrackModel(2),
                 new TrackModel(3),
                 new TrackModel(4),
-                new TrackModel(5),
             ]),
             new VoiceModel("Piano 2", [
                 new TrackModel(0),
@@ -37,7 +36,6 @@
                 new TrackModel(2),
                 new TrackModel(3),
                 new TrackModel(4),
-                new TrackModel(5),
             ]),
         ])
     );
