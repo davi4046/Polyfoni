@@ -1,6 +1,7 @@
 <script lang="ts">
     import VoiceShell from "./VoiceShell.svelte";
     import Track from "./Track.svelte";
+    import MidiTrack from "./MidiTrack.svelte";
 
     import { VoiceModel } from "../models";
 
@@ -8,7 +9,10 @@
 </script>
 
 <VoiceShell>
-    {#each data.children as track}
-        <Track bind:data={track}></Track>
-    {/each}
+    <MidiTrack></MidiTrack>
+    {#if !data.isCollapsed}
+        {#each data.children as track}
+            <Track bind:data={track}></Track>
+        {/each}
+    {/if}
 </VoiceShell>
