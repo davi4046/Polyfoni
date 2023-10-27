@@ -29,24 +29,17 @@
 </script>
 
 <TrackShell>
-    <div class="flex items-center w-32 p-2">
-        <button class="mr-2" on:click={toggleCollapsed}>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-                class:-rotate-90={data.parent?.isCollapsed}
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                />
-            </svg>
-        </button>
-        <p>{label}</p>
+    <div class="flex items-center w-32 p-2 space-x-2">
+        <svg class="w-6 h-6 text-gray-500" viewBox="0 0 100 100">
+            <g stroke="currentColor" stroke-width="8">
+                <path d="M 50 50 L 100 50 Z" />
+                {#if position == 4}
+                    <path d="M 50 0 L 50 50 Z" />
+                {:else}
+                    <path d="M 50 0 L 50 100 Z" />
+                {/if}
+            </g>
+        </svg>
+        <p class="font-semibold text-gray-700">{label}</p>
     </div>
 </TrackShell>
