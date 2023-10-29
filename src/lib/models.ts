@@ -56,6 +56,9 @@ abstract class TreeNode<
 export class TimelineModel extends TreeNode<null, VoiceModel> {
     public output = new TimelineOutput();
 
+    public meterTrack = new TrackModel(5);
+    public tempoTrack = new TrackModel(6);
+
     constructor(
         public length: number,
         children: VoiceModel[] = []
@@ -80,6 +83,8 @@ enum TrackType {
     Rest,
     Velocity,
     Harmony,
+    Meter,
+    Tempo,
 }
 
 export class TrackModel extends TreeNode<VoiceModel, ItemModel> {

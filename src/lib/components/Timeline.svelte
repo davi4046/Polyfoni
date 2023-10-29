@@ -11,26 +11,26 @@
 
     export let data: TimelineModel;
 
-    let trackDiv: HTMLElement;
-    let headerDiv: HTMLElement;
-    let markerDiv: HTMLElement;
-
     onMount(() => {
-        trackDiv.addEventListener("wheel", (event) => {
-            trackDiv.scrollLeft += event.deltaX;
-            markerDiv.scrollLeft += event.deltaX;
+        let hScroll = document.getElementsByClassName("h-scroll");
+        let vScroll = document.getElementsByClassName("v-scroll");
 
-            trackDiv.scrollTop += event.deltaY;
-            headerDiv.scrollTop += event.deltaY;
-        });
-        headerDiv.addEventListener("wheel", (event) => {
-            headerDiv.scrollTop += event.deltaY;
-            trackDiv.scrollTop += event.deltaY;
-        });
-        markerDiv.addEventListener("wheel", (event) => {
-            markerDiv.scrollLeft += event.deltaX;
-            trackDiv.scrollLeft += event.deltaX;
-        });
+        for (let element of hScroll) {
+            element.addEventListener("wheel", (event) => {
+                let wheelEvent = <WheelEvent>event;
+                for (let element of hScroll) {
+                    element.scrollLeft += wheelEvent.deltaX;
+                }
+            });
+        }
+        for (let element of vScroll) {
+            element.addEventListener("wheel", (event) => {
+                let wheelEvent = <WheelEvent>event;
+                for (let element of vScroll) {
+                    element.scrollTop += wheelEvent.deltaY;
+                }
+            });
+        }
     });
 </script>
 
@@ -38,7 +38,8 @@
     class="grid grid-cols-[auto,auto] grid-rows-[auto,1fr] h-full p-4 space-x-1 bg-gray-500"
 >
     <div></div>
-    <div class="h-6 overflow-hidden" bind:this={markerDiv}>
+    <!-- Markers -->
+    <div class="h-6 overflow-hidden h-scroll">
         <div class="relative" style="width: {data.length * 64}px">
             {#each Array(data.length) as _, index}
                 <div
@@ -55,37 +56,46 @@
             {/each}
         </div>
     </div>
-    <div
-        class="w-32 overflow-hidden relative h-full flex flex-col"
-        bind:this={headerDiv}
-    >
-        <div class="space-y-4">
+    <!-- Headers -->
+    <div class="relative flex flex-col w-32 h-full overflow-hidden">
+        <div class="z-10 mb-4 space-y-2">
+            <TrackHeader data={data.meterTrack} />
+            <TrackHeader data={data.tempoTrack} />
+        </div>
+        <div class="mb-4 space-y-4 overflow-hidden v-scroll">
             {#each data.children as voice}
                 <VoiceHeader bind:data={voice} />
             {/each}
         </div>
-        <div class="bg-gray-500 pt-4 mt-auto sticky bottom-0">
+        <div class="z-10 mt-auto">
             <TrackHeader data={data.output.harmonicSum} />
         </div>
     </div>
-    <div class="h-full overflow-hidden" bind:this={trackDiv}>
+    <!-- Tracks -->
+    <div class="h-full overflow-hidden h-scroll">
         <div
             class="relative flex flex-col h-full"
             style="width: {data.length * 64}px"
         >
-            {#each Array(data.length - 1) as _, index}
-                <div
-                    class="absolute top-0 z-10 h-full w-0.5 bg-gray-500"
-                    style="left: {index * 64 + 64}px"
-                />
-            {/each}
-            <div class="space-y-4">
+            <div class="z-10 mb-4 space-y-2">
+                <Track data={data.meterTrack} />
+                <Track data={data.tempoTrack} />
+            </div>
+            <div class="mb-4 space-y-4 overflow-hidden v-scroll">
                 {#each data.children as voice}
                     <Voice bind:data={voice} />
                 {/each}
             </div>
-            <div class="bg-gray-500 pt-4 mt-auto sticky bottom-0">
+            <div class="z-10 mt-auto">
                 <Track data={data.output.harmonicSum} />
+            </div>
+            <div class="absolute inset-0 z-20 pointer-events-none">
+                {#each Array(data.length - 1) as _, index}
+                    <div
+                        class="absolute top-0 h-full w-0.5 bg-gray-500"
+                        style="left: {index * 64 + 64}px"
+                    />
+                {/each}
             </div>
         </div>
     </div>

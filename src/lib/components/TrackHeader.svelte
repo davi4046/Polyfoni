@@ -25,6 +25,12 @@
         case 4:
             label = "Harmony";
             break;
+        case 5:
+            label = "Meter";
+            break;
+        case 6:
+            label = "Tempo";
+            break;
     }
 
     let pos: number;
