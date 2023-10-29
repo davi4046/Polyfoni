@@ -54,6 +54,8 @@ abstract class TreeNode<
 }
 
 export class TimelineModel extends TreeNode<null, VoiceModel> {
+    public output = new TimelineOutput();
+
     constructor(
         public length: number,
         children: VoiceModel[] = []
@@ -96,4 +98,8 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     ) {
         super();
     }
+}
+
+export class TimelineOutput {
+    public harmonicSum = new TrackModel(4);
 }

@@ -27,18 +27,26 @@
             break;
     }
 
-    let position = data.parent!.children.indexOf(data);
+    let pos: number;
+    let lastPos: number;
+
+    if (data.parent) {
+        pos = data.parent.children.indexOf(data);
+        lastPos = data.parent.children.length - 1;
+    }
 </script>
 
 <TrackShell>
     <div class="flex items-center p-2 space-x-2">
-        <div class="w-6 h-6 text-gray-500">
-            {#if position == 4}
-                <EndPipe />
-            {:else}
-                <Pipe />
-            {/if}
-        </div>
+        {#if data.parent}
+            <div class="w-6 h-6 text-gray-500">
+                {#if pos == lastPos}
+                    <EndPipe />
+                {:else}
+                    <Pipe />
+                {/if}
+            </div>
+        {/if}
         <p class="font-semibold text-gray-700">{label}</p>
     </div>
 </TrackShell>

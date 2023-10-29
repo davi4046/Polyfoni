@@ -3,6 +3,8 @@
     import VoiceHeader from "./VoiceHeader.svelte";
     import BigMarker from "./svg/BigMarker.svelte";
     import SmallMarker from "./svg/SmallMarker.svelte";
+    import Track from "./Track.svelte";
+    import TrackHeader from "./TrackHeader.svelte";
 
     import { TimelineModel } from "../models";
     import { onMount } from "svelte";
@@ -33,7 +35,7 @@
 </script>
 
 <div
-    class="grid grid-cols-[1fr,9fr] grid-rows-[auto,1fr] h-full p-4 space-x-1 bg-gray-500"
+    class="grid grid-cols-[auto,auto] grid-rows-[auto,1fr] h-full p-4 space-x-1 bg-gray-500"
 >
     <div></div>
     <div class="h-6 overflow-hidden" bind:this={markerDiv}>
@@ -53,13 +55,24 @@
             {/each}
         </div>
     </div>
-    <div class="space-y-4 overflow-hidden" bind:this={headerDiv}>
-        {#each data.children as voice}
-            <VoiceHeader bind:data={voice}></VoiceHeader>
-        {/each}
+    <div
+        class="w-32 overflow-hidden relative h-full flex flex-col"
+        bind:this={headerDiv}
+    >
+        <div class="space-y-4">
+            {#each data.children as voice}
+                <VoiceHeader bind:data={voice} />
+            {/each}
+        </div>
+        <div class="bg-gray-500 pt-4 mt-auto sticky bottom-0">
+            <TrackHeader data={data.output.harmonicSum} />
+        </div>
     </div>
     <div class="h-full overflow-hidden" bind:this={trackDiv}>
-        <div class="relative" style="width: {data.length * 64}px">
+        <div
+            class="relative flex flex-col h-full"
+            style="width: {data.length * 64}px"
+        >
             {#each Array(data.length - 1) as _, index}
                 <div
                     class="absolute top-0 z-10 h-full w-0.5 bg-gray-500"
@@ -68,8 +81,11 @@
             {/each}
             <div class="space-y-4">
                 {#each data.children as voice}
-                    <Voice bind:data={voice}></Voice>
+                    <Voice bind:data={voice} />
                 {/each}
+            </div>
+            <div class="bg-gray-500 pt-4 mt-auto sticky bottom-0">
+                <Track data={data.output.harmonicSum} />
             </div>
         </div>
     </div>
