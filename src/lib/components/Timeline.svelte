@@ -74,7 +74,7 @@
     <!-- Tracks -->
     <div class="h-full overflow-hidden h-scroll">
         <div
-            class="relative flex flex-col h-full"
+            class="relative flex flex-col h-full cursor-area"
             style="width: {data.length * 64}px"
         >
             <div class="z-10 mb-4 space-y-2">

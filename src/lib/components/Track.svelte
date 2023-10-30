@@ -7,8 +7,15 @@
     export let data: TrackModel;
 </script>
 
-<TrackShell>
-    {#each data.children as item}
-        <Item bind:data={item}></Item>
-    {/each}
-</TrackShell>
+<div
+    on:mouseenter={(_) => {
+        data.controller?.setHoveredNode(data);
+    }}
+    role="none"
+>
+    <TrackShell>
+        {#each data.children as item}
+            <Item bind:data={item}></Item>
+        {/each}
+    </TrackShell>
+</div>
