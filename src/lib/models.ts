@@ -129,6 +129,72 @@ enum TrackType {
 }
 
 export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
+    clearInterval(start: number, end: number) {
+        //index of last item starting before interval
+        let i = this.children.findLastIndex((item) => {
+            return item.start < start;
+        });
+        //index of first item ending after interval
+        let j = this.children.findIndex((item) => {
+            return item.end > end;
+        });
+
+        if (i == j && i != -1 && j != -1) {
+            //because i and j is the same item, we split it
+            let itemCopy: ItemModel = Object.assign(
+                Object.create(Object.getPrototypeOf(this.children[i])),
+                this.children[i]
+            );
+
+            this.children[i].end = start;
+
+            itemCopy.start = end;
+
+            super.addChild(itemCopy);
+        } else {
+            //remove items between i and j
+            if (i == -1 && j == -1) {
+                this.children.forEach((child) => {
+                    this.removeChild(child);
+                });
+            } else if (i == -1) {
+                this.children.slice(0, j).forEach((child) => {
+                    this.removeChild(child);
+                });
+            } else if (j == -1) {
+                this.children.slice(i + 1).forEach((child) => {
+                    this.removeChild(child);
+                });
+            } else {
+                this.children.slice(i + 1, j).forEach((child) => {
+                    this.removeChild(child);
+                });
+            }
+            //crop i and j so they aren't overlapping the interval
+            if (i != -1) {
+                this.children[i].end = Math.min(start, this.children[i].end);
+            }
+            if (j != -1) {
+                this.children[j].start = Math.max(end, this.children[j].start);
+            }
+        }
+    }
+
+    addChild(child: ItemModel): void {
+        this.clearInterval(child.start, child.end);
+
+        super.addChild(child);
+
+        this.children.sort((a, b) => {
+            if (a.start < b.start) {
+                return -1;
+            } else if (a.start > b.start) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
     constructor(
         public type: TrackType,
         children: ItemModel[] = []

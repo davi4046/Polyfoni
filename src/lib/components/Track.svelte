@@ -18,13 +18,14 @@
         {#each data.children as item}
             <Item bind:data={item}></Item>
         {/each}
-        {#if data.controller?.highlight?.tracks.includes(data)}
-            {#each data.controller?.highlight?.intervals as interval}
+        {@const highlight = data.controller?.highlight}
+        {#if highlight}
+            {#if highlight.tracks.includes(data)}
                 <Highlight
-                    width={(interval[1] - interval[0]) * 64}
-                    left={interval[0] * 64}
+                    width={(highlight.end - highlight.start) * 64}
+                    left={highlight.start * 64}
                 />
-            {/each}
+            {/if}
         {/if}
     </TrackShell>
 </div>

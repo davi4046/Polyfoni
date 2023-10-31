@@ -1,7 +1,8 @@
-import type { TimelineModel, TrackModel } from "./models";
-import type { Writable } from "svelte/store";
 import { listen } from "@tauri-apps/api/event";
 
+import { ItemModel, TimelineModel, TrackModel } from "./models";
+
+import type { Writable } from "svelte/store";
 export class Controller {
     private _clickedPos: number | null = null;
     private _clickedTrack: TrackModel | null = null;
@@ -113,7 +114,7 @@ export class Controller {
             let minBeat = Math.min(clickedBeat, hoveredBeat);
             let maxBeat = Math.max(clickedBeat, hoveredBeat);
 
-            this.highlight = new Highlight(tracks, [[minBeat, maxBeat]]);
+            this.highlight = new Highlight(minBeat, maxBeat, tracks);
 
             this._store.update((value) => {
                 return value;
@@ -150,18 +151,46 @@ export class Controller {
         });
 
         listen("insert", (_) => {
-            console.log("Insert was called!");
+            if (this.highlight) {
+                this.highlight.tracks.forEach((track) => {
+                    let newItem = new ItemModel(
+                        this.highlight!.start,
+                        this.highlight!.end
+                    );
+                    track.addChild(newItem);
+                });
+            }
+
+            this.highlight = null;
+
+            this._store.update((value) => {
+                return value;
+            });
         });
 
         listen("delete", (_) => {
-            console.log("Delete was called!");
+            if (this.highlight) {
+                this.highlight.tracks.forEach((track) => {
+                    track.clearInterval(
+                        this.highlight!.start,
+                        this.highlight!.end
+                    );
+                });
+            }
+
+            this.highlight = null;
+
+            this._store.update((value) => {
+                return value;
+            });
         });
     }
 }
 
 class Highlight {
     constructor(
-        public tracks: TrackModel[],
-        public intervals: [number, number][]
+        public start: number,
+        public end: number,
+        public tracks: TrackModel[]
     ) {}
 }
