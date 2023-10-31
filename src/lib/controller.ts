@@ -1,6 +1,6 @@
 import type { TimelineModel, TrackModel } from "./models";
-
 import type { Writable } from "svelte/store";
+import { listen } from "@tauri-apps/api/event";
 
 export class Controller {
     private _clickedPos: number | null = null;
@@ -145,6 +145,14 @@ export class Controller {
             );
 
             this.setHoveredPos(event.clientX - cursorArea.offsetLeft);
+        });
+
+        listen("insert", (_) => {
+            console.log("Insert was called!");
+        });
+
+        listen("delete", (_) => {
+            console.log("Delete was called!");
         });
     }
 }

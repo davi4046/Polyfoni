@@ -1,15 +1,39 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+use tauri::{CustomMenuItem, Menu, Submenu};
+
+fn create_menu() -> Menu {
+    return Menu::new()
+        .add_submenu(Submenu::new("File",Menu::new()
+            .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
+            )
+        )
+        .add_submenu(Submenu::new("Edit", Menu::new()
+            .add_item(CustomMenuItem::new("insert".to_string(), "Insert"))
+            .add_item(CustomMenuItem::new("delete".to_string(), "Delete"))
+            )  
+        )
 }
 
 fn main() {
+    let menu = create_menu();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .menu(menu)
+        .on_menu_event(|event| {
+            match event.menu_item_id() {
+                "quit" => {
+                    std::process::exit(0);
+                }
+                "insert" => {
+                    event.window().emit("insert", {}).unwrap();
+                }
+                "delete" => {
+                    event.window().emit("delete", {}).unwrap();
+                }
+                _ => {}
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
