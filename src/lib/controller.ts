@@ -122,7 +122,10 @@ export class Controller {
     }
 
     constructor(private _store: Writable<TimelineModel>) {
-        document.addEventListener("mousedown", (_) => {
+        document.addEventListener("mousedown", (event) => {
+            if (event.button != 0) {
+                return;
+            }
             if (this._hoveredPos) {
                 this._clickedPos = this._hoveredPos;
             }
