@@ -144,7 +144,9 @@ export class Controller {
                 document.getElementsByClassName("cursor-area")[0]
             );
 
-            this.setHoveredPos(event.clientX - cursorArea.offsetLeft);
+            this.setHoveredPos(
+                event.screenX - cursorArea.offsetLeft + cursorArea.scrollLeft
+            );
         });
 
         listen("insert", (_) => {

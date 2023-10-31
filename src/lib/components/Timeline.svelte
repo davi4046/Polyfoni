@@ -72,9 +72,9 @@
         </div>
     </div>
     <!-- Tracks -->
-    <div class="h-full overflow-hidden h-scroll">
+    <div class="h-full overflow-hidden h-scroll cursor-area">
         <div
-            class="relative flex flex-col h-full cursor-area"
+            class="relative flex flex-col h-full"
             style="width: {data.length * 64}px"
         >
             <div class="z-10 mb-4 space-y-2">
