@@ -28,104 +28,92 @@ export class Controller {
             this._clickedPos &&
             this._clickedTrack
         ) {
-            let clickedBeat = Math.round(this._clickedPos / 64);
-            let hoveredBeat = Math.round(this._hoveredPos / 64);
-
-            let start = Math.min(clickedBeat, hoveredBeat);
-            let end = Math.max(clickedBeat, hoveredBeat);
-
             let tracks: TrackModel[] = [];
 
-            let clickedTrackVoice = this._clickedTrack.parent;
-            let hoveredTrackVoice = this._hoveredTrack.parent;
+            let clickedVoice = this._clickedTrack.parent;
+            let hoveredVoice = this._hoveredTrack.parent;
 
-            if (clickedTrackVoice && hoveredTrackVoice) {
-                if (clickedTrackVoice == hoveredTrackVoice) {
-                    //single-voice highlight
-                    let clickedTrackIndex = clickedTrackVoice.children.indexOf(
-                        this._clickedTrack
-                    );
-                    let clickedVoiceIndex = clickedTrackVoice.children.indexOf(
-                        this._hoveredTrack
-                    );
-
-                    let minIndex = Math.min(
+            if (clickedVoice && hoveredVoice) {
+                let clickedTrackIndex = clickedVoice.children.indexOf(
+                    this._clickedTrack
+                );
+                let hoveredTrackIndex = hoveredVoice.children.indexOf(
+                    this._hoveredTrack
+                );
+                if (clickedVoice == hoveredVoice) {
+                    let minTrackIndex = Math.min(
                         clickedTrackIndex,
-                        clickedVoiceIndex
+                        hoveredTrackIndex
                     );
-                    let maxIndex = Math.max(
+                    let maxTrackIndex = Math.max(
                         clickedTrackIndex,
-                        clickedVoiceIndex
+                        hoveredTrackIndex
                     );
 
-                    tracks = clickedTrackVoice.children.slice(
-                        minIndex,
-                        maxIndex + 1
+                    tracks = clickedVoice.children.slice(
+                        minTrackIndex,
+                        maxTrackIndex + 1
                     );
                 } else {
-                    //cross-voice highlight
-                    let timeline = clickedTrackVoice.parent!;
+                    let timeline = clickedVoice.parent!;
 
                     let clickedVoiceIndex =
-                        timeline.children.indexOf(clickedTrackVoice);
+                        timeline.children.indexOf(clickedVoice);
                     let hoveredVoiceIndex =
-                        timeline.children.indexOf(hoveredTrackVoice);
+                        timeline.children.indexOf(hoveredVoice);
 
-                    let minIndex = Math.min(
+                    let minVoiceIndex = Math.min(
                         clickedVoiceIndex,
                         hoveredVoiceIndex
                     );
-                    let maxIndex = Math.max(
+                    let maxVoiceIndex = Math.max(
                         clickedVoiceIndex,
                         hoveredVoiceIndex
                     );
 
                     tracks = timeline.children
-                        .slice(minIndex + 1, maxIndex)
+                        .slice(minVoiceIndex + 1, maxVoiceIndex)
                         .map((voice) => {
                             return voice.children;
                         })
                         .flat();
 
-                    let clickedTrackIndex = clickedTrackVoice.children.indexOf(
-                        this._clickedTrack
-                    );
-
-                    let hoveredTrackIndex = hoveredTrackVoice.children.indexOf(
-                        this._hoveredTrack
-                    );
-
-                    if (clickedVoiceIndex > hoveredVoiceIndex) {
+                    if (clickedVoiceIndex < hoveredVoiceIndex) {
                         tracks = tracks.concat(
-                            clickedTrackVoice.children.slice(
+                            clickedVoice.children.slice(
+                                clickedTrackIndex,
+                                clickedVoice.children.length
+                            )
+                        );
+                        tracks = tracks.concat(
+                            hoveredVoice.children.slice(
+                                0,
+                                hoveredTrackIndex + 1
+                            )
+                        );
+                    } else {
+                        tracks = tracks.concat(
+                            clickedVoice.children.slice(
                                 0,
                                 clickedTrackIndex + 1
                             )
                         );
                         tracks = tracks.concat(
-                            hoveredTrackVoice.children.slice(
+                            hoveredVoice.children.slice(
                                 hoveredTrackIndex,
-                                hoveredTrackVoice.children.length
-                            )
-                        );
-                    } else {
-                        tracks = tracks.concat(
-                            clickedTrackVoice.children.slice(
-                                clickedTrackIndex,
-                                clickedTrackVoice.children.length
-                            )
-                        );
-                        tracks = tracks.concat(
-                            hoveredTrackVoice.children.slice(
-                                0,
-                                hoveredTrackIndex + 1
+                                hoveredVoice.children.length
                             )
                         );
                     }
                 }
             }
+            let clickedBeat = Math.round(this._clickedPos / 64);
+            let hoveredBeat = Math.round(this._hoveredPos / 64);
 
-            this.highlight = new Highlight(tracks, [[start, end]]);
+            let minBeat = Math.min(clickedBeat, hoveredBeat);
+            let maxBeat = Math.max(clickedBeat, hoveredBeat);
+
+            this.highlight = new Highlight(tracks, [[minBeat, maxBeat]]);
 
             this._store.update((value) => {
                 return value;
