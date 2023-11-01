@@ -99,6 +99,69 @@ export class TimelineModel extends TimelineNode<null, VoiceModel> {
 
     public store = writable(this);
 
+    getTracksBetween(fromTrack: TrackModel, toTrack: TrackModel) {
+        let tracks: TrackModel[] = [];
+
+        let fromVoice = fromTrack.parent;
+        let toVoice = toTrack.parent;
+
+        if (fromVoice && toVoice) {
+            if (fromVoice.parent == this && toVoice.parent == this) {
+                let fromTrackIndex = fromVoice.children.indexOf(fromTrack);
+                let toTrackIndex = toVoice.children.indexOf(toTrack);
+
+                if (fromVoice == toVoice) {
+                    let minTrackIndex = Math.min(fromTrackIndex, toTrackIndex);
+                    let maxTrackIndex = Math.max(fromTrackIndex, toTrackIndex);
+
+                    tracks = fromVoice.children.slice(
+                        minTrackIndex,
+                        maxTrackIndex + 1
+                    );
+                } else {
+                    let timeline = fromVoice.parent;
+
+                    let fromVoiceIndex = timeline.children.indexOf(fromVoice);
+                    let toVoiceIndex = timeline.children.indexOf(toVoice);
+
+                    let minVoiceIndex = Math.min(fromVoiceIndex, toVoiceIndex);
+                    let maxVoiceIndex = Math.max(fromVoiceIndex, toVoiceIndex);
+
+                    tracks = timeline.children
+                        .slice(minVoiceIndex + 1, maxVoiceIndex)
+                        .map((voice) => {
+                            return voice.children;
+                        })
+                        .flat();
+
+                    if (fromVoiceIndex < toVoiceIndex) {
+                        tracks = tracks.concat(
+                            fromVoice.children.slice(
+                                fromTrackIndex,
+                                fromVoice.children.length
+                            )
+                        );
+                        tracks = tracks.concat(
+                            toVoice.children.slice(0, toTrackIndex + 1)
+                        );
+                    } else {
+                        tracks = tracks.concat(
+                            fromVoice.children.slice(0, fromTrackIndex + 1)
+                        );
+                        tracks = tracks.concat(
+                            toVoice.children.slice(
+                                toTrackIndex,
+                                toVoice.children.length
+                            )
+                        );
+                    }
+                }
+                return tracks;
+            }
+        }
+        return null;
+    }
+
     constructor(
         public length: number,
         children: VoiceModel[] = []
@@ -226,6 +289,10 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
         this.parent?.clearInterval(newStart, newEnd);
         this._start = newStart;
         this._end = newEnd;
+    }
+
+    isSelected() {
+        return this.controller?.selectedItems.includes(this);
     }
 
     constructor(

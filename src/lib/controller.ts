@@ -1,3 +1,5 @@
+import { get } from "svelte/store";
+
 import { listen } from "@tauri-apps/api/event";
 
 import { HighlightModel, ItemModel, TimelineModel, TrackModel } from "./models";
@@ -9,6 +11,9 @@ export class Controller {
 
     private _hoveredPos: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
+
+    private _selectedItems: ItemModel[] = [];
+    private _clickWasSelect = false;
 
     public highlight: HighlightModel | null = null;
 
@@ -22,99 +27,80 @@ export class Controller {
             this._hoveredPos &&
             this._hoveredTrack &&
             this._clickedPos &&
-            this._clickedTrack
+            this._clickedTrack &&
+            !this._clickWasSelect
         ) {
-            let tracks: TrackModel[] = [];
-
-            let clickedVoice = this._clickedTrack.parent;
-            let hoveredVoice = this._hoveredTrack.parent;
-
-            if (clickedVoice && hoveredVoice) {
-                let clickedTrackIndex = clickedVoice.children.indexOf(
-                    this._clickedTrack
-                );
-                let hoveredTrackIndex = hoveredVoice.children.indexOf(
-                    this._hoveredTrack
-                );
-                if (clickedVoice == hoveredVoice) {
-                    let minTrackIndex = Math.min(
-                        clickedTrackIndex,
-                        hoveredTrackIndex
-                    );
-                    let maxTrackIndex = Math.max(
-                        clickedTrackIndex,
-                        hoveredTrackIndex
-                    );
-
-                    tracks = clickedVoice.children.slice(
-                        minTrackIndex,
-                        maxTrackIndex + 1
-                    );
-                } else {
-                    let timeline = clickedVoice.parent!;
-
-                    let clickedVoiceIndex =
-                        timeline.children.indexOf(clickedVoice);
-                    let hoveredVoiceIndex =
-                        timeline.children.indexOf(hoveredVoice);
-
-                    let minVoiceIndex = Math.min(
-                        clickedVoiceIndex,
-                        hoveredVoiceIndex
-                    );
-                    let maxVoiceIndex = Math.max(
-                        clickedVoiceIndex,
-                        hoveredVoiceIndex
-                    );
-
-                    tracks = timeline.children
-                        .slice(minVoiceIndex + 1, maxVoiceIndex)
-                        .map((voice) => {
-                            return voice.children;
-                        })
-                        .flat();
-
-                    if (clickedVoiceIndex < hoveredVoiceIndex) {
-                        tracks = tracks.concat(
-                            clickedVoice.children.slice(
-                                clickedTrackIndex,
-                                clickedVoice.children.length
-                            )
-                        );
-                        tracks = tracks.concat(
-                            hoveredVoice.children.slice(
-                                0,
-                                hoveredTrackIndex + 1
-                            )
-                        );
-                    } else {
-                        tracks = tracks.concat(
-                            clickedVoice.children.slice(
-                                0,
-                                clickedTrackIndex + 1
-                            )
-                        );
-                        tracks = tracks.concat(
-                            hoveredVoice.children.slice(
-                                hoveredTrackIndex,
-                                hoveredVoice.children.length
-                            )
-                        );
-                    }
-                }
-            }
             let clickedBeat = Math.round(this._clickedPos / 64);
             let hoveredBeat = Math.round(this._hoveredPos / 64);
+
+            if (clickedBeat == hoveredBeat) {
+                return;
+            }
+
+            let timeline = get(this._store);
+
+            let tracks = timeline.getTracksBetween(
+                this._clickedTrack,
+                this._hoveredTrack
+            );
+
+            if (tracks == null) {
+                return;
+            }
 
             let minBeat = Math.min(clickedBeat, hoveredBeat);
             let maxBeat = Math.max(clickedBeat, hoveredBeat);
 
             this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
 
+            this._selectedItems = [];
+
             this._store.update((value) => {
                 return value;
             });
         }
+    }
+
+    selectItem(item: ItemModel) {
+        this._selectedItems = [item];
+
+        this.highlight = null;
+
+        this._store.update((value) => {
+            return value;
+        });
+
+        this._clickWasSelect = true;
+    }
+
+    selectItemAdditive(item: ItemModel) {
+        this._selectedItems.push(item);
+
+        this.highlight = null;
+
+        this._store.update((value) => {
+            return value;
+        });
+
+        this._clickWasSelect = true;
+    }
+
+    deselectItem(item: ItemModel) {
+        this._selectedItems = this._selectedItems.filter((x) => {
+            return x !== item;
+        });
+
+        this.highlight = null;
+
+        this._store.update((value) => {
+            return value;
+        });
+
+        this._clickWasSelect = true;
+    }
+
+    get selectedItems() {
+        return this._selectedItems;
     }
 
     constructor(private _store: Writable<TimelineModel>) {
@@ -133,6 +119,8 @@ export class Controller {
         document.addEventListener("mouseup", (_) => {
             this._clickedPos = null;
             this._clickedTrack = null;
+
+            this._clickWasSelect = false;
         });
 
         document.addEventListener("mousemove", (event) => {
@@ -178,11 +166,17 @@ export class Controller {
                     );
                 });
                 this.highlight = null;
-
-                this._store.update((value) => {
-                    return value;
-                });
             }
+
+            this._selectedItems.forEach((item) => {
+                item.parent = null;
+            });
+
+            this._selectedItems = [];
+
+            this._store.update((value) => {
+                return value;
+            });
         });
     }
 }
