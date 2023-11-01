@@ -159,13 +159,12 @@ export class Controller {
                     );
                     track.addChild(newItem);
                 });
+                this.highlight = null;
+
+                this._store.update((value) => {
+                    return value;
+                });
             }
-
-            this.highlight = null;
-
-            this._store.update((value) => {
-                return value;
-            });
         });
 
         listen("delete", (_) => {
@@ -176,13 +175,12 @@ export class Controller {
                         this.highlight!.end
                     );
                 });
+                this.highlight = null;
+
+                this._store.update((value) => {
+                    return value;
+                });
             }
-
-            this.highlight = null;
-
-            this._store.update((value) => {
-                return value;
-            });
         });
     }
 }
