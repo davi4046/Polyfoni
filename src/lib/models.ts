@@ -130,69 +130,57 @@ enum TrackType {
 
 export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
     clearInterval(start: number, end: number) {
-        //index of last item starting before interval
-        let i = this.children.findLastIndex((item) => {
+        this.children.sort((a, b) => {
+            if (a.start < b.start) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        //last item starting before interval
+        let i = this.children.findLast((item) => {
             return item.start < start;
         });
-        //index of first item ending after interval
-        let j = this.children.findIndex((item) => {
+        //first item ending after interval
+        let j = this.children.find((item) => {
             return item.end > end;
         });
 
-        if (i == j && i != -1 && j != -1) {
+        if (i == j && i != null) {
             //because i and j is the same item, we split it
             let itemCopy: ItemModel = Object.assign(
-                Object.create(Object.getPrototypeOf(this.children[i])),
-                this.children[i]
+                Object.create(Object.getPrototypeOf(i)),
+                i
             );
 
-            this.children[i].end = start;
+            i.end = start;
 
             itemCopy.start = end;
 
             super.addChild(itemCopy);
         } else {
             //remove items between i and j
-            if (i == -1 && j == -1) {
-                this.children.forEach((child) => {
-                    this.removeChild(child);
+            this.children
+                .slice(
+                    i != null ? this.children.indexOf(i) + 1 : 0,
+                    j != null ? this.children.indexOf(j) : this.children.length
+                )
+                .forEach((child) => {
+                    super.removeChild(child);
                 });
-            } else if (i == -1) {
-                this.children.slice(0, j).forEach((child) => {
-                    this.removeChild(child);
-                });
-            } else if (j == -1) {
-                this.children.slice(i + 1).forEach((child) => {
-                    this.removeChild(child);
-                });
-            } else {
-                this.children.slice(i + 1, j).forEach((child) => {
-                    this.removeChild(child);
-                });
-            }
             //crop i and j so they aren't overlapping the interval
-            if (i != -1) {
-                this.children[i].end = Math.min(start, this.children[i].end);
+            if (i != null) {
+                i.end = Math.min(start, i.end);
             }
-            if (j != -1) {
-                this.children[j].start = Math.max(end, this.children[j].start);
+            if (j != null) {
+                j.start = Math.max(end, j.start);
             }
         }
     }
 
-    addChild(child: ItemModel): void {
+    addChild(child: ItemModel) {
         this.clearInterval(child.start, child.end);
-
         super.addChild(child);
-
-        this.children.sort((a, b) => {
-            if (a.start < b.start) {
-                return -1;
-            } else if (a.start > b.start) {
-                return 1;
-            }
-            return 0;
-        });
     }
 
     constructor(
