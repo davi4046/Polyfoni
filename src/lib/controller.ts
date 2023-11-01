@@ -12,11 +12,6 @@ export class Controller {
 
     public highlight: HighlightModel | null = null;
 
-    setHoveredPos(newPos: number) {
-        this._hoveredPos = newPos;
-        this.updateHighlight();
-    }
-
     setHoveredTrack(newTrack: TrackModel) {
         this._hoveredTrack = newTrack;
         this.updateHighlight();
@@ -145,9 +140,16 @@ export class Controller {
                 document.getElementsByClassName("cursor-area")[0]
             );
 
-            this.setHoveredPos(
-                event.screenX - cursorArea.offsetLeft + cursorArea.scrollLeft
+            let newPos =
+                event.screenX - cursorArea.offsetLeft + cursorArea.scrollLeft;
+
+            newPos = Math.min(
+                Math.max(newPos, 0),
+                cursorArea.offsetWidth + cursorArea.scrollLeft
             );
+
+            this._hoveredPos = newPos;
+            this.updateHighlight();
         });
 
         listen("insert", (_) => {
