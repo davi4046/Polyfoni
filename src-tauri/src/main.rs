@@ -9,9 +9,9 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
             )
         )
-        .add_submenu(Submenu::new("Edit", Menu::new()
-            .add_item(CustomMenuItem::new("insert".to_string(), "Insert"))
-            .add_item(CustomMenuItem::new("delete".to_string(), "Delete"))
+        .add_submenu(Submenu::new("Selection", Menu::new()
+            .add_item(CustomMenuItem::new("insert".to_string(), "Insert Empty Item(s)").accelerator("CmdOrCtrl+I"))
+            .add_item(CustomMenuItem::new("delete".to_string(), "Delete").accelerator("Delete"))
             )  
         )
 }
