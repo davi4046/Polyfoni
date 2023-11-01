@@ -1,6 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 
-import { ItemModel, TimelineModel, TrackModel } from "./models";
+import { HighlightModel, ItemModel, TimelineModel, TrackModel } from "./models";
 
 import type { Writable } from "svelte/store";
 export class Controller {
@@ -10,7 +10,7 @@ export class Controller {
     private _hoveredPos: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
 
-    public highlight: Highlight | null = null;
+    public highlight: HighlightModel | null = null;
 
     setHoveredPos(newPos: number) {
         this._hoveredPos = newPos;
@@ -114,7 +114,7 @@ export class Controller {
             let minBeat = Math.min(clickedBeat, hoveredBeat);
             let maxBeat = Math.max(clickedBeat, hoveredBeat);
 
-            this.highlight = new Highlight(minBeat, maxBeat, tracks);
+            this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
 
             this._store.update((value) => {
                 return value;
@@ -185,12 +185,4 @@ export class Controller {
             });
         });
     }
-}
-
-class Highlight {
-    constructor(
-        public start: number,
-        public end: number,
-        public tracks: TrackModel[]
-    ) {}
 }
