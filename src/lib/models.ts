@@ -204,9 +204,45 @@ export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
 }
 
 export class ItemModel extends TimelineNode<TrackModel, null> {
+    set start(newStart: number) {
+        if (newStart < this._start) {
+            this.parent?.clearInterval(newStart, this._start);
+        }
+        this._start = newStart;
+        if (this._end - this._start <= 0) {
+            this.parent = null;
+        }
+    }
+
+    get start() {
+        return this._start;
+    }
+
+    set end(newEnd: number) {
+        if (newEnd > this._end) {
+            this.parent?.clearInterval(this._end, newEnd);
+        }
+        this._end = newEnd;
+        if (this._end - this._start <= 0) {
+            this.parent = null;
+        }
+    }
+
+    get end() {
+        return this._end;
+    }
+
+    move(newStart: number) {
+        let length = this._end - this._start;
+        let newEnd = newStart + length;
+        this.parent?.clearInterval(newStart, newEnd);
+        this._start = newStart;
+        this._end = newEnd;
+    }
+
     constructor(
-        public start: number,
-        public end: number
+        private _start: number,
+        private _end: number
     ) {
         super();
     }
