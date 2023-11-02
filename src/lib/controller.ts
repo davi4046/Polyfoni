@@ -13,7 +13,7 @@ export class Controller {
     private _hoveredTrack: TrackModel | null = null;
 
     private _selectedItems: ItemModel[] = [];
-    private _clickWasSelect = false;
+    private _clickedOnItem = false;
 
     public highlight: HighlightModel | null = null;
 
@@ -28,7 +28,7 @@ export class Controller {
             this._hoveredTrack &&
             this._clickedPos &&
             this._clickedTrack &&
-            !this._clickWasSelect
+            !this._clickedOnItem
         ) {
             let clickedBeat = Math.round(this._clickedPos / 64);
             let hoveredBeat = Math.round(this._hoveredPos / 64);
@@ -70,7 +70,7 @@ export class Controller {
             return value;
         });
 
-        this._clickWasSelect = true;
+        this._clickedOnItem = true;
     }
 
     selectItemAdditive(item: ItemModel) {
@@ -82,7 +82,7 @@ export class Controller {
             return value;
         });
 
-        this._clickWasSelect = true;
+        this._clickedOnItem = true;
     }
 
     deselectItem(item: ItemModel) {
@@ -96,7 +96,7 @@ export class Controller {
             return value;
         });
 
-        this._clickWasSelect = true;
+        this._clickedOnItem = true;
     }
 
     get selectedItems() {
@@ -120,7 +120,7 @@ export class Controller {
             this._clickedPos = null;
             this._clickedTrack = null;
 
-            this._clickWasSelect = false;
+            this._clickedOnItem = false;
         });
 
         document.addEventListener("mousemove", (event) => {
