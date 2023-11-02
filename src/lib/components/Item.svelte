@@ -9,7 +9,8 @@
     style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
 >
     <div
-        class="flex items-center h-full p-2 bg-green-500 border-2 border-green-600"
+        class="flex items-center h-full p-2 bg-green-500 border-2"
+        class:border-green-600={!data.isSelected()}
         class:border-blue-500={data.isSelected()}
         on:mousedown={(event) => {
             if (event.shiftKey) {
