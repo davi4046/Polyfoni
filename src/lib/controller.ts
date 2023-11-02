@@ -20,7 +20,7 @@ export class Controller {
     }
 
     setHoveredTrack(newTrack: TrackModel) {
-        this._hoverCursor.y = newTrack;
+        this._hoverCursor.track = newTrack;
     }
 
     selectItem(item: ItemModel) {
@@ -62,13 +62,13 @@ export class Controller {
     }
 
     private makeHighlight(from: TimelinePosition, to: TimelinePosition) {
-        if (from.x == to.x) {
+        if (from.beat == to.beat) {
             return;
         }
 
         let timeline = get(this._store);
 
-        let tracks = timeline.getTracksFromTo(from.y, to.y);
+        let tracks = timeline.getTracksFromTo(from.track, to.track);
 
         if (tracks == null) {
             return;
@@ -76,8 +76,8 @@ export class Controller {
 
         console.log("to:", to);
 
-        let minBeat = Math.floor(Math.min(from.x, to.x));
-        let maxBeat = Math.ceil(Math.max(from.x, to.x));
+        let minBeat = Math.floor(Math.min(from.beat, to.beat));
+        let maxBeat = Math.ceil(Math.max(from.beat, to.beat));
 
         this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
 
@@ -106,17 +106,17 @@ export class Controller {
             if (event.button != 0) {
                 return;
             }
-            if (this._hoverCursor.x) {
-                this._clickCursor.x = this._hoverCursor.x;
+            if (this._hoverCursor.beat) {
+                this._clickCursor.beat = this._hoverCursor.beat;
             }
-            if (this._hoverCursor.y) {
-                this._clickCursor.y = this._hoverCursor.y;
+            if (this._hoverCursor.track) {
+                this._clickCursor.track = this._hoverCursor.track;
             }
         });
 
         document.addEventListener("mouseup", (_) => {
-            this._clickCursor.x = null;
-            this._clickCursor.y = null;
+            this._clickCursor.beat = null;
+            this._clickCursor.track = null;
             this._clickedOnItem = false;
         });
 
@@ -131,7 +131,7 @@ export class Controller {
 
             let beat = Math.min(Math.max(pos / 64, 0), timeline.length);
 
-            this._hoverCursor.x = beat;
+            this._hoverCursor.beat = beat;
             this.drag();
         });
 
@@ -185,12 +185,12 @@ export class HighlightModel {
 }
 
 class TimelineCursor {
-    public x: number | null = null;
-    public y: TrackModel | null = null;
+    public beat: number | null = null;
+    public track: TrackModel | null = null;
 
     getPosition() {
-        if (this.x != null && this.y != null) {
-            return new TimelinePosition(this.x, this.y);
+        if (this.beat != null && this.track != null) {
+            return new TimelinePosition(this.beat, this.track);
         } else {
             return null;
         }
@@ -199,7 +199,7 @@ class TimelineCursor {
 
 class TimelinePosition {
     constructor(
-        public x: number,
-        public y: TrackModel
+        public beat: number,
+        public track: TrackModel
     ) {}
 }
