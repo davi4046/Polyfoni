@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 
 import { listen } from "@tauri-apps/api/event";
 
-import { ItemModel, TimelineModel, TrackModel } from "./models";
+import { ItemModel, TimelineModel, TrackModel, VoiceModel } from "./models";
 
 import type { Writable } from "svelte/store";
 
@@ -119,6 +119,10 @@ export class Controller {
                 this._clickedTrack &&
                 this._clickedItem
             ) {
+                let timeline = get(this._store);
+
+                /* Calculate Beat Offset */
+
                 let minBeat = this._selectedItems[0].start;
                 let maxBeat = this._selectedItems[0].end;
 
@@ -135,25 +139,19 @@ export class Controller {
                     this._hoveredBeat - this._clickedBeat
                 );
 
-                let timeline = get(this._store);
-
                 beatOffset = Math.max(beatOffset, -minBeat);
                 beatOffset = Math.min(beatOffset, timeline.length - maxBeat);
 
-                const getTrackIndex = (track: TrackModel) => {
-                    return track.parent!.children.indexOf(track);
-                };
+                /* Calculate Track Offset */
 
-                let clickedTrackIndex = getTrackIndex(this._clickedTrack);
-                let hoveredTrackIndex = getTrackIndex(this._hoveredTrack);
+                let clickedTrackIndex = this._clickedTrack.getIndex()!;
+                let hoveredTrackIndex = this._hoveredTrack.getIndex()!;
 
-                let minTrackIndex = getTrackIndex(
-                    this._selectedItems[0].parent!
-                );
+                let minTrackIndex = this._selectedItems[0].parent!.getIndex()!;
                 let maxTrackIndex = minTrackIndex;
 
                 this._selectedItems.forEach((item) => {
-                    let trackIndex = getTrackIndex(item.parent!);
+                    let trackIndex = item.parent!.getIndex()!;
 
                     if (trackIndex < minTrackIndex) {
                         minTrackIndex = trackIndex;
@@ -164,16 +162,48 @@ export class Controller {
                     }
                 });
 
-                let newVoice = this._hoveredTrack.parent!;
-                let trackCount = newVoice.children.length;
+                const tracksPerVoice = 5; //IMPORTANT: Update if number of tracks per voice increases
 
-                //number of tracks to move each item (either positive or negative)
                 let trackOffset = hoveredTrackIndex - clickedTrackIndex;
+
                 trackOffset = Math.max(trackOffset, -minTrackIndex);
                 trackOffset = Math.min(
                     trackOffset,
-                    trackCount - 1 - maxTrackIndex
+                    tracksPerVoice - 1 - maxTrackIndex
                 );
+
+                /* Calculate Voice Offset */
+
+                let clickedVoiceIndex = this._clickedTrack.parent!.getIndex()!;
+                let hoveredVoiceIndex = this._hoveredTrack.parent!.getIndex()!;
+
+                let minVoiceIndex =
+                    this._selectedItems[0].parent!.parent!.getIndex()!;
+                let maxVoiceIndex = minVoiceIndex;
+
+                this._selectedItems.forEach((item) => {
+                    let voiceIndex = item.parent!.parent!.getIndex()!;
+
+                    if (voiceIndex < minVoiceIndex) {
+                        minVoiceIndex = voiceIndex;
+                    }
+
+                    if (voiceIndex > maxVoiceIndex) {
+                        maxVoiceIndex = voiceIndex;
+                    }
+                });
+
+                let voiceCount = timeline.children.length;
+
+                let voiceOffset = hoveredVoiceIndex - clickedVoiceIndex;
+
+                voiceOffset = Math.max(voiceOffset, -minVoiceIndex);
+                voiceOffset = Math.min(
+                    voiceOffset,
+                    voiceCount - 1 - maxVoiceIndex
+                );
+
+                /* Perform Move */
 
                 //sort items to avoid them clearing each other on move
                 this._selectedItems.sort((a, b) => {
@@ -185,12 +215,15 @@ export class Controller {
                 });
 
                 this._selectedItems.forEach((item) => {
-                    let newTrackIndex =
-                        getTrackIndex(item.parent!) + trackOffset;
-
-                    let newTrack = newVoice.children[newTrackIndex];
-
                     let newStart = item.start + beatOffset;
+                    let newTrackIndex = item.parent!.getIndex()! + trackOffset;
+                    let newVoiceIndex =
+                        item.parent!.parent!.getIndex()! + voiceOffset;
+
+                    let newTrack =
+                        timeline.children[newVoiceIndex].children[
+                            newTrackIndex
+                        ];
 
                     item.move(newStart, newTrack);
                 });

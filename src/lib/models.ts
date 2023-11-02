@@ -55,6 +55,10 @@ abstract class TreeNode<
             }
         }
     }
+
+    getIndex() {
+        return this._parent?.children.indexOf(this);
+    }
 }
 
 abstract class TimelineNode<
