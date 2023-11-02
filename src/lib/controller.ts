@@ -5,60 +5,22 @@ import { listen } from "@tauri-apps/api/event";
 import { HighlightModel, ItemModel, TimelineModel, TrackModel } from "./models";
 
 import type { Writable } from "svelte/store";
-export class Controller {
-    private _clickedPos: number | null = null;
-    private _clickedTrack: TrackModel | null = null;
 
-    private _hoveredPos: number | null = null;
-    private _hoveredTrack: TrackModel | null = null;
+export class Controller {
+    private _hoverCursor = new TimelineCursor();
+    private _clickCursor = new TimelineCursor();
 
     private _selectedItems: ItemModel[] = [];
     private _clickedOnItem = false;
 
     public highlight: HighlightModel | null = null;
 
-    setHoveredTrack(newTrack: TrackModel) {
-        this._hoveredTrack = newTrack;
-        this.updateHighlight();
+    get selectedItems() {
+        return this._selectedItems;
     }
 
-    updateHighlight() {
-        if (
-            this._hoveredPos &&
-            this._hoveredTrack &&
-            this._clickedPos &&
-            this._clickedTrack &&
-            !this._clickedOnItem
-        ) {
-            let clickedBeat = Math.round(this._clickedPos / 64);
-            let hoveredBeat = Math.round(this._hoveredPos / 64);
-
-            if (clickedBeat == hoveredBeat) {
-                return;
-            }
-
-            let timeline = get(this._store);
-
-            let tracks = timeline.getTracksFromTo(
-                this._clickedTrack,
-                this._hoveredTrack
-            );
-
-            if (tracks == null) {
-                return;
-            }
-
-            let minBeat = Math.min(clickedBeat, hoveredBeat);
-            let maxBeat = Math.max(clickedBeat, hoveredBeat);
-
-            this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
-
-            this._selectedItems = [];
-
-            this._store.update((value) => {
-                return value;
-            });
-        }
+    setHoveredTrack(newTrack: TrackModel) {
+        this._hoverCursor.y = newTrack;
     }
 
     selectItem(item: ItemModel) {
@@ -99,8 +61,45 @@ export class Controller {
         this._clickedOnItem = true;
     }
 
-    get selectedItems() {
-        return this._selectedItems;
+    private makeHighlight(from: TimelinePosition, to: TimelinePosition) {
+        let clickedBeat = Math.round(from.x / 64);
+        let hoveredBeat = Math.round(to.x / 64);
+
+        if (clickedBeat == hoveredBeat) {
+            return;
+        }
+
+        let timeline = get(this._store);
+
+        let tracks = timeline.getTracksFromTo(from.y, to.y);
+
+        if (tracks == null) {
+            return;
+        }
+
+        let minBeat = Math.min(clickedBeat, hoveredBeat);
+        let maxBeat = Math.max(clickedBeat, hoveredBeat);
+
+        this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
+
+        this._selectedItems = [];
+
+        this._store.update((value) => {
+            return value;
+        });
+    }
+
+    private drag() {
+        let hoveredPosition = this._hoverCursor.getPosition();
+        let clickedPosition = this._clickCursor.getPosition();
+
+        if (hoveredPosition && clickedPosition) {
+            if (this._clickedOnItem) {
+                //perform item move
+            } else {
+                this.makeHighlight(clickedPosition, hoveredPosition);
+            }
+        }
     }
 
     constructor(private _store: Writable<TimelineModel>) {
@@ -108,18 +107,17 @@ export class Controller {
             if (event.button != 0) {
                 return;
             }
-            if (this._hoveredPos) {
-                this._clickedPos = this._hoveredPos;
+            if (this._hoverCursor.x) {
+                this._clickCursor.x = this._hoverCursor.x;
             }
-            if (this._hoveredTrack) {
-                this._clickedTrack = this._hoveredTrack;
+            if (this._hoverCursor.y) {
+                this._clickCursor.y = this._hoverCursor.y;
             }
         });
 
         document.addEventListener("mouseup", (_) => {
-            this._clickedPos = null;
-            this._clickedTrack = null;
-
+            this._clickCursor.x = null;
+            this._clickCursor.y = null;
             this._clickedOnItem = false;
         });
 
@@ -136,8 +134,8 @@ export class Controller {
                 cursorArea.offsetWidth + cursorArea.scrollLeft
             );
 
-            this._hoveredPos = newPos;
-            this.updateHighlight();
+            this._hoverCursor.x = newPos;
+            this.drag();
         });
 
         listen("insert", (_) => {
@@ -179,4 +177,24 @@ export class Controller {
             });
         });
     }
+}
+
+class TimelineCursor {
+    public x: number | null = null;
+    public y: TrackModel | null = null;
+
+    getPosition() {
+        if (this.x && this.y) {
+            return new TimelinePosition(this.x, this.y);
+        } else {
+            return null;
+        }
+    }
+}
+
+class TimelinePosition {
+    constructor(
+        public x: number,
+        public y: TrackModel
+    ) {}
 }
