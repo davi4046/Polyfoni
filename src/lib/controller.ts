@@ -119,9 +119,26 @@ export class Controller {
                 this._clickedTrack &&
                 this._clickedItem
             ) {
+                let minBeat = this._selectedItems[0].start;
+                let maxBeat = this._selectedItems[0].end;
+
+                this._selectedItems.forEach((item) => {
+                    if (item.start < minBeat) {
+                        minBeat = item.start;
+                    }
+                    if (item.end > maxBeat) {
+                        maxBeat = item.end;
+                    }
+                });
+
                 let beatOffset = Math.round(
                     this._hoveredBeat - this._clickedBeat
                 );
+
+                let timeline = get(this._store);
+
+                beatOffset = Math.max(beatOffset, -minBeat);
+                beatOffset = Math.min(beatOffset, timeline.length - maxBeat);
 
                 const getTrackIndex = (track: TrackModel) => {
                     return track.parent!.children.indexOf(track);
@@ -137,9 +154,12 @@ export class Controller {
 
                 this._selectedItems.forEach((item) => {
                     let trackIndex = getTrackIndex(item.parent!);
+
                     if (trackIndex < minTrackIndex) {
                         minTrackIndex = trackIndex;
-                    } else if (trackIndex > maxTrackIndex) {
+                    }
+
+                    if (trackIndex > maxTrackIndex) {
                         maxTrackIndex = trackIndex;
                     }
                 });
