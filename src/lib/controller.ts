@@ -7,8 +7,11 @@ import { ItemModel, TimelineModel, TrackModel } from "./models";
 import type { Writable } from "svelte/store";
 
 export class Controller {
-    private _hoverCursor = new TimelineCursor();
-    private _clickCursor = new TimelineCursor();
+    private _hoveredBeat: number | null = null;
+    private _hoveredTrack: TrackModel | null = null;
+
+    private _clickedBeat: number | null = null;
+    private _clickedTrack: TrackModel | null = null;
 
     private _selectedItems: ItemModel[] = [];
     private _clickedOnItem = false;
@@ -20,7 +23,7 @@ export class Controller {
     }
 
     setHoveredTrack(newTrack: TrackModel) {
-        this._hoverCursor.track = newTrack;
+        this._hoveredTrack = newTrack;
     }
 
     selectItem(item: ItemModel) {
@@ -61,23 +64,26 @@ export class Controller {
         this._clickedOnItem = true;
     }
 
-    private makeHighlight(from: TimelinePosition, to: TimelinePosition) {
-        if (from.beat == to.beat) {
+    private makeHighlight(
+        fromBeat: number,
+        toBeat: number,
+        fromTrack: TrackModel,
+        toTrack: TrackModel
+    ) {
+        if (fromBeat == toBeat) {
             return;
         }
 
         let timeline = get(this._store);
 
-        let tracks = timeline.getTracksFromTo(from.track, to.track);
+        let tracks = timeline.getTracksFromTo(fromTrack, toTrack);
 
         if (tracks == null) {
             return;
         }
 
-        console.log("to:", to);
-
-        let minBeat = Math.floor(Math.min(from.beat, to.beat));
-        let maxBeat = Math.ceil(Math.max(from.beat, to.beat));
+        let minBeat = Math.floor(Math.min(fromBeat, toBeat));
+        let maxBeat = Math.ceil(Math.max(fromBeat, toBeat));
 
         this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
 
@@ -89,14 +95,21 @@ export class Controller {
     }
 
     private drag() {
-        let hoveredPosition = this._hoverCursor.getPosition();
-        let clickedPosition = this._clickCursor.getPosition();
-
-        if (hoveredPosition && clickedPosition) {
+        if (
+            this._hoveredBeat &&
+            this._hoveredTrack &&
+            this._clickedBeat &&
+            this._clickedTrack
+        ) {
             if (this._clickedOnItem) {
                 //perform item move
             } else {
-                this.makeHighlight(clickedPosition, hoveredPosition);
+                this.makeHighlight(
+                    this._clickedBeat,
+                    this._hoveredBeat,
+                    this._clickedTrack,
+                    this._hoveredTrack
+                );
             }
         }
     }
@@ -106,17 +119,76 @@ export class Controller {
             if (event.button != 0) {
                 return;
             }
-            if (this._hoverCursor.beat) {
-                this._clickCursor.beat = this._hoverCursor.beat;
+            if (this._hoveredBeat) {
+                this._clickedBeat = this._hoveredBeat;
             }
-            if (this._hoverCursor.track) {
-                this._clickCursor.track = this._hoverCursor.track;
+            if (this._hoveredTrack) {
+                this._clickedTrack = this._hoveredTrack;
             }
         });
 
         document.addEventListener("mouseup", (_) => {
-            this._clickCursor.beat = null;
-            this._clickCursor.track = null;
+            if (
+                this._hoveredBeat &&
+                this._hoveredTrack &&
+                this._clickedBeat &&
+                this._clickedTrack &&
+                this._clickedOnItem
+            ) {
+                let beatOffset = Math.round(
+                    this._hoveredBeat - this._clickedBeat
+                );
+
+                const getTrackIndex = (track: TrackModel) => {
+                    return track.parent!.children.indexOf(track);
+                };
+
+                let clickedTrackIndex = getTrackIndex(this._clickedTrack);
+                let hoveredTrackIndex = getTrackIndex(this._hoveredTrack);
+
+                let minTrackIndex = getTrackIndex(
+                    this._selectedItems[0].parent!
+                );
+                let maxTrackIndex = minTrackIndex;
+
+                this._selectedItems.forEach((item) => {
+                    let trackIndex = getTrackIndex(item.parent!);
+                    if (trackIndex < minTrackIndex) {
+                        minTrackIndex = trackIndex;
+                    } else if (trackIndex > maxTrackIndex) {
+                        maxTrackIndex = trackIndex;
+                    }
+                });
+
+                let newVoice = this._hoveredTrack.parent!;
+                let trackCount = newVoice.children.length;
+
+                //number of tracks to move each item (either positive or negative)
+                let trackOffset = hoveredTrackIndex - clickedTrackIndex;
+                trackOffset = Math.max(trackOffset, -minTrackIndex);
+                trackOffset = Math.min(
+                    trackOffset,
+                    trackCount - 1 - maxTrackIndex
+                );
+
+                this._selectedItems.forEach((item) => {
+                    let newTrackIndex =
+                        getTrackIndex(item.parent!) + trackOffset;
+
+                    let newTrack = newVoice.children[newTrackIndex];
+
+                    let newStart = item.start + beatOffset;
+
+                    item.move(newStart, newTrack);
+                });
+
+                this._store.update((value) => {
+                    return value;
+                });
+            }
+
+            this._clickedBeat = null;
+            this._clickedTrack = null;
             this._clickedOnItem = false;
         });
 
@@ -131,7 +203,7 @@ export class Controller {
 
             let beat = Math.min(Math.max(pos / 64, 0), timeline.length);
 
-            this._hoverCursor.beat = beat;
+            this._hoveredBeat = beat;
             this.drag();
         });
 
@@ -181,25 +253,5 @@ export class HighlightModel {
         public start: number,
         public end: number,
         public tracks: TrackModel[]
-    ) {}
-}
-
-class TimelineCursor {
-    public beat: number | null = null;
-    public track: TrackModel | null = null;
-
-    getPosition() {
-        if (this.beat != null && this.track != null) {
-            return new TimelinePosition(this.beat, this.track);
-        } else {
-            return null;
-        }
-    }
-}
-
-class TimelinePosition {
-    constructor(
-        public beat: number,
-        public track: TrackModel
     ) {}
 }

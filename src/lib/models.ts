@@ -281,12 +281,13 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
         return this._end;
     }
 
-    move(newStart: number) {
-        let length = this._end - this._start;
-        let newEnd = newStart + length;
-        this.parent?.clearInterval(newStart, newEnd);
+    move(newStart: number, newTrack: TrackModel) {
+        let newEnd = newStart + this._end - this._start;
+
         this._start = newStart;
         this._end = newEnd;
+
+        this.parent = newTrack;
     }
 
     isSelected() {
