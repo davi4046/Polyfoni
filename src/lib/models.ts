@@ -119,15 +119,13 @@ export class TimelineModel extends TimelineNode<null, VoiceModel> {
                         maxTrackIndex + 1
                     );
                 } else {
-                    let timeline = fromVoice.parent;
-
-                    let fromVoiceIndex = timeline.children.indexOf(fromVoice);
-                    let toVoiceIndex = timeline.children.indexOf(toVoice);
+                    let fromVoiceIndex = this.children.indexOf(fromVoice);
+                    let toVoiceIndex = this.children.indexOf(toVoice);
 
                     let minVoiceIndex = Math.min(fromVoiceIndex, toVoiceIndex);
                     let maxVoiceIndex = Math.max(fromVoiceIndex, toVoiceIndex);
 
-                    tracks = timeline.children
+                    tracks = this.children
                         .slice(minVoiceIndex + 1, maxVoiceIndex)
                         .map((voice) => {
                             return voice.children;
