@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 
 import { listen } from "@tauri-apps/api/event";
 
-import { HighlightModel, ItemModel, TimelineModel, TrackModel } from "./models";
+import { ItemModel, TimelineModel, TrackModel } from "./models";
 
 import type { Writable } from "svelte/store";
 
@@ -177,6 +177,14 @@ export class Controller {
             });
         });
     }
+}
+
+export class HighlightModel {
+    constructor(
+        public start: number,
+        public end: number,
+        public tracks: TrackModel[]
+    ) {}
 }
 
 class TimelineCursor {
