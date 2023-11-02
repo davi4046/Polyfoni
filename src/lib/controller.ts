@@ -155,6 +155,15 @@ export class Controller {
                     trackCount - 1 - maxTrackIndex
                 );
 
+                //sort items to avoid them clearing each other on move
+                this._selectedItems.sort((a, b) => {
+                    if (a.start > b.start) {
+                        return beatOffset > 0 ? -1 : 1;
+                    } else {
+                        return beatOffset > 0 ? 1 : -1;
+                    }
+                });
+
                 this._selectedItems.forEach((item) => {
                     let newTrackIndex =
                         getTrackIndex(item.parent!) + trackOffset;
