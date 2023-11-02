@@ -9,12 +9,13 @@ import type { Writable } from "svelte/store";
 export class Controller {
     private _hoveredBeat: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
+    private _hoveredItem: ItemModel | null = null;
 
     private _clickedBeat: number | null = null;
     private _clickedTrack: TrackModel | null = null;
+    private _clickedItem: ItemModel | null = null;
 
     private _selectedItems: ItemModel[] = [];
-    private _clickedOnItem = false;
 
     public highlight: HighlightModel | null = null;
 
@@ -22,46 +23,12 @@ export class Controller {
         return this._selectedItems;
     }
 
-    setHoveredTrack(newTrack: TrackModel) {
+    setHoveredItem(newItem: ItemModel | null) {
+        this._hoveredItem = newItem;
+    }
+
+    setHoveredTrack(newTrack: TrackModel | null) {
         this._hoveredTrack = newTrack;
-    }
-
-    selectItem(item: ItemModel) {
-        this._selectedItems = [item];
-
-        this.highlight = null;
-
-        this._store.update((value) => {
-            return value;
-        });
-
-        this._clickedOnItem = true;
-    }
-
-    selectItemAdditive(item: ItemModel) {
-        this._selectedItems.push(item);
-
-        this.highlight = null;
-
-        this._store.update((value) => {
-            return value;
-        });
-
-        this._clickedOnItem = true;
-    }
-
-    deselectItem(item: ItemModel) {
-        this._selectedItems = this._selectedItems.filter((x) => {
-            return x !== item;
-        });
-
-        this.highlight = null;
-
-        this._store.update((value) => {
-            return value;
-        });
-
-        this._clickedOnItem = true;
     }
 
     private makeHighlight(
@@ -101,7 +68,7 @@ export class Controller {
             this._clickedBeat &&
             this._clickedTrack
         ) {
-            if (this._clickedOnItem) {
+            if (this._clickedItem) {
                 //perform item move
             } else {
                 this.makeHighlight(
@@ -125,6 +92,23 @@ export class Controller {
             if (this._hoveredTrack) {
                 this._clickedTrack = this._hoveredTrack;
             }
+            if (this._hoveredItem) {
+                this._clickedItem = this._hoveredItem;
+
+                if (event.shiftKey) {
+                    if (!this._hoveredItem.isSelected()) {
+                        this._selectedItems.push(this._hoveredItem);
+                    }
+                } else {
+                    this._selectedItems = [this._hoveredItem];
+                }
+
+                this.highlight = null;
+
+                this._store.update((value) => {
+                    return value;
+                });
+            }
         });
 
         document.addEventListener("mouseup", (_) => {
@@ -133,7 +117,7 @@ export class Controller {
                 this._hoveredTrack &&
                 this._clickedBeat &&
                 this._clickedTrack &&
-                this._clickedOnItem
+                this._clickedItem
             ) {
                 let beatOffset = Math.round(
                     this._hoveredBeat - this._clickedBeat
@@ -181,15 +165,15 @@ export class Controller {
 
                     item.move(newStart, newTrack);
                 });
-
-                this._store.update((value) => {
-                    return value;
-                });
             }
+
+            this._store.update((value) => {
+                return value;
+            });
 
             this._clickedBeat = null;
             this._clickedTrack = null;
-            this._clickedOnItem = false;
+            this._clickedItem = null;
         });
 
         document.addEventListener("mousemove", (event) => {
