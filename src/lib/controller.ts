@@ -39,7 +39,7 @@ export class Controller {
 
             let timeline = get(this._store);
 
-            let tracks = timeline.getTracksBetween(
+            let tracks = timeline.getTracksFromTo(
                 this._clickedTrack,
                 this._hoveredTrack
             );

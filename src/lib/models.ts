@@ -99,7 +99,7 @@ export class TimelineModel extends TimelineNode<null, VoiceModel> {
 
     public store = writable(this);
 
-    getTracksBetween(fromTrack: TrackModel, toTrack: TrackModel) {
+    getTracksFromTo(fromTrack: TrackModel, toTrack: TrackModel) {
         let tracks: TrackModel[] = [];
 
         let fromVoice = fromTrack.parent;
