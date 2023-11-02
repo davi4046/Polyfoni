@@ -62,10 +62,7 @@ export class Controller {
     }
 
     private makeHighlight(from: TimelinePosition, to: TimelinePosition) {
-        let clickedBeat = Math.round(from.x / 64);
-        let hoveredBeat = Math.round(to.x / 64);
-
-        if (clickedBeat == hoveredBeat) {
+        if (from.x == to.x) {
             return;
         }
 
@@ -77,8 +74,10 @@ export class Controller {
             return;
         }
 
-        let minBeat = Math.min(clickedBeat, hoveredBeat);
-        let maxBeat = Math.max(clickedBeat, hoveredBeat);
+        console.log("to:", to);
+
+        let minBeat = Math.floor(Math.min(from.x, to.x));
+        let maxBeat = Math.ceil(Math.max(from.x, to.x));
 
         this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
 
@@ -122,19 +121,17 @@ export class Controller {
         });
 
         document.addEventListener("mousemove", (event) => {
-            let cursorArea = <HTMLElement>(
+            let area = <HTMLElement>(
                 document.getElementsByClassName("cursor-area")[0]
             );
 
-            let newPos =
-                event.screenX - cursorArea.offsetLeft + cursorArea.scrollLeft;
+            let pos = event.clientX - area.offsetLeft + area.scrollLeft;
 
-            newPos = Math.min(
-                Math.max(newPos, 0),
-                cursorArea.offsetWidth + cursorArea.scrollLeft
-            );
+            let timeline = get(this._store);
 
-            this._hoverCursor.x = newPos;
+            let beat = Math.min(Math.max(pos / 64, 0), timeline.length);
+
+            this._hoverCursor.x = beat;
             this.drag();
         });
 
@@ -192,7 +189,7 @@ class TimelineCursor {
     public y: TrackModel | null = null;
 
     getPosition() {
-        if (this.x && this.y) {
+        if (this.x != null && this.y != null) {
             return new TimelinePosition(this.x, this.y);
         } else {
             return null;
