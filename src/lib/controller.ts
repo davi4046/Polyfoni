@@ -198,10 +198,6 @@ export class Controller {
         });
 
         this.ghostItems = [];
-
-        this._store.update((value) => {
-            return value;
-        });
     }
 
     private drag() {
@@ -267,12 +263,24 @@ export class Controller {
         });
 
         document.addEventListener("mouseup", (event) => {
+            if (this.ghostItems.length == 0) {
+                if (!this._selectedItemOnClick) {
+                    this._selectedItems = this._selectedItems.filter((item) => {
+                        return item !== this._hoveredItem;
+                    });
+                }
+            } else {
+                this.placeGhostItems();
+            }
+
+            this._store.update((value) => {
+                return value;
+            });
+
             this._clickedBeat = null;
             this._clickedTrack = null;
             this._clickedItem = null;
             this._selectedItemOnClick = false;
-
-            this.placeGhostItems();
         });
 
         document.addEventListener("mousemove", (event) => {
