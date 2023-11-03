@@ -317,3 +317,12 @@ export class HighlightModel {
         public tracks: TrackModel[]
     ) {}
 }
+
+export class GhostItemModel {
+    constructor(
+        public item: ItemModel,
+        public start: number,
+        public end: number,
+        public track: TrackModel
+    ) {}
+}

@@ -11,7 +11,7 @@
     <div
         class="flex items-center h-full p-2 bg-green-500 border-2"
         class:border-green-600={!data.isSelected()}
-        class:border-blue-500={data.isSelected()}
+        class:border-blue-600={data.isSelected()}
         on:mouseenter={(_) => {
             data.controller?.setHoveredItem(data);
         }}

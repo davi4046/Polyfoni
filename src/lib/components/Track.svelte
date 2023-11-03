@@ -2,6 +2,7 @@
     import TrackShell from "./TrackShell.svelte";
     import Item from "./Item.svelte";
     import Highlight from "./Highlight.svelte";
+    import GhostItem from "./GhostItem.svelte";
 
     import { TrackModel } from "../models";
 
@@ -18,14 +19,22 @@
         {#each data.children as item}
             <Item bind:data={item}></Item>
         {/each}
-        {@const highlight = data.controller?.highlight}
-        {#if highlight}
-            {#if highlight.tracks.includes(data)}
-                <Highlight
-                    width={(highlight.end - highlight.start) * 64}
-                    left={highlight.start * 64}
-                />
+        {@const controller = data.controller}
+        {#if controller}
+            {@const highlight = controller.highlight}
+            {#if highlight}
+                {#if highlight.tracks.includes(data)}
+                    <Highlight
+                        width={(highlight.end - highlight.start) * 64}
+                        left={highlight.start * 64}
+                    />
+                {/if}
             {/if}
+            {#each controller.ghostItems as ghostItem}
+                {#if ghostItem.track == data}
+                    <GhostItem data={ghostItem} />
+                {/if}
+            {/each}
         {/if}
     </TrackShell>
 </div>

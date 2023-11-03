@@ -2,7 +2,13 @@ import { get } from "svelte/store";
 
 import { listen } from "@tauri-apps/api/event";
 
-import { HighlightModel, ItemModel, TimelineModel, TrackModel } from "./models";
+import {
+    GhostItemModel,
+    HighlightModel,
+    ItemModel,
+    TimelineModel,
+    TrackModel,
+} from "./models";
 
 import type { Writable } from "svelte/store";
 
@@ -20,6 +26,8 @@ export class Controller {
     private _selectedItemOnClick = false;
 
     public highlight: HighlightModel | null = null;
+
+    public ghostItems: GhostItemModel[] = [];
 
     get selectedItems() {
         return this._selectedItems;
@@ -55,8 +63,141 @@ export class Controller {
         let maxBeat = Math.ceil(Math.max(fromBeat, toBeat));
 
         this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
+    }
 
-        this._selectedItems = [];
+    private makeGhostItems(
+        fromBeat: number,
+        toBeat: number,
+        fromTrack: TrackModel,
+        toTrack: TrackModel
+    ) {
+        let timeline = get(this._store);
+
+        /* Calculate Beat Offset */
+
+        let minBeat = this._selectedItems[0].start;
+        let maxBeat = this._selectedItems[0].end;
+
+        this._selectedItems.forEach((item) => {
+            if (item.start < minBeat) {
+                minBeat = item.start;
+            }
+            if (item.end > maxBeat) {
+                maxBeat = item.end;
+            }
+        });
+
+        let beatOffset = Math.round(toBeat - fromBeat);
+
+        beatOffset = Math.max(beatOffset, -minBeat);
+        beatOffset = Math.min(beatOffset, timeline.length - maxBeat);
+
+        /* Calculate Track Offset */
+
+        let fromTrackIndex = fromTrack.getIndex()!;
+        let toTrackIndex = toTrack.getIndex()!;
+
+        let minTrackIndex = this._selectedItems[0].parent!.getIndex()!;
+        let maxTrackIndex = minTrackIndex;
+
+        this._selectedItems.forEach((item) => {
+            let trackIndex = item.parent!.getIndex()!;
+
+            if (trackIndex < minTrackIndex) {
+                minTrackIndex = trackIndex;
+            }
+
+            if (trackIndex > maxTrackIndex) {
+                maxTrackIndex = trackIndex;
+            }
+        });
+
+        const tracksPerVoice = 5; //IMPORTANT: Update if number of tracks per voice increases
+
+        let trackOffset = toTrackIndex - fromTrackIndex;
+
+        trackOffset = Math.max(trackOffset, -minTrackIndex);
+        trackOffset = Math.min(trackOffset, tracksPerVoice - 1 - maxTrackIndex);
+
+        /* Calculate Voice Offset */
+
+        let fromVoiceIndex = fromTrack.parent!.getIndex()!;
+        let toVoiceIndex = toTrack.parent!.getIndex()!;
+
+        let minVoiceIndex = this._selectedItems[0].parent!.parent!.getIndex()!;
+        let maxVoiceIndex = minVoiceIndex;
+
+        this._selectedItems.forEach((item) => {
+            let voiceIndex = item.parent!.parent!.getIndex()!;
+
+            if (voiceIndex < minVoiceIndex) {
+                minVoiceIndex = voiceIndex;
+            }
+
+            if (voiceIndex > maxVoiceIndex) {
+                maxVoiceIndex = voiceIndex;
+            }
+        });
+
+        let voiceCount = timeline.children.length;
+
+        let voiceOffset = toVoiceIndex - fromVoiceIndex;
+
+        voiceOffset = Math.max(voiceOffset, -minVoiceIndex);
+        voiceOffset = Math.min(voiceOffset, voiceCount - 1 - maxVoiceIndex);
+
+        let newGhostItems: GhostItemModel[] = [];
+
+        if (beatOffset != 0 || trackOffset != 0 || voiceOffset != 0) {
+            this._selectedItems.forEach((item) => {
+                let newStart = item.start + beatOffset;
+                let newEnd = newStart + item.end - item.start;
+                let newTrackIndex = item.parent!.getIndex()! + trackOffset;
+                let newVoiceIndex =
+                    item.parent!.parent!.getIndex()! + voiceOffset;
+
+                let newTrack =
+                    timeline.children[newVoiceIndex].children[newTrackIndex];
+
+                newGhostItems = newGhostItems.concat(
+                    new GhostItemModel(item, newStart, newEnd, newTrack)
+                );
+            });
+        } else {
+            newGhostItems = [];
+        }
+
+        this.ghostItems = newGhostItems;
+    }
+
+    private placeGhostItems() {
+        let isForwardMove =
+            this.ghostItems[0].start > this.ghostItems[0].item.start;
+
+        //sort items to avoid them clearing each other on move
+        if (isForwardMove) {
+            this.ghostItems.sort((a, b) => {
+                if (a.item.start > b.item.start) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
+        } else {
+            this.ghostItems.sort((a, b) => {
+                if (a.item.start > b.item.start) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+        }
+
+        this.ghostItems.forEach((ghostItem) => {
+            ghostItem.item.move(ghostItem.start, ghostItem.track);
+        });
+
+        this.ghostItems = [];
 
         this._store.update((value) => {
             return value;
@@ -71,7 +212,12 @@ export class Controller {
             this._clickedTrack
         ) {
             if (this._clickedItem) {
-                //perform item move
+                this.makeGhostItems(
+                    this._clickedBeat,
+                    this._hoveredBeat,
+                    this._clickedTrack,
+                    this._hoveredTrack
+                );
             } else {
                 this.makeHighlight(
                     this._clickedBeat,
@@ -79,7 +225,12 @@ export class Controller {
                     this._clickedTrack,
                     this._hoveredTrack
                 );
+                this._selectedItems = [];
             }
+
+            this._store.update((value) => {
+                return value;
+            });
         }
     }
 
@@ -116,158 +267,12 @@ export class Controller {
         });
 
         document.addEventListener("mouseup", (event) => {
-            let hasPerformedMove = false;
-
-            if (
-                this._hoveredBeat &&
-                this._hoveredTrack &&
-                this._clickedBeat &&
-                this._clickedTrack &&
-                this._clickedItem
-            ) {
-                let timeline = get(this._store);
-
-                /* Calculate Beat Offset */
-
-                let minBeat = this._selectedItems[0].start;
-                let maxBeat = this._selectedItems[0].end;
-
-                this._selectedItems.forEach((item) => {
-                    if (item.start < minBeat) {
-                        minBeat = item.start;
-                    }
-                    if (item.end > maxBeat) {
-                        maxBeat = item.end;
-                    }
-                });
-
-                let beatOffset = Math.round(
-                    this._hoveredBeat - this._clickedBeat
-                );
-
-                beatOffset = Math.max(beatOffset, -minBeat);
-                beatOffset = Math.min(beatOffset, timeline.length - maxBeat);
-
-                /* Calculate Track Offset */
-
-                let clickedTrackIndex = this._clickedTrack.getIndex()!;
-                let hoveredTrackIndex = this._hoveredTrack.getIndex()!;
-
-                let minTrackIndex = this._selectedItems[0].parent!.getIndex()!;
-                let maxTrackIndex = minTrackIndex;
-
-                this._selectedItems.forEach((item) => {
-                    let trackIndex = item.parent!.getIndex()!;
-
-                    if (trackIndex < minTrackIndex) {
-                        minTrackIndex = trackIndex;
-                    }
-
-                    if (trackIndex > maxTrackIndex) {
-                        maxTrackIndex = trackIndex;
-                    }
-                });
-
-                const tracksPerVoice = 5; //IMPORTANT: Update if number of tracks per voice increases
-
-                let trackOffset = hoveredTrackIndex - clickedTrackIndex;
-
-                trackOffset = Math.max(trackOffset, -minTrackIndex);
-                trackOffset = Math.min(
-                    trackOffset,
-                    tracksPerVoice - 1 - maxTrackIndex
-                );
-
-                /* Calculate Voice Offset */
-
-                let clickedVoiceIndex = this._clickedTrack.parent!.getIndex()!;
-                let hoveredVoiceIndex = this._hoveredTrack.parent!.getIndex()!;
-
-                let minVoiceIndex =
-                    this._selectedItems[0].parent!.parent!.getIndex()!;
-                let maxVoiceIndex = minVoiceIndex;
-
-                this._selectedItems.forEach((item) => {
-                    let voiceIndex = item.parent!.parent!.getIndex()!;
-
-                    if (voiceIndex < minVoiceIndex) {
-                        minVoiceIndex = voiceIndex;
-                    }
-
-                    if (voiceIndex > maxVoiceIndex) {
-                        maxVoiceIndex = voiceIndex;
-                    }
-                });
-
-                let voiceCount = timeline.children.length;
-
-                let voiceOffset = hoveredVoiceIndex - clickedVoiceIndex;
-
-                voiceOffset = Math.max(voiceOffset, -minVoiceIndex);
-                voiceOffset = Math.min(
-                    voiceOffset,
-                    voiceCount - 1 - maxVoiceIndex
-                );
-
-                if (beatOffset != 0 || trackOffset != 0 || voiceOffset != 0) {
-                    /* Perform Move */
-
-                    //sort items to avoid them clearing each other on move
-                    if (beatOffset > 0) {
-                        this._selectedItems.sort((a, b) => {
-                            if (a.start > b.start) {
-                                return -1;
-                            } else {
-                                return 1;
-                            }
-                        });
-                    } else {
-                        this._selectedItems.sort((a, b) => {
-                            if (a.start > b.start) {
-                                return 1;
-                            } else {
-                                return -1;
-                            }
-                        });
-                    }
-
-                    this._selectedItems.forEach((item) => {
-                        let newStart = item.start + beatOffset;
-                        let newTrackIndex =
-                            item.parent!.getIndex()! + trackOffset;
-                        let newVoiceIndex =
-                            item.parent!.parent!.getIndex()! + voiceOffset;
-
-                        let newTrack =
-                            timeline.children[newVoiceIndex].children[
-                                newTrackIndex
-                            ];
-
-                        item.move(newStart, newTrack);
-                    });
-
-                    hasPerformedMove = true;
-                }
-            }
-
-            if (
-                event.shiftKey &&
-                !this._selectedItemOnClick &&
-                !hasPerformedMove
-            ) {
-                this._selectedItems = this._selectedItems.filter((item) => {
-                    return item !== this._hoveredItem;
-                });
-            }
-
-            this._store.update((value) => {
-                return value;
-            });
-
             this._clickedBeat = null;
             this._clickedTrack = null;
             this._clickedItem = null;
             this._selectedItemOnClick = false;
+
+            this.placeGhostItems();
         });
 
         document.addEventListener("mousemove", (event) => {
