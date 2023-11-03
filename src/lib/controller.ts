@@ -17,6 +17,8 @@ export class Controller {
 
     private _selectedItems: ItemModel[] = [];
 
+    private _selectedItemOnClick = false;
+
     public highlight: HighlightModel | null = null;
 
     get selectedItems() {
@@ -98,9 +100,11 @@ export class Controller {
                 if (event.shiftKey) {
                     if (!this._hoveredItem.isSelected()) {
                         this._selectedItems.push(this._hoveredItem);
+                        this._selectedItemOnClick = true;
                     }
                 } else {
                     this._selectedItems = [this._hoveredItem];
+                    this._selectedItemOnClick = true;
                 }
 
                 this.highlight = null;
@@ -111,7 +115,9 @@ export class Controller {
             }
         });
 
-        document.addEventListener("mouseup", (_) => {
+        document.addEventListener("mouseup", (event) => {
+            let hasPerformedMove = false;
+
             if (
                 this._hoveredBeat &&
                 this._hoveredTrack &&
@@ -239,7 +245,19 @@ export class Controller {
 
                         item.move(newStart, newTrack);
                     });
+
+                    hasPerformedMove = true;
                 }
+            }
+
+            if (
+                event.shiftKey &&
+                !this._selectedItemOnClick &&
+                !hasPerformedMove
+            ) {
+                this._selectedItems = this._selectedItems.filter((item) => {
+                    return item !== this._hoveredItem;
+                });
             }
 
             this._store.update((value) => {
@@ -249,6 +267,7 @@ export class Controller {
             this._clickedBeat = null;
             this._clickedTrack = null;
             this._clickedItem = null;
+            this._selectedItemOnClick = false;
         });
 
         document.addEventListener("mousemove", (event) => {
