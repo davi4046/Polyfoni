@@ -203,30 +203,43 @@ export class Controller {
                     voiceCount - 1 - maxVoiceIndex
                 );
 
-                /* Perform Move */
+                if (beatOffset != 0 || trackOffset != 0 || voiceOffset != 0) {
+                    /* Perform Move */
 
-                //sort items to avoid them clearing each other on move
-                this._selectedItems.sort((a, b) => {
-                    if (a.start > b.start) {
-                        return beatOffset > 0 ? -1 : 1;
+                    //sort items to avoid them clearing each other on move
+                    if (beatOffset > 0) {
+                        this._selectedItems.sort((a, b) => {
+                            if (a.start > b.start) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        });
                     } else {
-                        return beatOffset > 0 ? 1 : -1;
+                        this._selectedItems.sort((a, b) => {
+                            if (a.start > b.start) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
                     }
-                });
 
-                this._selectedItems.forEach((item) => {
-                    let newStart = item.start + beatOffset;
-                    let newTrackIndex = item.parent!.getIndex()! + trackOffset;
-                    let newVoiceIndex =
-                        item.parent!.parent!.getIndex()! + voiceOffset;
+                    this._selectedItems.forEach((item) => {
+                        let newStart = item.start + beatOffset;
+                        let newTrackIndex =
+                            item.parent!.getIndex()! + trackOffset;
+                        let newVoiceIndex =
+                            item.parent!.parent!.getIndex()! + voiceOffset;
 
-                    let newTrack =
-                        timeline.children[newVoiceIndex].children[
-                            newTrackIndex
-                        ];
+                        let newTrack =
+                            timeline.children[newVoiceIndex].children[
+                                newTrackIndex
+                            ];
 
-                    item.move(newStart, newTrack);
-                });
+                        item.move(newStart, newTrack);
+                    });
+                }
             }
 
             this._store.update((value) => {
