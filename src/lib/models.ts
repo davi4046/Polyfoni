@@ -257,6 +257,9 @@ export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
 }
 
 export class ItemModel extends TimelineNode<TrackModel, null> {
+    public startHandle: ItemHandleModel | null = null;
+    public endHandle: ItemHandleModel | null = null;
+
     set start(newStart: number) {
         if (newStart < this._start) {
             this.parent?.clearInterval(newStart, this._start);
@@ -285,6 +288,16 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
         return this._end;
     }
 
+    set parent(newParent: TrackModel | null) {
+        super.parent = newParent;
+
+        this.updateHandles();
+    }
+
+    get parent() {
+        return super.parent;
+    }
+
     move(newStart: number, newTrack: TrackModel) {
         let newEnd = newStart + this._end - this._start;
 
@@ -296,6 +309,35 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
 
     isSelected() {
         return this.controller?.selectedItems.includes(this);
+    }
+
+    updateHandles() {
+        if (this.parent) {
+            let itemAtStart = this.parent.children.find((item) => {
+                return item.end == this.start;
+            });
+
+            let itemAtEnd = this.parent.children.find((item) => {
+                return item.start == this.end;
+            });
+
+            if (this.startHandle) {
+                this.startHandle.startOf = undefined;
+            }
+            if (this.endHandle) {
+                this.endHandle.endOf = undefined;
+            }
+
+            this.startHandle = new ItemHandleModel(this, itemAtStart);
+            this.endHandle = new ItemHandleModel(itemAtEnd, this);
+
+            if (itemAtStart) {
+                itemAtStart.endHandle = this.startHandle;
+            }
+            if (itemAtEnd) {
+                itemAtEnd.startHandle = this.endHandle;
+            }
+        }
     }
 
     constructor(
@@ -324,5 +366,12 @@ export class GhostItemModel {
         public start: number,
         public end: number,
         public track: TrackModel
+    ) {}
+}
+
+export class ItemHandleModel {
+    constructor(
+        public startOf: ItemModel | undefined,
+        public endOf: ItemModel | undefined
     ) {}
 }
