@@ -309,3 +309,11 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
 export class TimelineOutput {
     public harmonicSum = new TrackModel(4);
 }
+
+export class HighlightModel {
+    constructor(
+        public start: number,
+        public end: number,
+        public tracks: TrackModel[]
+    ) {}
+}
