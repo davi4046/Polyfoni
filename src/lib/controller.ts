@@ -253,13 +253,15 @@ export class Controller {
                     this._selectedItems = [this._hoveredItem];
                     this._selectedItemOnClick = true;
                 }
-
-                this.highlight = null;
-
-                this._store.update((value) => {
-                    return value;
-                });
+            } else {
+                this._selectedItems = [];
             }
+
+            this.highlight = null;
+
+            this._store.update((value) => {
+                return value;
+            });
         });
 
         document.addEventListener("mouseup", (event) => {
