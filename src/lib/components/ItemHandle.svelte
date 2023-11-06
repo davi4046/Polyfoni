@@ -5,10 +5,12 @@
 </script>
 
 <div
-    class="z-40 w-2 h-full bg-purple-500 cursor-w-resize"
+    class="z-40 w-2 h-full"
     on:mouseenter={(_) => {
-        console.log("startOf:", data.startOf);
-        console.log("endOf:", data.endOf);
+        data.controller?.setHoveredHandle(data);
+    }}
+    on:mouseleave={(_) => {
+        data.controller?.setHoveredHandle(null);
     }}
     role="none"
 ></div>

@@ -80,6 +80,15 @@ abstract class TimelineNode<
         return this._controller;
     }
 
+    set parent(newParent: T | null) {
+        super.parent = newParent;
+        this.controller = newParent != null ? newParent.controller : null;
+    }
+
+    get parent() {
+        return super.parent;
+    }
+
     addChild(child: U): void {
         super.addChild(child);
         if (child) {
@@ -290,12 +299,19 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
 
     set parent(newParent: TrackModel | null) {
         super.parent = newParent;
-
-        this.updateHandles();
     }
 
     get parent() {
         return super.parent;
+    }
+
+    set controller(newController: Controller | null) {
+        super.controller = newController;
+        this.updateHandles();
+    }
+
+    get controller() {
+        return super.controller;
     }
 
     move(newStart: number, newTrack: TrackModel) {
@@ -305,6 +321,8 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
         this._end = newEnd;
 
         this.parent = newTrack;
+
+        this.updateHandles();
     }
 
     isSelected() {
@@ -322,14 +340,22 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
             });
 
             if (this.startHandle) {
-                this.startHandle.startOf = undefined;
+                this.startHandle.startHandleOfItem = null;
             }
             if (this.endHandle) {
-                this.endHandle.endOf = undefined;
+                this.endHandle.endHandleOfItem = null;
             }
 
-            this.startHandle = new ItemHandleModel(this, itemAtStart);
-            this.endHandle = new ItemHandleModel(itemAtEnd, this);
+            this.startHandle = new ItemHandleModel(
+                this,
+                itemAtStart != undefined ? itemAtStart : null,
+                this.controller
+            );
+            this.endHandle = new ItemHandleModel(
+                itemAtEnd != undefined ? itemAtEnd : null,
+                this,
+                this.controller
+            );
 
             if (itemAtStart) {
                 itemAtStart.endHandle = this.startHandle;
@@ -371,7 +397,8 @@ export class GhostItemModel {
 
 export class ItemHandleModel {
     constructor(
-        public startOf: ItemModel | undefined,
-        public endOf: ItemModel | undefined
+        public startHandleOfItem: ItemModel | null,
+        public endHandleOfItem: ItemModel | null,
+        public controller: Controller | null
     ) {}
 }

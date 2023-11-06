@@ -5,6 +5,7 @@ import { listen } from "@tauri-apps/api/event";
 import {
     GhostItemModel,
     HighlightModel,
+    ItemHandleModel,
     ItemModel,
     TimelineModel,
     TrackModel,
@@ -16,10 +17,12 @@ export class Controller {
     private _hoveredBeat: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
     private _hoveredItem: ItemModel | null = null;
+    private _hoveredHandle: ItemHandleModel | null = null;
 
     private _clickedBeat: number | null = null;
     private _clickedTrack: TrackModel | null = null;
     private _clickedItem: ItemModel | null = null;
+    private _clickedHandle: ItemHandleModel | null = null;
 
     private _selectedItems: ItemModel[] = [];
 
@@ -33,12 +36,17 @@ export class Controller {
         return this._selectedItems;
     }
 
+    setHoveredTrack(newTrack: TrackModel | null) {
+        this._hoveredTrack = newTrack;
+    }
+
     setHoveredItem(newItem: ItemModel | null) {
         this._hoveredItem = newItem;
     }
 
-    setHoveredTrack(newTrack: TrackModel | null) {
-        this._hoveredTrack = newTrack;
+    setHoveredHandle(newHandle: ItemHandleModel | null) {
+        this._hoveredHandle = newHandle;
+        this.updateCursor();
     }
 
     private makeHighlight(
@@ -200,6 +208,57 @@ export class Controller {
         this.ghostItems = [];
     }
 
+    private adjustHandle(handle: ItemHandleModel, toBeat: number) {
+        toBeat = Math.round(toBeat);
+        if (handle.startHandleOfItem && handle.endHandleOfItem) {
+            if (
+                toBeat < handle.startHandleOfItem.end &&
+                toBeat > handle.endHandleOfItem.start
+            ) {
+                handle.startHandleOfItem.start = toBeat;
+                handle.endHandleOfItem.end = toBeat;
+            }
+        } else if (handle.startHandleOfItem) {
+            let siblings = handle.startHandleOfItem.parent!.children.slice();
+            siblings.sort((a, b) => {
+                if (a.start > b.start) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+            let x = siblings.findLast((item) => {
+                return (
+                    item.end <= this._clickedHandle!.startHandleOfItem!.start
+                );
+            });
+            if (x) {
+                toBeat = Math.max(toBeat, x.end);
+            }
+            if (toBeat < handle.startHandleOfItem.end) {
+                handle.startHandleOfItem.start = toBeat;
+            }
+        } else if (handle.endHandleOfItem) {
+            let siblings = handle.endHandleOfItem.parent!.children.slice();
+            siblings.sort((a, b) => {
+                if (a.start > b.start) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+            let x = siblings.find((item) => {
+                return item.start >= this._clickedHandle!.endHandleOfItem!.end;
+            });
+            if (x) {
+                toBeat = Math.min(toBeat, x.start);
+            }
+            if (toBeat > handle.endHandleOfItem.start) {
+                handle.endHandleOfItem.end = toBeat;
+            }
+        }
+    }
+
     private drag() {
         if (
             this._hoveredBeat &&
@@ -207,7 +266,9 @@ export class Controller {
             this._clickedBeat &&
             this._clickedTrack
         ) {
-            if (this._clickedItem) {
+            if (this._clickedHandle) {
+                this.adjustHandle(this._clickedHandle, this._hoveredBeat);
+            } else if (this._clickedItem) {
                 this.makeGhostItems(
                     this._clickedBeat,
                     this._hoveredBeat,
@@ -227,6 +288,22 @@ export class Controller {
             this._store.update((value) => {
                 return value;
             });
+        }
+    }
+
+    private updateCursor() {
+        if (this._hoveredHandle || this._clickedHandle) {
+            document.getElementById("app")!.style.cursor = "w-resize";
+        } else if (this._clickedItem) {
+            if (this._hoveredBeat != this._clickedBeat) {
+                document.getElementById("app")!.style.cursor = "grabbing";
+            } else {
+                document.getElementById("app")!.style.cursor = "default";
+            }
+        } else if (this._clickedTrack) {
+            document.getElementById("app")!.style.cursor = "crosshair";
+        } else {
+            document.getElementById("app")!.style.cursor = "default";
         }
     }
 
@@ -256,15 +333,20 @@ export class Controller {
             } else {
                 this._selectedItems = [];
             }
+            if (this._hoveredHandle) {
+                this._clickedHandle = this._hoveredHandle;
+            }
 
             this.highlight = null;
 
             this._store.update((value) => {
                 return value;
             });
+
+            this.updateCursor();
         });
 
-        document.addEventListener("mouseup", (event) => {
+        document.addEventListener("mouseup", (_) => {
             if (this.ghostItems.length == 0) {
                 if (!this._selectedItemOnClick) {
                     this._selectedItems = this._selectedItems.filter((item) => {
@@ -275,6 +357,14 @@ export class Controller {
                 this.placeGhostItems();
             }
 
+            if (this._clickedHandle) {
+                if (this._clickedHandle.startHandleOfItem) {
+                    this._clickedHandle.startHandleOfItem.updateHandles();
+                } else if (this._clickedHandle.endHandleOfItem) {
+                    this._clickedHandle.endHandleOfItem.updateHandles();
+                }
+            }
+
             this._store.update((value) => {
                 return value;
             });
@@ -282,7 +372,11 @@ export class Controller {
             this._clickedBeat = null;
             this._clickedTrack = null;
             this._clickedItem = null;
+            this._clickedHandle = null;
+
             this._selectedItemOnClick = false;
+
+            this.updateCursor();
         });
 
         document.addEventListener("mousemove", (event) => {
@@ -298,6 +392,8 @@ export class Controller {
 
             this._hoveredBeat = beat;
             this.drag();
+
+            this.updateCursor();
         });
 
         listen("insert", (_) => {
