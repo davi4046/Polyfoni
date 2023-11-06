@@ -1,5 +1,6 @@
 <script lang="ts">
     import ItemHandle from "./ItemHandle.svelte";
+    import Popup from "./Popup.svelte";
 
     import { ItemModel } from "../models";
 
@@ -23,7 +24,13 @@
             }}
             role="none"
         >
-            <p class="truncate">Item ({data.start}-{data.end})</p>
+            <p class="font-medium text-green-900 truncate">
+                {#if data.content}
+                    {data.content}
+                {:else}
+                    [empty]
+                {/if}
+            </p>
         </div>
         {#if data.startHandle}
             <div class="absolute top-0 bottom-0 left-0 -translate-x-1/2">

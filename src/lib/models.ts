@@ -269,6 +269,8 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
     public startHandle: ItemHandleModel | null = null;
     public endHandle: ItemHandleModel | null = null;
 
+    public content = "";
+
     set start(newStart: number) {
         if (newStart < this._start) {
             this.parent?.clearInterval(newStart, this._start);

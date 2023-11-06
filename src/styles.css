@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
+
+.btn:focus {
+    @apply outline-none;
+}
+
+.btn-sm {
+    @apply px-5 py-2.5 text-sm font-medium;
+}
+
+.btn-primary {
+    @apply text-white bg-blue-700;
+}
+
+.btn-primary:hover {
+    @apply bg-blue-800;
+}
+
+.btn-primary:focus {
+    @apply ring-4 ring-blue-300;
+}
+
+.btn-alternative {
+    @apply text-white bg-gray-500;
+}
+
+.btn-alternative:hover {
+    @apply bg-gray-600;
+}
+
+.btn-alternative:focus {
+    @apply ring-4 ring-gray-300;
+}
+
 @tailwind utilities;

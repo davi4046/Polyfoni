@@ -2,6 +2,7 @@ import { get } from "svelte/store";
 
 import { listen } from "@tauri-apps/api/event";
 
+import Popup from "./components/Popup.svelte";
 import {
     GhostItemModel,
     HighlightModel,
@@ -12,7 +13,6 @@ import {
 } from "./models";
 
 import type { Writable } from "svelte/store";
-
 export class Controller {
     private _hoveredBeat: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
@@ -394,6 +394,24 @@ export class Controller {
             this.drag();
 
             this.updateCursor();
+        });
+
+        document.addEventListener("dblclick", (_) => {
+            const timeline = document.getElementById("timeline");
+            if (this._hoveredItem && timeline) {
+                const onClose = () => {
+                    this._store.update((value) => {
+                        return value;
+                    });
+                };
+                new Popup({
+                    target: timeline,
+                    props: {
+                        data: this._hoveredItem,
+                        onClose: onClose,
+                    },
+                });
+            }
         });
 
         listen("insert", (_) => {

@@ -11,6 +11,12 @@
     <div
         class="flex items-center h-full p-2 bg-green-500 border-2 border-green-600 opacity-75"
     >
-        <p class="truncate">Item {data.item.start}-{data.item.end}</p>
+        <p class="font-medium text-green-900 truncate">
+            {#if data.item.content}
+                {data.item.content}
+            {:else}
+                [empty]
+            {/if}
+        </p>
     </div>
 </div>
