@@ -1,4 +1,4 @@
-export class Observer {
+export class ChangeTracker {
     private _changes: [object: Object, property: PropertyKey, newValue: any][] =
         [];
 
@@ -9,24 +9,20 @@ export class Observer {
     reportChange(target: Object, property: PropertyKey, value: any) {
         this._changes.push([target, property, value]);
     }
-}
 
-export abstract class Observable {
-    static create<T extends Object>(
-        object: T,
-        observer: Observer,
-        ignoreProperties: PropertyKey[] = []
-    ) {
+    create<T extends Object>(object: T, ignoreProperties: PropertyKey[] = []) {
         Object.keys(object).forEach((property) => {
             if (ignoreProperties.includes(property)) {
                 return;
             }
-            observer.reportChange(
+            this.reportChange(
                 object,
                 property,
                 object[property as keyof typeof object]
             );
         });
+
+        const tracker = this;
 
         return new Proxy(object, {
             deleteProperty: function (target, property) {
@@ -37,7 +33,7 @@ export abstract class Observable {
                 target[property as keyof T] = value;
 
                 if (!ignoreProperties.includes(property)) {
-                    observer.reportChange(target, property, value);
+                    tracker.reportChange(target, property, value);
                 }
 
                 return true;
