@@ -13,6 +13,7 @@ import {
 } from "./models";
 
 import type { Writable } from "svelte/store";
+
 export class Controller {
     private _hoveredBeat: number | null = null;
     private _hoveredTrack: TrackModel | null = null;
@@ -47,6 +48,12 @@ export class Controller {
     setHoveredHandle(newHandle: ItemHandleModel | null) {
         this._hoveredHandle = newHandle;
         this.updateCursor();
+    }
+
+    private refreshTimeline() {
+        this._store.update((value) => {
+            return value;
+        });
     }
 
     private makeHighlight(
@@ -284,10 +291,7 @@ export class Controller {
                 );
                 this._selectedItems = [];
             }
-
-            this._store.update((value) => {
-                return value;
-            });
+            this.refreshTimeline();
         }
     }
 
@@ -339,9 +343,7 @@ export class Controller {
 
             this.highlight = null;
 
-            this._store.update((value) => {
-                return value;
-            });
+            this.refreshTimeline();
 
             this.updateCursor();
         });
@@ -365,9 +367,7 @@ export class Controller {
                 }
             }
 
-            this._store.update((value) => {
-                return value;
-            });
+            this.refreshTimeline();
 
             this._clickedBeat = null;
             this._clickedTrack = null;
@@ -399,16 +399,11 @@ export class Controller {
         document.addEventListener("dblclick", (_) => {
             const timeline = document.getElementById("app");
             if (this._hoveredItem && timeline) {
-                const onClose = () => {
-                    this._store.update((value) => {
-                        return value;
-                    });
-                };
                 new Popup({
                     target: timeline,
                     props: {
                         data: this._hoveredItem,
-                        onClose: onClose,
+                        onClose: this.refreshTimeline,
                     },
                 });
             }
@@ -423,11 +418,10 @@ export class Controller {
                     );
                     track.addChild(newItem);
                 });
+
                 this.highlight = null;
 
-                this._store.update((value) => {
-                    return value;
-                });
+                this.refreshTimeline();
             }
         });
 
@@ -448,9 +442,7 @@ export class Controller {
 
             this._selectedItems = [];
 
-            this._store.update((value) => {
-                return value;
-            });
+            this.refreshTimeline();
         });
     }
 }
