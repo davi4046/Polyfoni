@@ -15,15 +15,19 @@ export abstract class Observable {
     static create<T extends Object>(
         object: T,
         observer: Observer,
-        watchProperties: PropertyKey[]
+        ignoreProperties: PropertyKey[] = []
     ) {
-        watchProperties.forEach((property) => {
+        Object.keys(object).forEach((property) => {
+            if (ignoreProperties.includes(property)) {
+                return;
+            }
             observer.reportChange(
                 object,
                 property,
                 object[property as keyof typeof object]
             );
         });
+
         return new Proxy(object, {
             deleteProperty: function (target, property) {
                 delete target[property as keyof T];
@@ -31,9 +35,11 @@ export abstract class Observable {
             },
             set: function (target, property, value, receiver) {
                 target[property as keyof T] = value;
-                if (watchProperties.includes(property)) {
+
+                if (!ignoreProperties.includes(property)) {
                     observer.reportChange(target, property, value);
                 }
+
                 return true;
             },
         });
