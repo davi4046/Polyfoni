@@ -344,7 +344,6 @@ export class Controller {
             this.highlight = null;
 
             this.refreshTimeline();
-
             this.updateCursor();
         });
 
@@ -367,8 +366,6 @@ export class Controller {
                 }
             }
 
-            this.refreshTimeline();
-
             this._clickedBeat = null;
             this._clickedTrack = null;
             this._clickedItem = null;
@@ -376,6 +373,7 @@ export class Controller {
 
             this._selectedItemOnClick = false;
 
+            this.refreshTimeline();
             this.updateCursor();
         });
 
@@ -397,13 +395,16 @@ export class Controller {
         });
 
         document.addEventListener("dblclick", (_) => {
-            const timeline = document.getElementById("app");
-            if (this._hoveredItem && timeline) {
+            const app = document.getElementById("app");
+            const onClose = () => {
+                this.refreshTimeline();
+            };
+            if (this._hoveredItem && app) {
                 new Popup({
-                    target: timeline,
+                    target: app,
                     props: {
                         data: this._hoveredItem,
-                        onClose: this.refreshTimeline,
+                        onClose: onClose,
                     },
                 });
             }
