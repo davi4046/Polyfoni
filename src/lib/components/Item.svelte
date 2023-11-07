@@ -1,6 +1,5 @@
 <script lang="ts">
     import ItemHandle from "./ItemHandle.svelte";
-    import Popup from "./Popup.svelte";
 
     import { ItemModel } from "../models";
 
@@ -10,6 +9,7 @@
 <div
     class="absolute z-30 h-full py-1"
     style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
+    title={data.content}
 >
     <div class="relative h-full">
         <div
