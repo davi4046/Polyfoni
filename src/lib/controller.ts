@@ -397,7 +397,7 @@ export class Controller {
         });
 
         document.addEventListener("dblclick", (_) => {
-            const timeline = document.getElementById("timeline");
+            const timeline = document.getElementById("app");
             if (this._hoveredItem && timeline) {
                 const onClose = () => {
                     this._store.update((value) => {

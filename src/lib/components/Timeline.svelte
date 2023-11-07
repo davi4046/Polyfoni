@@ -36,7 +36,7 @@
     });
 </script>
 
-<div class="relative h-full" id="timeline">
+<div class="relative h-full">
     <div
         class="grid grid-cols-[auto,auto] grid-rows-[auto,1fr] h-full p-4 space-x-1 bg-gray-500"
     >
