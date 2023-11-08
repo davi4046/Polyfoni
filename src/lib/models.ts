@@ -67,7 +67,7 @@ abstract class TimelineNode<
 > extends TreeNode<T, U> {
     private _controller: Controller | null = null;
 
-    set controller(newController: Controller | null) {
+    protected set controller(newController: Controller | null) {
         this._controller = newController;
         this.children.forEach((child) => {
             if (child) {
