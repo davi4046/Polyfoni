@@ -49,7 +49,8 @@ abstract class TreeNode<
 
     removeChild(child: U) {
         if (child) {
-            this._children = this._children.filter((c) => c !== child);
+            let childIndex = this._children.indexOf(child);
+            this._children.splice(childIndex, 1);
             if (child.parent === this) {
                 child.parent = null;
             }
