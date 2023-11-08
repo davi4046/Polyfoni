@@ -61,17 +61,10 @@
         </div>
         <!-- Headers -->
         <div class="relative flex flex-col w-32 h-full overflow-hidden">
-            <div class="z-10 mb-4 space-y-2">
-                <TrackHeader data={data.meterTrack} />
-                <TrackHeader data={data.tempoTrack} />
-            </div>
             <div class="mb-4 space-y-4 overflow-hidden v-scroll">
                 {#each data.children as voice}
                     <VoiceHeader bind:data={voice} />
                 {/each}
-            </div>
-            <div class="z-10 mt-auto">
-                <TrackHeader data={data.output.harmonicSum} />
             </div>
         </div>
         <!-- Tracks -->
@@ -80,17 +73,10 @@
                 class="relative flex flex-col h-full"
                 style="width: {data.length * 64}px"
             >
-                <div class="z-10 mb-4 space-y-2">
-                    <Track data={data.meterTrack} />
-                    <Track data={data.tempoTrack} />
-                </div>
                 <div class="relative mb-4 space-y-4 overflow-hidden v-scroll">
                     {#each data.children as voice}
                         <Voice bind:data={voice} />
                     {/each}
-                </div>
-                <div class="z-10 mt-auto">
-                    <Track data={data.output.harmonicSum} />
                 </div>
                 <div class="absolute inset-0 z-20 pointer-events-none">
                     {#each Array(data.length - 1) as _, index}
