@@ -1,13 +1,21 @@
+import { clone } from "lodash";
+
 export class ChangeTracker {
-    private _changes: [object: Object, property: PropertyKey, newValue: any][] =
-        [];
+    private _changes = new Map<Object, Map<PropertyKey, any>>();
 
     get changes() {
         return this._changes;
     }
 
-    reportChange(target: Object, property: PropertyKey, value: any) {
-        this._changes.push([target, property, value]);
+    private reportChange(target: Object, property: PropertyKey, value: any) {
+        let targetMap = this._changes.get(target);
+
+        if (!targetMap) {
+            targetMap = new Map<PropertyKey, any>();
+            this._changes.set(target, targetMap);
+        }
+
+        targetMap.set(property, clone(value));
     }
 
     create<T extends Object>(object: T, ignoreProperties: PropertyKey[] = []) {
@@ -15,11 +23,8 @@ export class ChangeTracker {
             if (ignoreProperties.includes(property)) {
                 return;
             }
-            this.reportChange(
-                object,
-                property,
-                object[property as keyof typeof object]
-            );
+            let value = object[property as keyof typeof object];
+            this.reportChange(object, property, value);
         });
 
         const tracker = this;
