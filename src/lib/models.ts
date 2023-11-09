@@ -6,41 +6,42 @@ abstract class TreeNode<
     T extends TreeNode<any, any> | null,
     U extends TreeNode<any, any> | null,
 > {
+    private _proxy: typeof this;
     private _parent: T | null = null;
     private _children: U[] = [];
 
-    constructor(children: U[]) {
-        this._children = children;
-    }
-
     get parent() {
         return this._parent;
-    }
-
-    set parent(newParent: T | null) {
-        let oldParent = this._parent;
-        this._parent = newParent;
-        if (oldParent) {
-            if (oldParent.children.includes(this)) {
-                oldParent.removeChild(this);
-            }
-        }
-        if (newParent) {
-            if (!newParent.children.includes(this)) {
-                newParent.addChild(this);
-            }
-        }
     }
 
     get children() {
         return this._children;
     }
 
+    get controller() {
+        return this._controller;
+    }
+
+    set parent(newParent: T | null) {
+        let oldParent = this._parent;
+        this._parent = newParent;
+        if (oldParent) {
+            if (oldParent.children.includes(this._proxy)) {
+                oldParent.removeChild(this._proxy);
+            }
+        }
+        if (newParent) {
+            if (!newParent.children.includes(this._proxy)) {
+                newParent.addChild(this._proxy);
+            }
+        }
+    }
+
     addChild(child: U) {
         if (child) {
             this._children.push(child);
-            if (child.parent !== this) {
-                child.parent = this;
+            if (child.parent !== this._proxy) {
+                child.parent = this._proxy;
             }
         }
     }
@@ -49,31 +50,24 @@ abstract class TreeNode<
         if (child) {
             let childIndex = this._children.indexOf(child);
             this._children.splice(childIndex, 1);
-            if (child.parent === this) {
+            if (child.parent === this._proxy) {
                 child.parent = null;
             }
         }
     }
 
     getIndex() {
-        return this._parent?.children.indexOf(this);
-    }
-}
-
-abstract class TimelineNode<
-    T extends TimelineNode<any, any> | null,
-    U extends TimelineNode<any, any> | null,
-> extends TreeNode<T, U> {
-    get controller() {
-        return this._controller;
+        return this._parent?.children.indexOf(this._proxy);
     }
 
     constructor(private _controller: Controller) {
-        super(_controller.tracker.create([]));
+        this._children = _controller.tracker.create([]);
+        this._proxy = _controller.tracker.create(this);
+        return this._proxy;
     }
 }
 
-export class TimelineModel extends TimelineNode<null, VoiceModel> {
+export class TimelineModel extends TreeNode<null, VoiceModel> {
     private _store = writable(this);
 
     get store() {
@@ -164,7 +158,7 @@ export class TimelineModel extends TimelineNode<null, VoiceModel> {
     }
 }
 
-export class VoiceModel extends TimelineNode<TimelineModel, TrackModel> {
+export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
     public label = "";
     public isCollapsed = false;
 
@@ -178,7 +172,7 @@ export class VoiceModel extends TimelineNode<TimelineModel, TrackModel> {
     }
 }
 
-export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
+export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
     public label = "";
 
     clearInterval(start: number, end: number) {
@@ -200,14 +194,9 @@ export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
 
         if (i == j && i != null) {
             //because i and j is the same item, we split it
-            let itemCopy: ItemModel = Object.assign(
-                Object.create(Object.getPrototypeOf(i)),
-                i
-            );
+            let itemCopy = new ItemModel(end, i.end, i.controller);
 
             i.end = start;
-
-            itemCopy.start = end;
 
             super.addChild(itemCopy);
         } else {
@@ -236,7 +225,7 @@ export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
     }
 }
 
-export class ItemModel extends TimelineNode<TrackModel, null> {
+export class ItemModel extends TreeNode<TrackModel, null> {
     public startHandle: ItemHandleModel | null = null;
     public endHandle: ItemHandleModel | null = null;
 

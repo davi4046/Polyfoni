@@ -19,14 +19,6 @@ export class ChangeTracker {
     }
 
     create<T extends Object>(object: T, ignoreProperties: PropertyKey[] = []) {
-        Object.keys(object).forEach((property) => {
-            if (ignoreProperties.includes(property)) {
-                return;
-            }
-            let value = object[property as keyof typeof object];
-            this.reportChange(object, property, value);
-        });
-
         const tracker = this;
 
         return new Proxy(object, {
