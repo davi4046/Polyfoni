@@ -20,6 +20,6 @@
         >
             <ArrowDown />
         </button>
-        <p class="font-semibold text-gray-700">{data.name}</p>
+        <p class="font-semibold text-gray-700">{data.label}</p>
     </div>
 </TrackShell>

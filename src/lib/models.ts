@@ -9,10 +9,8 @@ abstract class TreeNode<
     private _parent: T | null = null;
     private _children: U[] = [];
 
-    constructor(children: U[] = []) {
-        children.forEach((c) => {
-            this.addChild(c);
-        });
+    constructor(children: U[]) {
+        this._children = children;
     }
 
     get parent() {
@@ -66,52 +64,43 @@ abstract class TimelineNode<
     T extends TimelineNode<any, any> | null,
     U extends TimelineNode<any, any> | null,
 > extends TreeNode<T, U> {
-    private _controller: Controller | null = null;
-
-    protected set controller(newController: Controller | null) {
-        this._controller = newController;
-        this.children.forEach((child) => {
-            if (child) {
-                child.controller = newController;
-            }
-        });
-    }
-
     get controller() {
         return this._controller;
     }
 
-    set parent(newParent: T | null) {
-        super.parent = newParent;
-        this.controller = newParent != null ? newParent.controller : null;
-    }
-
-    get parent() {
-        return super.parent;
-    }
-
-    addChild(child: U): void {
-        super.addChild(child);
-        if (child) {
-            child.controller = this.controller;
-        }
-    }
-
-    removeChild(child: U): void {
-        super.removeChild(child);
-        if (child) {
-            child.controller = null;
-        }
+    constructor(private _controller: Controller) {
+        super(_controller.tracker.create([]));
     }
 }
 
 export class TimelineModel extends TimelineNode<null, VoiceModel> {
-    public output = new TimelineOutput();
+    private _store = writable(this);
 
-    public meterTrack = new TrackModel(5);
-    public tempoTrack = new TrackModel(6);
+    get store() {
+        return this._store;
+    }
 
-    public store = writable(this);
+    public length = 64;
+
+    createVoice(label: string) {
+        let newVoice = new VoiceModel(this.controller);
+        newVoice.label = label;
+
+        newVoice.createTrack("Pitch");
+        newVoice.createTrack("Duration");
+        newVoice.createTrack("Rest");
+        newVoice.createTrack("Harmony");
+
+        this.addChild(newVoice);
+
+        return newVoice;
+    }
+
+    refresh() {
+        this._store.update((value) => {
+            return value;
+        });
+    }
 
     getTracksFromTo(fromTrack: TrackModel, toTrack: TrackModel) {
         let tracks: TrackModel[] = [];
@@ -173,37 +162,25 @@ export class TimelineModel extends TimelineNode<null, VoiceModel> {
         }
         return null;
     }
-
-    constructor(
-        public length: number,
-        children: VoiceModel[] = []
-    ) {
-        super(children);
-        this.controller = new Controller(this.store);
-    }
 }
 
 export class VoiceModel extends TimelineNode<TimelineModel, TrackModel> {
-    constructor(
-        public name: string,
-        children: TrackModel[] = [],
-        public isCollapsed = false
-    ) {
-        super(children);
+    public label = "";
+    public isCollapsed = false;
+
+    createTrack(label: string) {
+        let newTrack = new TrackModel(this.controller);
+        newTrack.label = label;
+
+        this.addChild(newTrack);
+
+        return newTrack;
     }
 }
 
-enum TrackType {
-    Pitch,
-    Duration,
-    Rest,
-    Velocity,
-    Harmony,
-    Meter,
-    Tempo,
-}
-
 export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
+    public label = "";
+
     clearInterval(start: number, end: number) {
         this.children.sort((a, b) => {
             if (a.start < b.start) {
@@ -257,13 +234,6 @@ export class TrackModel extends TimelineNode<VoiceModel, ItemModel> {
         this.clearInterval(child.start, child.end);
         super.addChild(child);
     }
-
-    constructor(
-        public type: TrackType,
-        children: ItemModel[] = []
-    ) {
-        super(children);
-    }
 }
 
 export class ItemModel extends TimelineNode<TrackModel, null> {
@@ -302,19 +272,11 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
 
     set parent(newParent: TrackModel | null) {
         super.parent = newParent;
+        this.updateHandles();
     }
 
     get parent() {
         return super.parent;
-    }
-
-    set controller(newController: Controller | null) {
-        super.controller = newController;
-        this.updateHandles();
-    }
-
-    get controller() {
-        return super.controller;
     }
 
     move(newStart: number, newTrack: TrackModel) {
@@ -371,14 +333,11 @@ export class ItemModel extends TimelineNode<TrackModel, null> {
 
     constructor(
         private _start: number,
-        private _end: number
+        private _end: number,
+        controller: Controller
     ) {
-        super();
+        super(controller);
     }
-}
-
-export class TimelineOutput {
-    public harmonicSum = new TrackModel(4);
 }
 
 export class HighlightModel {

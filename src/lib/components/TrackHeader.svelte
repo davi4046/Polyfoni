@@ -7,32 +7,6 @@
 
     export let data: TrackModel;
 
-    let label: string;
-
-    switch (data.type) {
-        case 0:
-            label = "Pitch";
-            break;
-        case 1:
-            label = "Duration";
-            break;
-        case 2:
-            label = "Rest";
-            break;
-        case 3:
-            label = "Velocity";
-            break;
-        case 4:
-            label = "Harmony";
-            break;
-        case 5:
-            label = "Meter";
-            break;
-        case 6:
-            label = "Tempo";
-            break;
-    }
-
     let pos: number;
     let lastPos: number;
 
@@ -53,6 +27,6 @@
                 {/if}
             </div>
         {/if}
-        <p class="font-semibold text-gray-700">{label}</p>
+        <p class="font-semibold text-gray-700">{data.label}</p>
     </div>
 </TrackShell>

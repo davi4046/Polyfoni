@@ -1,7 +1,6 @@
-import { get } from "svelte/store";
-
 import { listen } from "@tauri-apps/api/event";
 
+import { ChangeTracker } from "./change-tracker";
 import Popup from "./components/Popup.svelte";
 import {
     GhostItemModel,
@@ -11,8 +10,6 @@ import {
     TimelineModel,
     TrackModel,
 } from "./models";
-
-import type { Writable } from "svelte/store";
 
 export class Controller {
     private _hoveredBeat: number | null = null;
@@ -26,15 +23,24 @@ export class Controller {
     private _clickedHandle: ItemHandleModel | null = null;
 
     private _selectedItems: ItemModel[] = [];
-
     private _selectedItemOnClick = false;
 
     public highlight: HighlightModel | null = null;
-
     public ghostItems: GhostItemModel[] = [];
+
+    private _timeline: TimelineModel;
+    private _tracker = new ChangeTracker();
+
+    get timeline() {
+        return this._timeline;
+    }
 
     get selectedItems() {
         return this._selectedItems;
+    }
+
+    get tracker() {
+        return this._tracker;
     }
 
     setHoveredTrack(newTrack: TrackModel | null) {
@@ -50,12 +56,6 @@ export class Controller {
         this.updateCursor();
     }
 
-    private refreshTimeline() {
-        this._store.update((value) => {
-            return value;
-        });
-    }
-
     private makeHighlight(
         fromBeat: number,
         toBeat: number,
@@ -66,9 +66,7 @@ export class Controller {
             return;
         }
 
-        let timeline = get(this._store);
-
-        let tracks = timeline.getTracksFromTo(fromTrack, toTrack);
+        let tracks = this._timeline.getTracksFromTo(fromTrack, toTrack);
 
         if (tracks == null) {
             return;
@@ -86,8 +84,6 @@ export class Controller {
         fromTrack: TrackModel,
         toTrack: TrackModel
     ) {
-        let timeline = get(this._store);
-
         /* Calculate Beat Offset */
 
         let minBeat = this._selectedItems[0].start;
@@ -105,7 +101,7 @@ export class Controller {
         let beatOffset = Math.round(toBeat - fromBeat);
 
         beatOffset = Math.max(beatOffset, -minBeat);
-        beatOffset = Math.min(beatOffset, timeline.length - maxBeat);
+        beatOffset = Math.min(beatOffset, this._timeline.length - maxBeat);
 
         /* Calculate Track Offset */
 
@@ -127,7 +123,7 @@ export class Controller {
             }
         });
 
-        const tracksPerVoice = 5; //IMPORTANT: Update if number of tracks per voice increases
+        const tracksPerVoice = 4; //IMPORTANT: Update if number of tracks per voice changes
 
         let trackOffset = toTrackIndex - fromTrackIndex;
 
@@ -154,7 +150,7 @@ export class Controller {
             }
         });
 
-        let voiceCount = timeline.children.length;
+        let voiceCount = this._timeline.children.length;
 
         let voiceOffset = toVoiceIndex - fromVoiceIndex;
 
@@ -172,7 +168,9 @@ export class Controller {
                     item.parent!.parent!.getIndex()! + voiceOffset;
 
                 let newTrack =
-                    timeline.children[newVoiceIndex].children[newTrackIndex];
+                    this._timeline.children[newVoiceIndex].children[
+                        newTrackIndex
+                    ];
 
                 newGhostItems = newGhostItems.concat(
                     new GhostItemModel(item, newStart, newEnd, newTrack)
@@ -291,7 +289,7 @@ export class Controller {
                 );
                 this._selectedItems = [];
             }
-            this.refreshTimeline();
+            this._timeline.refresh();
         }
     }
 
@@ -311,7 +309,9 @@ export class Controller {
         }
     }
 
-    constructor(private _store: Writable<TimelineModel>) {
+    constructor() {
+        this._timeline = new TimelineModel(this);
+
         document.addEventListener("mousedown", (event) => {
             if (event.button != 0) {
                 return;
@@ -343,7 +343,7 @@ export class Controller {
 
             this.highlight = null;
 
-            this.refreshTimeline();
+            this._timeline.refresh();
             this.updateCursor();
         });
 
@@ -373,7 +373,7 @@ export class Controller {
 
             this._selectedItemOnClick = false;
 
-            this.refreshTimeline();
+            this._timeline.refresh();
             this.updateCursor();
         });
 
@@ -384,9 +384,7 @@ export class Controller {
 
             let pos = event.clientX - area.offsetLeft + area.scrollLeft;
 
-            let timeline = get(this._store);
-
-            let beat = Math.min(Math.max(pos / 64, 0), timeline.length);
+            let beat = Math.min(Math.max(pos / 64, 0), this._timeline.length);
 
             this._hoveredBeat = beat;
             this.drag();
@@ -397,7 +395,7 @@ export class Controller {
         document.addEventListener("dblclick", (_) => {
             const app = document.getElementById("app");
             const onClose = () => {
-                this.refreshTimeline();
+                this._timeline.refresh();
             };
             if (this._hoveredItem && app) {
                 new Popup({
@@ -415,14 +413,15 @@ export class Controller {
                 this.highlight.tracks.forEach((track) => {
                     let newItem = new ItemModel(
                         this.highlight!.start,
-                        this.highlight!.end
+                        this.highlight!.end,
+                        this
                     );
                     track.addChild(newItem);
                 });
 
                 this.highlight = null;
 
-                this.refreshTimeline();
+                this._timeline.refresh();
             }
         });
 
@@ -443,7 +442,7 @@ export class Controller {
 
             this._selectedItems = [];
 
-            this.refreshTimeline();
+            this._timeline.refresh();
         });
     }
 }

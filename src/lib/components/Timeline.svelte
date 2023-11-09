@@ -3,8 +3,6 @@
     import VoiceHeader from "./VoiceHeader.svelte";
     import BigMarker from "./svg/BigMarker.svelte";
     import SmallMarker from "./svg/SmallMarker.svelte";
-    import Track from "./Track.svelte";
-    import TrackHeader from "./TrackHeader.svelte";
 
     import { TimelineModel } from "../models";
     import { onMount } from "svelte";
@@ -17,7 +15,6 @@
 
         for (let element of hScroll) {
             element.addEventListener("wheel", (event) => {
-                console.log("horizontal scroll");
                 let wheelEvent = <WheelEvent>event;
                 for (let element of hScroll) {
                     element.scrollLeft += wheelEvent.deltaX;
@@ -26,7 +23,6 @@
         }
         for (let element of vScroll) {
             element.addEventListener("wheel", (event) => {
-                console.log("vertical scroll");
                 let wheelEvent = <WheelEvent>event;
                 for (let element of vScroll) {
                     element.scrollTop += wheelEvent.deltaY;
