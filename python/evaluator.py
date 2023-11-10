@@ -21,6 +21,6 @@ if __name__ == "__main__":
             sys.stdout.write(str(result) + "\n")
             sys.stdout.flush()
         except (Exception, FunctionTimedOut) as e:
-            sys.stderr.write(str(e) + "\n")
-            sys.stderr.flush()
+            sys.stdout.write(str(e) + "\n")
+            sys.stdout.flush()
         
