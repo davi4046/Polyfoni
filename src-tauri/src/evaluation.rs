@@ -1,8 +1,9 @@
 use std::io::{Write, BufReader, BufRead};
 use std::process::{Command, Stdio};
+use std::collections::HashMap;
 
 #[tauri::command]
-pub fn evaluate(app_handle: tauri::AppHandle, input: Vec<(&str, f64)>) -> String {
+pub fn evaluate(app_handle: tauri::AppHandle, tasks: Vec<(&str, HashMap<&str, f64>)>) -> Vec<String> {
     
     let python = app_handle.path_resolver()
         .resolve_resource("../python/venv/Scripts/python.exe")
@@ -24,13 +25,15 @@ pub fn evaluate(app_handle: tauri::AppHandle, input: Vec<(&str, f64)>) -> String
 
     let mut reader = BufReader::new(stdout);
 
-    for i in 0..5 {
-        let input = format!("sin(x), {{\"x\": {i}}}\n");
+    let mut results: Vec<String> = Vec::new();
+
+    for task in tasks {
+        let input = format!("{}, {:?}\n", task.0, task.1);
         stdin.write_all(input.as_bytes()).expect("Failed to write to stdin");
         let mut result = String::new();
         reader.read_line(&mut result).expect("Failed to read from stdout");
-        println!("{result}")
+        results.push(result);
     }
 
-    return "temp".to_string();
+    return results;
 }
