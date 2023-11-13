@@ -9,7 +9,7 @@
 </script>
 
 <VoiceShell>
-    <MidiTrack></MidiTrack>
+    <MidiTrack {data}></MidiTrack>
     {#if !data.isCollapsed}
         {#each data.children as track}
             <Track bind:data={track}></Track>

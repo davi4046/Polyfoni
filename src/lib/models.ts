@@ -161,7 +161,7 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
 export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
     public label = "";
     public isCollapsed = false;
-    public generation: NoteModel[] = [];
+    public generation: Promise<NoteModel[]> | null = null;
 
     createTrack(label: string) {
         let newTrack = new TrackModel(this.controller);
@@ -178,7 +178,7 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 
     getItemAtBeat(beat: number) {
         return this.children.find((item) => {
-            return item.start <= beat && item.end >= beat;
+            return item.start <= beat && item.end > beat;
         });
     }
 
@@ -362,5 +362,10 @@ export class ItemHandleModel {
 }
 
 export class NoteModel {
-    constructor(start: number, end: number, pitch: number, isRest: boolean) {}
+    constructor(
+        public start: number,
+        public end: number,
+        public pitch: number,
+        public isRest: boolean
+    ) {}
 }
