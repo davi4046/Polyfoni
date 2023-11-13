@@ -43,7 +43,6 @@ class Chord {
         let decimal = Number(parts[1]);
 
         if (isNaN(decimal)) {
-            console.log(parts[1]);
             throw new Error("Invalid chord decimal");
         }
 
@@ -73,11 +72,6 @@ class NoteBuilder {
             this.noteIsRest != undefined
         ) {
             let pitch = this.noteChord.degreeToPitch(this.notePitch);
-
-            if (isNaN(pitch)) {
-                console.log("pitch:", this.notePitch);
-                console.log("chord:", this.noteChord);
-            }
 
             return new NoteModel(
                 this.noteStart,
@@ -112,7 +106,7 @@ export class Generator {
                         let index = durations.length;
 
                         let response = (await invoke("evaluate", {
-                            tasks: [[item.content, { x: index }]],
+                            tasks: [`${item.content}, {"x": ${index}}`],
                         })) as Array<String>;
 
                         let num = Number(response[0].trim());
@@ -172,7 +166,7 @@ export class Generator {
                             itemCounter.set(item, index);
 
                             let response = (await invoke("evaluate", {
-                                tasks: [[item.content, { x: index }]],
+                                tasks: [`${item.content}, {"x": ${index}}`],
                             })) as Array<String>;
 
                             let pitch = Number(response[0].trim());
@@ -199,7 +193,7 @@ export class Generator {
                             itemCounter.set(item, index);
 
                             let response = (await invoke("evaluate", {
-                                tasks: [[item.content, { x: index }]],
+                                tasks: [`${item.content}, {"x": ${index}}`],
                             })) as Array<String>;
 
                             let s = response[0].trim();
