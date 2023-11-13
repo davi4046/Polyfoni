@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
 
 import { ChangeTracker } from "./change-tracker";
 import Popup from "./components/Popup.svelte";
+import { Generator } from "./generator";
 import {
     GhostItemModel,
     HighlightModel,
@@ -29,6 +30,8 @@ export class Controller {
     public ghostItems: GhostItemModel[] = [];
 
     private _timeline: TimelineModel;
+    private _generator: Generator;
+
     private _tracker = new ChangeTracker();
 
     get timeline() {
@@ -311,6 +314,7 @@ export class Controller {
 
     constructor() {
         this._timeline = new TimelineModel(this);
+        this._generator = new Generator(this._timeline);
 
         document.addEventListener("mousedown", (event) => {
             if (event.button != 0) {
@@ -356,6 +360,7 @@ export class Controller {
                 }
             } else {
                 this.placeGhostItems();
+                this._generator.regenerate();
             }
 
             if (this._clickedHandle) {
@@ -395,6 +400,7 @@ export class Controller {
         document.addEventListener("dblclick", (_) => {
             const app = document.getElementById("app");
             const onClose = () => {
+                this._generator.regenerate();
                 this._timeline.refresh();
             };
             if (this._hoveredItem && app) {
@@ -442,6 +448,7 @@ export class Controller {
 
             this._selectedItems = [];
 
+            this._generator.regenerate();
             this._timeline.refresh();
         });
     }

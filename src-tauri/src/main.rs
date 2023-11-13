@@ -3,6 +3,8 @@
 
 use tauri::{CustomMenuItem, Menu, Submenu};
 
+mod evaluation;
+
 fn create_menu() -> Menu {
     return Menu::new()
         .add_submenu(Submenu::new("File",Menu::new()
@@ -17,9 +19,8 @@ fn create_menu() -> Menu {
 }
 
 fn main() {
-    let menu = create_menu();
     tauri::Builder::default()
-        .menu(menu)
+        .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
                 "quit" => {
@@ -34,6 +35,7 @@ fn main() {
                 _ => {}
             }
         })
+        .invoke_handler(tauri::generate_handler![evaluation::evaluate])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
