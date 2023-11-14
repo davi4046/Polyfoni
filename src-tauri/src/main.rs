@@ -1,7 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{CustomMenuItem, Menu, Submenu};
+use evaluation::Evaluator;
+use tauri::{CustomMenuItem, Menu, Submenu, Manager};
+use workerpool::Pool;
+use std::{env, sync::Mutex};
 
 mod evaluation;
 
@@ -20,6 +23,23 @@ fn create_menu() -> Menu {
 
 fn main() {
     tauri::Builder::default()
+        .setup(|app| {
+            env::set_var("PYTHON_PATH", app.path_resolver()
+                .resolve_resource("../python/venv/Scripts/python.exe")
+                .expect("Failed to resolve resource")
+            );
+
+            env::set_var("SCRIPT_PATH", app.path_resolver()
+                .resolve_resource("../python/evaluator.py")
+                .expect("Failed to resolve resource")
+            );
+
+            let pool = Pool::<Evaluator>::new(4);
+
+            app.manage(Mutex::new(pool));
+
+            Ok(())
+        })
         .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
