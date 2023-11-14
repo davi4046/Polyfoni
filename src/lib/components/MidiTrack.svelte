@@ -23,7 +23,7 @@
                         1) *
                     height}
                 <div
-                    class="absolute bg-green-500 z-30 border-green-600 border-r-2 border-b-2"
+                    class="absolute z-30 bg-black"
                     style="width:{width}px; left:{left}px; height:{height}%; top:{top}%;"
                     title={String(note.pitch)}
                 ></div>

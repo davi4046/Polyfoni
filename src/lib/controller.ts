@@ -1,7 +1,11 @@
+import { onMount } from "svelte";
+
 import { listen } from "@tauri-apps/api/event";
 
 import { ChangeTracker } from "./change-tracker";
 import Popup from "./components/Popup.svelte";
+import PauseIcon from "./components/svg/PauseIcon.svelte";
+import PlayIcon from "./components/svg/PlayIcon.svelte";
 import { Generator } from "./generator";
 import {
     GhostItemModel,
@@ -34,6 +38,13 @@ export class Controller {
 
     private _tracker = new ChangeTracker();
 
+    private _playbackPosition = 0;
+    private _playbackIntervalId: number | null = null;
+    private _isPlaying = false;
+
+    private _hScrollElements: Element[] = [];
+    private _vScrollElements: Element[] = [];
+
     get timeline() {
         return this._timeline;
     }
@@ -57,6 +68,56 @@ export class Controller {
     setHoveredHandle(newHandle: ItemHandleModel | null) {
         this._hoveredHandle = newHandle;
         this.updateCursor();
+    }
+
+    private set playbackPosition(newPosition: number) {
+        this._playbackPosition = newPosition;
+
+        const playerHead = document.getElementById("player-head")!;
+        const playerBody = document.getElementById("player-body")!;
+
+        let playerPositionPx = Math.round(newPosition * 64);
+
+        if (playerHead && playerBody) {
+            playerHead.style.setProperty("left", playerPositionPx + "px");
+            playerBody.style.setProperty("left", playerPositionPx + "px");
+        }
+
+        let width = playerBody.parentElement!.parentElement!.clientWidth;
+        let maxVisiblePx = width + this._hScrollElements[0].scrollLeft;
+
+        if (playerPositionPx > maxVisiblePx) {
+            for (let element of this._hScrollElements) {
+                element.scrollLeft = playerPositionPx;
+            }
+        }
+    }
+
+    private get playbackPosition() {
+        return this._playbackPosition;
+    }
+
+    private startPlayback() {
+        const BPM = 60;
+        this._playbackIntervalId = window.setInterval(() => {
+            if (this.playbackPosition >= this.timeline.length) {
+                this.pausePlayback();
+            }
+            this.playbackPosition += BPM / 6000;
+        }, 10);
+        this._isPlaying = true;
+    }
+
+    private pausePlayback() {
+        if (this._playbackIntervalId) {
+            window.clearInterval(this._playbackIntervalId);
+            this._isPlaying = false;
+        }
+    }
+
+    private resetPlayback() {
+        this.pausePlayback();
+        this.playbackPosition = 0;
     }
 
     private makeHighlight(
@@ -305,7 +366,7 @@ export class Controller {
             } else {
                 document.getElementById("app")!.style.cursor = "default";
             }
-        } else if (this._clickedTrack) {
+        } else if (this._clickedTrack && this.highlight) {
             document.getElementById("app")!.style.cursor = "crosshair";
         } else {
             document.getElementById("app")!.style.cursor = "default";
@@ -369,6 +430,15 @@ export class Controller {
                 } else if (this._clickedHandle.endHandleOfItem) {
                     this._clickedHandle.endHandleOfItem.updateHandles();
                 }
+            }
+
+            if (
+                this._clickedBeat &&
+                !this._clickedItem &&
+                !this._clickedHandle &&
+                !this.highlight
+            ) {
+                this.playbackPosition = Math.round(this._clickedBeat);
             }
 
             this._clickedBeat = null;
@@ -450,6 +520,61 @@ export class Controller {
 
             this._generator.regenerate();
             this._timeline.refresh();
+        });
+
+        onMount(() => {
+            const timelineElement = document.getElementById("timeline")!;
+
+            this._hScrollElements = [
+                ...timelineElement.getElementsByClassName("h-scroll"),
+            ];
+
+            this._vScrollElements = [
+                ...timelineElement.getElementsByClassName("v-scroll"),
+            ];
+
+            for (let element of this._hScrollElements) {
+                element.addEventListener("wheel", (event) => {
+                    let wheelEvent = <WheelEvent>event;
+                    for (let element of this._hScrollElements) {
+                        element.scrollLeft += wheelEvent.deltaX;
+                    }
+                });
+            }
+
+            for (let element of this._vScrollElements) {
+                element.addEventListener("wheel", (event) => {
+                    let wheelEvent = <WheelEvent>event;
+                    for (let element of this._vScrollElements) {
+                        element.scrollTop += wheelEvent.deltaY;
+                    }
+                });
+            }
+
+            const startPauseButton =
+                document.getElementById("start-pause-button");
+
+            const resetButton = document.getElementById("reset-button");
+
+            startPauseButton?.addEventListener("click", (_) => {
+                if (this._isPlaying) {
+                    this.pausePlayback();
+                    startPauseButton.innerHTML = "";
+                    new PlayIcon({ target: startPauseButton });
+                } else {
+                    this.startPlayback();
+                    startPauseButton.innerHTML = "";
+                    new PauseIcon({ target: startPauseButton });
+                }
+            });
+
+            resetButton?.addEventListener("click", (_) => {
+                this.resetPlayback();
+                if (startPauseButton) {
+                    startPauseButton.innerHTML = "";
+                    new PlayIcon({ target: startPauseButton });
+                }
+            });
         });
     }
 }

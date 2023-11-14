@@ -51,7 +51,7 @@
                 }}>Apply</button
             >
             <button
-                class="btn btn-sm btn-alternative"
+                class="btn btn-sm btn-primary"
                 on:click={(_) => {
                     close();
                 }}>Cancel</button

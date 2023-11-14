@@ -1,36 +1,32 @@
 @tailwind base;
 @tailwind components;
 
+.btn {
+    @apply font-semibold border-2;
+}
+
 .btn:focus {
     @apply outline-none;
 }
 
 .btn-sm {
-    @apply px-5 py-2.5 text-sm font-medium;
+    @apply px-4 py-2 text-sm;
 }
 
 .btn-primary {
-    @apply text-white bg-blue-700;
-}
-
-.btn-primary:hover {
-    @apply bg-blue-800;
+    @apply text-black bg-gray-400 border-black;
 }
 
 .btn-primary:focus {
-    @apply ring-4 ring-blue-300;
+    @apply ring-2 ring-blue-300;
 }
 
-.btn-alternative {
-    @apply text-white bg-gray-500;
+.item {
+    @apply flex items-center h-full p-2 font-semibold text-black bg-green-500 border-2 border-black;
 }
 
-.btn-alternative:hover {
-    @apply bg-gray-600;
-}
-
-.btn-alternative:focus {
-    @apply ring-4 ring-gray-300;
+.selected {
+    @apply ring-2 ring-blue-300;
 }
 
 @tailwind utilities;

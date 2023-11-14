@@ -8,10 +8,8 @@
     class="absolute z-40 h-full py-1 pointer-events-none"
     style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
 >
-    <div
-        class="flex items-center h-full p-2 bg-green-500 border-2 border-green-600 opacity-75"
-    >
-        <p class="font-medium text-green-900 truncate">
+    <div class="border-opacity-75 opacity-75 item">
+        <p class="truncate">
             {#if data.item.content}
                 {data.item.content}
             {:else}

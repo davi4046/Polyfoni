@@ -13,9 +13,8 @@
 >
     <div class="relative h-full">
         <div
-            class="relative flex items-center h-full p-2 bg-green-500 border-2"
-            class:border-green-600={!data.isSelected()}
-            class:border-blue-600={data.isSelected()}
+            class="relative item"
+            class:selected={data.isSelected()}
             on:mouseenter={(_) => {
                 data.controller?.setHoveredItem(data);
             }}
@@ -24,7 +23,7 @@
             }}
             role="none"
         >
-            <p class="font-medium text-green-900 truncate">
+            <p class="truncate">
                 {#if data.content}
                     {data.content}
                 {:else}
