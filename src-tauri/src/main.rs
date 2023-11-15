@@ -25,12 +25,12 @@ fn main() {
     tauri::Builder::default()
         .setup(|app| {
             env::set_var("PYTHON_PATH", app.path_resolver()
-                .resolve_resource("../python/venv/Scripts/python.exe")
+                .resolve_resource("res/python/venv/Scripts/python.exe")
                 .expect("Failed to resolve resource")
             );
 
             env::set_var("SCRIPT_PATH", app.path_resolver()
-                .resolve_resource("../python/evaluator.py")
+                .resolve_resource("res/python/evaluator.py")
                 .expect("Failed to resolve resource")
             );
 

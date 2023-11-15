@@ -19,6 +19,9 @@
             },
             "globalShortcut": {
                 "all": true
+            },
+            "fs": {
+                "scope": ["$RESOURCE/*"]
             }
         },
         "bundle": {
@@ -32,7 +35,7 @@
                 "icons/icon.icns",
                 "icons/icon.ico"
             ],
-            "resources": ["../python/*"]
+            "resources": ["res/**"]
         },
         "security": {
             "csp": null
