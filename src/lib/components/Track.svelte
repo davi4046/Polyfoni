@@ -25,7 +25,7 @@
             {#if highlight}
                 {#if highlight.tracks.includes(data)}
                     <Highlight
-                        width={(highlight.end - highlight.start) * 64}
+                        width={(highlight.end - highlight.start) * 64 + 1}
                         left={highlight.start * 64}
                     />
                 {/if}

@@ -8,7 +8,8 @@
 
 <div
     class="absolute z-30 h-full py-1"
-    style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
+    style="width: {(data.end - data.start) * 64 + 1}px; left: {data.start *
+        64}px"
     title={data.content}
 >
     <div class="relative h-full">
