@@ -45,6 +45,9 @@ export class Controller {
     private _hScrollElements: Element[] = [];
     private _vScrollElements: Element[] = [];
 
+    private _startButton: HTMLElement | null = null;
+    private _resetButton: HTMLElement | null = null;
+
     get timeline() {
         return this._timeline;
     }
@@ -76,19 +79,19 @@ export class Controller {
         const playerHead = document.getElementById("player-head")!;
         const playerBody = document.getElementById("player-body")!;
 
-        let playerPositionPx = Math.round(newPosition * 64);
+        let newPositionPx = Math.round(newPosition * 64);
 
         if (playerHead && playerBody) {
-            playerHead.style.setProperty("left", playerPositionPx + "px");
-            playerBody.style.setProperty("left", playerPositionPx + "px");
+            playerHead.style.setProperty("left", newPositionPx + "px");
+            playerBody.style.setProperty("left", newPositionPx + "px");
         }
 
         let width = playerBody.parentElement!.parentElement!.clientWidth;
         let maxVisiblePx = width + this._hScrollElements[0].scrollLeft;
 
-        if (playerPositionPx > maxVisiblePx) {
+        if (newPositionPx > maxVisiblePx) {
             for (let element of this._hScrollElements) {
-                element.scrollLeft = playerPositionPx;
+                element.scrollLeft = newPositionPx;
             }
         }
     }
@@ -99,18 +102,36 @@ export class Controller {
 
     private startPlayback() {
         const BPM = 60;
+
         this._playbackIntervalId = window.setInterval(() => {
-            if (this.playbackPosition >= this.timeline.length) {
+            this.playbackPosition = Math.min(
+                this.playbackPosition + BPM / 6000,
+                this.timeline.length
+            );
+            if (this.playbackPosition == this.timeline.length) {
                 this.pausePlayback();
             }
-            this.playbackPosition += BPM / 6000;
         }, 10);
+
+        if (this._startButton) {
+            this._startButton.innerHTML = "";
+            new PauseIcon({ target: this._startButton });
+        }
+
         this._isPlaying = true;
     }
 
     private pausePlayback() {
         if (this._playbackIntervalId) {
             window.clearInterval(this._playbackIntervalId);
+
+            if (this._startButton) {
+                this._startButton.innerHTML = "";
+                new PlayIcon({
+                    target: this._startButton,
+                });
+            }
+
             this._isPlaying = false;
         }
     }
@@ -551,29 +572,19 @@ export class Controller {
                 });
             }
 
-            const startPauseButton =
-                document.getElementById("start-pause-button");
+            this._startButton = document.getElementById("start-button");
+            this._resetButton = document.getElementById("reset-button");
 
-            const resetButton = document.getElementById("reset-button");
-
-            startPauseButton?.addEventListener("click", (_) => {
+            this._startButton?.addEventListener("click", (_) => {
                 if (this._isPlaying) {
                     this.pausePlayback();
-                    startPauseButton.innerHTML = "";
-                    new PlayIcon({ target: startPauseButton });
                 } else {
                     this.startPlayback();
-                    startPauseButton.innerHTML = "";
-                    new PauseIcon({ target: startPauseButton });
                 }
             });
 
-            resetButton?.addEventListener("click", (_) => {
+            this._resetButton?.addEventListener("click", (_) => {
                 this.resetPlayback();
-                if (startPauseButton) {
-                    startPauseButton.innerHTML = "";
-                    new PlayIcon({ target: startPauseButton });
-                }
             });
         });
     }

@@ -17,7 +17,7 @@
         class="grid grid-cols-[auto,auto] grid-rows-[auto,1fr] h-full p-4 gap-x-1 bg-gray-500"
     >
         <div class="mb-2 space-x-2">
-            <button class="w-8 h-8 p-2 btn btn-primary" id="start-pause-button">
+            <button class="w-8 h-8 p-2 btn btn-primary" id="start-button">
                 <PlayIcon />
             </button>
             <button class="w-8 h-8 p-2 btn btn-primary" id="reset-button">
