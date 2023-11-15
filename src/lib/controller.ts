@@ -1,6 +1,7 @@
 import { onMount } from "svelte";
 
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/tauri";
 
 import { ChangeTracker } from "./change-tracker";
 import Popup from "./components/Popup.svelte";
@@ -12,8 +13,10 @@ import {
     HighlightModel,
     ItemHandleModel,
     ItemModel,
+    NoteModel,
     TimelineModel,
     TrackModel,
+    VoiceModel,
 } from "./models";
 
 export class Controller {
@@ -108,11 +111,44 @@ export class Controller {
     private startPlayback() {
         const BPM = 60;
 
+        let lastPlayedNotes = new Map<VoiceModel, NoteModel>();
+
         this._playbackIntervalId = window.setInterval(() => {
             this.playbackPosition = Math.min(
                 this.playbackPosition + BPM / 6000,
                 this.timeline.length
             );
+
+            this.timeline.children.forEach((voice) => {
+                if (voice.generation) {
+                    voice.generation.then((notes) => {
+                        let currNote = notes.find((note) => {
+                            return (
+                                note.start <= this.playbackPosition &&
+                                note.end > this.playbackPosition
+                            );
+                        });
+
+                        if (currNote && !currNote.isRest) {
+                            if (lastPlayedNotes.get(voice) != currNote) {
+                                let duration =
+                                    ((currNote.end - currNote.start) / BPM) *
+                                    60;
+
+                                invoke("play_note", {
+                                    channel: 0,
+                                    key: currNote.pitch,
+                                    velocity: 100,
+                                    duration: duration,
+                                });
+
+                                lastPlayedNotes.set(voice, currNote);
+                            }
+                        }
+                    });
+                }
+            });
+
             if (this.playbackPosition == this.timeline.length) {
                 this.pausePlayback();
             }
