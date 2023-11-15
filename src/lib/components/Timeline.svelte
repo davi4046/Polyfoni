@@ -79,7 +79,8 @@
                     {/each}
                 </div>
                 <div
-                    class="absolute left-0 z-40 h-full -translate-x-1/2 bg-cyan-300 w-0.5"
+                    class="absolute z-40 h-full -translate-x-1/2 bg-cyan-300 w-0.5"
+                    style="left: 1px;"
                     id="player-body"
                 ></div>
             </div>

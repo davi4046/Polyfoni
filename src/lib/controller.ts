@@ -79,19 +79,24 @@ export class Controller {
         const playerHead = document.getElementById("player-head")!;
         const playerBody = document.getElementById("player-body")!;
 
-        let newPositionPx = Math.round(newPosition * 64);
+        let newPositionPx = Math.min(
+            Math.round(newPosition * 64 + 1),
+            this.timeline.length * 64 - 1
+        );
 
         if (playerHead && playerBody) {
             playerHead.style.setProperty("left", newPositionPx + "px");
             playerBody.style.setProperty("left", newPositionPx + "px");
         }
 
-        let width = playerBody.parentElement!.parentElement!.clientWidth;
-        let maxVisiblePx = width + this._hScrollElements[0].scrollLeft;
+        const trackDiv = playerBody.parentElement!.parentElement!;
 
-        if (newPositionPx > maxVisiblePx) {
+        let minVisiblePx = trackDiv.scrollLeft;
+        let maxVisiblePx = trackDiv.clientWidth + trackDiv.scrollLeft;
+
+        if (newPositionPx < minVisiblePx || newPositionPx > maxVisiblePx) {
             for (let element of this._hScrollElements) {
-                element.scrollLeft = newPositionPx;
+                element.scrollLeft = newPositionPx - 1;
             }
         }
     }
