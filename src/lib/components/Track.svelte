@@ -13,6 +13,9 @@
     on:mouseenter={(_) => {
         data.controller?.setHoveredTrack(data);
     }}
+    on:mouseleave={(_) => {
+        data.controller?.setHoveredTrack(null);
+    }}
     role="none"
 >
     <TrackShell>

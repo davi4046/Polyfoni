@@ -455,6 +455,7 @@ export class Controller {
 
             if (
                 this._clickedBeat &&
+                this._clickedTrack &&
                 !this._clickedItem &&
                 !this._clickedHandle &&
                 !this.highlight
