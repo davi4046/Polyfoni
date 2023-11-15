@@ -35,7 +35,7 @@
                 "icons/icon.icns",
                 "icons/icon.ico"
             ],
-            "resources": ["res/**"]
+            "resources": ["res/**/*"]
         },
         "security": {
             "csp": null
