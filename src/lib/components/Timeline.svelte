@@ -26,7 +26,10 @@
         </div>
         <!-- Markers -->
         <div class="h-full overflow-hidden h-scroll">
-            <div class="relative h-full" style="width: {data.length * 64}px">
+            <div
+                class="relative h-full overflow-clip"
+                style="width: {data.length * 64}px"
+            >
                 {#each Array(data.length) as _, index}
                     <div
                         class="absolute flex h-6 bottom-0 space-x-1.5 text-gray-900"
@@ -59,7 +62,7 @@
         <!-- Tracks -->
         <div class="h-full overflow-hidden h-scroll cursor-area">
             <div
-                class="relative flex flex-col h-full"
+                class="relative flex flex-col h-full overflow-clip"
                 style="width: {data.length * 64}px"
             >
                 <div class="relative space-y-4 overflow-hidden v-scroll">
