@@ -25,13 +25,14 @@ fn create_menu() -> Menu {
 }
 
 #[tauri::command(async)]
-fn play_note(synthesizer: tauri::State<Arc<Mutex<Synthesizer>>>, channel: i32, key: i32, velocity: i32, duration: f32) {
+fn note_on(synthesizer: tauri::State<Arc<Mutex<Synthesizer>>>, channel: i32, key: i32, velocity: i32) {
     let synth_clone = synthesizer.clone();
-
     synth_clone.lock().unwrap().note_on(channel, key, velocity);
+}
 
-    std::thread::sleep(std::time::Duration::from_secs_f32(duration));
-
+#[tauri::command(async)]
+fn note_off(synthesizer: tauri::State<Arc<Mutex<Synthesizer>>>, channel: i32, key: i32) {
+    let synth_clone = synthesizer.clone();
     synth_clone.lock().unwrap().note_off(channel, key);
 }
 
@@ -109,7 +110,7 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![evaluation::evaluate, play_note])
+        .invoke_handler(tauri::generate_handler![evaluation::evaluate, note_on, note_off])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

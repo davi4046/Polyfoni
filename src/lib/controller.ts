@@ -51,6 +51,8 @@ export class Controller {
     private _startButton: HTMLElement | null = null;
     private _resetButton: HTMLElement | null = null;
 
+    private _playingNotes = new Map<VoiceModel, NoteModel | undefined>();
+
     get timeline() {
         return this._timeline;
     }
@@ -111,43 +113,44 @@ export class Controller {
     private startPlayback() {
         const BPM = 60;
 
-        let lastPlayedNotes = new Map<VoiceModel, NoteModel>();
-
         this._playbackIntervalId = window.setInterval(() => {
             this.playbackPosition = Math.min(
                 this.playbackPosition + BPM / 6000,
                 this.timeline.length
             );
 
-            this.timeline.children.forEach((voice) => {
-                if (voice.generation) {
-                    voice.generation.then((notes) => {
-                        let currNote = notes.find((note) => {
-                            return (
-                                note.start <= this.playbackPosition &&
-                                note.end > this.playbackPosition
-                            );
-                        });
+            for (let voice of this.timeline.children) {
+                if (!voice.generation) continue;
 
-                        if (currNote && !currNote.isRest) {
-                            if (lastPlayedNotes.get(voice) != currNote) {
-                                let duration =
-                                    ((currNote.end - currNote.start) / BPM) *
-                                    60;
-
-                                invoke("play_note", {
-                                    channel: 0,
-                                    key: currNote.pitch,
-                                    velocity: 100,
-                                    duration: duration,
-                                });
-
-                                lastPlayedNotes.set(voice, currNote);
-                            }
-                        }
+                voice.generation.then((notes) => {
+                    let note = notes.find((note) => {
+                        return (
+                            note.start <= this.playbackPosition &&
+                            note.end > this.playbackPosition
+                        );
                     });
-                }
-            });
+
+                    let currNote = this._playingNotes.get(voice);
+
+                    if (note == currNote) return;
+
+                    if (currNote && !currNote.isRest) {
+                        invoke("note_off", {
+                            channel: voice.getIndex(),
+                            key: currNote.pitch,
+                        });
+                    }
+                    if (note && !note.isRest) {
+                        invoke("note_on", {
+                            channel: voice.getIndex(),
+                            key: note.pitch,
+                            velocity: 100,
+                        });
+                    }
+
+                    this._playingNotes.set(voice, note);
+                });
+            }
 
             if (this.playbackPosition == this.timeline.length) {
                 this.pausePlayback();
@@ -163,22 +166,28 @@ export class Controller {
     }
 
     private pausePlayback() {
-        if (this._playbackIntervalId) {
-            window.clearInterval(this._playbackIntervalId);
+        if (!this._playbackIntervalId) return;
 
-            if (this._startButton) {
-                this._startButton.innerHTML = "";
-                new PlayIcon({
-                    target: this._startButton,
-                });
-            }
+        window.clearInterval(this._playbackIntervalId);
 
-            this._isPlaying = false;
+        if (this._startButton) {
+            this._startButton.innerHTML = "";
+            new PlayIcon({
+                target: this._startButton,
+            });
         }
+
+        this._playingNotes.forEach((note, voice) => {
+            if (!note) return;
+            invoke("note_off", { channel: voice.getIndex(), key: note.pitch });
+        });
+
+        this._isPlaying = false;
     }
 
     private resetPlayback() {
         this.pausePlayback();
+        this._playingNotes.clear();
         this.playbackPosition = 0;
     }
 
@@ -188,15 +197,11 @@ export class Controller {
         fromTrack: TrackModel,
         toTrack: TrackModel
     ) {
-        if (fromBeat == toBeat) {
-            return;
-        }
+        if (fromBeat == toBeat) return;
 
         let tracks = this._timeline.getTracksFromTo(fromTrack, toTrack);
 
-        if (tracks == null) {
-            return;
-        }
+        if (tracks == null) return;
 
         let minBeat = Math.floor(Math.min(fromBeat, toBeat));
         let maxBeat = Math.ceil(Math.max(fromBeat, toBeat));
@@ -316,11 +321,8 @@ export class Controller {
         //sort items to avoid them clearing each other on move
         if (isForwardMove) {
             this.ghostItems.sort((a, b) => {
-                if (a.item.start > b.item.start) {
-                    return -1;
-                } else {
-                    return 1;
-                }
+                if (a.item.start > b.item.start) return -1;
+                else return 1;
             });
         } else {
             this.ghostItems.sort((a, b) => {
@@ -440,9 +442,8 @@ export class Controller {
         this._generator = new Generator(this._timeline);
 
         document.addEventListener("mousedown", (event) => {
-            if (event.button != 0) {
-                return;
-            }
+            if (event.button != 0) return;
+
             if (this._hoveredBeat) {
                 this._clickedBeat = this._hoveredBeat;
             }
