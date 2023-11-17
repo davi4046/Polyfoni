@@ -341,57 +341,6 @@ export class Controller {
         this.ghostItems = [];
     }
 
-    private adjustHandle(handle: ItemHandleModel, toBeat: number) {
-        toBeat = Math.round(toBeat);
-        if (handle.startHandleOfItem && handle.endHandleOfItem) {
-            if (
-                toBeat < handle.startHandleOfItem.end &&
-                toBeat > handle.endHandleOfItem.start
-            ) {
-                handle.startHandleOfItem.start = toBeat;
-                handle.endHandleOfItem.end = toBeat;
-            }
-        } else if (handle.startHandleOfItem) {
-            let siblings = handle.startHandleOfItem.parent!.children.slice();
-            siblings.sort((a, b) => {
-                if (a.start > b.start) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            });
-            let x = siblings.findLast((item) => {
-                return (
-                    item.end <= this._clickedHandle!.startHandleOfItem!.start
-                );
-            });
-            if (x) {
-                toBeat = Math.max(toBeat, x.end);
-            }
-            if (toBeat < handle.startHandleOfItem.end) {
-                handle.startHandleOfItem.start = toBeat;
-            }
-        } else if (handle.endHandleOfItem) {
-            let siblings = handle.endHandleOfItem.parent!.children.slice();
-            siblings.sort((a, b) => {
-                if (a.start > b.start) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            });
-            let x = siblings.find((item) => {
-                return item.start >= this._clickedHandle!.endHandleOfItem!.end;
-            });
-            if (x) {
-                toBeat = Math.min(toBeat, x.start);
-            }
-            if (toBeat > handle.endHandleOfItem.start) {
-                handle.endHandleOfItem.end = toBeat;
-            }
-        }
-    }
-
     private drag() {
         if (
             this._hoveredBeat &&
@@ -400,7 +349,7 @@ export class Controller {
             this._clickedTrack
         ) {
             if (this._clickedHandle) {
-                this.adjustHandle(this._clickedHandle, this._hoveredBeat);
+                this._clickedHandle.updateBeat(Math.round(this._hoveredBeat));
             } else if (this._clickedItem) {
                 this.makeGhostItems(
                     this._clickedBeat,
@@ -488,11 +437,13 @@ export class Controller {
             }
 
             if (this._clickedHandle) {
-                if (this._clickedHandle.startHandleOfItem) {
-                    this._clickedHandle.startHandleOfItem.updateHandles();
-                } else if (this._clickedHandle.endHandleOfItem) {
-                    this._clickedHandle.endHandleOfItem.updateHandles();
-                }
+                if (this._clickedHandle.itemL)
+                    this._clickedHandle.itemL.updateHandles();
+
+                if (this._clickedHandle.itemR)
+                    this._clickedHandle.itemR.updateHandles();
+
+                this._generator.regenerate();
             }
 
             if (

@@ -10,6 +10,10 @@ abstract class TreeNode<
     private _parent: T | null = null;
     private _children: U[] = [];
 
+    protected get proxy() {
+        return this._proxy;
+    }
+
     get parent() {
         return this._parent;
     }
@@ -291,16 +295,10 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 
     updateHandles() {
-        if (this.startHandle) {
-            this.startHandle.startHandleOfItem = null;
-        }
-        if (this.endHandle) {
-            this.endHandle.endHandleOfItem = null;
-        }
+        if (this.startHandle) this.startHandle.itemL = undefined;
+        if (this.endHandle) this.endHandle.itemR = undefined;
 
-        if (!this.parent) {
-            return;
-        }
+        if (!this.parent) return;
 
         let itemAtStart = this.parent.children.find((item) => {
             return item.end == this.start;
@@ -310,13 +308,15 @@ export class ItemModel extends TreeNode<TrackModel, null> {
         });
 
         this.startHandle = new ItemHandleModel(
-            this,
-            itemAtStart != undefined ? itemAtStart : null,
+            this.start,
+            itemAtStart,
+            this.proxy,
             this.controller
         );
         this.endHandle = new ItemHandleModel(
-            itemAtEnd != undefined ? itemAtEnd : null,
-            this,
+            this.end,
+            this.proxy,
+            itemAtEnd,
             this.controller
         );
 
@@ -355,11 +355,75 @@ export class GhostItemModel {
 }
 
 export class ItemHandleModel {
+    private _beat = 0;
+
+    updateBeat(newBeat: number): number {
+        if (this.itemL && this.itemR) {
+            if (newBeat <= this.itemL.start || newBeat >= this.itemR.end) {
+                return this.beat;
+            }
+        } else if (this.itemL && this.itemL.parent) {
+            let siblings = this.itemL.parent.children.slice();
+
+            siblings.sort((a, b) => {
+                if (a.start > b.start) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+
+            let nextItem = siblings.find((item) => {
+                return item.start >= this.itemL!.end;
+            });
+
+            if (nextItem) newBeat = Math.min(newBeat, nextItem.start);
+
+            if (newBeat <= this.itemL.start) {
+                return this._beat;
+            }
+        } else if (this.itemR && this.itemR.parent) {
+            let siblings = this.itemR.parent.children.slice();
+
+            siblings.sort((a, b) => {
+                if (a.start > b.start) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+
+            let prevItem = siblings.findLast((item) => {
+                return item.end <= this.itemR!.start;
+            });
+
+            if (prevItem) newBeat = Math.max(newBeat, prevItem.end);
+
+            if (newBeat >= this.itemR.end) {
+                return this._beat;
+            }
+        }
+
+        if (this.itemL) this.itemL.end = newBeat;
+        if (this.itemR) this.itemR.start = newBeat;
+
+        this._beat = newBeat;
+
+        return newBeat;
+    }
+
+    get beat() {
+        return this._beat;
+    }
+
     constructor(
-        public startHandleOfItem: ItemModel | null,
-        public endHandleOfItem: ItemModel | null,
+        beat: number,
+        public itemL: ItemModel | undefined,
+        public itemR: ItemModel | undefined,
         public controller: Controller | null
-    ) {}
+    ) {
+        this.updateBeat(beat);
+    }
 }
 
 export class NoteModel {
