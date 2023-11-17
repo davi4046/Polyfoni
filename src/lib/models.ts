@@ -291,39 +291,40 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 
     updateHandles() {
-        if (this.parent) {
-            let itemAtStart = this.parent.children.find((item) => {
-                return item.end == this.start;
-            });
+        if (this.startHandle) {
+            this.startHandle.startHandleOfItem = null;
+        }
+        if (this.endHandle) {
+            this.endHandle.endHandleOfItem = null;
+        }
 
-            let itemAtEnd = this.parent.children.find((item) => {
-                return item.start == this.end;
-            });
+        if (!this.parent) {
+            return;
+        }
 
-            if (this.startHandle) {
-                this.startHandle.startHandleOfItem = null;
-            }
-            if (this.endHandle) {
-                this.endHandle.endHandleOfItem = null;
-            }
+        let itemAtStart = this.parent.children.find((item) => {
+            return item.end == this.start;
+        });
+        let itemAtEnd = this.parent.children.find((item) => {
+            return item.start == this.end;
+        });
 
-            this.startHandle = new ItemHandleModel(
-                this,
-                itemAtStart != undefined ? itemAtStart : null,
-                this.controller
-            );
-            this.endHandle = new ItemHandleModel(
-                itemAtEnd != undefined ? itemAtEnd : null,
-                this,
-                this.controller
-            );
+        this.startHandle = new ItemHandleModel(
+            this,
+            itemAtStart != undefined ? itemAtStart : null,
+            this.controller
+        );
+        this.endHandle = new ItemHandleModel(
+            itemAtEnd != undefined ? itemAtEnd : null,
+            this,
+            this.controller
+        );
 
-            if (itemAtStart) {
-                itemAtStart.endHandle = this.startHandle;
-            }
-            if (itemAtEnd) {
-                itemAtEnd.startHandle = this.endHandle;
-            }
+        if (itemAtStart) {
+            itemAtStart.endHandle = this.startHandle;
+        }
+        if (itemAtEnd) {
+            itemAtEnd.startHandle = this.endHandle;
         }
     }
 
