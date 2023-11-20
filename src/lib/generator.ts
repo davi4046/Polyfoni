@@ -91,12 +91,13 @@ export class Generator {
         console.log("regenerate called");
 
         for (let voice of this._timeline.children) {
-            voice.generation = new Promise(async (resolve, reject) => {
-                let durationsMap = new Map<ItemModel, number[] | string>();
+            voice.generation = new Promise(async (resolve, _) => {
+                let durationsMap = new Map<ItemModel, number[]>();
 
                 const durationsTrack = voice.children[1];
 
                 for (let item of durationsTrack.children) {
+                    item.error = null;
                     let length = item.end - item.start;
                     let sum = 0;
 
@@ -112,7 +113,8 @@ export class Generator {
                         let num = Number(response[0].trim());
 
                         if (isNaN(num)) {
-                            durationsMap.set(item, response[0].trim());
+                            durationsMap.set(item, []);
+                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
                             break;
                         }
 
@@ -158,9 +160,13 @@ export class Generator {
 
                     const track = voice.children[0];
 
+                    for (let item of track.children) {
+                        item.error = null;
+                    }
+
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item) {
+                        if (item && !item.error) {
                             let counter = itemCounter.get(item);
                             let index = counter != undefined ? counter + 1 : 0;
                             itemCounter.set(item, index);
@@ -172,6 +178,7 @@ export class Generator {
                             let pitch = Number(response[0].trim());
 
                             if (isNaN(pitch)) {
+                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
                                 continue;
                             }
 
@@ -185,9 +192,13 @@ export class Generator {
 
                     const track = voice.children[2];
 
+                    for (let item of track.children) {
+                        item.error = null;
+                    }
+
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item) {
+                        if (item && !item.error) {
                             let counter = itemCounter.get(item);
                             let index = counter != undefined ? counter + 1 : 0;
                             itemCounter.set(item, index);
@@ -205,6 +216,11 @@ export class Generator {
                                     ? false
                                     : undefined;
 
+                            if (isRest == undefined) {
+                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                                continue;
+                            }
+
                             note.noteIsRest = isRest;
                         }
                     }
@@ -217,7 +233,7 @@ export class Generator {
 
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item) {
+                        if (item && !item.error) {
                             let counter = itemCounter.get(item);
                             let index = counter != undefined ? counter + 1 : 0;
                             itemCounter.set(item, index);
@@ -246,6 +262,7 @@ export class Generator {
                     generation.push(note);
                 });
 
+                voice.controller.timeline.refresh();
                 resolve(generation);
             });
         }

@@ -241,6 +241,7 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     public endHandle: ItemHandleModel | null = null;
 
     public content = "";
+    public error: String | null = null;
 
     set start(newStart: number) {
         if (newStart < this._start) {
