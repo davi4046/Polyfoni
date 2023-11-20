@@ -431,10 +431,22 @@ export class ItemHandleModel {
 }
 
 export class NoteModel {
+    private static _count = 0;
+
+    private _id: number;
+
+    get id() {
+        return this._id;
+    }
+
     constructor(
         public start: number,
         public end: number,
         public pitch: number,
         public isRest: boolean
-    ) {}
+    ) {
+        this._id = NoteModel._count;
+
+        NoteModel._count += 1;
+    }
 }

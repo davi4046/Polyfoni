@@ -22,11 +22,13 @@
                         uniquePitches.indexOf(note.pitch) -
                         1) *
                     height}
+                {@const title = String(note.pitch)}
                 <div
+                    id="note-{note.id}"
                     class="absolute z-30 bg-black"
                     style="width:{width}px; left:{left}px; height:{height}%; top:{top}%;"
-                    title={String(note.pitch)}
-                ></div>
+                    {title}
+                />
             {/each}
         {/await}
     {/if}

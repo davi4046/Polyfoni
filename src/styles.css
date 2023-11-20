@@ -40,3 +40,7 @@
 }
 
 @tailwind utilities;
+
+.active-note {
+    @apply bg-cyan-400;
+}

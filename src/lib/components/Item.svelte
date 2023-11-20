@@ -43,7 +43,7 @@
     {/if}
     {#if data.error}
         <div
-            class="squiggly-line-red h-3 w-full left-0 absolute bottom-0 -my-1 z-40 pointer-events-none"
+            class="absolute bottom-0 left-0 z-40 w-full h-3 -my-1 pointer-events-none squiggly-line-red"
         />
     {/if}
 </div>

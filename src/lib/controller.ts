@@ -139,13 +139,22 @@ export class Controller {
                             channel: voice.getIndex(),
                             key: currNote.pitch,
                         });
+                        let noteElement = document.getElementById(
+                            `note-${currNote.id}`
+                        );
+                        noteElement?.classList.remove("active-note");
                     }
+
                     if (note && !note.isRest) {
                         invoke("note_on", {
                             channel: voice.getIndex(),
                             key: note.pitch,
                             velocity: 100,
                         });
+                        let noteElement = document.getElementById(
+                            `note-${note.id}`
+                        );
+                        noteElement?.classList.add("active-note");
                     }
 
                     this._playingNotes.set(voice, note);
