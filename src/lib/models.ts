@@ -2,6 +2,8 @@ import { writable } from "svelte/store";
 
 import { Controller } from "./controller";
 
+import type { Interval } from "./interval";
+
 abstract class TreeNode<
     T extends TreeNode<any, any> | null,
     U extends TreeNode<any, any> | null,
@@ -179,6 +181,7 @@ export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
 
 export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
     public label = "";
+    public uncoveredIntervals: Interval[] = [];
 
     getItemAtBeat(beat: number) {
         return this.children.find((item) => {

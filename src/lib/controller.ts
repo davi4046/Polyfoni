@@ -321,8 +321,11 @@ export class Controller {
         //sort items to avoid them clearing each other on move
         if (isForwardMove) {
             this.ghostItems.sort((a, b) => {
-                if (a.item.start > b.item.start) return -1;
-                else return 1;
+                if (a.item.start > b.item.start) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             });
         } else {
             this.ghostItems.sort((a, b) => {
@@ -512,6 +515,7 @@ export class Controller {
 
                 this.highlight = null;
 
+                this._generator.regenerate();
                 this._timeline.refresh();
             }
         });

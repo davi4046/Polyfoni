@@ -1,6 +1,9 @@
 import { invoke } from "@tauri-apps/api";
 
+import { mergeIntervals, subtractIntervals } from "./interval";
 import { ItemModel, NoteModel, TimelineModel } from "./models";
+
+import type { Interval } from "./interval";
 
 const pitchnames = [
     "A",
@@ -92,6 +95,34 @@ export class Generator {
 
         for (let voice of this._timeline.children) {
             voice.generation = new Promise(async (resolve, _) => {
+                /* Find uncovered intervals */
+                {
+                    let allIntervals: Interval[] = [];
+
+                    voice.children.forEach((track) => {
+                        track.children.forEach((item) => {
+                            allIntervals.push([item.start, item.end]);
+                        });
+                    });
+
+                    allIntervals.sort((a, b) => {
+                        return a[0] - b[0];
+                    });
+
+                    allIntervals = mergeIntervals(allIntervals);
+
+                    voice.children.forEach((track) => {
+                        let trackIntervals = track.children.map((item) => {
+                            return [item.start, item.end] as Interval;
+                        });
+
+                        track.uncoveredIntervals = subtractIntervals(
+                            allIntervals,
+                            trackIntervals
+                        );
+                    });
+                }
+
                 let durationsMap = new Map<ItemModel, number[]>();
 
                 const durationsTrack = voice.children[1];
@@ -166,24 +197,27 @@ export class Generator {
 
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item && !item.error) {
-                            let counter = itemCounter.get(item);
-                            let index = counter != undefined ? counter + 1 : 0;
-                            itemCounter.set(item, index);
 
-                            let response = (await invoke("evaluate", {
-                                tasks: [`${item.content}, {"x": ${index}}`],
-                            })) as Array<String>;
-
-                            let pitch = Number(response[0].trim());
-
-                            if (isNaN(pitch)) {
-                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
-                                continue;
-                            }
-
-                            note.notePitch = Math.round(pitch);
+                        if (!item || item.error) {
+                            continue;
                         }
+
+                        let counter = itemCounter.get(item);
+                        let index = counter != undefined ? counter + 1 : 0;
+                        itemCounter.set(item, index);
+
+                        let response = (await invoke("evaluate", {
+                            tasks: [`${item.content}, {"x": ${index}}`],
+                        })) as Array<String>;
+
+                        let pitch = Number(response[0].trim());
+
+                        if (isNaN(pitch)) {
+                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                            continue;
+                        }
+
+                        note.notePitch = Math.round(pitch);
                     }
                 }
 
@@ -198,31 +232,34 @@ export class Generator {
 
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item && !item.error) {
-                            let counter = itemCounter.get(item);
-                            let index = counter != undefined ? counter + 1 : 0;
-                            itemCounter.set(item, index);
 
-                            let response = (await invoke("evaluate", {
-                                tasks: [`${item.content}, {"x": ${index}}`],
-                            })) as Array<String>;
-
-                            let s = response[0].trim();
-
-                            let isRest =
-                                s == "True"
-                                    ? true
-                                    : s == "False"
-                                    ? false
-                                    : undefined;
-
-                            if (isRest == undefined) {
-                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
-                                continue;
-                            }
-
-                            note.noteIsRest = isRest;
+                        if (!item || item.error) {
+                            continue;
                         }
+
+                        let counter = itemCounter.get(item);
+                        let index = counter != undefined ? counter + 1 : 0;
+                        itemCounter.set(item, index);
+
+                        let response = (await invoke("evaluate", {
+                            tasks: [`${item.content}, {"x": ${index}}`],
+                        })) as Array<String>;
+
+                        let s = response[0].trim();
+
+                        let isRest =
+                            s == "True"
+                                ? true
+                                : s == "False"
+                                ? false
+                                : undefined;
+
+                        if (isRest == undefined) {
+                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                            continue;
+                        }
+
+                        note.noteIsRest = isRest;
                     }
                 }
 
@@ -233,21 +270,24 @@ export class Generator {
 
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
-                        if (item && !item.error) {
-                            let counter = itemCounter.get(item);
-                            let index = counter != undefined ? counter + 1 : 0;
-                            itemCounter.set(item, index);
 
-                            let chord: Chord;
-
-                            try {
-                                chord = new Chord(item.content);
-                            } catch (error) {
-                                continue;
-                            }
-
-                            note.noteChord = chord;
+                        if (!item || item.error) {
+                            continue;
                         }
+
+                        let counter = itemCounter.get(item);
+                        let index = counter != undefined ? counter + 1 : 0;
+                        itemCounter.set(item, index);
+
+                        let chord: Chord;
+
+                        try {
+                            chord = new Chord(item.content);
+                        } catch (error) {
+                            continue;
+                        }
+
+                        note.noteChord = chord;
                     }
                 }
 

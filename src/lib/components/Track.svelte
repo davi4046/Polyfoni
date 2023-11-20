@@ -22,6 +22,14 @@
         {#each data.children as item}
             <Item bind:data={item}></Item>
         {/each}
+        {#each data.uncoveredIntervals as interval}
+            {@const width = (interval[1] - interval[0]) * 64 + 1}
+            {@const left = interval[0] * 64}
+            <div
+                class="squiggly-line-blue absolute h-3 bottom-0 -my-1 z-40"
+                style="width:{width}px; left:{left}px;"
+            ></div>
+        {/each}
         {@const controller = data.controller}
         {#if controller}
             {@const highlight = controller.highlight}
