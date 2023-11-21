@@ -361,7 +361,14 @@ export class Controller {
             this._clickedTrack
         ) {
             if (this._clickedHandle) {
-                this._clickedHandle.updateBeat(Math.round(this._hoveredBeat));
+                let oldBeat = this._clickedHandle.beat;
+                let newBeat = this._clickedHandle.updateBeat(
+                    Math.round(this._hoveredBeat)
+                );
+                if (newBeat != oldBeat) {
+                    this._generator.updateUncoveredIntervals();
+                    this.timeline.refresh();
+                }
             } else if (this._clickedItem) {
                 this.makeGhostItems(
                     this._clickedBeat,

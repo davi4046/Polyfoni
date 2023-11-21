@@ -90,39 +90,40 @@ class NoteBuilder {
 export class Generator {
     constructor(private _timeline: TimelineModel) {}
 
+    async updateUncoveredIntervals() {
+        for (let voice of this._timeline.children) {
+            let allIntervals: Interval[] = [];
+
+            voice.children.forEach((track) => {
+                track.children.forEach((item) => {
+                    allIntervals.push([item.start, item.end]);
+                });
+            });
+
+            allIntervals.sort((a, b) => {
+                return a[0] - b[0];
+            });
+
+            allIntervals = mergeIntervals(allIntervals);
+
+            voice.children.forEach((track) => {
+                let trackIntervals = track.children.map((item) => {
+                    return [item.start, item.end] as Interval;
+                });
+
+                track.uncoveredIntervals = subtractIntervals(
+                    allIntervals,
+                    trackIntervals
+                );
+            });
+        }
+    }
+
     async regenerate() {
-        console.log("regenerate called");
+        this.updateUncoveredIntervals();
 
         for (let voice of this._timeline.children) {
             voice.generation = new Promise(async (resolve, _) => {
-                /* Find uncovered intervals */
-                {
-                    let allIntervals: Interval[] = [];
-
-                    voice.children.forEach((track) => {
-                        track.children.forEach((item) => {
-                            allIntervals.push([item.start, item.end]);
-                        });
-                    });
-
-                    allIntervals.sort((a, b) => {
-                        return a[0] - b[0];
-                    });
-
-                    allIntervals = mergeIntervals(allIntervals);
-
-                    voice.children.forEach((track) => {
-                        let trackIntervals = track.children.map((item) => {
-                            return [item.start, item.end] as Interval;
-                        });
-
-                        track.uncoveredIntervals = subtractIntervals(
-                            allIntervals,
-                            trackIntervals
-                        );
-                    });
-                }
-
                 let durationsMap = new Map<ItemModel, number[]>();
 
                 const durationsTrack = voice.children[1];
