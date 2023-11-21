@@ -111,6 +111,10 @@ export class Generator {
                     return [item.start, item.end] as Interval;
                 });
 
+                trackIntervals.sort((a, b) => {
+                    return a[0] - b[0];
+                });
+
                 track.uncoveredIntervals = subtractIntervals(
                     allIntervals,
                     trackIntervals
