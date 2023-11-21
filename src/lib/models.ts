@@ -209,6 +209,7 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
         if (i == j && i != null) {
             //because i and j is the same item, we split it
             let itemCopy = new ItemModel(end, i.end, i.controller);
+            itemCopy.content = i.content;
 
             i.end = start;
 
