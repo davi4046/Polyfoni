@@ -1,6 +1,6 @@
 import { onMount } from "svelte";
 
-import { listen } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
 
 import { ChangeTracker } from "./change-tracker";
@@ -52,6 +52,8 @@ export class Controller {
     private _resetButton: HTMLElement | null = null;
 
     private _playingNotes = new Map<VoiceModel, NoteModel | undefined>();
+
+    private _clipboard: [trackIndex: number, item: ItemModel][] = [];
 
     get timeline() {
         return this._timeline;
@@ -413,6 +415,46 @@ export class Controller {
         }
     }
 
+    private copyToClipboard() {
+        if (this.highlight) {
+            this._clipboard = this.highlight.tracks.flatMap((track) => {
+                track.children.sort((a, b) => {
+                    return a.start - b.start;
+                });
+                let i = track.children.findIndex((item) => {
+                    return (
+                        item.end > this.highlight!.start &&
+                        item.end <= this.highlight!.end
+                    );
+                });
+                let j = track.children.findLastIndex((item) => {
+                    return (
+                        item.start < this.highlight!.end &&
+                        item.start >= this.highlight!.start
+                    );
+                });
+                return track.children
+                    .slice(i == -1 ? j : i, (j == -1 ? i : j) + 1)
+                    .map((item) => {
+                        const newItem = new ItemModel(
+                            Math.max(this.highlight!.start, item.start),
+                            Math.min(this.highlight!.end, item.end),
+                            item.controller
+                        );
+
+                        newItem.content = item.content;
+
+                        let result: [number, ItemModel] = [
+                            track.getIndex()!,
+                            newItem,
+                        ];
+
+                        return result;
+                    });
+            });
+        }
+    }
+
     constructor() {
         this._timeline = new TimelineModel(this);
         this._generator = new Generator(this._timeline);
@@ -563,6 +605,40 @@ export class Controller {
 
             this._generator.regenerate();
             this._timeline.refresh();
+        });
+
+        listen("cut", (_) => {
+            this.copyToClipboard();
+            emit("delete");
+        });
+
+        listen("copy", (_) => {
+            this.copyToClipboard();
+        });
+
+        listen("paste", (_) => {
+            const hoveredVoice = this._hoveredTrack?.parent;
+
+            if (!hoveredVoice || !this._hoveredBeat) return;
+
+            this._clipboard.sort((a, b) => {
+                return a[1].start - b[1].start;
+            });
+
+            this._clipboard.forEach((value) => {
+                let offset = value[1].start - this._clipboard[0][1].start;
+
+                let start = Math.floor(this._hoveredBeat!) + offset;
+                let end = start + value[1].end - value[1].start;
+
+                const item = new ItemModel(start, end, this);
+                item.content = value[1].content;
+
+                hoveredVoice.children[value[0]].addChild(item);
+            });
+
+            this._generator.regenerate();
+            this.timeline.refresh();
         });
 
         onMount(() => {

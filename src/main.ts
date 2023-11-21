@@ -12,6 +12,9 @@ import App from "./App.svelte";
 
 unregister("CmdOrCtrl+I");
 unregister("Delete");
+unregister("CmdOrCtrl+X");
+unregister("CmdOrCtrl+C");
+unregister("CmdOrCtrl+V");
 
 const app = new App({
     target: document.getElementById("app"),
@@ -26,4 +29,13 @@ register("CmdOrCtrl+I", (_) => {
 });
 register("Delete", (_) => {
     emit("delete");
+});
+register("CmdOrCtrl+X", (_) => {
+    emit("cut");
+});
+register("CmdOrCtrl+C", (_) => {
+    emit("copy");
+});
+register("CmdOrCtrl+V", (_) => {
+    emit("paste");
 });
