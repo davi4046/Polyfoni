@@ -342,7 +342,7 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 }
 
-export class SelectionModel {
+export class HighlightModel {
     constructor(
         public start: number,
         public end: number,

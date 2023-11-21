@@ -10,10 +10,10 @@ import PlayIcon from "./components/svg/PlayIcon.svelte";
 import { Generator } from "./generator";
 import {
     GhostItemModel,
+    HighlightModel,
     ItemHandleModel,
     ItemModel,
     NoteModel,
-    SelectionModel,
     TimelineModel,
     TrackModel,
     VoiceModel,
@@ -33,7 +33,7 @@ export class Controller {
     private _selectedItems: ItemModel[] = [];
     private _selectedItemOnClick = false;
 
-    public selection: SelectionModel | null = null;
+    public highlight: HighlightModel | null = null;
     public ghostItems: GhostItemModel[] = [];
 
     private _timeline: TimelineModel;
@@ -208,7 +208,7 @@ export class Controller {
         this.playbackPosition = 0;
     }
 
-    private makeSelection(
+    private makeHighlight(
         fromBeat: number,
         toBeat: number,
         fromTrack: TrackModel,
@@ -223,7 +223,7 @@ export class Controller {
         let minBeat = Math.floor(Math.min(fromBeat, toBeat));
         let maxBeat = Math.ceil(Math.max(fromBeat, toBeat));
 
-        this.selection = new SelectionModel(minBeat, maxBeat, tracks);
+        this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
     }
 
     private makeGhostItems(
@@ -385,7 +385,7 @@ export class Controller {
                     this._hoveredTrack
                 );
             } else {
-                this.makeSelection(
+                this.makeHighlight(
                     this._clickedBeat,
                     this._hoveredBeat,
                     this._clickedTrack,
@@ -406,7 +406,7 @@ export class Controller {
             } else {
                 document.getElementById("app")!.style.cursor = "default";
             }
-        } else if (this._clickedTrack && this.selection) {
+        } else if (this._clickedTrack && this.highlight) {
             document.getElementById("app")!.style.cursor = "crosshair";
         } else {
             document.getElementById("app")!.style.cursor = "default";
@@ -445,7 +445,7 @@ export class Controller {
                 this._clickedHandle = this._hoveredHandle;
             }
 
-            this.selection = null;
+            this.highlight = null;
 
             this._timeline.refresh();
             this.updateCursor();
@@ -478,7 +478,7 @@ export class Controller {
                 this._clickedTrack &&
                 !this._clickedItem &&
                 !this._clickedHandle &&
-                !this.selection
+                !this.highlight
             ) {
                 this.playbackPosition = Math.round(this._clickedBeat);
             }
@@ -527,17 +527,17 @@ export class Controller {
         });
 
         listen("insert", (_) => {
-            if (this.selection) {
-                this.selection.tracks.forEach((track) => {
+            if (this.highlight) {
+                this.highlight.tracks.forEach((track) => {
                     let newItem = new ItemModel(
-                        this.selection!.start,
-                        this.selection!.end,
+                        this.highlight!.start,
+                        this.highlight!.end,
                         this
                     );
                     track.addChild(newItem);
                 });
 
-                this.selection = null;
+                this.highlight = null;
 
                 this._generator.regenerate();
                 this._timeline.refresh();
@@ -545,14 +545,14 @@ export class Controller {
         });
 
         listen("delete", (_) => {
-            if (this.selection) {
-                this.selection.tracks.forEach((track) => {
+            if (this.highlight) {
+                this.highlight.tracks.forEach((track) => {
                     track.clearInterval(
-                        this.selection!.start,
-                        this.selection!.end
+                        this.highlight!.start,
+                        this.highlight!.end
                     );
                 });
-                this.selection = null;
+                this.highlight = null;
             }
 
             this._selectedItems.forEach((item) => {
