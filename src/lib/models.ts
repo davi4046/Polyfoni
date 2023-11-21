@@ -299,10 +299,11 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 
     updateHandles() {
-        if (this.startHandle) this.startHandle.itemL = undefined;
-        if (this.endHandle) this.endHandle.itemR = undefined;
-
-        if (!this.parent) return;
+        if (!this.parent) {
+            this.startHandle?.itemL?.updateHandles();
+            this.endHandle?.itemR?.updateHandles();
+            return;
+        }
 
         let itemAtStart = this.parent.children.find((item) => {
             return item.end == this.start;
