@@ -196,7 +196,15 @@ export class Controller {
 
     private resetPlayback() {
         this.pausePlayback();
+
+        this._playingNotes.forEach((note, _) => {
+            if (!note) return;
+            let noteElement = document.getElementById(`note-${note.id}`);
+            noteElement?.classList.remove("active-note");
+        });
+
         this._playingNotes.clear();
+
         this.playbackPosition = 0;
     }
 
