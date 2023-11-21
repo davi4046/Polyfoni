@@ -1,7 +1,7 @@
 <script lang="ts">
     import TrackShell from "./TrackShell.svelte";
     import Item from "./Item.svelte";
-    import Highlight from "./Highlight.svelte";
+    import Highlight from "./Selection.svelte";
     import GhostItem from "./GhostItem.svelte";
 
     import { TrackModel } from "../models";
@@ -26,7 +26,7 @@
             {@const width = (interval[1] - interval[0]) * 64 + 1}
             {@const left = interval[0] * 64}
             <div
-                class="squiggly-line-blue absolute h-3 bottom-0 -my-1 z-40"
+                class="absolute bottom-0 z-40 h-3 -my-1 squiggly-line-blue"
                 style="width:{width}px; left:{left}px;"
             ></div>
         {/each}
