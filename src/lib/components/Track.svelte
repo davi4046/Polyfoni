@@ -2,7 +2,7 @@
     import TrackShell from "./TrackShell.svelte";
     import Item from "./Item.svelte";
     import Warning from "./Warning.svelte";
-    import Selection from "./Selection.svelte";
+    import Highlight from "./Highlight.svelte";
     import GhostItem from "./GhostItem.svelte";
 
     import { TrackModel } from "../models";
@@ -38,7 +38,7 @@
             {@const highlight = controller.selection}
             {#if highlight}
                 {#if highlight.tracks.includes(data)}
-                    <Selection
+                    <Highlight
                         width={(highlight.end - highlight.start) * 64 + 1}
                         left={highlight.start * 64}
                     />
