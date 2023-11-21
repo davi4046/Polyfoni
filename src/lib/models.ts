@@ -1,6 +1,6 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store';
 
-import { Controller } from "./controller";
+import { Controller } from './controller';
 
 import type { Interval } from "./interval";
 
@@ -244,7 +244,7 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     public endHandle: ItemHandleModel | null = null;
 
     public content = "";
-    public error: String | null = null;
+    public error: string | null = null;
 
     set start(newStart: number) {
         if (newStart < this._start) {

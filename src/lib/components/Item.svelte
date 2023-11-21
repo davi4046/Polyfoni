@@ -1,19 +1,19 @@
 <script lang="ts">
     import ItemHandle from "./ItemHandle.svelte";
+    import Highlight from "./Highlight.svelte";
 
     import { ItemModel } from "../models";
 
     export let data: ItemModel;
+
+    $: width = (data.end - data.start) * 64 + 1;
+    $: left = data.start * 64;
 </script>
 
-<div
-    class="absolute z-30 h-full py-1"
-    style="width: {(data.end - data.start) * 64 + 1}px; left: {data.start *
-        64}px"
->
+<div class="absolute h-full py-1.5" style="width: {width}px; left: {left}px">
     <div
-        class="relative item"
-        title={data.error ? data.content + "\n\n" + data.error : data.content}
+        class="relative z-40 item"
+        title={data.content}
         class:selected={data.isSelected()}
         on:mouseenter={(_) => {
             data.controller?.setHoveredItem(data);
@@ -41,9 +41,13 @@
             <ItemHandle data={data.endHandle} />
         </div>
     {/if}
-    {#if data.error}
-        <div
-            class="absolute bottom-0 left-0 z-40 w-full h-3 -my-1 pointer-events-none squiggly-line-red"
-        />
-    {/if}
 </div>
+{#if data.error}
+    <div
+        class="absolute z-30 h-full"
+        style="width: {width}px; left: {left}px;"
+        title={data.error}
+    >
+        <Highlight stripeColor="#ef4444" />
+    </div>
+{/if}
