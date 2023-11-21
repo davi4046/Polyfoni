@@ -35,7 +35,7 @@
         {/each}
         {@const controller = data.controller}
         {#if controller}
-            {@const highlight = controller.highlight}
+            {@const highlight = controller.selection}
             {#if highlight}
                 {#if highlight.tracks.includes(data)}
                     <Selection

@@ -1,6 +1,6 @@
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
-import { Controller } from './controller';
+import { Controller } from "./controller";
 
 import type { Interval } from "./interval";
 
@@ -341,7 +341,7 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 }
 
-export class HighlightModel {
+export class SelectionModel {
     constructor(
         public start: number,
         public end: number,
