@@ -273,6 +273,10 @@ export class Generator {
 
                     const track = voice.children[3];
 
+                    for (let item of track.children) {
+                        item.error = null;
+                    }
+
                     for (let note of noteBuilders) {
                         let item = track.getItemAtBeat(note.noteStart!);
 
@@ -289,6 +293,7 @@ export class Generator {
                         try {
                             chord = new Chord(item.content);
                         } catch (error) {
+                            item.error = error as string;
                             continue;
                         }
 
