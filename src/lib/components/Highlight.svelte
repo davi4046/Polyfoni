@@ -4,6 +4,6 @@
 </script>
 
 <div
-    class="absolute z-30 h-full pointer-events-none bg-cyan-500 bg-opacity-20"
+    class="absolute z-40 h-full bg-opacity-25 pointer-events-none bg-cyan-500 border-x-4 border-x-cyan-500"
     style="width: {width}px; left: {left}px"
 ></div>
