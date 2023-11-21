@@ -1,7 +1,7 @@
 <script lang="ts">
     import TrackShell from "./TrackShell.svelte";
     import Item from "./Item.svelte";
-    import Highlight from "./Highlight.svelte";
+    import Warning from "./Warning.svelte";
     import Selection from "./Selection.svelte";
     import GhostItem from "./GhostItem.svelte";
 
@@ -30,7 +30,7 @@
                 class="absolute z-30 h-full"
                 style="width: {width}px; left: {left}px;"
             >
-                <Highlight stripeColor="#3b82f6" />
+                <Warning stripeColor="#3b82f6" />
             </div>
         {/each}
         {@const controller = data.controller}

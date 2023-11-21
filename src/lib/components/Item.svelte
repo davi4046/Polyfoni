@@ -1,6 +1,6 @@
 <script lang="ts">
     import ItemHandle from "./ItemHandle.svelte";
-    import Highlight from "./Highlight.svelte";
+    import Warning from "./Warning.svelte";
 
     import { ItemModel } from "../models";
 
@@ -50,6 +50,6 @@
         style="width: {width}px; left: {left}px;"
         title={data.error}
     >
-        <Highlight stripeColor="#ef4444" />
+        <Warning stripeColor="#ef4444" />
     </div>
 {/if}
