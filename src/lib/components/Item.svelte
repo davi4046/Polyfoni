@@ -32,12 +32,12 @@
         </p>
     </div>
     {#if data.startHandle}
-        <div class="absolute top-0 bottom-0 left-0 -translate-x-1/2">
+        <div class="absolute top-0 bottom-0 left-0 z-50 -translate-x-1/2">
             <ItemHandle data={data.startHandle} />
         </div>
     {/if}
     {#if data.endHandle}
-        <div class="absolute top-0 bottom-0 right-0 translate-x-1/2">
+        <div class="absolute top-0 bottom-0 right-0 z-50 translate-x-1/2">
             <ItemHandle data={data.endHandle} />
         </div>
     {/if}
