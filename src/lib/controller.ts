@@ -58,6 +58,13 @@ export class Controller {
     private _clipboardBeat: number | null = null;
     private _clipboardTrack: TrackModel | null = null;
 
+    private _pressedKeys: string[] = [];
+    private _keyboardShortcuts = new Map<string[], string>();
+
+    public createKeyboardShortcut(keys: string[], event: string) {
+        this._keyboardShortcuts.set(keys.sort(), event);
+    }
+
     get timeline() {
         return this._timeline;
     }
@@ -519,6 +526,21 @@ export class Controller {
             }
         });
 
+        document.onkeydown = (e) => {
+            this._pressedKeys.push(e.key);
+            this._pressedKeys.sort();
+            this._keyboardShortcuts.forEach((event, keys) => {
+                if (keys.toString() == this._pressedKeys.toString())
+                    emit(event);
+            });
+        };
+
+        document.onkeyup = (e) => {
+            this._pressedKeys = this._pressedKeys.filter((key) => {
+                return key != e.key;
+            });
+        };
+
         listen("insert", (_) => {
             if (this.highlight) {
                 this.highlight.tracks.forEach((track) => {
@@ -559,6 +581,11 @@ export class Controller {
 
             this._generator.regenerate();
             this._timeline.refresh();
+        });
+
+        listen("cut", (_) => {
+            emit("copy");
+            emit("delete");
         });
 
         listen("copy", (_) => {
