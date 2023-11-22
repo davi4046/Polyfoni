@@ -2,13 +2,18 @@
     import type { ItemData } from "../models";
 
     export let data: ItemData;
+
+    $: bgColor = data.track?.itemColorFunc(data);
 </script>
 
 <div
     class="absolute z-40 h-full py-1.5 pointer-events-none"
     style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
 >
-    <div class="border-opacity-75 opacity-75 item">
+    <div
+        class="border-opacity-75 opacity-75 item"
+        style="background-color: {bgColor};"
+    >
         <p class="truncate">
             {#if data.content}
                 {data.content}
