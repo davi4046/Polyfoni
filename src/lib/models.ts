@@ -208,7 +208,10 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 
         if (i == j && i != null) {
             //because i and j is the same item, we split it
-            let itemCopy = new ItemModel(end, i.end, i.content, i.controller);
+            let itemCopy = new ItemModel(
+                new ItemData(end, i.end, i.content, null),
+                i.controller
+            );
 
             i.end = start;
 
@@ -239,53 +242,75 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
     }
 }
 
+export class ItemData {
+    constructor(
+        public start: number,
+        public end: number,
+        public content: string,
+        public track: TrackModel | null
+    ) {}
+}
+
 export class ItemModel extends TreeNode<TrackModel, null> {
     public startHandle: ItemHandleModel | null = null;
     public endHandle: ItemHandleModel | null = null;
     public error: string | null = null;
 
     set start(newStart: number) {
-        if (newStart < this._start) {
-            this.parent?.clearInterval(newStart, this._start);
+        if (newStart < this.start) {
+            this.parent?.clearInterval(newStart, this.start);
         }
-        this._start = newStart;
-        if (this._end - this._start <= 0) {
+        this._data.start = newStart;
+        if (this.end - this.start <= 0) {
             this.parent = null;
         }
     }
 
     get start() {
-        return this._start;
+        return this._data.start;
     }
 
     set end(newEnd: number) {
-        if (newEnd > this._end) {
-            this.parent?.clearInterval(this._end, newEnd);
+        if (newEnd > this.end) {
+            this.parent?.clearInterval(this.end, newEnd);
         }
-        this._end = newEnd;
-        if (this._end - this._start <= 0) {
+        this._data.end = newEnd;
+        if (this.end - this.start <= 0) {
             this.parent = null;
         }
     }
 
     get end() {
-        return this._end;
+        return this._data.end;
+    }
+
+    set content(newContent: string) {
+        this._data.content = newContent;
+    }
+
+    get content() {
+        return this._data.content;
     }
 
     set parent(newParent: TrackModel | null) {
         super.parent = newParent;
         this.updateHandles();
+        this._data.track = newParent;
     }
 
     get parent() {
         return super.parent;
     }
 
-    move(newStart: number, newTrack: TrackModel) {
-        let newEnd = newStart + this._end - this._start;
+    get data() {
+        return this._data;
+    }
 
-        this._start = newStart;
-        this._end = newEnd;
+    move(newStart: number, newTrack: TrackModel) {
+        let newEnd = newStart + this.end - this.start;
+
+        this._data.start = newStart;
+        this._data.end = newEnd;
 
         this.parent = newTrack;
 
@@ -332,12 +357,11 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     }
 
     constructor(
-        private _start: number,
-        private _end: number,
-        public content: string,
+        private _data: ItemData,
         controller: Controller
     ) {
         super(controller);
+        this.parent = this._data.track;
     }
 }
 
@@ -346,15 +370,6 @@ export class HighlightModel {
         public start: number,
         public end: number,
         public tracks: TrackModel[]
-    ) {}
-}
-
-export class ItemMove {
-    constructor(
-        public item: ItemModel,
-        public newStart: number,
-        public newEnd: number,
-        public newTrack: TrackModel
     ) {}
 }
 

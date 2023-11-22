@@ -1,18 +1,17 @@
 <script lang="ts">
-    import type { ItemMove } from "../models";
+    import type { ItemData } from "../models";
 
-    export let data: ItemMove;
+    export let data: ItemData;
 </script>
 
 <div
     class="absolute z-40 h-full py-1.5 pointer-events-none"
-    style="width: {(data.newEnd - data.newStart) * 64}px; left: {data.newStart *
-        64}px"
+    style="width: {(data.end - data.start) * 64}px; left: {data.start * 64}px"
 >
     <div class="border-opacity-75 opacity-75 item">
         <p class="truncate">
-            {#if data.item.content}
-                {data.item.content}
+            {#if data.content}
+                {data.content}
             {:else}
                 [empty]
             {/if}

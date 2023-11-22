@@ -31,7 +31,8 @@ register("Delete", (_) => {
     emit("delete");
 });
 register("CmdOrCtrl+X", (_) => {
-    emit("cut");
+    emit("copy");
+    emit("delete");
 });
 register("CmdOrCtrl+C", (_) => {
     emit("copy");

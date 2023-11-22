@@ -1,3 +1,4 @@
+import { clone } from "lodash";
 import { onMount } from "svelte";
 
 import { emit, listen } from "@tauri-apps/api/event";
@@ -10,9 +11,9 @@ import PlayIcon from "./components/svg/PlayIcon.svelte";
 import { Generator } from "./generator";
 import {
     HighlightModel,
+    ItemData,
     ItemHandleModel,
     ItemModel,
-    ItemMove,
     NoteModel,
     TimelineModel,
     TrackModel,
@@ -34,7 +35,7 @@ export class Controller {
     private _selectedItemOnClick = false;
 
     private _highlight: HighlightModel | null = null;
-    private _itemMoves: ItemMove[] = [];
+    private _ghostItems: ItemData[] = [];
 
     private _timeline: TimelineModel;
     private _generator: Generator;
@@ -53,7 +54,9 @@ export class Controller {
 
     private _playingNotes = new Map<VoiceModel, NoteModel | undefined>();
 
-    private _clipboard: [trackIndex: number, item: ItemModel][] = [];
+    private _clipboard: ItemData[] = [];
+    private _clipboardBeat: number | null = null;
+    private _clipboardTrack: TrackModel | null = null;
 
     get timeline() {
         return this._timeline;
@@ -71,8 +74,8 @@ export class Controller {
         return this._highlight;
     }
 
-    get itemMoves() {
-        return this._itemMoves;
+    get ghostItems() {
+        return this._ghostItems;
     }
 
     setHoveredTrack(newTrack: TrackModel | null) {
@@ -236,13 +239,13 @@ export class Controller {
         this._highlight = new HighlightModel(minBeat, maxBeat, tracks);
     }
 
-    private makeItemMoves(
-        items: ItemModel[],
+    private offsetItems(
+        items: ItemData[],
         fromBeat: number,
         toBeat: number,
         fromTrack: TrackModel,
         toTrack: TrackModel
-    ): ItemMove[] {
+    ): ItemData[] {
         /* Calculate Beat Offset */
 
         let minBeat = items[0].start;
@@ -266,11 +269,11 @@ export class Controller {
         let fromTrackIndex = fromTrack.getIndex()!;
         let toTrackIndex = toTrack.getIndex()!;
 
-        let minTrackIndex = items[0].parent!.getIndex()!;
+        let minTrackIndex = items[0].track!.getIndex()!;
         let maxTrackIndex = minTrackIndex;
 
         items.forEach((item) => {
-            let trackIndex = item.parent!.getIndex()!;
+            let trackIndex = item.track!.getIndex()!;
 
             if (trackIndex < minTrackIndex) {
                 minTrackIndex = trackIndex;
@@ -291,11 +294,11 @@ export class Controller {
         let fromVoiceIndex = fromTrack.parent!.getIndex()!;
         let toVoiceIndex = toTrack.parent!.getIndex()!;
 
-        let minVoiceIndex = items[0].parent!.parent!.getIndex()!;
+        let minVoiceIndex = items[0].track!.parent!.getIndex()!;
         let maxVoiceIndex = minVoiceIndex;
 
         items.forEach((item) => {
-            let voiceIndex = item.parent!.parent!.getIndex()!;
+            let voiceIndex = item.track!.parent!.getIndex()!;
 
             if (voiceIndex < minVoiceIndex) {
                 minVoiceIndex = voiceIndex;
@@ -312,49 +315,28 @@ export class Controller {
         voiceOffset = Math.min(voiceOffset, voiceCount - 1 - maxVoiceIndex);
 
         if (beatOffset != 0 || trackOffset != 0 || voiceOffset != 0) {
-            return items.map((item) => {
-                let newStart = item.start + beatOffset;
-                let newEnd = newStart + item.end - item.start;
-                let newTrackIndex = item.parent!.getIndex()! + trackOffset;
+            return items.map((itemData) => {
+                let newStart = itemData.start + beatOffset;
+                let newEnd = newStart + itemData.end - itemData.start;
+
+                let newTrackIndex = itemData.track!.getIndex()! + trackOffset;
                 let newVoiceIndex =
-                    item.parent!.parent!.getIndex()! + voiceOffset;
+                    itemData.track!.parent!.getIndex()! + voiceOffset;
 
                 let newTrack =
                     this._timeline.children[newVoiceIndex].children[
                         newTrackIndex
                     ];
 
-                return new ItemMove(item, newStart, newEnd, newTrack);
+                return new ItemData(
+                    newStart,
+                    newEnd,
+                    itemData.content,
+                    newTrack
+                );
             });
         }
         return [];
-    }
-
-    private commitItemMoves() {
-        let isForwardMove =
-            this._itemMoves[0].newStart > this._itemMoves[0].item.start;
-        //sort items to avoid them clearing each other on move
-        if (isForwardMove) {
-            this._itemMoves.sort((a, b) => {
-                if (a.item.start > b.item.start) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            });
-        } else {
-            this._itemMoves.sort((a, b) => {
-                if (a.item.start > b.item.start) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            });
-        }
-        this._itemMoves.forEach((itemMove) => {
-            itemMove.item.move(itemMove.newStart, itemMove.newTrack);
-        });
-        this._itemMoves = [];
     }
 
     private drag() {
@@ -374,8 +356,12 @@ export class Controller {
                     this.timeline.refresh();
                 }
             } else if (this._clickedItem) {
-                this._itemMoves = this.makeItemMoves(
-                    this._selectedItems,
+                let itemData = this._selectedItems.map((item) => {
+                    return clone(item.data);
+                });
+
+                this._ghostItems = this.offsetItems(
+                    itemData,
                     this._clickedBeat,
                     this._hoveredBeat,
                     this._clickedTrack,
@@ -407,45 +393,6 @@ export class Controller {
             document.getElementById("app")!.style.cursor = "crosshair";
         } else {
             document.getElementById("app")!.style.cursor = "default";
-        }
-    }
-
-    private copyToClipboard() {
-        if (this.highlight) {
-            this._clipboard = this.highlight.tracks.flatMap((track) => {
-                track.children.sort((a, b) => {
-                    return a.start - b.start;
-                });
-                let i = track.children.findIndex((item) => {
-                    return (
-                        item.end > this.highlight!.start &&
-                        item.end <= this.highlight!.end
-                    );
-                });
-                let j = track.children.findLastIndex((item) => {
-                    return (
-                        item.start < this.highlight!.end &&
-                        item.start >= this.highlight!.start
-                    );
-                });
-                return track.children
-                    .slice(i == -1 ? j : i, (j == -1 ? i : j) + 1)
-                    .map((item) => {
-                        const newItem = new ItemModel(
-                            Math.max(this.highlight!.start, item.start),
-                            Math.min(this.highlight!.end, item.end),
-                            item.content,
-                            this
-                        );
-
-                        let result: [number, ItemModel] = [
-                            track.getIndex()!,
-                            newItem,
-                        ];
-
-                        return result;
-                    });
-            });
         }
     }
 
@@ -488,14 +435,24 @@ export class Controller {
         });
 
         document.addEventListener("mouseup", (_) => {
-            if (this._itemMoves.length == 0) {
+            if (this._ghostItems.length == 0) {
                 if (!this._selectedItemOnClick) {
                     this._selectedItems = this._selectedItems.filter((item) => {
                         return item !== this._hoveredItem;
                     });
                 }
             } else {
-                this.commitItemMoves();
+                this._selectedItems.forEach((item) => {
+                    item.parent = null;
+                });
+                this._selectedItems = [];
+
+                this._ghostItems.forEach((itemData) => {
+                    const newItem = new ItemModel(itemData, this);
+                    this.selectedItems.push(newItem);
+                });
+                this._ghostItems = [];
+
                 this._generator.regenerate();
             }
 
@@ -565,13 +522,15 @@ export class Controller {
         listen("insert", (_) => {
             if (this.highlight) {
                 this.highlight.tracks.forEach((track) => {
-                    let newItem = new ItemModel(
-                        this.highlight!.start,
-                        this.highlight!.end,
-                        "",
+                    new ItemModel(
+                        new ItemData(
+                            this.highlight!.start,
+                            this.highlight!.end,
+                            "",
+                            track
+                        ),
                         this
                     );
-                    track.addChild(newItem);
                 });
 
                 this._highlight = null;
@@ -602,35 +561,72 @@ export class Controller {
             this._timeline.refresh();
         });
 
-        listen("cut", (_) => {
-            this.copyToClipboard();
-            emit("delete");
-        });
-
         listen("copy", (_) => {
-            this.copyToClipboard();
+            if (!this._hoveredBeat || !this._hoveredTrack) return;
+
+            this._clipboardBeat = this._hoveredBeat;
+            this._clipboardTrack = this._hoveredTrack;
+
+            if (this.highlight) {
+                this._clipboard = this.highlight.tracks.flatMap((track) => {
+                    track.children.sort((a, b) => {
+                        return a.start - b.start;
+                    });
+                    let i = track.children.findIndex((item) => {
+                        return (
+                            item.end > this.highlight!.start &&
+                            item.end <= this.highlight!.end
+                        );
+                    });
+                    let j = track.children.findLastIndex((item) => {
+                        return (
+                            item.start < this.highlight!.end &&
+                            item.start >= this.highlight!.start
+                        );
+                    });
+                    return track.children
+                        .slice(i == -1 ? j : i, (j == -1 ? i : j) + 1)
+                        .map((item) => {
+                            const data = clone(item.data);
+
+                            data.start = Math.max(
+                                this.highlight!.start,
+                                item.start
+                            );
+                            data.end = Math.min(this.highlight!.end, item.end);
+
+                            return data;
+                        });
+                });
+            }
         });
 
         listen("paste", (_) => {
-            const hoveredVoice = this._hoveredTrack?.parent;
+            if (
+                !this._clipboardBeat ||
+                !this._clipboardTrack ||
+                !this._hoveredBeat ||
+                !this._hoveredTrack
+            )
+                return;
 
-            if (!hoveredVoice || !this._hoveredBeat) return;
-
-            this._clipboard.sort((a, b) => {
-                return a[1].start - b[1].start;
+            let itemData = this._clipboard.map((itemData) => {
+                return clone(itemData);
             });
 
-            this._clipboard.forEach((value) => {
-                let offset = value[1].start - this._clipboard[0][1].start;
+            itemData = this.offsetItems(
+                itemData,
+                this._clipboardBeat,
+                this._hoveredBeat,
+                this._clipboardTrack,
+                this._hoveredTrack
+            );
 
-                let start = Math.floor(this._hoveredBeat!) + offset;
-                let end = start + value[1].end - value[1].start;
-
-                const item = new ItemModel(start, end, value[1].content, this);
-
-                hoveredVoice.children[value[0]].addChild(item);
+            itemData.forEach((itemData) => {
+                new ItemModel(itemData, this);
             });
 
+            this._highlight = null;
             this._generator.regenerate();
             this.timeline.refresh();
         });
