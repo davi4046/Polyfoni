@@ -83,8 +83,7 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
     public length = 64;
 
     createVoice(label: string) {
-        let newVoice = new VoiceModel(this.controller);
-        newVoice.label = label;
+        let newVoice = new VoiceModel(label, this.controller);
 
         newVoice.createTrack("Pitch");
         newVoice.createTrack("Duration");
@@ -165,22 +164,26 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
 }
 
 export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
-    public label = "";
     public isCollapsed = false;
     public generation: Promise<NoteModel[]> | null = null;
 
     createTrack(label: string) {
-        let newTrack = new TrackModel(this.controller);
-        newTrack.label = label;
+        let newTrack = new TrackModel(label, this.controller);
 
         this.addChild(newTrack);
 
         return newTrack;
     }
+
+    constructor(
+        public label: string,
+        controller: Controller
+    ) {
+        super(controller);
+    }
 }
 
 export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
-    public label = "";
     public uncoveredIntervals: Interval[] = [];
 
     getItemAtBeat(beat: number) {
@@ -239,6 +242,13 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
     addChild(child: ItemModel) {
         this.clearInterval(child.start, child.end);
         super.addChild(child);
+    }
+
+    constructor(
+        public label: string,
+        controller: Controller
+    ) {
+        super(controller);
     }
 }
 
