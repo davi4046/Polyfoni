@@ -641,13 +641,15 @@ export class Controller {
                 return clone(itemData);
             });
 
-            itemData = this.offsetItems(
+            let movedItems = this.offsetItems(
                 itemData,
                 this._clipboardBeat,
                 this._hoveredBeat,
                 this._clipboardTrack,
                 this._hoveredTrack
             );
+
+            if (movedItems.length != 0) itemData = movedItems;
 
             itemData.forEach((itemData) => {
                 new ItemModel(itemData, this);
