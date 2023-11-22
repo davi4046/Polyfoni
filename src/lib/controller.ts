@@ -9,10 +9,10 @@ import PauseIcon from "./components/svg/PauseIcon.svelte";
 import PlayIcon from "./components/svg/PlayIcon.svelte";
 import { Generator } from "./generator";
 import {
-    GhostItemModel,
     HighlightModel,
     ItemHandleModel,
     ItemModel,
+    ItemMove,
     NoteModel,
     TimelineModel,
     TrackModel,
@@ -33,8 +33,8 @@ export class Controller {
     private _selectedItems: ItemModel[] = [];
     private _selectedItemOnClick = false;
 
-    public highlight: HighlightModel | null = null;
-    public ghostItems: GhostItemModel[] = [];
+    private _highlight: HighlightModel | null = null;
+    private _itemMoves: ItemMove[] = [];
 
     private _timeline: TimelineModel;
     private _generator: Generator;
@@ -65,6 +65,14 @@ export class Controller {
 
     get tracker() {
         return this._tracker;
+    }
+
+    get highlight() {
+        return this._highlight;
+    }
+
+    get itemMoves() {
+        return this._itemMoves;
     }
 
     setHoveredTrack(newTrack: TrackModel | null) {
@@ -225,25 +233,25 @@ export class Controller {
         let minBeat = Math.floor(Math.min(fromBeat, toBeat));
         let maxBeat = Math.ceil(Math.max(fromBeat, toBeat));
 
-        this.highlight = new HighlightModel(minBeat, maxBeat, tracks);
+        this._highlight = new HighlightModel(minBeat, maxBeat, tracks);
     }
 
-    private makeGhostItems(
+    private makeItemMoves(
+        items: ItemModel[],
         fromBeat: number,
         toBeat: number,
         fromTrack: TrackModel,
         toTrack: TrackModel
-    ) {
+    ): ItemMove[] {
         /* Calculate Beat Offset */
 
-        let minBeat = this._selectedItems[0].start;
-        let maxBeat = this._selectedItems[0].end;
+        let minBeat = items[0].start;
+        let maxBeat = items[0].end;
 
-        this._selectedItems.forEach((item) => {
+        items.forEach((item) => {
             if (item.start < minBeat) {
                 minBeat = item.start;
-            }
-            if (item.end > maxBeat) {
+            } else if (item.end > maxBeat) {
                 maxBeat = item.end;
             }
         });
@@ -258,17 +266,15 @@ export class Controller {
         let fromTrackIndex = fromTrack.getIndex()!;
         let toTrackIndex = toTrack.getIndex()!;
 
-        let minTrackIndex = this._selectedItems[0].parent!.getIndex()!;
+        let minTrackIndex = items[0].parent!.getIndex()!;
         let maxTrackIndex = minTrackIndex;
 
-        this._selectedItems.forEach((item) => {
+        items.forEach((item) => {
             let trackIndex = item.parent!.getIndex()!;
 
             if (trackIndex < minTrackIndex) {
                 minTrackIndex = trackIndex;
-            }
-
-            if (trackIndex > maxTrackIndex) {
+            } else if (trackIndex > maxTrackIndex) {
                 maxTrackIndex = trackIndex;
             }
         });
@@ -285,32 +291,28 @@ export class Controller {
         let fromVoiceIndex = fromTrack.parent!.getIndex()!;
         let toVoiceIndex = toTrack.parent!.getIndex()!;
 
-        let minVoiceIndex = this._selectedItems[0].parent!.parent!.getIndex()!;
+        let minVoiceIndex = items[0].parent!.parent!.getIndex()!;
         let maxVoiceIndex = minVoiceIndex;
 
-        this._selectedItems.forEach((item) => {
+        items.forEach((item) => {
             let voiceIndex = item.parent!.parent!.getIndex()!;
 
             if (voiceIndex < minVoiceIndex) {
                 minVoiceIndex = voiceIndex;
-            }
-
-            if (voiceIndex > maxVoiceIndex) {
+            } else if (voiceIndex > maxVoiceIndex) {
                 maxVoiceIndex = voiceIndex;
             }
         });
 
-        let voiceCount = this._timeline.children.length;
+        const voiceCount = this._timeline.children.length;
 
         let voiceOffset = toVoiceIndex - fromVoiceIndex;
 
         voiceOffset = Math.max(voiceOffset, -minVoiceIndex);
         voiceOffset = Math.min(voiceOffset, voiceCount - 1 - maxVoiceIndex);
 
-        let newGhostItems: GhostItemModel[] = [];
-
         if (beatOffset != 0 || trackOffset != 0 || voiceOffset != 0) {
-            this._selectedItems.forEach((item) => {
+            return items.map((item) => {
                 let newStart = item.start + beatOffset;
                 let newEnd = newStart + item.end - item.start;
                 let newTrackIndex = item.parent!.getIndex()! + trackOffset;
@@ -322,24 +324,18 @@ export class Controller {
                         newTrackIndex
                     ];
 
-                newGhostItems = newGhostItems.concat(
-                    new GhostItemModel(item, newStart, newEnd, newTrack)
-                );
+                return new ItemMove(item, newStart, newEnd, newTrack);
             });
-        } else {
-            newGhostItems = [];
         }
-
-        this.ghostItems = newGhostItems;
+        return [];
     }
 
-    private placeGhostItems() {
+    private commitItemMoves() {
         let isForwardMove =
-            this.ghostItems[0].start > this.ghostItems[0].item.start;
-
+            this._itemMoves[0].newStart > this._itemMoves[0].item.start;
         //sort items to avoid them clearing each other on move
         if (isForwardMove) {
-            this.ghostItems.sort((a, b) => {
+            this._itemMoves.sort((a, b) => {
                 if (a.item.start > b.item.start) {
                     return -1;
                 } else {
@@ -347,7 +343,7 @@ export class Controller {
                 }
             });
         } else {
-            this.ghostItems.sort((a, b) => {
+            this._itemMoves.sort((a, b) => {
                 if (a.item.start > b.item.start) {
                     return 1;
                 } else {
@@ -355,12 +351,10 @@ export class Controller {
                 }
             });
         }
-
-        this.ghostItems.forEach((ghostItem) => {
-            ghostItem.item.move(ghostItem.start, ghostItem.track);
+        this._itemMoves.forEach((itemMove) => {
+            itemMove.item.move(itemMove.newStart, itemMove.newTrack);
         });
-
-        this.ghostItems = [];
+        this._itemMoves = [];
     }
 
     private drag() {
@@ -380,7 +374,8 @@ export class Controller {
                     this.timeline.refresh();
                 }
             } else if (this._clickedItem) {
-                this.makeGhostItems(
+                this._itemMoves = this.makeItemMoves(
+                    this._selectedItems,
                     this._clickedBeat,
                     this._hoveredBeat,
                     this._clickedTrack,
@@ -439,10 +434,9 @@ export class Controller {
                         const newItem = new ItemModel(
                             Math.max(this.highlight!.start, item.start),
                             Math.min(this.highlight!.end, item.end),
-                            item.controller
+                            item.content,
+                            this
                         );
-
-                        newItem.content = item.content;
 
                         let result: [number, ItemModel] = [
                             track.getIndex()!,
@@ -487,21 +481,21 @@ export class Controller {
                 this._clickedHandle = this._hoveredHandle;
             }
 
-            this.highlight = null;
+            this._highlight = null;
 
             this._timeline.refresh();
             this.updateCursor();
         });
 
         document.addEventListener("mouseup", (_) => {
-            if (this.ghostItems.length == 0) {
+            if (this._itemMoves.length == 0) {
                 if (!this._selectedItemOnClick) {
                     this._selectedItems = this._selectedItems.filter((item) => {
                         return item !== this._hoveredItem;
                     });
                 }
             } else {
-                this.placeGhostItems();
+                this.commitItemMoves();
                 this._generator.regenerate();
             }
 
@@ -574,12 +568,13 @@ export class Controller {
                     let newItem = new ItemModel(
                         this.highlight!.start,
                         this.highlight!.end,
+                        "",
                         this
                     );
                     track.addChild(newItem);
                 });
 
-                this.highlight = null;
+                this._highlight = null;
 
                 this._generator.regenerate();
                 this._timeline.refresh();
@@ -594,7 +589,7 @@ export class Controller {
                         this.highlight!.end
                     );
                 });
-                this.highlight = null;
+                this._highlight = null;
             }
 
             this._selectedItems.forEach((item) => {
@@ -631,8 +626,7 @@ export class Controller {
                 let start = Math.floor(this._hoveredBeat!) + offset;
                 let end = start + value[1].end - value[1].start;
 
-                const item = new ItemModel(start, end, this);
-                item.content = value[1].content;
+                const item = new ItemModel(start, end, value[1].content, this);
 
                 hoveredVoice.children[value[0]].addChild(item);
             });

@@ -208,8 +208,7 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 
         if (i == j && i != null) {
             //because i and j is the same item, we split it
-            let itemCopy = new ItemModel(end, i.end, i.controller);
-            itemCopy.content = i.content;
+            let itemCopy = new ItemModel(end, i.end, i.content, i.controller);
 
             i.end = start;
 
@@ -243,8 +242,6 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 export class ItemModel extends TreeNode<TrackModel, null> {
     public startHandle: ItemHandleModel | null = null;
     public endHandle: ItemHandleModel | null = null;
-
-    public content = "";
     public error: string | null = null;
 
     set start(newStart: number) {
@@ -337,6 +334,7 @@ export class ItemModel extends TreeNode<TrackModel, null> {
     constructor(
         private _start: number,
         private _end: number,
+        public content: string,
         controller: Controller
     ) {
         super(controller);
@@ -351,12 +349,12 @@ export class HighlightModel {
     ) {}
 }
 
-export class GhostItemModel {
+export class ItemMove {
     constructor(
         public item: ItemModel,
-        public start: number,
-        public end: number,
-        public track: TrackModel
+        public newStart: number,
+        public newEnd: number,
+        public newTrack: TrackModel
     ) {}
 }
 

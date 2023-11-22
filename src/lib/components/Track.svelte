@@ -44,9 +44,9 @@
                     />
                 {/if}
             {/if}
-            {#each controller.ghostItems as ghostItem}
-                {#if ghostItem.track == data}
-                    <GhostItem data={ghostItem} />
+            {#each controller.itemMoves as itemMove}
+                {#if itemMove.newTrack == data}
+                    <GhostItem data={itemMove} />
                 {/if}
             {/each}
         {/if}
