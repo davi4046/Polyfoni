@@ -1,3 +1,5 @@
+import chroma from "chroma-js";
+
 import { invoke } from "@tauri-apps/api";
 
 import { mergeIntervals, subtractIntervals } from "./interval";
@@ -24,7 +26,7 @@ function quantizeDuration(duration: number) {
     return Math.pow(2, Math.round(Math.log2(duration)));
 }
 
-class Chord {
+export class Chord {
     private pitchClassSet: Array<number>;
 
     degreeToPitch(degree: number) {
@@ -32,6 +34,14 @@ class Chord {
         let index = degree % this.pitchClassSet.length;
         while (index < 0) index += this.pitchClassSet.length;
         return this.pitchClassSet[index] + 12 * octave;
+    }
+
+    getColor() {
+        const hue = (360 / 12) * this.pitchClassSet[0];
+
+        const saturation = (this.pitchClassSet.length / 12) * 100;
+
+        return chroma.hcl(hue, 100, 80).css();
     }
 
     constructor(public str: string) {

@@ -22,7 +22,7 @@
 }
 
 .item {
-    @apply flex items-center h-full p-2 font-semibold text-black border-2 border-black;
+    @apply flex items-center h-full p-2 font-semibold text-black border-2 border-black bg-green-500;
 }
 
 .selected {

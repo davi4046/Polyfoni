@@ -9,7 +9,7 @@
     $: width = (data.end - data.start) * 64 + 1;
     $: left = data.start * 64;
 
-    $: bgColor = data.parent?.itemColorFunc(data.data);
+    $: color = data.parent?.itemColorFunc(data.data);
 </script>
 
 <div class="absolute h-full py-1.5" style="width: {width}px; left: {left}px">
@@ -18,7 +18,7 @@
             class="relative z-40 item"
             title={data.content}
             class:selected={data.isSelected()}
-            style="background-color: {bgColor};"
+            style="background-color: {color};"
             on:mouseenter={(_) => {
                 data.controller?.setHoveredItem(data);
             }}
@@ -27,7 +27,7 @@
             }}
             role="none"
         >
-            <p class="truncate">
+            <p class="truncate z-10">
                 {#if data.content}
                     {data.content}
                 {:else}

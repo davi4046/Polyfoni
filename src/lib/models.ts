@@ -1,9 +1,9 @@
 import { writable } from "svelte/store";
 
 import { Controller } from "./controller";
+import { Chord } from "./generator";
 
 import type { Interval } from "./interval";
-
 abstract class TreeNode<
     T extends TreeNode<any, any> | null,
     U extends TreeNode<any, any> | null,
@@ -85,17 +85,17 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
     createVoice(label: string) {
         let newVoice = new VoiceModel(label, this.controller);
 
-        newVoice.createTrack("Pitch", (_) => {
-            return "#d1d5db";
-        });
-        newVoice.createTrack("Duration", (_) => {
-            return "#d1d5db";
-        });
-        newVoice.createTrack("Rest", (_) => {
-            return "#d1d5db";
-        });
-        newVoice.createTrack("Harmony", (_) => {
-            return "#d1d5db";
+        newVoice.createTrack("Pitch");
+        newVoice.createTrack("Duration");
+        newVoice.createTrack("Rest");
+        newVoice.createTrack("Harmony", (itemData) => {
+            let chord;
+            try {
+                chord = new Chord(itemData.content);
+            } catch (_) {
+                return "";
+            }
+            return chord.getColor();
         });
 
         this.addChild(newVoice);
@@ -175,7 +175,12 @@ export class VoiceModel extends TreeNode<TimelineModel, TrackModel> {
     public isCollapsed = false;
     public generation: Promise<NoteModel[]> | null = null;
 
-    createTrack(label: string, itemColorFunc: (itemData: ItemData) => string) {
+    createTrack(
+        label: string,
+        itemColorFunc = (itemData: ItemData) => {
+            return "";
+        }
+    ) {
         let newTrack = new TrackModel(label, itemColorFunc, this.controller);
 
         this.addChild(newTrack);
@@ -254,7 +259,9 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 
     constructor(
         public label: string,
-        public itemColorFunc: (itemData: ItemData) => string,
+        public itemColorFunc = (itemData: ItemData) => {
+            return "";
+        },
         controller: Controller
     ) {
         super(controller);
