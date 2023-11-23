@@ -76,11 +76,25 @@ abstract class TreeNode<
 export class TimelineModel extends TreeNode<null, VoiceModel> {
     private _store = writable(this);
 
+    public length = 64;
+
+    public harmonicSumTrack = new TrackModel(
+        "Harmonic Sum",
+        (itemData) => {
+            let chord;
+            try {
+                chord = new Chord(itemData.content);
+            } catch (_) {
+                return "";
+            }
+            return chord.getColor();
+        },
+        this.controller
+    );
+
     get store() {
         return this._store;
     }
-
-    public length = 64;
 
     createVoice(label: string) {
         let newVoice = new VoiceModel(label, this.controller);

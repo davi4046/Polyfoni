@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Track from "./Track.svelte";
+    import TrackHeader from "./TrackHeader.svelte";
     import Voice from "./Voice.svelte";
     import VoiceHeader from "./VoiceHeader.svelte";
     import BigMarker from "./svg/BigMarker.svelte";
@@ -14,9 +16,10 @@
 
 <div class="relative h-full" id="timeline">
     <div
-        class="grid grid-cols-[auto,auto] grid-rows-[auto,1fr] h-full p-4 gap-x-1 bg-gray-500"
+        class="grid p-4 grid-cols-[auto,auto] grid-rows-[auto,1fr,auto] h-full gap-x-1 bg-gray-500"
     >
-        <div class="mb-2 space-x-2">
+        <!-- Buttons -->
+        <div class="col-start-1 row-start-1 mb-2 space-x-2">
             <button class="w-8 h-8 p-2 btn btn-primary" id="start-button">
                 <PlayIcon />
             </button>
@@ -25,7 +28,7 @@
             </button>
         </div>
         <!-- Markers -->
-        <div class="h-full overflow-hidden h-scroll">
+        <div class="h-full col-start-2 row-start-1 overflow-hidden h-scroll">
             <div
                 class="relative h-full overflow-clip"
                 style="width: {data.length * 64}px"
@@ -52,15 +55,19 @@
             </div>
         </div>
         <!-- Headers -->
-        <div class="relative flex flex-col w-32 h-full overflow-hidden">
-            <div class="space-y-4 overflow-hidden v-scroll">
+        <div
+            class="relative flex flex-col h-full col-start-1 row-start-2 overflow-hidden rounded-l-lg"
+        >
+            <div class="space-y-4 overflow-hidden rounded-l-lg v-scroll">
                 {#each data.children as voice}
                     <VoiceHeader bind:data={voice} />
                 {/each}
             </div>
         </div>
         <!-- Tracks -->
-        <div class="h-full overflow-hidden h-scroll cursor-area">
+        <div
+            class="h-full col-start-2 row-start-2 overflow-hidden rounded-r-lg h-scroll cursor-area"
+        >
             <div
                 class="relative flex flex-col h-full overflow-clip"
                 style="width: {data.length * 64}px"
@@ -70,7 +77,36 @@
                         <Voice bind:data={voice} />
                     {/each}
                 </div>
-                <div class="absolute inset-0 z-20 pointer-events-none">
+            </div>
+        </div>
+        <!-- Divider -->
+        <div class="h-4 col-start-1 col-end-2 row-start-3" />
+        <!-- Bottom Headers -->
+        <div
+            class="relative flex flex-col h-full col-start-1 row-start-4 overflow-hidden rounded-l-lg"
+        >
+            <TrackHeader data={data.harmonicSumTrack} />
+        </div>
+        <!-- Bottom Tracks -->
+        <div
+            class="h-full col-start-2 row-start-4 overflow-hidden rounded-r-lg h-scroll cursor-area"
+        >
+            <div
+                class="relative flex flex-col h-full overflow-clip"
+                style="width: {data.length * 64}px"
+            >
+                <Track data={data.harmonicSumTrack} />
+            </div>
+        </div>
+        <!-- Bar Lines -->
+        <div
+            class="col-span-1 col-start-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
+        >
+            <div
+                class="relative flex flex-col h-full overflow-clip"
+                style="width: {data.length * 64}px"
+            >
+                <div class="absolute inset-0 z-30 pointer-events-none">
                     {#each Array(data.length - 1) as _, index}
                         <div
                             class="absolute top-0 h-full w-0.5 bg-gray-500"
