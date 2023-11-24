@@ -2,8 +2,12 @@ import chroma from "chroma-js";
 
 import { invoke } from "@tauri-apps/api";
 
-import { mergeIntervals, subtractIntervals } from "./interval";
-import { ItemModel, NoteModel, TimelineModel } from "./models";
+import {
+    intersectIntervals,
+    mergeIntervals,
+    subtractIntervals,
+} from "./interval";
+import { ItemData, ItemModel, NoteModel, TimelineModel } from "./models";
 
 import type { Interval } from "./interval";
 
@@ -27,7 +31,7 @@ function quantizeDuration(duration: number) {
 }
 
 export class Chord {
-    private pitchClassSet: Array<number>;
+    private pitchClassSet: number[];
 
     degreeToPitch(degree: number) {
         let octave = Math.floor(degree / this.pitchClassSet.length) + 4;
@@ -36,16 +40,35 @@ export class Chord {
         return this.pitchClassSet[index] + 12 * octave;
     }
 
+    getName() {
+        let root = this.pitchClassSet[0] % 12;
+        let rootName = pitchnames[(root + 3) % 12];
+
+        let binary = Array(12).fill("0");
+
+        this.pitchClassSet.forEach((pitchClass) => {
+            let index = pitchClass - root;
+
+            while (index >= 12) index -= 12;
+            while (index < 0) index += 12;
+
+            binary[11 - index] = "1";
+        });
+
+        let binaryString = binary.join("");
+
+        let decimal = parseInt(binaryString, 2);
+
+        return rootName + "-" + decimal;
+    }
+
     getColor() {
         const hue = (360 / 12) * this.pitchClassSet[0];
-
-        const saturation = (this.pitchClassSet.length / 12) * 100;
-
         return chroma.hcl(hue, 100, 80).css();
     }
 
-    constructor(public str: string) {
-        let parts = str.split("-", 2);
+    public static createFromString(string: string): Chord {
+        let parts = string.split("-", 2);
 
         let root = pitchnames.indexOf(parts[0]);
 
@@ -63,9 +86,21 @@ export class Chord {
 
         while (binary.length < 12) binary = "0" + binary;
 
-        this.pitchClassSet = [...Array(12).keys()]
-            .filter((x) => binary[11 - x] === "1")
-            .map((x) => x + root - 3);
+        let pitchClassSet = new Set(
+            [...Array(12).keys()]
+                .filter((x) => binary[11 - x] === "1")
+                .map((x) => x + root - 3)
+        );
+
+        return new Chord(pitchClassSet);
+    }
+
+    public static createFromPitches(pitches: number[]): Chord {
+        return new Chord(new Set(pitches.sort()));
+    }
+
+    constructor(pitchClassSet: Set<number>) {
+        this.pitchClassSet = Array.from(pitchClassSet);
     }
 }
 
@@ -133,198 +168,264 @@ export class Generator {
         }
     }
 
+    async updateHarmonicSum(notes: NoteModel[]) {
+        let intervals = this._timeline.children
+            .flatMap((voice) => {
+                const harmonyTrack = voice.children[3];
+                return harmonyTrack.children.map((item) => {
+                    if (item.error === null) {
+                        return [item.start, item.end] as Interval;
+                    }
+                });
+            })
+            .filter((value): value is Interval => {
+                return value !== undefined;
+            });
+
+        intervals = intersectIntervals(intervals);
+
+        notes.sort((a, b) => {
+            return a.start - b.start;
+        });
+
+        intervals.forEach((interval) => {
+            const startNoteIndex = notes.findIndex((note) => {
+                return note.start >= interval[0] && note.start < interval[1];
+            });
+            const endNoteIndex = notes.findLastIndex((note) => {
+                return note.start >= interval[0] && note.start < interval[1];
+            });
+
+            let pitches = notes
+                .slice(startNoteIndex, endNoteIndex + 1)
+                .map((note) => {
+                    return note.pitch;
+                });
+
+            if (pitches.length === 0) return;
+
+            let chord = Chord.createFromPitches(pitches);
+
+            new ItemModel(
+                new ItemData(
+                    interval[0],
+                    interval[1],
+                    chord.getName(),
+                    this._timeline.harmonicSumTrack
+                ),
+                this._timeline.controller
+            );
+        });
+
+        this._timeline.refresh();
+    }
+
     async regenerate() {
         this.updateUncoveredIntervals();
 
+        let promises: Promise<NoteModel[]>[] = [];
+
         for (let voice of this._timeline.children) {
-            voice.generation = new Promise(async (resolve, _) => {
-                let durationsMap = new Map<ItemModel, number[]>();
+            const promise: Promise<NoteModel[]> = new Promise(
+                async (resolve, _) => {
+                    let durationsMap = new Map<ItemModel, number[]>();
 
-                const durationsTrack = voice.children[1];
+                    const durationsTrack = voice.children[1];
 
-                for (let item of durationsTrack.children) {
-                    item.error = null;
-                    let length = item.end - item.start;
-                    let sum = 0;
+                    for (let item of durationsTrack.children) {
+                        item.error = undefined;
+                        let length = item.end - item.start;
+                        let sum = 0;
 
-                    let durations: number[] = [];
+                        let durations: number[] = [];
 
-                    while (sum < length) {
-                        let index = durations.length;
+                        while (sum < length) {
+                            let index = durations.length;
 
-                        let response = (await invoke("evaluate", {
-                            tasks: [`${item.content}, {"x": ${index}}`],
-                        })) as Array<String>;
+                            let response = (await invoke("evaluate", {
+                                tasks: [`${item.content}, {"x": ${index}}`],
+                            })) as Array<String>;
 
-                        let num = Number(response[0].trim());
+                            let num = Number(response[0].trim());
 
-                        if (isNaN(num)) {
-                            durationsMap.set(item, []);
-                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
-                            break;
+                            if (isNaN(num)) {
+                                durationsMap.set(item, []);
+                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                                break;
+                            }
+
+                            num = quantizeDuration(Math.abs(num));
+
+                            durations.push(num);
+                            sum += num;
                         }
 
-                        num = quantizeDuration(Math.abs(num));
-
-                        durations.push(num);
-                        sum += num;
+                        durationsMap.set(item, durations);
+                        if (item.error == undefined) item.error = null;
                     }
 
-                    durationsMap.set(item, durations);
-                }
+                    let noteBuilders: NoteBuilder[] = [];
 
-                let noteBuilders: NoteBuilder[] = [];
-
-                durationsMap.forEach((value, item) => {
-                    if (typeof value === "string") {
-                        return;
-                    }
-
-                    let offset = 0;
-
-                    value.forEach((duration) => {
-                        if (duration <= 0) {
+                    durationsMap.forEach((value, item) => {
+                        if (typeof value === "string") {
                             return;
                         }
 
-                        let noteBuilder = new NoteBuilder();
+                        let offset = 0;
 
-                        let start = item.start + offset;
-                        let end = start + duration;
+                        value.forEach((duration) => {
+                            if (duration <= 0) {
+                                return;
+                            }
 
-                        noteBuilder.noteStart = start;
-                        noteBuilder.noteEnd = end;
+                            let noteBuilder = new NoteBuilder();
 
-                        noteBuilders.push(noteBuilder);
+                            let start = item.start + offset;
+                            let end = start + duration;
 
-                        offset += duration;
+                            noteBuilder.noteStart = start;
+                            noteBuilder.noteEnd = end;
+
+                            noteBuilders.push(noteBuilder);
+
+                            offset += duration;
+                        });
                     });
-                });
 
-                {
-                    let itemCounter = new Map<ItemModel, number>();
+                    {
+                        let itemCounter = new Map<ItemModel, number>();
 
-                    const track = voice.children[0];
+                        const track = voice.children[0];
 
-                    for (let item of track.children) {
-                        item.error = null;
-                    }
-
-                    for (let note of noteBuilders) {
-                        let item = track.getItemAtBeat(note.noteStart!);
-
-                        if (!item || item.error) {
-                            continue;
+                        for (let item of track.children) {
+                            item.error = undefined;
                         }
 
-                        let counter = itemCounter.get(item);
-                        let index = counter != undefined ? counter + 1 : 0;
-                        itemCounter.set(item, index);
+                        for (let note of noteBuilders) {
+                            let item = track.getItemAtBeat(note.noteStart!);
 
-                        let response = (await invoke("evaluate", {
-                            tasks: [`${item.content}, {"x": ${index}}`],
-                        })) as Array<String>;
+                            if (!item || item.error) {
+                                continue;
+                            }
 
-                        let pitch = Number(response[0].trim());
+                            let counter = itemCounter.get(item);
+                            let index = counter != undefined ? counter + 1 : 0;
+                            itemCounter.set(item, index);
 
-                        if (isNaN(pitch)) {
-                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
-                            continue;
+                            let response = (await invoke("evaluate", {
+                                tasks: [`${item.content}, {"x": ${index}}`],
+                            })) as Array<String>;
+
+                            let pitch = Number(response[0].trim());
+
+                            if (isNaN(pitch)) {
+                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                                continue;
+                            }
+
+                            note.notePitch = Math.round(pitch);
+                            item.error = null;
+                        }
+                    }
+
+                    {
+                        let itemCounter = new Map<ItemModel, number>();
+
+                        const track = voice.children[2];
+
+                        for (let item of track.children) {
+                            item.error = undefined;
                         }
 
-                        note.notePitch = Math.round(pitch);
+                        for (let note of noteBuilders) {
+                            let item = track.getItemAtBeat(note.noteStart!);
+
+                            if (!item || item.error) {
+                                continue;
+                            }
+
+                            let counter = itemCounter.get(item);
+                            let index = counter != undefined ? counter + 1 : 0;
+                            itemCounter.set(item, index);
+
+                            let response = (await invoke("evaluate", {
+                                tasks: [`${item.content}, {"x": ${index}}`],
+                            })) as Array<String>;
+
+                            let s = response[0].trim();
+
+                            let isRest =
+                                s == "True"
+                                    ? true
+                                    : s == "False"
+                                    ? false
+                                    : undefined;
+
+                            if (isRest == undefined) {
+                                item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
+                                continue;
+                            }
+
+                            note.noteIsRest = isRest;
+                            item.error = null;
+                        }
                     }
+
+                    {
+                        let itemCounter = new Map<ItemModel, number>();
+
+                        const track = voice.children[3];
+
+                        for (let item of track.children) {
+                            item.error = undefined;
+                        }
+
+                        for (let note of noteBuilders) {
+                            let item = track.getItemAtBeat(note.noteStart!);
+
+                            if (!item || item.error) {
+                                continue;
+                            }
+
+                            let counter = itemCounter.get(item);
+                            let index = counter != undefined ? counter + 1 : 0;
+                            itemCounter.set(item, index);
+
+                            let chord: Chord;
+
+                            try {
+                                chord = Chord.createFromString(item.content);
+                            } catch (error) {
+                                item.error = error as string;
+                                continue;
+                            }
+
+                            note.noteChord = chord;
+                            item.error = null;
+                        }
+                    }
+
+                    let generation: NoteModel[] = [];
+
+                    noteBuilders.forEach((noteBuilder) => {
+                        let note = noteBuilder.tryBuild();
+
+                        if (!note) {
+                            return;
+                        }
+                        generation.push(note);
+                    });
+
+                    voice.controller.timeline.refresh();
+                    resolve(generation);
                 }
-
-                {
-                    let itemCounter = new Map<ItemModel, number>();
-
-                    const track = voice.children[2];
-
-                    for (let item of track.children) {
-                        item.error = null;
-                    }
-
-                    for (let note of noteBuilders) {
-                        let item = track.getItemAtBeat(note.noteStart!);
-
-                        if (!item || item.error) {
-                            continue;
-                        }
-
-                        let counter = itemCounter.get(item);
-                        let index = counter != undefined ? counter + 1 : 0;
-                        itemCounter.set(item, index);
-
-                        let response = (await invoke("evaluate", {
-                            tasks: [`${item.content}, {"x": ${index}}`],
-                        })) as Array<String>;
-
-                        let s = response[0].trim();
-
-                        let isRest =
-                            s == "True"
-                                ? true
-                                : s == "False"
-                                ? false
-                                : undefined;
-
-                        if (isRest == undefined) {
-                            item.error = `Failed to evaluate at index ${index}: ${response[0].trim()}`;
-                            continue;
-                        }
-
-                        note.noteIsRest = isRest;
-                    }
-                }
-
-                {
-                    let itemCounter = new Map<ItemModel, number>();
-
-                    const track = voice.children[3];
-
-                    for (let item of track.children) {
-                        item.error = null;
-                    }
-
-                    for (let note of noteBuilders) {
-                        let item = track.getItemAtBeat(note.noteStart!);
-
-                        if (!item || item.error) {
-                            continue;
-                        }
-
-                        let counter = itemCounter.get(item);
-                        let index = counter != undefined ? counter + 1 : 0;
-                        itemCounter.set(item, index);
-
-                        let chord: Chord;
-
-                        try {
-                            chord = new Chord(item.content);
-                        } catch (error) {
-                            item.error = error as string;
-                            continue;
-                        }
-
-                        note.noteChord = chord;
-                    }
-                }
-
-                let generation: NoteModel[] = [];
-
-                noteBuilders.forEach((noteBuilder) => {
-                    let note = noteBuilder.tryBuild();
-
-                    if (!note) {
-                        return;
-                    }
-                    generation.push(note);
-                });
-
-                voice.controller.timeline.refresh();
-                resolve(generation);
-            });
+            );
+            voice.generation = promise;
+            promises.push(promise);
         }
+
+        await Promise.all(promises).then((notes) => {
+            this.updateHarmonicSum(notes.flat());
+        });
     }
 }

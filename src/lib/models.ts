@@ -83,7 +83,7 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
         (itemData) => {
             let chord;
             try {
-                chord = new Chord(itemData.content);
+                chord = Chord.createFromString(itemData.content);
             } catch (_) {
                 return "";
             }
@@ -105,7 +105,7 @@ export class TimelineModel extends TreeNode<null, VoiceModel> {
         newVoice.createTrack("Harmony", (itemData) => {
             let chord;
             try {
-                chord = new Chord(itemData.content);
+                chord = Chord.createFromString(itemData.content);
             } catch (_) {
                 return "";
             }
@@ -294,7 +294,7 @@ export class ItemData {
 export class ItemModel extends TreeNode<TrackModel, null> {
     public startHandle: ItemHandleModel | null = null;
     public endHandle: ItemHandleModel | null = null;
-    public error: string | null = null;
+    public error: string | null | undefined = undefined;
 
     set start(newStart: number) {
         if (newStart < this.start) {
