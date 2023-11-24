@@ -168,21 +168,37 @@ export class Generator {
         }
     }
 
-    async updateHarmonicSum(notes: NoteModel[]) {
-        let intervals = this._timeline.children
-            .flatMap((voice) => {
-                const harmonyTrack = voice.children[3];
-                return harmonyTrack.children.map((item) => {
+    async updateHarmonicSum(generations: NoteModel[][]) {
+        this._timeline.harmonicSumTrack.children.forEach((child) => {
+            child.parent = null;
+        });
+
+        let intervals = this._timeline.children.flatMap((voice, index) => {
+            const harmonyTrack = voice.children[3];
+
+            let intervals = harmonyTrack.children
+                .map((item) => {
                     if (item.error === null) {
                         return [item.start, item.end] as Interval;
                     }
+                })
+                .filter((value): value is Interval => {
+                    return value !== undefined;
                 });
-            })
-            .filter((value): value is Interval => {
-                return value !== undefined;
+
+            let noteIntervals = generations[index].map((note) => {
+                return [note.start, note.end] as Interval;
             });
 
+            return subtractIntervals(
+                intervals,
+                subtractIntervals(intervals, noteIntervals)
+            );
+        });
+
         intervals = intersectIntervals(intervals);
+
+        let notes = generations.flat();
 
         notes.sort((a, b) => {
             return a.start - b.start;
@@ -198,6 +214,9 @@ export class Generator {
 
             let pitches = notes
                 .slice(startNoteIndex, endNoteIndex + 1)
+                .filter((note) => {
+                    return !note.isRest;
+                })
                 .map((note) => {
                     return note.pitch;
                 });
@@ -425,7 +444,7 @@ export class Generator {
         }
 
         await Promise.all(promises).then((notes) => {
-            this.updateHarmonicSum(notes.flat());
+            this.updateHarmonicSum(notes);
         });
     }
 }
