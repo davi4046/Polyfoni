@@ -61,3 +61,44 @@ export function mergeIntervals(intervals: Interval[]): Interval[] {
         return result;
     }, []);
 }
+
+/**
+ * Breaks down a set of intervals into the smallest non-overlapping intervals
+ * and returns the resulting intervals.
+ *
+ * @param intervals An array of intervals represented as arrays of two numbers.
+ * @returns An array of non-overlapping intervals obtained from the input intervals.
+ */
+export function intersectIntervals(intervals: Interval[]): Interval[] {
+    type Point = [number, string];
+
+    let points: Point[] = intervals
+        .flatMap((interval) => {
+            return [
+                [interval[0], "S"],
+                [interval[1], "E"],
+            ] as Point[];
+        })
+        .filter((value, index, array) => {
+            return array.indexOf(value) === index;
+        })
+        .sort((a, b) => {
+            return a[0] - b[0];
+        });
+
+    let result: Interval[] = [];
+
+    let prev = points[0];
+
+    for (let i = 1; i < points.length; i++) {
+        let curr = points[i];
+
+        if (!(prev[1] == "E" && curr[1] == "S")) {
+            result.push([prev[0], curr[0]]);
+        }
+
+        prev = curr;
+    }
+
+    return result;
+}
