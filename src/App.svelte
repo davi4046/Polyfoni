@@ -10,12 +10,6 @@
     controller.timeline.createVoice("Piano 3");
     controller.timeline.createVoice("Piano 4");
 
-    controller.createKeyboardShortcut(["Delete"], "delete");
-    controller.createKeyboardShortcut(["Control", "i"], "insert");
-    controller.createKeyboardShortcut(["Control", "x"], "cut");
-    controller.createKeyboardShortcut(["Control", "c"], "copy");
-    controller.createKeyboardShortcut(["Control", "v"], "paste");
-
     let store = controller.timeline.store;
 </script>
 

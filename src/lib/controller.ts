@@ -1,24 +1,18 @@
-import { clone } from "lodash";
-import { onMount } from "svelte";
+import { clone } from 'lodash';
+import { onMount } from 'svelte';
 
-import { emit, listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from '@tauri-apps/api/tauri';
 
-import { ChangeTracker } from "./change-tracker";
-import Popup from "./components/Popup.svelte";
-import PauseIcon from "./components/svg/PauseIcon.svelte";
-import PlayIcon from "./components/svg/PlayIcon.svelte";
-import { Generator } from "./generator";
+import { ChangeTracker } from './change-tracker';
+import Popup from './components/Popup.svelte';
+import PauseIcon from './components/svg/PauseIcon.svelte';
+import PlayIcon from './components/svg/PlayIcon.svelte';
+import { Generator } from './generator';
+import HotkeyHandler from './hotkeys';
 import {
-    HighlightModel,
-    ItemData,
-    ItemHandleModel,
-    ItemModel,
-    NoteModel,
-    TimelineModel,
-    TrackModel,
-    VoiceModel,
-} from "./models";
+    HighlightModel, ItemData, ItemHandleModel, ItemModel, NoteModel, TimelineModel, TrackModel,
+    VoiceModel
+} from './models';
 
 export class Controller {
     private _hoveredBeat: number | null = null;
@@ -57,13 +51,6 @@ export class Controller {
     private _clipboard: ItemData[] = [];
     private _clipboardBeat: number | null = null;
     private _clipboardTrack: TrackModel | null = null;
-
-    private _pressedKeys: string[] = [];
-    private _keyboardShortcuts = new Map<string[], string>();
-
-    public createKeyboardShortcut(keys: string[], event: string) {
-        this._keyboardShortcuts.set(keys.sort(), event);
-    }
 
     get timeline() {
         return this._timeline;
@@ -128,6 +115,122 @@ export class Controller {
 
     private get playbackPosition() {
         return this._playbackPosition;
+    }
+
+    private cutSelection() {
+        this.copySelection();
+        this.deleteSelection();
+    }
+
+    private copySelection() {
+        if (!this._hoveredBeat || !this._hoveredTrack) return;
+
+        this._clipboardBeat = this._hoveredBeat;
+        this._clipboardTrack = this._hoveredTrack;
+
+        if (this.highlight) {
+            this._clipboard = this.highlight.tracks.flatMap((track) => {
+                track.children.sort((a, b) => {
+                    return a.start - b.start;
+                });
+                let i = track.children.findIndex((item) => {
+                    return (
+                        item.end > this.highlight!.start &&
+                        item.end <= this.highlight!.end
+                    );
+                });
+                let j = track.children.findLastIndex((item) => {
+                    return (
+                        item.start < this.highlight!.end &&
+                        item.start >= this.highlight!.start
+                    );
+                });
+                return track.children
+                    .slice(i == -1 ? j : i, (j == -1 ? i : j) + 1)
+                    .map((item) => {
+                        const data = clone(item.data);
+
+                        data.start = Math.max(
+                            this.highlight!.start,
+                            item.start
+                        );
+                        data.end = Math.min(this.highlight!.end, item.end);
+
+                        return data;
+                    });
+            });
+        }
+    }
+
+    private pasteSelection() {
+        if (
+            !this._clipboardBeat ||
+            !this._clipboardTrack ||
+            !this._hoveredBeat ||
+            !this._hoveredTrack
+        )
+            return;
+
+        let itemData = this._clipboard.map((itemData) => {
+            return clone(itemData);
+        });
+
+        let movedItems = this.offsetItems(
+            itemData,
+            this._clipboardBeat,
+            this._hoveredBeat,
+            this._clipboardTrack,
+            this._hoveredTrack
+        );
+
+        if (movedItems.length != 0) itemData = movedItems;
+
+        itemData.forEach((itemData) => {
+            new ItemModel(itemData, this);
+        });
+
+        this._highlight = null;
+        this._generator.regenerate();
+        this.timeline.refresh();
+    }
+
+    private insertEmptyItems() {
+        if (this.highlight) {
+            this.highlight.tracks.forEach((track) => {
+                new ItemModel(
+                    new ItemData(
+                        this.highlight!.start,
+                        this.highlight!.end,
+                        "",
+                        track
+                    ),
+                    this
+                );
+            });
+
+            this._highlight = null;
+
+            this._generator.regenerate();
+            this._timeline.refresh();
+        }
+    }
+
+    private deleteSelection() {
+        if (this.highlight) {
+            this.highlight.tracks.forEach((track) => {
+                track.clearInterval(this.highlight!.start, this.highlight!.end);
+            });
+            this._highlight = null;
+        }
+
+        this._selectedItems.forEach((item) => {
+            item.parent = null;
+        });
+
+        this._selectedItems = [];
+
+        this._generator.regenerate();
+        this._timeline.refresh();
     }
 
     private startPlayback() {
@@ -526,140 +629,6 @@ export class Controller {
             }
         });
 
-        document.onkeydown = (e) => {
-            this._pressedKeys.push(e.key);
-            this._pressedKeys.sort();
-            this._keyboardShortcuts.forEach((event, keys) => {
-                if (keys.toString() == this._pressedKeys.toString())
-                    emit(event);
-            });
-        };
-
-        document.onkeyup = (e) => {
-            this._pressedKeys = this._pressedKeys.filter((key) => {
-                return key != e.key;
-            });
-        };
-
-        listen("insert", (_) => {
-            if (this.highlight) {
-                this.highlight.tracks.forEach((track) => {
-                    new ItemModel(
-                        new ItemData(
-                            this.highlight!.start,
-                            this.highlight!.end,
-                            "",
-                            track
-                        ),
-                        this
-                    );
-                });
-
-                this._highlight = null;
-
-                this._generator.regenerate();
-                this._timeline.refresh();
-            }
-        });
-
-        listen("delete", (_) => {
-            if (this.highlight) {
-                this.highlight.tracks.forEach((track) => {
-                    track.clearInterval(
-                        this.highlight!.start,
-                        this.highlight!.end
-                    );
-                });
-                this._highlight = null;
-            }
-
-            this._selectedItems.forEach((item) => {
-                item.parent = null;
-            });
-
-            this._selectedItems = [];
-
-            this._generator.regenerate();
-            this._timeline.refresh();
-        });
-
-        listen("cut", (_) => {
-            emit("copy");
-            emit("delete");
-        });
-
-        listen("copy", (_) => {
-            if (!this._hoveredBeat || !this._hoveredTrack) return;
-
-            this._clipboardBeat = this._hoveredBeat;
-            this._clipboardTrack = this._hoveredTrack;
-
-            if (this.highlight) {
-                this._clipboard = this.highlight.tracks.flatMap((track) => {
-                    track.children.sort((a, b) => {
-                        return a.start - b.start;
-                    });
-                    let i = track.children.findIndex((item) => {
-                        return (
-                            item.end > this.highlight!.start &&
-                            item.end <= this.highlight!.end
-                        );
-                    });
-                    let j = track.children.findLastIndex((item) => {
-                        return (
-                            item.start < this.highlight!.end &&
-                            item.start >= this.highlight!.start
-                        );
-                    });
-                    return track.children
-                        .slice(i == -1 ? j : i, (j == -1 ? i : j) + 1)
-                        .map((item) => {
-                            const data = clone(item.data);
-
-                            data.start = Math.max(
-                                this.highlight!.start,
-                                item.start
-                            );
-                            data.end = Math.min(this.highlight!.end, item.end);
-
-                            return data;
-                        });
-                });
-            }
-        });
-
-        listen("paste", (_) => {
-            if (
-                !this._clipboardBeat ||
-                !this._clipboardTrack ||
-                !this._hoveredBeat ||
-                !this._hoveredTrack
-            )
-                return;
-
-            let itemData = this._clipboard.map((itemData) => {
-                return clone(itemData);
-            });
-
-            let movedItems = this.offsetItems(
-                itemData,
-                this._clipboardBeat,
-                this._hoveredBeat,
-                this._clipboardTrack,
-                this._hoveredTrack
-            );
-
-            if (movedItems.length != 0) itemData = movedItems;
-
-            itemData.forEach((itemData) => {
-                new ItemModel(itemData, this);
-            });
-
-            this._highlight = null;
-            this._generator.regenerate();
-            this.timeline.refresh();
-        });
-
         onMount(() => {
             const timelineElement = document.getElementById("timeline")!;
 
@@ -703,6 +672,26 @@ export class Controller {
             this._resetButton?.addEventListener("click", (_) => {
                 this.resetPlayback();
             });
+        });
+
+        HotkeyHandler.registerHotkey("ControlLeft+KeyI", () => {
+            this.insertEmptyItems();
+        });
+
+        HotkeyHandler.registerHotkey("Delete", () => {
+            this.deleteSelection();
+        });
+
+        HotkeyHandler.registerHotkey("ControlLeft+KeyX", () => {
+            this.cutSelection();
+        });
+
+        HotkeyHandler.registerHotkey("ControlLeft+KeyC", () => {
+            this.copySelection();
+        });
+
+        HotkeyHandler.registerHotkey("ControlLeft+KeyV", () => {
+            this.pasteSelection();
         });
     }
 }
