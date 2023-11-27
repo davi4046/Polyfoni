@@ -221,11 +221,7 @@ export class TrackModel extends TreeNode<VoiceModel, ItemModel> {
 
     clearInterval(start: number, end: number) {
         this.children.sort((a, b) => {
-            if (a.start < b.start) {
-                return -1;
-            } else {
-                return 1;
-            }
+            return a.start - b.start;
         });
         //last item starting before interval
         let i = this.children.findLast((item) => {
@@ -425,11 +421,7 @@ export class ItemHandleModel {
             let siblings = this.itemL.parent.children.slice();
 
             siblings.sort((a, b) => {
-                if (a.start > b.start) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return a.start - b.start;
             });
 
             let nextItem = siblings.find((item) => {
@@ -445,11 +437,7 @@ export class ItemHandleModel {
             let siblings = this.itemR.parent.children.slice();
 
             siblings.sort((a, b) => {
-                if (a.start > b.start) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return a.start - b.start;
             });
 
             let prevItem = siblings.findLast((item) => {
