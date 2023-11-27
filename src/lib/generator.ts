@@ -40,7 +40,7 @@ export class Chord {
         return this.pitchClassSet[index] + 12 * octave;
     }
 
-    getName() {
+    getString() {
         let root = this.pitchClassSet[0] % 12;
         let rootName = pitchnames[(root + 3) % 12];
 
@@ -93,10 +93,6 @@ export class Chord {
         );
 
         return new Chord(pitchClassSet);
-    }
-
-    public static createFromPitches(pitches: number[]): Chord {
-        return new Chord(new Set(pitches.sort()));
     }
 
     constructor(pitchClassSet: Set<number>) {
@@ -223,13 +219,13 @@ export class Generator {
 
             if (pitches.length === 0) return;
 
-            let chord = Chord.createFromPitches(pitches);
+            let chord = new Chord(new Set(pitches.sort()));
 
             new ItemModel(
                 new ItemData(
                     interval[0],
                     interval[1],
-                    chord.getName(),
+                    chord.getString(),
                     this._timeline.harmonicSumTrack
                 ),
                 this._timeline.controller
