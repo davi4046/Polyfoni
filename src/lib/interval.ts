@@ -88,14 +88,20 @@ export function intersectIntervals(intervals: Interval[]): Interval[] {
 
     let result: Interval[] = [];
 
-    let prev = points[0];
+    let balance = 0;
 
-    for (let i = 1; i < points.length; i++) {
+    for (let i = 0; i < points.length - 1; i++) {
         let curr = points[i];
+        let next = points[i + 1];
 
-        if ((prev[1] != "E" || curr[1] != "S") && prev[0] != curr[0]) {
-            result.push([prev[0], curr[0]]);
-            prev = curr;
+        if (curr[1] == "S") {
+            balance += 1;
+        } else {
+            balance -= 1;
+        }
+
+        if (balance > 0 && curr[0] != next[0]) {
+            result.push([curr[0], next[0]]);
         }
     }
 
