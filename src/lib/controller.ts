@@ -1,18 +1,39 @@
-import { clone } from 'lodash';
-import { onMount } from 'svelte';
+import { clone } from "lodash";
+import { onMount } from "svelte";
 
-import { invoke } from '@tauri-apps/api/tauri';
-
-import { ChangeTracker } from './change-tracker';
-import Popup from './components/Popup.svelte';
-import PauseIcon from './components/svg/PauseIcon.svelte';
-import PlayIcon from './components/svg/PlayIcon.svelte';
-import { Generator } from './generator';
-import HotkeyHandler from './hotkeys';
+import { ChangeTracker } from "./change-tracker";
+import Popup from "./components/Popup.svelte";
+import PauseIcon from "./components/svg/PauseIcon.svelte";
+import PlayIcon from "./components/svg/PlayIcon.svelte";
+import { Generator } from "./generator";
+import HotkeyHandler from "./hotkeys";
 import {
-    HighlightModel, ItemData, ItemHandleModel, ItemModel, NoteModel, TimelineModel, TrackModel,
-    VoiceModel
-} from './models';
+    HighlightModel,
+    ItemData,
+    ItemHandleModel,
+    ItemModel,
+    NoteModel,
+    TimelineModel,
+    TrackModel,
+    VoiceModel,
+} from "./models";
+
+const audioContext = new window.AudioContext();
+
+function playNote(value: number, duration: number) {
+    let frequency = 440 * Math.pow(2, (value - 69) / 12);
+
+    const oscillator = audioContext.createOscillator();
+
+    oscillator.type = "square";
+    oscillator.frequency.value = frequency; // value in hertz
+    oscillator.connect(audioContext.destination);
+    oscillator.start();
+
+    setTimeout(function () {
+        oscillator.stop();
+    }, duration);
+}
 
 export class Controller {
     private _hoveredBeat: number | null = null;
@@ -258,10 +279,6 @@ export class Controller {
                     if (note == currNote) return;
 
                     if (currNote && !currNote.isRest) {
-                        invoke("note_off", {
-                            channel: voice.getIndex(),
-                            key: currNote.pitch,
-                        });
                         let noteElement = document.getElementById(
                             `note-${currNote.id}`
                         );
@@ -269,11 +286,10 @@ export class Controller {
                     }
 
                     if (note && !note.isRest) {
-                        invoke("note_on", {
-                            channel: voice.getIndex(),
-                            key: note.pitch,
-                            velocity: 100,
-                        });
+                        playNote(
+                            note.pitch,
+                            ((note.end - note.start) / BPM) * 60000
+                        );
                         let noteElement = document.getElementById(
                             `note-${note.id}`
                         );
@@ -308,11 +324,6 @@ export class Controller {
                 target: this._startButton,
             });
         }
-
-        this._playingNotes.forEach((note, voice) => {
-            if (!note) return;
-            invoke("note_off", { channel: voice.getIndex(), key: note.pitch });
-        });
 
         this._isPlaying = false;
     }

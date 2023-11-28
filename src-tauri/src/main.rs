@@ -2,12 +2,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use evaluation::Evaluator;
-use rustysynth::{SoundFont, SynthesizerSettings, Synthesizer};
 use tauri::{CustomMenuItem, Menu, Submenu, Manager};
 use workerpool::Pool;
-use std::{env, sync::{Mutex, Arc}, fs::File};
-use tinyaudio::prelude::*;
-use itertools::Itertools;
+use std::{env, sync::Mutex};
 
 mod evaluation;
 
@@ -22,18 +19,6 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("delete".to_string(), "Delete").accelerator("Delete"))
             )  
         )
-}
-
-#[tauri::command(async)]
-fn note_on(synthesizer: tauri::State<Arc<Mutex<Synthesizer>>>, channel: i32, key: i32, velocity: i32) {
-    let synth_clone = synthesizer.clone();
-    synth_clone.lock().unwrap().note_on(channel, key, velocity);
-}
-
-#[tauri::command(async)]
-fn note_off(synthesizer: tauri::State<Arc<Mutex<Synthesizer>>>, channel: i32, key: i32) {
-    let synth_clone = synthesizer.clone();
-    synth_clone.lock().unwrap().note_off(channel, key);
 }
 
 fn main() {
@@ -53,46 +38,6 @@ fn main() {
 
             app.manage(Mutex::new(pool));
 
-            // Setup the audio output.
-            let params = OutputDeviceParameters {
-                channels_count: 2,
-                sample_rate: 44100,
-                channel_sample_count: 4410,
-            };
-
-            // Buffer for the audio output.
-            let mut left: Vec<f32> = vec![0_f32; params.channel_sample_count];
-            let mut right: Vec<f32> = vec![0_f32; params.channel_sample_count];
-
-            // Load the SoundFont.
-            let soundfont_path = app.path_resolver()
-                .resolve_resource("res/GeneralUser GS v1.471.sf2")
-                .expect("Failed to resolve resource");
-            let mut soundfont_file = File::open(soundfont_path).unwrap();
-            let soundfont = Arc::new(SoundFont::new(&mut soundfont_file).unwrap());
-            
-            // Create the MIDI file sequencer.
-            let settings = SynthesizerSettings::new(params.sample_rate as i32);
-            let synthesizer = Arc::new(
-                Mutex::new(Synthesizer::new(&soundfont, &settings).unwrap())
-            );
-
-            let synth_clone = synthesizer.clone();
-
-            let audio_output_device = run_output_device(params, {
-                move |data| {
-                    synth_clone.lock().unwrap().render(&mut left[..], &mut right[..]);
-                    for (i, value) in left.iter().interleave(right.iter()).enumerate() {
-                        data[i] = *value;
-                    }
-                }
-            })
-            .unwrap();
-
-            app.manage(Mutex::new(audio_output_device));
-
-            app.manage(synthesizer);
-
             Ok(())
         })
         .menu(create_menu())
@@ -110,7 +55,7 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![evaluation::evaluate, note_on, note_off])
+        .invoke_handler(tauri::generate_handler![evaluation::evaluate])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
