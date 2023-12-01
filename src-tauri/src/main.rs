@@ -40,7 +40,7 @@ fn main() {
 
             Ok(())
         })
-        .menu(create_menu())
+        //.menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
                 "quit" => {
