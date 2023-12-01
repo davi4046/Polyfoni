@@ -1,18 +1,19 @@
 <script lang="ts">
-    import Timeline from "./lib/components/Timeline.svelte";
+    import Timeline from "./lib/views/timeline/Timeline.svelte";
+    import TimelineModel from "./lib/models/timeline/timeline/TimelineModel";
+    import VoiceModel from "./lib/models/timeline/voice/VoiceModel";
+    import VMFactory from "./lib/services/VMFactory";
+    import VMFactory from "./lib/factories/VMFactory";
 
-    import { Controller } from "./lib/controller";
+    let timeline = new TimelineModel([
+        new VoiceModel("Piano 1"),
+        new VoiceModel("Piano 2"),
+        new VoiceModel("Piano 3"),
+    ]);
 
-    let controller = new Controller();
-
-    controller.timeline.createVoice("Piano 1");
-    controller.timeline.createVoice("Piano 2");
-    controller.timeline.createVoice("Piano 3");
-    controller.timeline.createVoice("Piano 4");
-
-    let store = controller.timeline.store;
+    let timelineVM = VMFactory.createTimelineVM(timeline);
 </script>
 
 <main class="h-full">
-    <Timeline bind:data={$store}></Timeline>
+    <Timeline {timelineVM}></Timeline>
 </main>
