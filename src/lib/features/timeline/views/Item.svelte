@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ItemVM from "../../view_models/timeline/item/ItemVM";
+    import type ItemVM from "../view_models/item/ItemVM";
 
     export let itemVM: ItemVM;
 

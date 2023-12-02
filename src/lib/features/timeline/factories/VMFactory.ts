@@ -1,9 +1,9 @@
-import type Item from "../models/timeline/item/Item";
-import type TimelineModel from "../models/timeline/timeline/Timeline";
-import type Track from "../models/timeline/track/Track";
-import ItemVM from '../view_models/timeline/item/ItemVM';
-import TimelineVM from '../view_models/timeline/timeline/TimelineVM';
-import TrackVM from '../view_models/timeline/track/TrackVM';
+import type Item from "../models/item/Item";
+import type TimelineModel from "../models/timeline/Timeline";
+import type Track from "../models/track/Track";
+import ItemVM from "../view_models/item/ItemVM";
+import TimelineVM from "../view_models/timeline/TimelineVM";
+import TrackVM from "../view_models/track/TrackVM";
 
 abstract class VMFactory {
     private static createItemVM(model: Item): ItemVM {

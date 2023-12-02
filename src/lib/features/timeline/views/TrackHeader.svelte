@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type TrackVM from "../../view_models/timeline/track/TrackVM";
+    import type TrackVM from "../view_models/track/TrackVM";
 
     export let trackVM: TrackVM;
 </script>

@@ -3,7 +3,7 @@
     import TrackHeader from "./TrackHeader.svelte";
     import MarkerBig from "./components/MarkerBig.svelte";
     import MarkerSmall from "./components/MarkerSmall.svelte";
-    import type TimelineVM from "../../view_models/timeline/timeline/TimelineVM";
+    import type TimelineVM from "../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
 
     export let timelineVM: TimelineVM;

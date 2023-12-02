@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Timeline from "./lib/views/timeline/Timeline.svelte";
-    import VMFactory from "./lib/factories/VMFactory";
-    import makeDemoTimeline from "./lib/dev_utils/makeDemoTimeline";
+    import Timeline from "./lib/features/timeline/views/Timeline.svelte";
+    import VMFactory from "./lib/features/timeline/factories/VMFactory";
+    import makeDemoTimeline from "./lib/features/timeline/dev_utils/makeDemoTimeline";
 
     let timeline = makeDemoTimeline();
 

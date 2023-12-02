@@ -1,7 +1,7 @@
-import Interval from '../models/timeline/interval/Interval';
-import ItemModel from '../models/timeline/item/Item';
-import TimelineModel from '../models/timeline/timeline/Timeline';
-import VoiceModel from '../models/timeline/voice/Voice';
+import Interval from "../models/interval/Interval";
+import ItemModel from "../models/item/Item";
+import TimelineModel from "../models/timeline/Timeline";
+import VoiceModel from "../models/voice/Voice";
 
 function makeDemoTimeline(): TimelineModel {
     const mapRange = (

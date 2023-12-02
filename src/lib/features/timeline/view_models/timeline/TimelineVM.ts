@@ -1,10 +1,10 @@
-import type { TrackVMGroup } from "../../../aliases";
+import type TrackVM from "../track/TrackVM";
 
 class TimelineVM {
     constructor(
-        private _top: TrackVMGroup[],
-        private _center: TrackVMGroup[],
-        private _bottom: TrackVMGroup[]
+        private _top: TrackVM[][],
+        private _center: TrackVM[][],
+        private _bottom: TrackVM[][]
     ) {}
 
     get top() {
