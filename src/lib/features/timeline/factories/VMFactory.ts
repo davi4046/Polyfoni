@@ -1,3 +1,4 @@
+import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 import type TimelineModel from "../models/timeline/Timeline";
 import type Track from "../models/track/Track";
@@ -5,8 +6,10 @@ import ItemVM from "../view_models/item/ItemVM";
 import TimelineVM from "../view_models/timeline/TimelineVM";
 import TrackVM from "../view_models/track/TrackVM";
 
-abstract class VMFactory {
-    private static createItemVM(model: Item): ItemVM {
+class VMFactory {
+    constructor(private _context: TimelineContext) {}
+
+    createItemVM(model: Item): ItemVM {
         let itemVM = new ItemVM(
             model.interval.start,
             model.interval.end,
@@ -19,7 +22,7 @@ abstract class VMFactory {
         return itemVM;
     }
 
-    static createTrackVM(model: Track): TrackVM {
+    createTrackVM(model: Track): TrackVM {
         let trackVM = new TrackVM(
             model.label,
             model.items.map((item) => {
@@ -30,7 +33,7 @@ abstract class VMFactory {
         return trackVM;
     }
 
-    static createTimelineVM(model: TimelineModel): TimelineVM {
+    createTimelineVM(model: TimelineModel): TimelineVM {
         let center = model.voices.map((voice) => {
             return [
                 this.createTrackVM(voice.outputTrack),
