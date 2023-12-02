@@ -5,7 +5,7 @@
     export let trackVM: TrackVM;
 </script>
 
-<div>
+<div class="relative h-[var(--track-height)] bg-[var(--track-color)]">
     {#each trackVM.items as itemVM}
         <Item {itemVM}></Item>
     {/each}

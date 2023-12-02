@@ -4,6 +4,8 @@
     export let trackVM: TrackVM;
 </script>
 
-<div>
+<div
+    class="flex items-center w-full h-[var(--track-height)] p-2 whitespace-nowrap"
+>
     {trackVM.label}
 </div>

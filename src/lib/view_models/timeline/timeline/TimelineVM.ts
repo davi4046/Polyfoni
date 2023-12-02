@@ -1,4 +1,4 @@
-import type { TrackVMGroup } from "../../../asiases";
+import type { TrackVMGroup } from "../../../aliases";
 
 class TimelineVM {
     constructor(

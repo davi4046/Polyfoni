@@ -27,7 +27,7 @@
             }}
             role="none"
         >
-            <p class="truncate z-10">
+            <p class="z-10 truncate">
                 {#if data.content}
                     {data.content}
                 {:else}

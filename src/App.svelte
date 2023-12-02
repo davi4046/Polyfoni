@@ -1,15 +1,9 @@
 <script lang="ts">
     import Timeline from "./lib/views/timeline/Timeline.svelte";
-    import TimelineModel from "./lib/models/timeline/timeline/TimelineModel";
-    import VoiceModel from "./lib/models/timeline/voice/VoiceModel";
-    import VMFactory from "./lib/services/VMFactory";
     import VMFactory from "./lib/factories/VMFactory";
+    import makeDemoTimeline from "./lib/dev_utils/makeDemoTimeline";
 
-    let timeline = new TimelineModel([
-        new VoiceModel("Piano 1"),
-        new VoiceModel("Piano 2"),
-        new VoiceModel("Piano 3"),
-    ]);
+    let timeline = makeDemoTimeline();
 
     let timelineVM = VMFactory.createTimelineVM(timeline);
 </script>

@@ -1,36 +1,14 @@
 @tailwind base;
 @tailwind components;
-
-.btn {
-    @apply font-semibold border-2;
-}
-
-.btn:focus {
-    @apply outline-none;
-}
-
-.btn-sm {
-    @apply px-4 py-2 text-sm;
-}
-
-.btn-primary {
-    @apply text-black bg-gray-400 border-black;
-}
-
-.btn-primary:focus {
-    @apply ring-2 ring-cyan-300;
-}
-
-.item {
-    @apply flex items-center h-full p-2 font-semibold text-black border-2 border-black bg-green-500;
-}
-
-.selected {
-    @apply ring-2 ring-cyan-300;
-}
-
 @tailwind utilities;
 
-.active-note {
-    @apply bg-cyan-400;
+:root {
+    /* TRACK */
+    --track-color: #e5e7eb; /* gray-200 */
+    --track-spacing: 8px;
+    --track-height: 48px;
+
+    /* TRACK GROUP */
+    --track-group-color: #f9fafb; /* gray-50 */
+    --track-group-spacing: 16px;
 }
