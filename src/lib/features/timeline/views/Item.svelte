@@ -13,6 +13,10 @@
 >
     <div
         class="flex items-center h-full p-2 text-white bg-black border-x-2 border-x-white"
+        on:mousedown={(event) => {
+            itemVM.handleMouseDown?.(event);
+        }}
+        role="none"
     >
         <div class="truncate">
             {itemVM.text}

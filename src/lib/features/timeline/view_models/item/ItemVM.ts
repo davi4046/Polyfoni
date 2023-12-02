@@ -2,7 +2,8 @@ class ItemVM {
     constructor(
         private _start: number,
         private _end: number,
-        private _text: string
+        private _text: string,
+        private _handleMouseDown?: (event: MouseEvent) => void
     ) {}
 
     get start() {
@@ -15,6 +16,10 @@ class ItemVM {
 
     get text() {
         return this._text;
+    }
+
+    get handleMouseDown() {
+        return this._handleMouseDown;
     }
 }
 

@@ -10,7 +10,10 @@ abstract class VMFactory {
         let itemVM = new ItemVM(
             model.interval.start,
             model.interval.end,
-            model.content
+            model.content,
+            (_) => {
+                console.log("item mousedown");
+            }
         );
         // TODO: assign callback functions on itemVM
         return itemVM;
