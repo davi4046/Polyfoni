@@ -1,6 +1,8 @@
 <script lang="ts">
     import Track from "./Track.svelte";
     import TrackHeader from "./TrackHeader.svelte";
+    import MarkerBig from "./components/MarkerBig.svelte";
+    import MarkerSmall from "./components/MarkerSmall.svelte";
     import type TimelineVM from "../../view_models/timeline/timeline/TimelineVM";
     import { onMount } from "svelte";
 
@@ -40,10 +42,15 @@
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
-                    class="absolute bottom-0 h-6"
+                    class="absolute bottom-0 flex h-6 space-x-1.5"
                     style="left: {index * 64 + 1}px"
                 >
-                    {index}
+                    {#if (index / 4) % 1 == 0}
+                        <MarkerBig />
+                        <div>{index}</div>
+                    {:else}
+                        <MarkerSmall />
+                    {/if}
                 </div>
             {/each}
         </div>
