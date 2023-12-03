@@ -150,9 +150,11 @@
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
-                    class="absolute inset-y-0 w-0.5 bg-black"
-                    style="left: {index * 64}px"
-                />
+                    class="absolute h-full text-[var(--timeline-vline-color)]"
+                    style="left: {index * 64 + 1}px"
+                >
+                    <VerticalLine />
+                </div>
             {/each}
         </div>
     </div>

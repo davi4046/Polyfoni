@@ -10,5 +10,5 @@
     --timeline-group-color: theme("colors.gray.50");
     --timeline-group-spacing: theme("spacing.4");
 
-    --timeline-separator-color: theme("colors.gray.400");
+    --timeline-vline-color: theme("colors.gray.400");
 }
