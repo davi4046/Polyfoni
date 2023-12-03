@@ -3,6 +3,7 @@
     import TrackHeader from "./TrackHeader.svelte";
     import MarkerBig from "./components/MarkerBig.svelte";
     import MarkerSmall from "./components/MarkerSmall.svelte";
+    import VerticalLine from "./components/VerticalLine.svelte";
     import type TimelineVM from "../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
 
@@ -57,10 +58,10 @@
     </div>
     <!-- TOP HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--track-group-spacing)] col-start-1 row-start-2 overflow-hidden"
+        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-2 overflow-hidden"
     >
         {#each timelineVM.top as trackVMGroup}
-            <div class="space-y-[var(--track-spacing)]">
+            <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
@@ -69,10 +70,10 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--track-group-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
+        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
     >
         {#each timelineVM.center as trackVMGroup}
-            <div class="space-y-[var(--track-spacing)]">
+            <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
@@ -81,10 +82,10 @@
     </div>
     <!-- BOTTOM HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--track-group-spacing)] col-start-1 row-start-4 overflow-hidden"
+        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-4 overflow-hidden"
     >
         {#each timelineVM.bottom as trackVMGroup}
-            <div class="space-y-[var(--track-spacing)]">
+            <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
@@ -94,12 +95,12 @@
     <!-- TOP TRACKS -->
     <div class="h-full col-start-2 row-start-2 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--track-group-spacing)] overflow-clip"
+            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-clip"
             style="width: 4096px;"
         >
             {#each timelineVM.top as trackVMGroup}
                 <div
-                    class="space-y-[var(--track-spacing)] bg-[color:var(--track-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>
@@ -111,12 +112,12 @@
     <!-- CENTER TRACKS -->
     <div class="h-full col-start-2 row-start-3 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--track-group-spacing)] overflow-hidden v-scroll"
+            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden v-scroll"
             style="width: 4096px;"
         >
             {#each timelineVM.center as trackVMGroup}
                 <div
-                    class="space-y-[var(--track-spacing)] bg-[var(--track-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-group-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>
@@ -128,12 +129,12 @@
     <!-- BOTTOM TRACKS -->
     <div class="h-full col-start-2 row-start-4 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--track-group-spacing)] overflow-hidden"
+            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.bottom as trackVMGroup}
                 <div
-                    class="space-y-[var(--track-spacing)] bg-[color:var(--track-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>

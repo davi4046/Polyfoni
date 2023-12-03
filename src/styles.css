@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-    /* TRACK */
-    --track-color: #e5e7eb; /* gray-200 */
-    --track-spacing: 8px;
-    --track-height: 48px;
+    --timeline-track-color: theme("colors.gray.200");
+    --timeline-track-spacing: theme("spacing.2");
+    --timeline-track-height: theme("height.12");
 
-    /* TRACK GROUP */
-    --track-group-color: #f9fafb; /* gray-50 */
-    --track-group-spacing: 16px;
+    --timeline-group-color: theme("colors.gray.50");
+    --timeline-group-spacing: theme("spacing.4");
+
+    --timeline-separator-color: theme("colors.gray.400");
 }
