@@ -3,53 +3,34 @@ import type Item from "../models/item/Item";
 class SelectionContext {
     private _selectedItems: Item[] = [];
 
-    private _selectItem(item: Item) {
+    readonly selectItem = (item: Item) => {
         if (this._selectedItems.includes(item)) return;
         this._selectedItems.push(item);
         item.notifySubscribers();
-    }
+        console.log(this._selectedItems);
+    };
 
-    private _deselectItem(item: Item) {
+    readonly deselectItem = (item: Item) => {
         let index = this._selectedItems.indexOf(item);
         this._selectedItems.splice(index, 1);
         item.notifySubscribers();
-    }
+    };
 
-    private _toggleSelected(item: Item) {
+    readonly toggleSelected = (item: Item) => {
         if (this._selectedItems.includes(item)) {
-            this._deselectItem(item);
+            this.deselectItem(item);
         } else {
-            this._selectItem(item);
+            this.selectItem(item);
         }
-    }
+    };
 
-    private _deselectAll() {
+    readonly deselectAll = () => {
         this._selectedItems.slice().forEach((item) => this.deselectItem(item));
-    }
+    };
 
-    private _isSelected(item: Item) {
+    readonly isSelected = (item: Item) => {
         return this._selectedItems.includes(item);
-    }
-
-    get selectItem() {
-        return this._selectItem;
-    }
-
-    get deselectItem() {
-        return this._deselectItem;
-    }
-
-    get toggleSelected() {
-        return this._toggleSelected;
-    }
-
-    get deselectAll() {
-        return this._deselectAll;
-    }
-
-    get isSelected() {
-        return this._isSelected;
-    }
+    };
 }
 
 export default SelectionContext;
