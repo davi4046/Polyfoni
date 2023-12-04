@@ -38,6 +38,7 @@
 <div
     class="h-full grid grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
     on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
+    on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
 >
     <!-- BUTTONS -->

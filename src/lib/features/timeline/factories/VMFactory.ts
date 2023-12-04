@@ -11,6 +11,7 @@ import TrackVMState from "../view_models/track/TrackVMState";
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 import type Timeline from "../models/timeline/Timeline";
+
 class VMFactory {
     constructor(private _context: TimelineContext) {}
 
@@ -56,11 +57,6 @@ class VMFactory {
 
     createTimelineVM(model: Timeline): TimelineVM {
         const update = (model: Timeline): TimelineVMState => {
-            const handleMouseDown = (event: MouseEvent) => {
-                if (event.shiftKey) return;
-                this._context.selection.deselectAll();
-            };
-
             let center = model.voices.map((voice) => {
                 return [
                     this.createTrackVM(voice.outputTrack),
@@ -70,9 +66,25 @@ class VMFactory {
                     this.createTrackVM(voice.harmonyTrack),
                 ];
             });
+
             let bottom = [[this.createTrackVM(model.harmonicSumTrack)]];
 
-            return new TimelineVMState([], center, bottom, handleMouseDown);
+            const handleMouseDown = (event: MouseEvent) => {
+                if (event.shiftKey) return;
+                this._context.selection.deselectAll();
+            };
+
+            const handleMouseMove = (event: MouseEvent) => {
+                console.log("timeline mousemove");
+            };
+
+            return new TimelineVMState(
+                [],
+                center,
+                bottom,
+                handleMouseDown,
+                handleMouseMove
+            );
         };
 
         return new TimelineVM(model, update);
