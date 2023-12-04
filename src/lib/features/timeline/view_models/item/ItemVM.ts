@@ -1,26 +1,8 @@
-class ItemVM {
-    constructor(
-        private _start: number,
-        private _end: number,
-        private _text: string,
-        private _handleMouseDown?: (event: MouseEvent) => void
-    ) {}
+import Stateful from "../../../../shared/stateful/Stateful";
 
-    get start() {
-        return this._start;
-    }
+import type Item from "../../models/item/Item";
+import type ItemVMState from "./ItemVMState";
 
-    get end() {
-        return this._end;
-    }
-
-    get text() {
-        return this._text;
-    }
-
-    get handleMouseDown() {
-        return this._handleMouseDown;
-    }
-}
+class ItemVM extends Stateful<Item, ItemVMState> {}
 
 export default ItemVM;

@@ -3,12 +3,14 @@
     import type TrackVM from "../view_models/track/TrackVM";
 
     export let trackVM: TrackVM;
+
+    trackVM.subscribe((_) => (trackVM = trackVM));
 </script>
 
 <div
     class="relative h-[var(--timeline-track-height)] bg-[var(--timeline-track-color)]"
 >
-    {#each trackVM.items as itemVM}
+    {#each trackVM.state.items as itemVM}
         <Item {itemVM}></Item>
     {/each}
 </div>

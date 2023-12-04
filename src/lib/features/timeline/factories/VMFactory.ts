@@ -1,53 +1,70 @@
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
-import type TimelineModel from "../models/timeline/Timeline";
-import type Track from "../models/track/Track";
+import type Timeline from "../models/timeline/Timeline";
+import Track from "../models/track/Track";
 import ItemVM from "../view_models/item/ItemVM";
+import ItemVMState from "../view_models/item/ItemVMState";
 import TimelineVM from "../view_models/timeline/TimelineVM";
+import TimelineVMState from "../view_models/timeline/TimelineVMState";
 import TrackVM from "../view_models/track/TrackVM";
+import TrackVMState from "../view_models/track/TrackVMState";
 
 class VMFactory {
     constructor(private _context: TimelineContext) {}
 
     createItemVM(model: Item): ItemVM {
-        let itemVM = new ItemVM(
-            model.interval.start,
-            model.interval.end,
-            model.content,
-            (_) => {
-                console.log("item mousedown");
-            }
-        );
-        // TODO: assign callback functions on itemVM
-        return itemVM;
+        const update = (model: Item): ItemVMState => {
+            const handleMouseDown = (event: MouseEvent) => {
+                if (event.shiftKey) {
+                    this._context.selection.toggleSelected(model);
+                } else {
+                    this._context.selection.deselectAll();
+                    this._context.selection.selectItem(model);
+                }
+            };
+
+            return new ItemVMState(
+                model.interval.start,
+                model.interval.end,
+                model.content,
+                this._context.selection.isSelected(model),
+                handleMouseDown
+            );
+        };
+
+        return new ItemVM(model, update);
     }
 
     createTrackVM(model: Track): TrackVM {
-        let trackVM = new TrackVM(
-            model.label,
-            model.items.map((item) => {
-                return this.createItemVM(item);
-            })
-        );
-        // TODO: assign callback functions on trackVM
-        return trackVM;
+        const update = (model: Track): TrackVMState => {
+            return new TrackVMState(
+                model.label,
+                model.items.map((item) => {
+                    return this.createItemVM(item);
+                })
+            );
+        };
+
+        return new TrackVM(model, update);
     }
 
-    createTimelineVM(model: TimelineModel): TimelineVM {
-        let center = model.voices.map((voice) => {
-            return [
-                this.createTrackVM(voice.outputTrack),
-                this.createTrackVM(voice.pitchTrack),
-                this.createTrackVM(voice.durationTrack),
-                this.createTrackVM(voice.restTrack),
-                this.createTrackVM(voice.harmonyTrack),
-            ];
-        });
-        let bottom = [[this.createTrackVM(model.harmonicSumTrack)]];
+    createTimelineVM(model: Timeline): TimelineVM {
+        const update = (model: Timeline): TimelineVMState => {
+            let center = model.voices.map((voice) => {
+                return [
+                    this.createTrackVM(voice.outputTrack),
+                    this.createTrackVM(voice.pitchTrack),
+                    this.createTrackVM(voice.durationTrack),
+                    this.createTrackVM(voice.restTrack),
+                    this.createTrackVM(voice.harmonyTrack),
+                ];
+            });
+            let bottom = [[this.createTrackVM(model.harmonicSumTrack)]];
 
-        let timelineVM = new TimelineVM([], center, bottom);
-        // TODO: assign callback functions on timelineVM
-        return timelineVM;
+            return new TimelineVMState([], center, bottom);
+        };
+
+        return new TimelineVM(model, update);
     }
 }
 

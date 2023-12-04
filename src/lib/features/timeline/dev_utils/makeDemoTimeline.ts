@@ -1,9 +1,9 @@
 import Interval from "../models/interval/Interval";
 import ItemModel from "../models/item/Item";
-import TimelineModel from "../models/timeline/Timeline";
+import Timeline from "../models/timeline/Timeline";
 import VoiceModel from "../models/voice/Voice";
 
-function makeDemoTimeline(): TimelineModel {
+function makeDemoTimeline(): Timeline {
     const mapRange = (
         value: number,
         inMin: number,
@@ -44,7 +44,7 @@ function makeDemoTimeline(): TimelineModel {
         }
     }
 
-    let timeline = new TimelineModel(voices);
+    let timeline = new Timeline(voices);
 
     return timeline;
 }

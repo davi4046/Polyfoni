@@ -1,23 +1,8 @@
-import type TrackVM from "../track/TrackVM";
+import Stateful from "../../../../shared/stateful/Stateful";
 
-class TimelineVM {
-    constructor(
-        private _top: TrackVM[][],
-        private _center: TrackVM[][],
-        private _bottom: TrackVM[][]
-    ) {}
+import type Timeline from "../../models/timeline/Timeline";
+import type TimelineVMState from "./TimelineVMState";
 
-    get top() {
-        return this._top;
-    }
-
-    get center() {
-        return this._center;
-    }
-
-    get bottom() {
-        return this._bottom;
-    }
-}
+class TimelineVM extends Stateful<Timeline, TimelineVMState> {}
 
 export default TimelineVM;

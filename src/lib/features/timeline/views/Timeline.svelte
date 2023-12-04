@@ -9,8 +9,9 @@
 
     export let timelineVM: TimelineVM;
 
+    timelineVM.subscribe((_) => (timelineVM = timelineVM));
+
     onMount(() => {
-        // HORISONTAL SCROLLING
         for (let element of document.getElementsByClassName("h-scroll")) {
             element.addEventListener("wheel", (event) => {
                 let wheelEvent = event as WheelEvent;
@@ -21,7 +22,6 @@
                 }
             });
         }
-        // VERTICAL SCROLLING
         for (let element of document.getElementsByClassName("v-scroll")) {
             element.addEventListener("wheel", (event) => {
                 let wheelEvent = event as WheelEvent;
@@ -60,7 +60,7 @@
     <div
         class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-2 overflow-hidden"
     >
-        {#each timelineVM.top as trackVMGroup}
+        {#each timelineVM.state.top as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
@@ -72,7 +72,7 @@
     <div
         class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
     >
-        {#each timelineVM.center as trackVMGroup}
+        {#each timelineVM.state.center as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
@@ -84,7 +84,7 @@
     <div
         class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-4 overflow-hidden"
     >
-        {#each timelineVM.bottom as trackVMGroup}
+        {#each timelineVM.state.bottom as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
                 {#each trackVMGroup as trackVM}
                     <TrackHeader {trackVM}></TrackHeader>
@@ -98,7 +98,7 @@
             class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each timelineVM.top as trackVMGroup}
+            {#each timelineVM.state.top as trackVMGroup}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
                 >
@@ -115,7 +115,7 @@
             class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden v-scroll"
             style="width: 4096px;"
         >
-            {#each timelineVM.center as trackVMGroup}
+            {#each timelineVM.state.center as trackVMGroup}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-group-color)]"
                 >
@@ -132,7 +132,7 @@
             class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.bottom as trackVMGroup}
+            {#each timelineVM.state.bottom as trackVMGroup}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
                 >

@@ -1,6 +1,7 @@
+import Subscribable from "../../../../shared/subscribable/Subscribable";
 import Track from "../track/Track";
 
-class Voice {
+class Voice extends Subscribable {
     public pitchTrack = new Track("Pitch", []);
     public durationTrack = new Track("Duration", []);
     public restTrack = new Track("Rest", []);
@@ -8,6 +9,7 @@ class Voice {
     public outputTrack: Track;
 
     constructor(public label: string) {
+        super();
         this.outputTrack = new Track(label, []);
     }
 }

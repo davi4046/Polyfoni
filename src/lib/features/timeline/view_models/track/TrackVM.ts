@@ -1,18 +1,8 @@
-import type ItemVM from "../item/ItemVM";
+import Stateful from "../../../../shared/stateful/Stateful";
 
-class TrackVM {
-    constructor(
-        private _label: string,
-        private _items: ItemVM[]
-    ) {}
+import type Track from "../../models/track/Track";
+import type TrackVMState from "./TrackVMState";
 
-    get label() {
-        return this._label;
-    }
-
-    get items() {
-        return this._items;
-    }
-}
+class TrackVM extends Stateful<Track, TrackVMState> {}
 
 export default TrackVM;

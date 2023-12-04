@@ -3,8 +3,10 @@
 
     export let itemVM: ItemVM;
 
-    $: width = (itemVM.end - itemVM.start) * 64 + 2;
-    $: left = itemVM.start * 64;
+    itemVM.subscribe((_) => (itemVM = itemVM));
+
+    $: width = (itemVM.state.end - itemVM.state.start) * 64 + 2;
+    $: left = itemVM.state.start * 64;
 </script>
 
 <div
@@ -14,12 +16,12 @@
     <div
         class="flex items-center h-full p-2 text-white bg-black border-x-2 border-x-white"
         on:mousedown={(event) => {
-            itemVM.handleMouseDown?.(event);
+            itemVM.state.handleMouseDown(event);
         }}
         role="none"
     >
         <div class="truncate">
-            {itemVM.text}
+            {itemVM.state.isSelected}
         </div>
     </div>
 </div>

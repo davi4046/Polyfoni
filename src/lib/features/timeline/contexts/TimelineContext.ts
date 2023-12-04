@@ -7,11 +7,11 @@ class TimelineContext {
         private _highlightContext: HighlightContext
     ) {}
 
-    get selectionContext() {
+    get selection() {
         return this._selectionContext;
     }
 
-    get highlightContext() {
+    get highlight() {
         return this._highlightContext;
     }
 }
