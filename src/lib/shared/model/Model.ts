@@ -1,5 +1,5 @@
 import Subscribable from "../subscribable/Subscribable";
-import randomId from "../utils/randomId";
+import randomId from "../utils/random_id/randomId";
 
 class Model extends Subscribable {
     private static _usedIds: string[] = [];
