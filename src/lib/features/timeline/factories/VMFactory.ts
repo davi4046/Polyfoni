@@ -1,5 +1,6 @@
 import chroma from "chroma-js";
 
+import findClosestElement from "../../../shared/utils/find_closest_element/findClosestElement";
 import Track from "../models/track/Track";
 import ItemVM from "../view_models/item/ItemVM";
 import ItemVMState from "../view_models/item/ItemVMState";
@@ -11,7 +12,6 @@ import TrackVMState from "../view_models/track/TrackVMState";
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 import type Timeline from "../models/timeline/Timeline";
-
 class VMFactory {
     constructor(private _context: TimelineContext) {}
 
@@ -79,7 +79,13 @@ class VMFactory {
                     document.querySelectorAll("[data-type='track']")
                 );
 
-                console.log(trackElements);
+                const closestTrack = findClosestElement(
+                    event.clientX,
+                    event.clientY,
+                    trackElements
+                );
+
+                console.log(closestTrack?.getAttribute("data-id"));
             };
 
             return new TimelineVMState(
