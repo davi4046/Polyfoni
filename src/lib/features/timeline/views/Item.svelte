@@ -14,14 +14,13 @@
     style="width: {width}px; left: {left}px;"
 >
     <div
-        class="flex items-center h-full p-2 text-white bg-black border-x-2 border-x-white"
+        class="flex items-center h-full p-2 font-semibold text-black border-2 border-black outline outline-4"
+        style="background-color: {itemVM.state.backgroundColor.css()}; outline-color: {itemVM.state.outlineColor.css()};"
         on:mousedown={(event) => {
             itemVM.state.handleMouseDown(event);
         }}
         role="none"
     >
-        <div class="truncate">
-            {itemVM.state.isSelected}
-        </div>
+        <div class="truncate">{itemVM.state.text}</div>
     </div>
 </div>

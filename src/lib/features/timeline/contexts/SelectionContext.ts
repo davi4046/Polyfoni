@@ -24,7 +24,7 @@ class SelectionContext {
     }
 
     private _deselectAll() {
-        this._selectedItems.forEach((item) => this.deselectItem(item));
+        this._selectedItems.slice().forEach((item) => this.deselectItem(item));
     }
 
     private _isSelected(item: Item) {

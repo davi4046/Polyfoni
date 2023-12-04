@@ -3,7 +3,8 @@ class ItemVMState {
         private _start: number,
         private _end: number,
         private _text: string,
-        private _isSelected: boolean,
+        private _backgroundColor: chroma.Color,
+        private _outlineColor: chroma.Color,
         private _handleMouseDown: (event: MouseEvent) => void
     ) {}
 
@@ -19,8 +20,12 @@ class ItemVMState {
         return this._text;
     }
 
-    get isSelected() {
-        return this._isSelected;
+    get backgroundColor() {
+        return this._backgroundColor;
+    }
+
+    get outlineColor() {
+        return this._outlineColor;
     }
 
     get handleMouseDown() {
