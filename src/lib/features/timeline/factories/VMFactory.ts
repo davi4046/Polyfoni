@@ -75,7 +75,11 @@ class VMFactory {
             };
 
             const handleMouseMove = (event: MouseEvent) => {
-                console.log("timeline mousemove");
+                const trackElements = Array.from(
+                    document.querySelectorAll("[data-type='track']")
+                );
+
+                console.log(trackElements);
             };
 
             return new TimelineVMState(

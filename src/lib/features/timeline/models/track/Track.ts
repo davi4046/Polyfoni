@@ -1,8 +1,8 @@
-import Subscribable from "../../../../shared/subscribable/Subscribable";
+import Model from "../../../../shared/model/Model";
 
 import type Item from "../item/Item";
 
-class Track extends Subscribable {
+class Track extends Model {
     constructor(
         public label: string,
         public items: Item[]

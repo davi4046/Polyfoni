@@ -1,6 +1,6 @@
-import Subscribable from "../../../../shared/subscribable/Subscribable";
+import Model from "../../../../shared/model/Model";
 
-class Interval extends Subscribable {
+class Interval extends Model {
     constructor(
         public start: number,
         public end: number

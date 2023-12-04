@@ -1,8 +1,8 @@
-import Subscribable from "../../../../shared/subscribable/Subscribable";
+import Model from "../../../../shared/model/Model";
 
 import type Interval from "../interval/Interval";
 
-class Item extends Subscribable {
+class Item extends Model {
     constructor(
         public interval: Interval,
         public content: string

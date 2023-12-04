@@ -1,7 +1,7 @@
-import Subscribable from "../../../../shared/subscribable/Subscribable";
+import Model from "../../../../shared/model/Model";
 import Track from "../track/Track";
 
-class Voice extends Subscribable {
+class Voice extends Model {
     public pitchTrack = new Track("Pitch", []);
     public durationTrack = new Track("Duration", []);
     public restTrack = new Track("Rest", []);

@@ -1,8 +1,8 @@
 import type Voice from "../voice/Voice";
-import Subscribable from "../../../../shared/subscribable/Subscribable";
+import Model from "../../../../shared/model/Model";
 import Track from "../track/Track";
 
-class Timeline extends Subscribable {
+class Timeline extends Model {
     public harmonicSumTrack = new Track("Harmonic Sum", []);
 
     constructor(public voices: Voice[]) {
