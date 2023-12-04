@@ -1,6 +1,6 @@
 import Subscribable from "../subscribable/Subscribable";
 
-class Stateful<
+class ViewModel<
     Model extends Subscribable,
     State extends object,
 > extends Subscribable {
@@ -23,4 +23,4 @@ class Stateful<
     }
 }
 
-export default Stateful;
+export default ViewModel;
