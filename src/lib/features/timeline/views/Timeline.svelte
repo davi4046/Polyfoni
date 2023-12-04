@@ -63,7 +63,7 @@
     </div>
     <!-- TOP HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-2 overflow-hidden"
+        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-2 overflow-hidden"
     >
         {#each timelineVM.state.top as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -75,7 +75,7 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
+        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
     >
         {#each timelineVM.state.center as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -87,7 +87,7 @@
     </div>
     <!-- BOTTOM HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] col-start-1 row-start-4 overflow-hidden"
+        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-4 overflow-hidden"
     >
         {#each timelineVM.state.bottom as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -100,12 +100,12 @@
     <!-- TOP TRACKS -->
     <div class="h-full col-start-2 row-start-2 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-clip"
+            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
         >
             {#each timelineVM.state.top as trackVMGroup}
                 <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>
@@ -117,12 +117,12 @@
     <!-- CENTER TRACKS -->
     <div class="h-full col-start-2 row-start-3 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden v-scroll"
+            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden v-scroll"
             style="width: 4096px;"
         >
             {#each timelineVM.state.center as trackVMGroup}
                 <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-voice-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>
@@ -134,12 +134,12 @@
     <!-- BOTTOM TRACKS -->
     <div class="h-full col-start-2 row-start-4 overflow-hidden h-scroll">
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-group-spacing)] overflow-hidden"
+            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.state.bottom as trackVMGroup}
                 <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-group-color)]"
+                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
                     {#each trackVMGroup as trackVM}
                         <Track {trackVM}></Track>
