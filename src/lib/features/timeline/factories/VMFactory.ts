@@ -23,6 +23,7 @@ class VMFactory {
                     this._context.selection.deselectAll();
                     this._context.selection.selectItem(model);
                 }
+                event.stopPropagation();
             };
 
             return new ItemVMState(
@@ -55,6 +56,11 @@ class VMFactory {
 
     createTimelineVM(model: Timeline): TimelineVM {
         const update = (model: Timeline): TimelineVMState => {
+            const handleMouseDown = (event: MouseEvent) => {
+                if (event.shiftKey) return;
+                this._context.selection.deselectAll();
+            };
+
             let center = model.voices.map((voice) => {
                 return [
                     this.createTrackVM(voice.outputTrack),
@@ -66,7 +72,7 @@ class VMFactory {
             });
             let bottom = [[this.createTrackVM(model.harmonicSumTrack)]];
 
-            return new TimelineVMState([], center, bottom);
+            return new TimelineVMState([], center, bottom, handleMouseDown);
         };
 
         return new TimelineVM(model, update);

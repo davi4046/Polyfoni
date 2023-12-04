@@ -35,7 +35,11 @@
     });
 </script>
 
-<div class="h-full grid grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]">
+<div
+    class="h-full grid grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
+    on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
+    role="none"
+>
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
     <!-- MARKERS -->

@@ -4,7 +4,8 @@ class TimelineVMState {
     constructor(
         private _top: TrackVM[][],
         private _center: TrackVM[][],
-        private _bottom: TrackVM[][]
+        private _bottom: TrackVM[][],
+        private _handleMouseDown: (event: MouseEvent) => void
     ) {}
 
     get top() {
@@ -17,6 +18,10 @@ class TimelineVMState {
 
     get bottom() {
         return this._bottom;
+    }
+
+    get handleMouseDown() {
+        return this._handleMouseDown;
     }
 }
 
