@@ -12,10 +12,6 @@ class Model extends Subscribable {
     }
 
     readonly id = Model._uniqueId();
-
-    constructor() {
-        super();
-    }
 }
 
 export default Model;
