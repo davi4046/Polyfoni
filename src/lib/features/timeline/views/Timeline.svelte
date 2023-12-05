@@ -40,7 +40,7 @@
     on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
-    data-view-type="timeline"
+    data-type="timeline"
     data-model-id={timelineVM.modelId}
 >
     <!-- BUTTONS -->
@@ -100,7 +100,10 @@
         {/each}
     </div>
     <!-- TOP TRACKS -->
-    <div class="h-full col-start-2 row-start-2 overflow-hidden h-scroll">
+    <div
+        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
+        data-type="top"
+    >
         <div
             class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
@@ -117,7 +120,10 @@
         </div>
     </div>
     <!-- CENTER TRACKS -->
-    <div class="h-full col-start-2 row-start-3 overflow-hidden h-scroll">
+    <div
+        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
+        data-type="center"
+    >
         <div
             class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden v-scroll"
             style="width: 4096px;"
@@ -134,7 +140,10 @@
         </div>
     </div>
     <!-- BOTTOM TRACKS -->
-    <div class="h-full col-start-2 row-start-4 overflow-hidden h-scroll">
+    <div
+        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
+        data-type="bottom"
+    >
         <div
             class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"

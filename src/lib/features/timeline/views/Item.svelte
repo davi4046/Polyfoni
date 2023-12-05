@@ -12,7 +12,7 @@
 <div
     class="absolute z-50 h-full py-1"
     style="width: {width}px; left: {left}px;"
-    data-view-type="item"
+    data-type="item"
     data-model-id={itemVM.modelId}
 >
     <div

@@ -12,7 +12,7 @@ function findClosestTrack(timeline: Timeline, x: number, y: number): Track {
         timeline.id
     );
     const trackElements = Array.from(
-        timelineElement.querySelectorAll("[data-view-type='track']")
+        timelineElement.querySelectorAll("[data-type='track']")
     );
     const trackElement = findClosestElement(x, y, trackElements);
     const modelId = getModelIdOfElement(trackElement);
