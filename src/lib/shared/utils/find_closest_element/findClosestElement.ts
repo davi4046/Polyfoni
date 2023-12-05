@@ -2,8 +2,8 @@ function findClosestElement(
     x: number,
     y: number,
     elements: Element[]
-): Element | null {
-    let closestElement: Element | null = null;
+): Element {
+    let closestElement: Element = elements[0];
     let minDistance = Number.MAX_SAFE_INTEGER;
 
     elements.forEach((element) => {
