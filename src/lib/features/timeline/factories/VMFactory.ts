@@ -1,8 +1,8 @@
 import chroma from "chroma-js";
 
-import findClosestElement from "../../../shared/utils/find_closest_element/findClosestElement";
-import findModelById from "../../../shared/utils/find_model_by_id/findModelById";
 import Track from "../models/track/Track";
+import findClosestTrack from "../utils/find_closest_track.ts/findClosestTrack";
+import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import ItemVM from "../view_models/item/ItemVM";
 import ItemVMState from "../view_models/item/ItemVMState";
 import TimelineVM from "../view_models/timeline/TimelineVM";
@@ -77,21 +77,11 @@ class VMFactory {
             };
 
             const handleMouseMove = (event: MouseEvent) => {
-                const trackElements = Array.from(
-                    document.querySelectorAll("[data-view-type='track']")
-                );
+                const hoveredBeat = getBeatAtClientX(model, event.clientX);
+                const hoveredTrack = findClosestTrack(model, event.clientY);
 
-                const closestTrack = findClosestElement(
-                    event.clientX,
-                    event.clientY,
-                    trackElements
-                );
-
-                const id = closestTrack?.getAttribute("data-model-id");
-
-                if (id) {
-                    console.log(findModelById(model, id));
-                }
+                this._context.cursor.hoveredBeat = hoveredBeat;
+                this._context.cursor.hoveredTrack = hoveredTrack;
             };
 
             return new TimelineVMState(
