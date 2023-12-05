@@ -9,8 +9,8 @@
 
 <div
     class="relative h-[var(--timeline-track-height)] bg-[var(--timeline-track-color)]"
-    data-type="track"
-    data-id={trackVM.modelId}
+    data-view-type="track"
+    data-model-id={trackVM.modelId}
 >
     {#each trackVM.state.items as itemVM}
         <Item {itemVM}></Item>

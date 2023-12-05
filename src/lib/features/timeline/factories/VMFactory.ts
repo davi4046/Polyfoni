@@ -78,7 +78,7 @@ class VMFactory {
 
             const handleMouseMove = (event: MouseEvent) => {
                 const trackElements = Array.from(
-                    document.querySelectorAll("[data-type='track']")
+                    document.querySelectorAll("[data-view-type='track']")
                 );
 
                 const closestTrack = findClosestElement(
@@ -87,7 +87,7 @@ class VMFactory {
                     trackElements
                 );
 
-                const id = closestTrack?.getAttribute("data-id");
+                const id = closestTrack?.getAttribute("data-model-id");
 
                 if (id) {
                     console.log(findModelById(model, id));
