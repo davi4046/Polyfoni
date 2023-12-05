@@ -40,6 +40,8 @@
     on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
+    data-view-type="timeline"
+    data-model-id={timelineVM.modelId}
 >
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>

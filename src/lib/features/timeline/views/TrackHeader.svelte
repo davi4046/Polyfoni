@@ -8,6 +8,8 @@
 
 <div
     class="flex items-center w-full h-[var(--timeline-track-height)] p-2 whitespace-nowrap"
+    data-view-type="header"
+    data-model-id={trackVM.modelId}
 >
     {trackVM.state.label}
 </div>

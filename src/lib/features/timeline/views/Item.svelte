@@ -12,6 +12,8 @@
 <div
     class="absolute z-50 h-full py-1"
     style="width: {width}px; left: {left}px;"
+    data-view-type="item"
+    data-model-id={itemVM.modelId}
 >
     <div
         class="flex items-center h-full p-2 font-semibold text-black border-2 border-black outline outline-4"
