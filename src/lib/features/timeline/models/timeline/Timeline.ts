@@ -3,7 +3,7 @@ import Model from "../../../../shared/model/Model";
 import Track from "../track/Track";
 
 class Timeline extends Model {
-    public harmonicSumTrack = new Track("Harmonic Sum", []);
+    public harmonicSumTrack = new Track(null, "Harmonic Sum", []);
 
     constructor(public voices: Voice[]) {
         super();

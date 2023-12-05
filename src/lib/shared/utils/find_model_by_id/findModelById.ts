@@ -1,17 +1,27 @@
 import Model from "../../model/Model";
 
 function findModelById(object: Object, id: string): Model | null {
-    if (object instanceof Model) {
-        if (object.id === id) return object;
-    }
+    const checkedObjects: Object[] = [];
 
-    for (const value of Object.values(object)) {
-        if (!(value instanceof Object)) continue;
-        const result = findModelById(value, id);
-        if (result !== null) return result;
-    }
+    const checkRecursively = (object: Object): Model | null => {
+        checkedObjects.push(object);
 
-    return null;
+        if (object instanceof Model) {
+            if (object.id === id) return object;
+        }
+
+        for (const value of Object.values(object)) {
+            if (!(value instanceof Object) || checkedObjects.includes(value)) {
+                continue;
+            }
+            const result = checkRecursively(value);
+            if (result !== null) return result;
+        }
+
+        return null;
+    };
+
+    return checkRecursively(object);
 }
 
 export default findModelById;

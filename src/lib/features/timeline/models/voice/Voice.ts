@@ -2,15 +2,17 @@ import Model from "../../../../shared/model/Model";
 import Track from "../track/Track";
 
 class Voice extends Model {
-    public pitchTrack = new Track("Pitch", []);
-    public durationTrack = new Track("Duration", []);
-    public restTrack = new Track("Rest", []);
-    public harmonyTrack = new Track("Harmony", []);
-    public outputTrack: Track;
+    public tracks: Track[];
 
     constructor(public label: string) {
         super();
-        this.outputTrack = new Track(label, []);
+        this.tracks = [
+            new Track(this, label, []),
+            new Track(this, "Pitch", []),
+            new Track(this, "Duration", []),
+            new Track(this, "Rest", []),
+            new Track(this, "Harmony", []),
+        ];
     }
 }
 
