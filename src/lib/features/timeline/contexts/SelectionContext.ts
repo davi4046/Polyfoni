@@ -7,7 +7,6 @@ class SelectionContext {
         if (this._selectedItems.includes(item)) return;
         this._selectedItems.push(item);
         item.notifySubscribers();
-        console.log(this._selectedItems);
     };
 
     readonly deselectItem = (item: Item) => {
