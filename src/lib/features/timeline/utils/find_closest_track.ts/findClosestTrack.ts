@@ -6,7 +6,7 @@ import getModelIdOfElement from "../../../../shared/utils/get_model_id_of_elemen
 import type Timeline from "../../models/timeline/Timeline";
 import type Track from "../../models/track/Track";
 
-function findClosestTrack(timeline: Timeline, x: number, y: number): Track {
+function findClosestTrack(timeline: Timeline, clientY: number): Track {
     const timelineElement = findElementByModelId(
         document.documentElement,
         timeline.id
@@ -14,7 +14,7 @@ function findClosestTrack(timeline: Timeline, x: number, y: number): Track {
     const trackElements = Array.from(
         timelineElement.querySelectorAll("[data-type='track']")
     );
-    const trackElement = findClosestElement(x, y, trackElements);
+    const trackElement = findClosestElement(0, clientY, trackElements);
     const modelId = getModelIdOfElement(trackElement);
     const model = getModelById(timeline, modelId) as Track;
 
