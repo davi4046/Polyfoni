@@ -1,3 +1,4 @@
+import findModelById from "../../../shared/utils/find_model_by_id/findModelById";
 import clamp from "../../../shared/utils/math_utils/clamp/clamp";
 import Item from "../models/item/Item";
 import Track from "../models/track/Track";
@@ -23,6 +24,25 @@ class MoveContext {
         tracks.forEach((track) => track.notifySubscribers());
     }
 
+    private _moveItems() {
+        for (const item of this._items) {
+            const originalItem = findModelById(
+                item.track.voice.section,
+                item.id
+            ) as Item;
+
+            originalItem.track.items = originalItem.track.items.filter(
+                (item) => item !== originalItem
+            );
+            originalItem.track.notifySubscribers();
+            item.track.items.push(originalItem);
+
+            originalItem.start = item.start;
+            originalItem.end = item.end;
+            originalItem.track = item.track;
+        }
+    }
+
     constructor(
         private _selection: SelectionContext,
         private _cursor: CursorContext
@@ -43,6 +63,7 @@ class MoveContext {
                 !hoveredBeat ||
                 !hoveredTrack
             ) {
+                this._moveItems();
                 this._setItems([]);
                 return;
             }
