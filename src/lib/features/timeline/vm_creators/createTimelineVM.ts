@@ -3,14 +3,14 @@ import Timeline from "../models/timeline/Timeline";
 import findClosestTrack from "../utils/find_closest_track.ts/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import TimelineVM from "../view_models/timeline/TimelineVM";
-import TimelineVMState from "../view_models/timeline/TimelineVMState";
+import { createTimelineVMState } from "../view_models/timeline/TimelineVMState";
 import createTrackVM from "./createTrackVM";
 
 function createTimelineVM(
     model: Timeline,
     context: TimelineContext
 ): TimelineVM {
-    const update = (model: Timeline): TimelineVMState => {
+    const update = (model: Timeline) => {
         const center = model.center.voices.map((voice) => {
             return voice.tracks.map((track) => {
                 return createTrackVM(track, context);
@@ -34,14 +34,12 @@ function createTimelineVM(
             context.cursor.hoveredTrack = hoveredTrack;
         };
 
-        return new TimelineVMState(
-            [],
-            center,
-            [],
-            handleMouseDown,
-            handleMouseUp,
-            handleMouseMove
-        );
+        return createTimelineVMState({
+            center: center,
+            handleMouseDown: handleMouseDown,
+            handleMouseUp: handleMouseUp,
+            handleMouseMove: handleMouseMove,
+        });
     };
 
     return new TimelineVM(model, update);

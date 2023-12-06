@@ -1,10 +1,14 @@
+import createVMState from "../../../../shared/utils/create_vm_state/createVMState";
+
 import type ItemVM from "../item/ItemVM";
 
-class TrackVMState {
-    constructor(
-        readonly label: string,
-        readonly items: ItemVM[]
-    ) {}
+interface TrackVMState {
+    readonly label: string;
+    readonly items: ItemVM[];
 }
 
-export default TrackVMState;
+function createTrackVMState(options: TrackVMState) {
+    return createVMState(options, {});
+}
+
+export { type TrackVMState, createTrackVMState };
