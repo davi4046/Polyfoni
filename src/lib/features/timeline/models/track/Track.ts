@@ -5,7 +5,7 @@ import type Voice from "../voice/Voice";
 
 class Track extends Model {
     constructor(
-        public voice: Voice | null,
+        public voice: Voice,
         public label: string,
         public items: Item[]
     ) {

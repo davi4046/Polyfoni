@@ -10,20 +10,17 @@ function offsetItems(
         const newStart = item.start + beatOffset;
         const newEnd = newStart + item.end - item.start;
 
-        let newTrack = item.track;
+        const track = item.track;
+        const voice = track.voice;
+        const section = voice.section;
 
-        const voice = item.track.voice;
-        const section = voice?.section;
+        const trackIndex = voice.tracks.indexOf(track);
+        const voiceIndex = section.voices.indexOf(voice);
 
-        if (voice && section) {
-            const trackIndex = voice.tracks.indexOf(item.track);
-            const voiceIndex = section.voices.indexOf(voice);
+        const newTrackIndex = trackIndex + trackOffset;
+        const newVoiceIndex = voiceIndex + voiceOffset;
 
-            const newTrackIndex = trackIndex + trackOffset;
-            const newVoiceIndex = voiceIndex + voiceOffset;
-
-            newTrack = section.voices[newVoiceIndex].tracks[newTrackIndex];
-        }
+        const newTrack = section.voices[newVoiceIndex].tracks[newTrackIndex];
 
         item.start = newStart;
         item.end = newEnd;
