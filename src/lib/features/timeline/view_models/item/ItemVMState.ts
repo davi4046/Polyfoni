@@ -5,6 +5,7 @@ class ItemVMState {
         readonly text: string,
         readonly backgroundColor: chroma.Color,
         readonly outlineColor: chroma.Color,
+        readonly opacity: number,
         readonly handleMouseDown: (event: MouseEvent) => void
     ) {}
 }

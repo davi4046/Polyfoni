@@ -3,6 +3,7 @@ import type Track from "../models/track/Track";
 import type ItemVM from "../view_models/item/ItemVM";
 import TrackVM from "../view_models/track/TrackVM";
 import TrackVMState from "../view_models/track/TrackVMState";
+import createGhostVM from "./createGhostVM";
 import createItemVM from "./createItemVM";
 
 function createTrackVM(model: Track, context: TimelineContext): TrackVM {
@@ -14,7 +15,7 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
         const ghostItems = context.move.items
             .map((item) => {
                 if (item.track === model) {
-                    return createItemVM(item, context);
+                    return createGhostVM(item, context);
                 }
             })
             .filter((value): value is ItemVM => value !== undefined);

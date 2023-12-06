@@ -27,6 +27,7 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
             context.selection.isSelected(model)
                 ? chroma.hcl(240, 80, 80)
                 : chroma.hcl(0, 0, 0, 0),
+            1,
             handleMouseDown
         );
     };
