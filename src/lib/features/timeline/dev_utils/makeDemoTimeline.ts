@@ -1,7 +1,6 @@
-import Interval from "../models/interval/Interval";
-import ItemModel from "../models/item/Item";
+import Item from "../models/item/Item";
 import Timeline from "../models/timeline/Timeline";
-import VoiceModel from "../models/voice/Voice";
+import Voice from "../models/voice/Voice";
 
 function makeDemoTimeline(): Timeline {
     const mapRange = (
@@ -14,37 +13,33 @@ function makeDemoTimeline(): Timeline {
         return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
     };
 
-    let voices = [
-        new VoiceModel("Piano 1"),
-        new VoiceModel("Piano 2"),
-        new VoiceModel("Piano 3"),
+    const timeline = new Timeline([]);
+
+    const voices = [
+        new Voice(timeline, "Piano 1"),
+        new Voice(timeline, "Piano 2"),
+        new Voice(timeline, "Piano 3"),
     ];
 
-    for (let voice of voices) {
-        for (let track of [
-            voice.pitchTrack,
-            voice.durationTrack,
-            voice.restTrack,
-            voice.harmonyTrack,
-        ]) {
+    for (const voice of voices) {
+        for (const track of voice.tracks.slice(1, 5)) {
             let start = 0;
 
             while (start < 8) {
-                let length = Math.round(mapRange(Math.random(), 0, 1, 1, 4));
-                let end = start + length;
+                const length = Math.round(mapRange(Math.random(), 0, 1, 1, 4));
+                const end = start + length;
 
                 if (Math.random() > 0.2) {
                     track.items.push(
-                        new ItemModel(new Interval(start, end), "blahblahblah")
+                        new Item(track, start, end, "blahblahblah")
                     );
                 }
 
                 start = end;
             }
         }
+        timeline.voices.push(voice);
     }
-
-    let timeline = new Timeline(voices);
 
     return timeline;
 }

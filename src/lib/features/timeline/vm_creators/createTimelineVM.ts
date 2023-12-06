@@ -12,13 +12,9 @@ function createTimelineVM(
 ): TimelineVM {
     const update = (model: Timeline): TimelineVMState => {
         const center = model.voices.map((voice) => {
-            return [
-                createTrackVM(voice.outputTrack, context),
-                createTrackVM(voice.pitchTrack, context),
-                createTrackVM(voice.durationTrack, context),
-                createTrackVM(voice.restTrack, context),
-                createTrackVM(voice.harmonyTrack, context),
-            ];
+            return voice.tracks.map((track) => {
+                return createTrackVM(track, context);
+            });
         });
 
         const bottom = [[createTrackVM(model.harmonicSumTrack, context)]];
@@ -26,6 +22,10 @@ function createTimelineVM(
         const handleMouseDown = (event: MouseEvent) => {
             if (event.shiftKey) return;
             context.selection.deselectAll();
+        };
+
+        const handleMouseUp = () => {
+            context.cursor.reportMouseUp(); //toggled on by ItemVM (see createItemVM)
         };
 
         const handleMouseMove = (event: MouseEvent) => {
@@ -41,6 +41,7 @@ function createTimelineVM(
             center,
             bottom,
             handleMouseDown,
+            handleMouseUp,
             handleMouseMove
         );
     };

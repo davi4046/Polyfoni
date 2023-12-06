@@ -1,10 +1,14 @@
 import Model from "../../../../shared/model/Model";
 import Track from "../track/Track";
 
+import type Timeline from "../timeline/Timeline";
 class Voice extends Model {
     public tracks: Track[];
 
-    constructor(public label: string) {
+    constructor(
+        public timeline: Timeline,
+        public label: string
+    ) {
         super();
         this.tracks = [
             new Track(this, label, []),

@@ -3,6 +3,10 @@ import type Item from "../models/item/Item";
 class SelectionContext {
     private _selectedItems: Item[] = [];
 
+    get selectedItems() {
+        return this._selectedItems;
+    }
+
     readonly selectItem = (item: Item) => {
         if (this._selectedItems.includes(item)) return;
         this._selectedItems.push(item);

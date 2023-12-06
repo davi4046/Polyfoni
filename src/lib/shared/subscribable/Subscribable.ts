@@ -1,9 +1,7 @@
-type SubscribeCallback<T extends Subscribable> = (value: T) => void;
-
 class Subscribable {
-    private _callbacks: SubscribeCallback<Subscribable>[] = [];
+    private _callbacks: ((value: Subscribable) => void)[] = [];
 
-    readonly subscribe = (callback: SubscribeCallback<Subscribable>) => {
+    readonly subscribe = (callback: (value: Subscribable) => void) => {
         this._callbacks.push(callback);
     };
 

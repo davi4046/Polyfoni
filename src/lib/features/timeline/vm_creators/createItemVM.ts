@@ -15,12 +15,13 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
                 context.selection.deselectAll();
                 context.selection.selectItem(model);
             }
+            context.cursor.reportMouseDown();
             event.stopPropagation();
         };
 
         return new ItemVMState(
-            model.interval.start,
-            model.interval.end,
+            model.start,
+            model.end,
             model.content,
             chroma.hcl(0, 0, 80),
             context.selection.isSelected(model)
