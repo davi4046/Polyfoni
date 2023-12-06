@@ -8,24 +8,19 @@
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
     import MoveContext from "./lib/features/timeline/contexts/MoveContext";
 
-    const timeline = makeDemoTimeline();
+    const highlightCtx = new HighlightContext();
+    const selectionCtx = new SelectionContext();
+    const cursorCtx = new CursorContext();
+    const moveCtx = new MoveContext(selectionCtx, cursorCtx);
 
     const timelineCtx = new TimelineContext(
-        timeline,
-        (ctx: TimelineContext) => {
-            return new HighlightContext(ctx.model);
-        },
-        (ctx: TimelineContext) => {
-            return new SelectionContext(ctx.model);
-        },
-        (ctx: TimelineContext) => {
-            return new CursorContext(ctx.model);
-        },
-        (ctx: TimelineContext) => {
-            return new MoveContext(ctx.model, ctx.selection, ctx.cursor);
-        }
+        highlightCtx,
+        selectionCtx,
+        cursorCtx,
+        moveCtx
     );
 
+    const timeline = makeDemoTimeline();
     const timelineVM = createTimelineVM(timeline, timelineCtx);
 </script>
 
