@@ -1,12 +1,18 @@
-import type Voice from "../voice/Voice";
 import Model from "../../../../shared/model/Model";
-import Track from "../track/Track";
+import Section from "../section/Section";
+
+import type Voice from "../voice/Voice";
 
 class Timeline extends Model {
-    public harmonicSumTrack = new Track(null, "Harmonic Sum", []);
+    readonly top: Section;
+    readonly center: Section;
+    readonly bottom: Section;
 
-    constructor(public voices: Voice[]) {
+    constructor(voices: Voice[]) {
         super();
+        this.top = new Section(this, []);
+        this.center = new Section(this, voices);
+        this.bottom = new Section(this, []);
     }
 }
 

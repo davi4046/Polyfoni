@@ -16,9 +16,9 @@ function makeDemoTimeline(): Timeline {
     const timeline = new Timeline([]);
 
     const voices = [
-        new Voice(timeline, "Piano 1"),
-        new Voice(timeline, "Piano 2"),
-        new Voice(timeline, "Piano 3"),
+        new Voice(timeline.center, "Piano 1"),
+        new Voice(timeline.center, "Piano 2"),
+        new Voice(timeline.center, "Piano 3"),
     ];
 
     for (const voice of voices) {
@@ -38,7 +38,7 @@ function makeDemoTimeline(): Timeline {
                 start = end;
             }
         }
-        timeline.voices.push(voice);
+        timeline.center.voices.push(voice);
     }
 
     return timeline;

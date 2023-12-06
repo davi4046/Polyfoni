@@ -13,16 +13,16 @@ function offsetItems(
         let newTrack = item.track;
 
         const voice = item.track.voice;
-        const timeline = voice?.timeline;
+        const section = voice?.section;
 
-        if (voice && timeline) {
+        if (voice && section) {
             const trackIndex = voice.tracks.indexOf(item.track);
-            const voiceIndex = timeline.voices.indexOf(voice);
+            const voiceIndex = section.voices.indexOf(voice);
 
             const newTrackIndex = trackIndex + trackOffset;
             const newVoiceIndex = voiceIndex + voiceOffset;
 
-            newTrack = timeline.voices[newVoiceIndex].tracks[newTrackIndex];
+            newTrack = section.voices[newVoiceIndex].tracks[newTrackIndex];
         }
 
         item.start = newStart;

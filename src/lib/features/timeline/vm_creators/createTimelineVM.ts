@@ -11,13 +11,11 @@ function createTimelineVM(
     context: TimelineContext
 ): TimelineVM {
     const update = (model: Timeline): TimelineVMState => {
-        const center = model.voices.map((voice) => {
+        const center = model.center.voices.map((voice) => {
             return voice.tracks.map((track) => {
                 return createTrackVM(track, context);
             });
         });
-
-        const bottom = [[createTrackVM(model.harmonicSumTrack, context)]];
 
         const handleMouseDown = (event: MouseEvent) => {
             if (event.shiftKey) return;
@@ -39,7 +37,7 @@ function createTimelineVM(
         return new TimelineVMState(
             [],
             center,
-            bottom,
+            [],
             handleMouseDown,
             handleMouseUp,
             handleMouseMove

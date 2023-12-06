@@ -62,25 +62,25 @@ class MoveContext {
                 );
 
                 const clickedVoiceIndex =
-                    clickedVoice.timeline.voices.indexOf(clickedVoice);
+                    clickedVoice.section.voices.indexOf(clickedVoice);
                 const hoveredVoiceIndex =
-                    hoveredVoice.timeline.voices.indexOf(hoveredVoice);
+                    hoveredVoice.section.voices.indexOf(hoveredVoice);
 
                 const minVoiceIndex = items.reduce((min, item) => {
-                    const index = item.track.voice!.timeline.voices.indexOf(
+                    const index = item.track.voice!.section.voices.indexOf(
                         item.track.voice!
                     );
                     return Math.min(min, index);
                 }, Number.MAX_VALUE);
 
                 const maxVoiceIndex = items.reduce((max, item) => {
-                    const index = item.track.voice!.timeline.voices.indexOf(
+                    const index = item.track.voice!.section.voices.indexOf(
                         item.track.voice!
                     );
                     return Math.max(max, index);
                 }, Number.MIN_VALUE);
 
-                const voiceCount = items[0].track.voice!.timeline.voices.length;
+                const voiceCount = items[0].track.voice!.section.voices.length;
 
                 const voiceOffset = clamp(
                     hoveredVoiceIndex - clickedVoiceIndex,
