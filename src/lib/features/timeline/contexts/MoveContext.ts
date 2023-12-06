@@ -1,14 +1,18 @@
+import Context from "../../../shared/context/Context";
 import clamp from "../../../shared/utils/math_utils/clamp/clamp";
 import offsetItems from "../utils/offset_items/offsetItems";
 
+import type Timeline from "../models/timeline/Timeline";
 import type CursorContext from "./CursorContext";
 import type SelectionContext from "./SelectionContext";
 
-class MoveContext {
+class MoveContext extends Context<Timeline> {
     constructor(
+        timeline: Timeline,
         private _selection: SelectionContext,
         private _cursor: CursorContext
     ) {
+        super(timeline);
         this._cursor.subscribe((_) => {
             const clickedBeat = this._cursor.clickedBeat;
             const clickedTrack = this._cursor.clickedTrack;

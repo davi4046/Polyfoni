@@ -1,8 +1,10 @@
-import Subscribable from "../../../shared/subscribable/Subscribable";
+import Context from "../../../shared/context/Context";
+
+import type Timeline from "../models/timeline/Timeline";
 
 import type Track from "../models/track/Track";
 
-class CursorContext extends Subscribable {
+class CursorContext extends Context<Timeline> {
     private _hoveredBeat: number | null = null;
     private _hoveredTrack: Track | null = null;
     private _clickedBeat: number | null = null;

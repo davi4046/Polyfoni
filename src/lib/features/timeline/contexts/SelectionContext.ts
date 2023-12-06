@@ -1,6 +1,9 @@
-import type Item from "../models/item/Item";
+import Context from "../../../shared/context/Context";
 
-class SelectionContext {
+import type Item from "../models/item/Item";
+import type Timeline from "../models/timeline/Timeline";
+
+class SelectionContext extends Context<Timeline> {
     private _selectedItems: Item[] = [];
 
     get selectedItems() {
