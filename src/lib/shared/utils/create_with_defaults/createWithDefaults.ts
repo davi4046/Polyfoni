@@ -4,8 +4,8 @@ type OptionalKeys<T> = {
 
 type Defaults<T> = Required<Pick<T, OptionalKeys<T>>>;
 
-function createVMState<T>(options: T, defaults: Defaults<T>) {
+function createWithDefaults<T>(options: T, defaults: Defaults<T>) {
     return Object.assign({}, defaults, options) as T;
 }
 
-export default createVMState;
+export default createWithDefaults;

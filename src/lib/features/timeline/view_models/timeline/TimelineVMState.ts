@@ -1,4 +1,4 @@
-import createVMState from "../../../../shared/utils/create_vm_state/createVMState";
+import createWithDefaults from '../../../../shared/utils/create_with_defaults/createWithDefaults';
 
 import type TrackVM from "../track/TrackVM";
 
@@ -21,7 +21,7 @@ const defaults = {
 };
 
 function createTimelineVMState(options: TimelineVMState) {
-    return createVMState(options, defaults);
+    return createWithDefaults(options, defaults);
 }
 
 export { type TimelineVMState, createTimelineVMState };

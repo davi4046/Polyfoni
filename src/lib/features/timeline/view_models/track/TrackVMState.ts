@@ -1,4 +1,4 @@
-import createVMState from "../../../../shared/utils/create_vm_state/createVMState";
+import createWithDefaults from '../../../../shared/utils/create_with_defaults/createWithDefaults';
 
 import type ItemVM from "../item/ItemVM";
 
@@ -8,7 +8,7 @@ interface TrackVMState {
 }
 
 function createTrackVMState(options: TrackVMState) {
-    return createVMState(options, {});
+    return createWithDefaults(options, {});
 }
 
 export { type TrackVMState, createTrackVMState };

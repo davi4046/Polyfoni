@@ -1,6 +1,6 @@
-import chroma from "chroma-js";
+import chroma from 'chroma-js';
 
-import createVMState from "../../../../shared/utils/create_vm_state/createVMState";
+import createWithDefaults from '../../../../shared/utils/create_with_defaults/createWithDefaults';
 
 interface ItemVMState {
     readonly start: number;
@@ -20,7 +20,7 @@ const defaults = {
 };
 
 function createItemVMState(options: ItemVMState) {
-    return createVMState(options, defaults);
+    return createWithDefaults(options, defaults);
 }
 
 export { type ItemVMState, createItemVMState };
