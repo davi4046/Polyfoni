@@ -11,5 +11,5 @@
     data-type="header"
     data-model-id={trackVM.modelId}
 >
-    {trackVM.state.label}
+    {trackVM.label}
 </div>

@@ -3,6 +3,7 @@ import ViewModel from '../../../../shared/view_model/ViewModel';
 import type Timeline from "../../models/timeline/Timeline";
 import type { TimelineVMState } from "./TimelineVMState";
 
-class TimelineVM extends ViewModel<Timeline, TimelineVMState> {}
+type TimelineVM = ViewModel<Timeline, TimelineVMState> &
+    Required<TimelineVMState>;
 
-export default TimelineVM;
+export type { TimelineVM as default };

@@ -1,7 +1,6 @@
-import chroma from "chroma-js";
-
-import ItemVM from "../view_models/item/ItemVM";
-import { createItemVMState } from "../view_models/item/ItemVMState";
+import type ItemVM from "../view_models/item/ItemVM";
+import ViewModel from '../../../shared/view_model/ViewModel';
+import { createItemVMState } from '../view_models/item/ItemVMState';
 
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
@@ -16,7 +15,7 @@ function createGhostVM(model: Item, context: TimelineContext): ItemVM {
         });
     };
 
-    return new ItemVM(model, update);
+    return ViewModel.create(model, update);
 }
 
 export default createGhostVM;

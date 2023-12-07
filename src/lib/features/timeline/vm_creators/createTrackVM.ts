@@ -1,10 +1,12 @@
+import ViewModel from '../../../shared/view_model/ViewModel';
+import { createTrackVMState } from '../view_models/track/TrackVMState';
+import createGhostVM from './createGhostVM';
+import createItemVM from './createItemVM';
+
 import type TimelineContext from "../contexts/TimelineContext";
 import type Track from "../models/track/Track";
 import type ItemVM from "../view_models/item/ItemVM";
-import TrackVM from "../view_models/track/TrackVM";
-import { createTrackVMState } from "../view_models/track/TrackVMState";
-import createGhostVM from "./createGhostVM";
-import createItemVM from "./createItemVM";
+import type TrackVM from "../view_models/track/TrackVM";
 
 function createTrackVM(model: Track, context: TimelineContext): TrackVM {
     const update = (model: Track) => {
@@ -26,7 +28,7 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
         });
     };
 
-    return new TrackVM(model, update);
+    return ViewModel.create(model, update);
 }
 
 export default createTrackVM;
