@@ -1,8 +1,7 @@
-import findModelById from "../../../shared/utils/find_model_by_id/findModelById";
-import clamp from "../../../shared/utils/math_utils/clamp/clamp";
-import Item from "../models/item/Item";
-import Track from "../models/track/Track";
-import offsetItems from "../utils/offset_items/offsetItems";
+import findModelById from '../../../shared/utils/find_model_by_id/findModelById';
+import clamp from '../../../shared/utils/math_utils/clamp/clamp';
+import Item from '../models/item/Item';
+import offsetItems from '../utils/offset_items/offsetItems';
 
 import type CursorContext from "./CursorContext";
 import type SelectionContext from "./SelectionContext";
