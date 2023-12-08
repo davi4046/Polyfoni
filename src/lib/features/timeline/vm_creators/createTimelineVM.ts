@@ -1,12 +1,10 @@
-import ViewModel from '../../../shared/view_model/ViewModel';
-import TimelineContext from '../contexts/TimelineContext';
-import Timeline from '../models/timeline/Timeline';
-import findClosestTrack from '../utils/find_closest_track.ts/findClosestTrack';
-import getBeatAtClientX from '../utils/get_beat_at_client_x/getBeatAtClientX';
-import { createTimelineVMState } from '../view_models/timeline/TimelineVMState';
-import createTrackVM from './createTrackVM';
-
-import type TimelineVM from "../view_models/timeline/TimelineVM";
+import TimelineContext from "../contexts/TimelineContext";
+import Timeline from "../models/timeline/Timeline";
+import findClosestTrack from "../utils/find_closest_track.ts/findClosestTrack";
+import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
+import TimelineVM from "../view_models/timeline/TimelineVM";
+import { createTimelineVMState } from "../view_models/timeline/TimelineVMState";
+import createTrackVM from "./createTrackVM";
 
 function createTimelineVM(
     model: Timeline,
@@ -44,7 +42,7 @@ function createTimelineVM(
         });
     };
 
-    return ViewModel.create(model, update);
+    return new TimelineVM(model, update);
 }
 
 export default createTimelineVM;

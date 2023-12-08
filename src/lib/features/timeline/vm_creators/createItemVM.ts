@@ -1,9 +1,8 @@
-import chroma from 'chroma-js';
+import chroma from "chroma-js";
 
-import ViewModel from '../../../shared/view_model/ViewModel';
-import { createItemVMState } from '../view_models/item/ItemVMState';
+import ItemVM from "../view_models/item/ItemVM";
+import { createItemVMState } from "../view_models/item/ItemVMState";
 
-import type ItemVM from "../view_models/item/ItemVM";
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 
@@ -31,7 +30,7 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
         });
     };
 
-    return ViewModel.create(model, update);
+    return new ItemVM(model, update);
 }
 
 export default createItemVM;

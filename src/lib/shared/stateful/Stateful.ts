@@ -1,15 +1,15 @@
 import Subscribable from "../subscribable/Subscribable";
 
-class Stateful<TState extends Object> extends Subscribable {
+class Stateful<TState extends object> extends Subscribable {
     constructor(private _state: TState) {
         super();
     }
 
-    set state(newState: TState) {
+    protected _setState(newState: TState) {
         this._state = Object.freeze(newState);
     }
 
-    get state() {
+    protected _getState() {
         return this._state;
     }
 }

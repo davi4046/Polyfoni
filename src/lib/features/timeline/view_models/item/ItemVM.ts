@@ -1,8 +1,8 @@
-import ViewModel from '../../../../shared/view_model/ViewModel';
+import ViewModel from "../../../../shared/view_model/ViewModel";
 
 import type Item from "../../models/item/Item";
 import type { ItemVMState } from "./ItemVMState";
 
-type ItemVM = ViewModel<Item, ItemVMState> & Required<ItemVMState>;
+class ItemVM extends ViewModel<Item, ItemVMState> {}
 
-export type { ItemVM as default };
+export default ItemVM;
