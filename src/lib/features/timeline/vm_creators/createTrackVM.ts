@@ -13,7 +13,7 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
 
         return createTrackVMState({
             label: model.state.label,
-            items: [...items],
+            items: items,
         });
     };
 

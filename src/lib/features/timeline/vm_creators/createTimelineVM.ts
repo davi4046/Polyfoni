@@ -39,11 +39,7 @@ function createTimelineVM(
         };
 
         const handleMouseMove = (event: MouseEvent) => {
-            const hoveredBeat = getBeatAtClientX(model, event.clientX);
-            const hoveredTrack = findClosestTrack(model, event.clientY);
-
-            context.cursor.hoveredBeat = hoveredBeat;
-            context.cursor.hoveredTrack = hoveredTrack;
+            context.cursor.setHoveredPosition(event.clientX, event.clientY);
         };
 
         return createTimelineVMState({

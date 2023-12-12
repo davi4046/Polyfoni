@@ -1,54 +1,39 @@
-import Subscribable from "../../../shared/subscribable/Subscribable";
-
-import type Track from "../models/track/Track";
+import type DragBehaviour from "../../../shared/behaviours/drag/DragBehaviour";
 
 class CursorContext {
-    readonly subscribable = new Subscribable(this);
+    private _hoveredX: number | null = null;
+    private _hoveredY: number | null = null;
+    private _clickedX: number | null = null;
+    private _clickedY: number | null = null;
 
-    private _hoveredBeat: number | null = null;
-    private _hoveredTrack: Track | null = null;
-    private _clickedBeat: number | null = null;
-    private _clickedTrack: Track | null = null;
+    private _dragBehaviour: DragBehaviour | null = null;
 
-    readonly reportMouseDown = () => {
-        this._clickedBeat = this._hoveredBeat;
-        this._clickedTrack = this._hoveredTrack;
-        this.subscribable.notifySubscribers();
+    readonly reportMouseDown = (newDragBehaviour: DragBehaviour | null) => {
+        this._clickedX = this._hoveredX;
+        this._clickedY = this._hoveredY;
+        this._dragBehaviour = newDragBehaviour;
     };
 
     readonly reportMouseUp = () => {
-        this._clickedBeat = null;
-        this._hoveredBeat = null;
-        this.subscribable.notifySubscribers();
+        this._clickedX = null;
+        this._clickedY = null;
+        this._dragBehaviour?.drop();
+        this._dragBehaviour = null;
     };
 
-    set hoveredBeat(newValue: number | null) {
-        if (newValue === this._hoveredBeat) return;
-        this._hoveredBeat = newValue;
-        this.subscribable.notifySubscribers();
-    }
+    readonly setHoveredPosition = (x: number, y: number) => {
+        this._hoveredX = x;
+        this._hoveredY = y;
 
-    set hoveredTrack(newValue: Track | null) {
-        if (newValue === this._hoveredTrack) return;
-        this._hoveredTrack = newValue;
-        this.subscribable.notifySubscribers();
-    }
+        if (!this._clickedX || !this._clickedY) return;
 
-    get hoveredBeat() {
-        return this._hoveredBeat;
-    }
-
-    get hoveredTrack() {
-        return this._hoveredTrack;
-    }
-
-    get clickedBeat() {
-        return this._clickedBeat;
-    }
-
-    get clickedTrack() {
-        return this._clickedTrack;
-    }
+        this._dragBehaviour?.drag(
+            this._clickedX,
+            this._clickedY,
+            this._hoveredX,
+            this._hoveredY
+        );
+    };
 }
 
 export default CursorContext;
