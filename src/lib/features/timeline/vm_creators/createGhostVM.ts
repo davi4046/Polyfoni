@@ -7,9 +7,9 @@ import type Item from "../models/item/Item";
 function createGhostVM(model: Item, context: TimelineContext): ItemVM {
     const update = (model: Item) => {
         return createItemVMState({
-            start: model.start,
-            end: model.end,
-            text: model.content,
+            start: model.state.start,
+            end: model.state.end,
+            text: model.state.content,
             opacity: 0.75,
         });
     };

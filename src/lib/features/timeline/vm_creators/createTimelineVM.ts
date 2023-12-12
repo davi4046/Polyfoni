@@ -11,8 +11,20 @@ function createTimelineVM(
     context: TimelineContext
 ): TimelineVM {
     const update = (model: Timeline) => {
-        const center = model.center.voices.map((voice) => {
-            return voice.tracks.map((track) => {
+        const top = model.state.top.state.voices.map((voice) => {
+            return voice.state.tracks.map((track) => {
+                return createTrackVM(track, context);
+            });
+        });
+
+        const center = model.state.center.state.voices.map((voice) => {
+            return voice.state.tracks.map((track) => {
+                return createTrackVM(track, context);
+            });
+        });
+
+        const bottom = model.state.bottom.state.voices.map((voice) => {
+            return voice.state.tracks.map((track) => {
                 return createTrackVM(track, context);
             });
         });
@@ -35,7 +47,9 @@ function createTimelineVM(
         };
 
         return createTimelineVMState({
+            top: top,
             center: center,
+            bottom: bottom,
             handleMouseDown: handleMouseDown,
             handleMouseUp: handleMouseUp,
             handleMouseMove: handleMouseMove,

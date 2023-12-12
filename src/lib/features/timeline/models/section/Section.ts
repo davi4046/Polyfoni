@@ -1,15 +1,7 @@
 import Model from "../../../../shared/model/Model";
 
-import type Timeline from "../timeline/Timeline";
-import type Voice from "../voice/Voice";
+import type { SectionState } from "./SectionState";
 
-class Section extends Model {
-    constructor(
-        public timeline: Timeline,
-        public voices: Voice[]
-    ) {
-        super();
-    }
-}
+class Section extends Model<SectionState> {}
 
 export default Section;

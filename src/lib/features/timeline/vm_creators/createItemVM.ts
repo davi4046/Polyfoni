@@ -9,6 +9,7 @@ import type Item from "../models/item/Item";
 function createItemVM(model: Item, context: TimelineContext): ItemVM {
     const update = (model: Item) => {
         const handleMouseDown = (event: MouseEvent) => {
+            console.log("mouse down item", model);
             if (event.shiftKey) {
                 context.selection.toggleSelected(model);
             } else {
@@ -20,9 +21,9 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
         };
 
         return createItemVMState({
-            start: model.start,
-            end: model.end,
-            text: model.content,
+            start: model.state.start,
+            end: model.state.end,
+            text: model.state.content,
             ...(context.selection.isSelected(model)
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),

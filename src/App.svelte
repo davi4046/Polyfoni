@@ -6,18 +6,15 @@
     import HighlightContext from "./lib/features/timeline/contexts/HighlightContext";
     import CursorContext from "./lib/features/timeline/contexts/CursorContext";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
-    import MoveContext from "./lib/features/timeline/contexts/MoveContext";
 
     const highlightCtx = new HighlightContext();
     const selectionCtx = new SelectionContext();
     const cursorCtx = new CursorContext();
-    const moveCtx = new MoveContext(selectionCtx, cursorCtx);
 
     const timelineCtx = new TimelineContext(
         highlightCtx,
         selectionCtx,
-        cursorCtx,
-        moveCtx
+        cursorCtx
     );
 
     const timeline = makeDemoTimeline();

@@ -1,16 +1,7 @@
 import Model from "../../../../shared/model/Model";
 
-import type Item from "../item/Item";
-import type Voice from "../voice/Voice";
+import type { TrackState } from "./TrackState";
 
-class Track extends Model {
-    constructor(
-        public voice: Voice,
-        public label: string,
-        public items: Item[]
-    ) {
-        super();
-    }
-}
+class Track extends Model<TrackState> {}
 
 export default Track;

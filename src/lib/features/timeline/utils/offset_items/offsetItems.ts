@@ -7,24 +7,28 @@ function offsetItems(
     voiceOffset: number
 ) {
     items.forEach((item) => {
-        const newStart = item.start + beatOffset;
-        const newEnd = newStart + item.end - item.start;
+        const newStart = item.state.start + beatOffset;
+        const newEnd = newStart + item.state.end - item.state.start;
 
-        const track = item.track;
-        const voice = track.voice;
-        const section = voice.section;
+        const track = item.state.track;
+        const voice = track.state.voice;
+        const section = voice.state.section;
 
-        const trackIndex = voice.tracks.indexOf(track);
-        const voiceIndex = section.voices.indexOf(voice);
+        const trackIndex = voice.state.tracks.indexOf(track);
+        const voiceIndex = section.state.voices.indexOf(voice);
 
         const newTrackIndex = trackIndex + trackOffset;
         const newVoiceIndex = voiceIndex + voiceOffset;
 
-        const newTrack = section.voices[newVoiceIndex].tracks[newTrackIndex];
+        const newTrack =
+            section.state.voices[newVoiceIndex].state.tracks[newTrackIndex];
 
-        item.start = newStart;
-        item.end = newEnd;
-        item.track = newTrack;
+        item.state.setState({
+            track: newTrack,
+            start: newStart,
+            end: newEnd,
+            content: item.state.content,
+        });
     });
 }
 
