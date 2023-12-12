@@ -1,7 +1,7 @@
-import findModelById from '../../../shared/utils/find_model_by_id/findModelById';
-import clamp from '../../../shared/utils/math_utils/clamp/clamp';
-import Item from '../models/item/Item';
-import offsetItems from '../utils/offset_items/offsetItems';
+import findModelById from "../../../shared/utils/find_model_by_id/findModelById";
+import clamp from "../../../shared/utils/math_utils/clamp/clamp";
+import Item from "../models/item/Item";
+import offsetItems from "../utils/offset_items/offsetItems";
 
 import type CursorContext from "./CursorContext";
 import type SelectionContext from "./SelectionContext";
@@ -20,7 +20,7 @@ class MoveContext {
 
         this._items = newItems;
 
-        tracks.forEach((track) => track.notifySubscribers());
+        tracks.forEach((track) => track.subscribable.notifySubscribers());
     }
 
     private _moveItems() {
@@ -33,7 +33,7 @@ class MoveContext {
             originalItem.track.items = originalItem.track.items.filter(
                 (item) => item !== originalItem
             );
-            originalItem.track.notifySubscribers();
+            originalItem.track.subscribable.notifySubscribers();
             item.track.items.push(originalItem);
 
             originalItem.start = item.start;
@@ -50,7 +50,7 @@ class MoveContext {
         let lastTrackOffset = 0;
         let lastVoiceOffset = 0;
 
-        this._cursor.subscribe((_) => {
+        this._cursor.subscribable.subscribe((_) => {
             const clickedBeat = this._cursor.clickedBeat;
             const clickedTrack = this._cursor.clickedTrack;
             const hoveredBeat = this._cursor.hoveredBeat;

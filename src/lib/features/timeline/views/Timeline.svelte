@@ -9,7 +9,7 @@
 
     export let timelineVM: TimelineVM;
 
-    timelineVM.subscribe((_) => (timelineVM = timelineVM));
+    timelineVM.subscribable.subscribe((_) => (timelineVM = timelineVM));
 
     onMount(() => {
         for (let element of document.getElementsByClassName("h-scroll")) {

@@ -1,16 +1,27 @@
-import Subscribable from "../subscribable/Subscribable";
+class Stateful<TState extends object> {
+    private stateKeys: (keyof TState)[];
 
-class Stateful<TState extends object> extends Subscribable {
-    constructor(private _state: TState) {
-        super();
+    private constructor(state: TState) {
+        this.setState(state);
+        this.stateKeys = Object.keys(state) as (keyof TState)[];
     }
 
-    protected _setState(newState: TState) {
-        this._state = Object.freeze(newState);
+    public setState(newState: TState) {
+        Object.assign(this, newState);
     }
 
-    protected _getState() {
-        return this._state;
+    public getState(): TState {
+        const state: Partial<TState> = {};
+
+        this.stateKeys.forEach((key) => {
+            state[key] = (this as unknown as TState)[key];
+        });
+
+        return state as TState;
+    }
+
+    static create<TState extends object>(state: TState) {
+        return new Stateful(state) as Stateful<TState> & TState;
     }
 }
 

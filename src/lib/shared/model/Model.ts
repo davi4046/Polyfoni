@@ -1,7 +1,9 @@
 import Subscribable from "../subscribable/Subscribable";
 import randomId from "../utils/random_id/randomId";
 
-class Model extends Subscribable {
+class Model {
+    readonly subscribable = new Subscribable(this);
+
     private static _usedIds: string[] = [];
 
     private static _uniqueId(): string {

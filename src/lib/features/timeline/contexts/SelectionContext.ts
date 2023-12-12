@@ -10,13 +10,13 @@ class SelectionContext {
     readonly selectItem = (item: Item) => {
         if (this._selectedItems.includes(item)) return;
         this._selectedItems.push(item);
-        item.notifySubscribers();
+        item.subscribable.notifySubscribers();
     };
 
     readonly deselectItem = (item: Item) => {
         let index = this._selectedItems.indexOf(item);
         this._selectedItems.splice(index, 1);
-        item.notifySubscribers();
+        item.subscribable.notifySubscribers();
     };
 
     readonly toggleSelected = (item: Item) => {

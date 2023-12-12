@@ -1,13 +1,16 @@
 import Model from "../../model/Model";
 
-function findModelById(object: Object, id: string): Model | null {
+function findModelById<TModel extends Model>(
+    object: Object,
+    id: string
+): TModel | null {
     const checkedObjects: Object[] = [];
 
-    const checkRecursively = (object: Object): Model | null => {
+    const checkRecursively = (object: Object): TModel | null => {
         checkedObjects.push(object);
 
         if (object instanceof Model) {
-            if (object.id === id) return object;
+            if (object.id === id) return object as TModel;
         }
 
         for (const value of Object.values(object)) {

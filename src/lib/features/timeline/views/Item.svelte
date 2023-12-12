@@ -3,7 +3,7 @@
 
     export let itemVM: ItemVM;
 
-    itemVM.subscribe((_) => (itemVM = itemVM));
+    itemVM.subscribable.subscribe((_) => (itemVM = itemVM));
 
     $: width = (itemVM.state.end - itemVM.state.start) * 64 + 2;
     $: left = itemVM.state.start * 64;
