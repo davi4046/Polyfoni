@@ -27,8 +27,10 @@ abstract class TimelineDrag implements DragBehaviour {
         fromY: number,
         toY: number
     ) => {
-        const fromBeat = getBeatAtClientX(this.context.timeline, fromX);
-        const toBeat = getBeatAtClientX(this.context.timeline, toX);
+        const fromBeat = Math.round(
+            getBeatAtClientX(this.context.timeline, fromX)
+        );
+        const toBeat = Math.round(getBeatAtClientX(this.context.timeline, toX));
 
         const fromTrack = findClosestTrack(this.context.timeline, fromY);
         const toTrack = findClosestTrack(this.context.timeline, toY); // TODO: should round up when dragging down and round down when dragging up
