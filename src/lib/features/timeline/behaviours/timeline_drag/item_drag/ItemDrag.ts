@@ -51,6 +51,10 @@ class ItemDrag extends TimelineDrag {
     protected handleDrop() {
         this.context.move.ghostItems = [];
     }
+
+    protected handleReset() {
+        this.context.move.ghostItems = [];
+    }
 }
 
 export default ItemDrag;

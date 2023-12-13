@@ -21,6 +21,8 @@ abstract class TimelineDrag implements DragBehaviour {
 
     protected abstract handleDrop(): void;
 
+    protected abstract handleReset(): void;
+
     readonly drag = (
         fromX: number,
         toX: number,
@@ -46,12 +48,17 @@ abstract class TimelineDrag implements DragBehaviour {
             return;
         }
 
-        this.handleDrag(fromBeat, toBeat, fromTrack, toTrack);
-
         this._prevFromBeat = fromBeat;
         this._prevToBeat = toBeat;
         this._prevFromTrack = fromTrack;
         this._prevToTrack = toTrack;
+
+        if (fromBeat === toBeat && fromTrack === toTrack) {
+            this.handleReset();
+            return;
+        }
+
+        this.handleDrag(fromBeat, toBeat, fromTrack, toTrack);
     };
 
     readonly drop = () => this.handleDrop();
