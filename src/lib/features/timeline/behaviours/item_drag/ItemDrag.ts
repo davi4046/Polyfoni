@@ -1,19 +1,17 @@
-import type DragBehaviour from "../../../../shared/behaviours/drag/DragBehaviour";
-import type TimelineContext from "../../contexts/TimelineContext";
+import type Track from "../../models/track/Track";
+import TimelineDrag from "../timeline_drag/TimelineDrag";
 
-class ItemDrag implements DragBehaviour {
-    constructor(private _context: TimelineContext) {}
-
-    readonly drag = (
-        fromX: number,
-        fromY: number,
-        toX: number,
-        toY: number
-    ) => {
+class ItemDrag extends TimelineDrag {
+    protected handleDrag(
+        fromBeat: number,
+        toBeat: number,
+        fromTrack: Track,
+        toTrack: Track
+    ) {
         console.log("item dragged");
-    };
+    }
 
-    readonly drop = () => {};
+    protected handleDrop() {}
 }
 
 export default ItemDrag;
