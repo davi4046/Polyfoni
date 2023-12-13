@@ -11,13 +11,13 @@ class Model<TState extends object> {
         this._state = Stateful.create(state(this));
     }
 
-    set state(newState: TState) {
+    set state(newState: Partial<TState>) {
         this._state.setState(newState);
         this.subscribable.notifySubscribers();
     }
 
-    get state() {
-        return this._state.getState();
+    get state(): Required<TState> {
+        return this._state.getState() as Required<TState>;
     }
 }
 

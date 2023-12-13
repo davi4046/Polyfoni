@@ -1,19 +1,19 @@
 class Stateful<TState extends object> {
-    private stateKeys: (keyof TState)[];
+    private _stateKeys: (keyof TState)[];
 
     private constructor(state: TState) {
         this.setState(state);
-        this.stateKeys = Object.keys(state) as (keyof TState)[];
+        this._stateKeys = Object.keys(state) as (keyof TState)[];
     }
 
-    public setState(newState: TState) {
+    public setState(newState: Partial<TState>) {
         Object.assign(this, newState);
     }
 
     public getState(): TState {
         const state: Partial<TState> = {};
 
-        this.stateKeys.forEach((key) => {
+        this._stateKeys.forEach((key) => {
             state[key] = (this as unknown as TState)[key];
         });
 
