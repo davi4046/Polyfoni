@@ -1,4 +1,3 @@
-import clamp from "../../../../../shared/utils/math_utils/clamp/clamp";
 import Item from "../../../models/item/Item";
 import offsetItems from "../../../utils/offset_items/offsetItems";
 import TimelineDrag from "../TimelineDrag";
@@ -12,7 +11,7 @@ class ItemDrag extends TimelineDrag {
         toTrack: Track
     ) {
         const ghostItems = this.context.selection.selectedItems.map(
-            (item) => new Item(() => item.state.getState())
+            (item) => new Item(() => item.state)
         );
 
         /* Calculate Beat Offset */

@@ -90,12 +90,12 @@ function offsetItems(
         const newTrack =
             section.state.voices[newVoiceIndex].state.tracks[newTrackIndex];
 
-        item.state.setState({
+        item.state = {
             track: newTrack,
             start: newStart,
             end: newEnd,
             content: item.state.content,
-        });
+        };
     });
 }
 
