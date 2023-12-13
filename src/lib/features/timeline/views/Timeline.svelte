@@ -70,7 +70,7 @@
     >
         {#each timelineVM.state.top as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM}
+                {#each trackVMGroup as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -82,7 +82,7 @@
     >
         {#each timelineVM.state.center as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM}
+                {#each trackVMGroup as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -94,7 +94,7 @@
     >
         {#each timelineVM.state.bottom as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM}
+                {#each trackVMGroup as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -113,7 +113,7 @@
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM}
+                    {#each trackVMGroup as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>
@@ -133,7 +133,7 @@
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM}
+                    {#each trackVMGroup as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>
@@ -153,7 +153,7 @@
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM}
+                    {#each trackVMGroup as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>

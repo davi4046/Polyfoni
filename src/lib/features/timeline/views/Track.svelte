@@ -12,7 +12,7 @@
     data-type="track"
     data-model-id={trackVM.modelId}
 >
-    {#each trackVM.state.items as itemVM}
+    {#each trackVM.state.items as itemVM (itemVM.modelId)}
         <Item {itemVM}></Item>
     {/each}
 </div>
