@@ -7,12 +7,14 @@ import getBeatAtClientX from "../../utils/get_beat_at_client_x/getBeatAtClientX"
 abstract class TimelineDrag implements DragBehaviour {
     constructor(private _context: TimelineContext) {}
 
-    abstract handleDrag: (
+    protected abstract handleDrag(
         fromBeat: number,
         toBeat: number,
         fromTrack: Track,
         toTrack: Track
-    ) => void;
+    ): void;
+
+    protected abstract handleDrop(): void;
 
     readonly drag = (
         fromX: number,
@@ -31,7 +33,7 @@ abstract class TimelineDrag implements DragBehaviour {
         this.handleDrag(fromBeat, toBeat, fromTrack, toTrack);
     };
 
-    readonly drop = () => {};
+    readonly drop = () => this.handleDrop();
 }
 
 export default TimelineDrag;
