@@ -5,7 +5,7 @@ import findClosestTrack from "../../utils/find_closest_track.ts/findClosestTrack
 import getBeatAtClientX from "../../utils/get_beat_at_client_x/getBeatAtClientX";
 
 abstract class TimelineDrag implements DragBehaviour {
-    constructor(private _context: TimelineContext) {}
+    constructor(readonly context: TimelineContext) {}
 
     protected abstract handleDrag(
         fromBeat: number,
@@ -22,11 +22,11 @@ abstract class TimelineDrag implements DragBehaviour {
         fromY: number,
         toY: number
     ) => {
-        const fromBeat = getBeatAtClientX(this._context.timeline, fromX);
-        const toBeat = getBeatAtClientX(this._context.timeline, toX);
+        const fromBeat = getBeatAtClientX(this.context.timeline, fromX);
+        const toBeat = getBeatAtClientX(this.context.timeline, toX);
 
-        const fromTrack = findClosestTrack(this._context.timeline, fromY);
-        const toTrack = findClosestTrack(this._context.timeline, toY); // TODO: should round up when dragging down and round down when dragging up
+        const fromTrack = findClosestTrack(this.context.timeline, fromY);
+        const toTrack = findClosestTrack(this.context.timeline, toY); // TODO: should round up when dragging down and round down when dragging up
 
         if (!fromTrack || !toTrack) return;
 
