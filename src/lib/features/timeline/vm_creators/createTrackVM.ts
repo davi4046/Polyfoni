@@ -1,5 +1,6 @@
 import TrackVM from "../view_models/track/TrackVM";
 import { createTrackVMState } from "../view_models/track/TrackVMState";
+import createGhostVM from "./createGhostVM";
 import createItemVM from "./createItemVM";
 
 import type TimelineContext from "../contexts/TimelineContext";
@@ -11,9 +12,13 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
             return createItemVM(item, context);
         });
 
+        const ghostItems = context.move.ghostItems
+            .filter((item) => item.state.track === model)
+            .map((item) => createGhostVM(item, context));
+
         return createTrackVMState({
             label: model.state.label,
-            items: items,
+            items: [...items, ...ghostItems],
         });
     };
 
