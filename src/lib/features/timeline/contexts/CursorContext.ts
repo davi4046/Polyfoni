@@ -29,8 +29,8 @@ class CursorContext {
 
         this._dragBehaviour?.drag(
             this._clickedX,
-            this._clickedY,
             this._hoveredX,
+            this._clickedY,
             this._hoveredY
         );
     };

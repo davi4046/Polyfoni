@@ -16,8 +16,8 @@ abstract class TimelineDrag implements DragBehaviour {
 
     readonly drag = (
         fromX: number,
-        fromY: number,
         toX: number,
+        fromY: number,
         toY: number
     ) => {
         const fromBeat = getBeatAtClientX(this._context.timeline, fromX);

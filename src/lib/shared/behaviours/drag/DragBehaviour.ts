@@ -1,5 +1,5 @@
 interface DragBehaviour {
-    drag: (fromX: number, fromY: number, toX: number, toY: number) => void;
+    drag: (fromX: number, toX: number, fromY: number, toY: number) => void;
     drop: () => void;
 }
 
