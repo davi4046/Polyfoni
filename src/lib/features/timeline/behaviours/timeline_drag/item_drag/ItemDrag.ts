@@ -1,5 +1,5 @@
-import type Track from "../../models/track/Track";
-import TimelineDrag from "../timeline_drag/TimelineDrag";
+import type Track from "../../../models/track/Track";
+import TimelineDrag from "../TimelineDrag";
 
 class ItemDrag extends TimelineDrag {
     protected handleDrag(

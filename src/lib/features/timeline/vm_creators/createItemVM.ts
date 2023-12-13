@@ -1,6 +1,6 @@
 import chroma from "chroma-js";
 
-import ItemDrag from "../behaviours/item_drag/ItemDrag";
+import ItemDrag from "../behaviours/timeline_drag/item_drag/ItemDrag";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
