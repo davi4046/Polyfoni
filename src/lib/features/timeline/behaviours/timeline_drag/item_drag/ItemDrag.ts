@@ -3,6 +3,7 @@ import offsetItems from "../../../utils/offset_items/offsetItems";
 import TimelineDrag from "../TimelineDrag";
 
 import type Track from "../../../models/track/Track";
+
 class ItemDrag extends TimelineDrag {
     protected handleDrag(
         fromBeat: number,
@@ -10,9 +11,12 @@ class ItemDrag extends TimelineDrag {
         fromTrack: Track,
         toTrack: Track
     ) {
-        const ghostItems = this.context.selection.selectedItems.map(
-            (item) => new Item(() => item.state)
-        );
+        const ghostPairs = this.context.selection.selectedItems.map((item) => {
+            return [item, new Item(() => item.state)] as [
+                legit: Item,
+                ghost: Item,
+            ];
+        });
 
         /* Calculate Beat Offset */
 
@@ -40,19 +44,22 @@ class ItemDrag extends TimelineDrag {
 
         /* Offset Items */
 
-        offsetItems(ghostItems, beatOffset, trackOffset, voiceOffset);
+        offsetItems(
+            ghostPairs.map((pair) => pair[1]),
+            beatOffset,
+            trackOffset,
+            voiceOffset
+        );
 
-        this.context.move.ghostItems = ghostItems;
-
-        console.log("item dragged");
+        this.context.move.ghostPairs = ghostPairs;
     }
 
     protected handleDrop() {
-        this.context.move.ghostItems = [];
+        this.context.move.placeGhostItems();
     }
 
     protected handleReset() {
-        this.context.move.ghostItems = [];
+        this.context.move.ghostPairs = [];
     }
 }
 
