@@ -39,82 +39,89 @@ function makeRandomItems(track: Track): Item[] {
 function makeDemoTimeline(): Timeline {
     return new Timeline((timeline) =>
         createTimelineState({
-            top: new Section((section) =>
-                createSectionState({
-                    parent: timeline,
-                    children: [],
-                })
-            ),
-            center: new Section((section) =>
-                createSectionState({
-                    parent: timeline,
-                    children: [
-                        new Voice((voice) =>
-                            createVoiceState({
-                                parent: section,
-                                children: [
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Piano 1",
-                                            children: makeRandomItems(track),
-                                        })
-                                    ),
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Pitch",
-                                            children: makeRandomItems(track),
-                                        })
-                                    ),
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Duration",
-                                            children: makeRandomItems(track),
-                                        })
-                                    ),
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Rest",
-                                            children: makeRandomItems(track),
-                                        })
-                                    ),
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Harmony",
-                                            children: makeRandomItems(track),
-                                        })
-                                    ),
-                                ],
-                            })
-                        ),
-                    ],
-                })
-            ),
-            bottom: new Section((section) =>
-                createSectionState({
-                    parent: timeline,
-                    children: [
-                        new Voice((voice) =>
-                            createVoiceState({
-                                parent: section,
-                                children: [
-                                    new Track((track) =>
-                                        createTrackState({
-                                            parent: voice,
-                                            label: "Harmonic Sum",
-                                            children: [],
-                                        })
-                                    ),
-                                ],
-                            })
-                        ),
-                    ],
-                })
-            ),
+            children: [
+                new Section((section) =>
+                    createSectionState({
+                        parent: timeline,
+                        children: [],
+                    })
+                ),
+                new Section((section) =>
+                    createSectionState({
+                        parent: timeline,
+                        children: [
+                            new Voice((voice) =>
+                                createVoiceState({
+                                    parent: section,
+                                    children: [
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Piano 1",
+                                                children:
+                                                    makeRandomItems(track),
+                                            })
+                                        ),
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Pitch",
+                                                children:
+                                                    makeRandomItems(track),
+                                            })
+                                        ),
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Duration",
+                                                children:
+                                                    makeRandomItems(track),
+                                            })
+                                        ),
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Rest",
+                                                children:
+                                                    makeRandomItems(track),
+                                            })
+                                        ),
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Harmony",
+                                                children:
+                                                    makeRandomItems(track),
+                                            })
+                                        ),
+                                    ],
+                                })
+                            ),
+                        ],
+                    })
+                ),
+                new Section((section) =>
+                    createSectionState({
+                        parent: timeline,
+                        children: [
+                            new Voice((voice) =>
+                                createVoiceState({
+                                    parent: section,
+                                    children: [
+                                        new Track((track) =>
+                                            createTrackState({
+                                                parent: voice,
+                                                label: "Harmonic Sum",
+                                                children: [],
+                                            })
+                                        ),
+                                    ],
+                                })
+                            ),
+                        ],
+                    })
+                ),
+            ],
         })
     );
 }

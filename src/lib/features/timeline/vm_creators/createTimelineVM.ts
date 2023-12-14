@@ -9,19 +9,19 @@ function createTimelineVM(
     context: TimelineContext
 ): TimelineVM {
     const update = (model: Timeline) => {
-        const top = model.state.top.state.children.map((voice) => {
+        const top = model.state.children[0].state.children.map((voice) => {
             return voice.state.children.map((track) => {
                 return createTrackVM(track, context);
             });
         });
 
-        const center = model.state.center.state.children.map((voice) => {
+        const center = model.state.children[1].state.children.map((voice) => {
             return voice.state.children.map((track) => {
                 return createTrackVM(track, context);
             });
         });
 
-        const bottom = model.state.bottom.state.children.map((voice) => {
+        const bottom = model.state.children[2].state.children.map((voice) => {
             return voice.state.children.map((track) => {
                 return createTrackVM(track, context);
             });
