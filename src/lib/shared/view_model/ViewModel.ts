@@ -5,11 +5,11 @@ import Subscribable from "../subscribable/Subscribable";
 class ViewModel<TModel extends Model<any>, TState extends object> {
     private _subscribable = new Subscribable(this);
     private _stateful: Stateful<TState> & Required<TState>;
-    readonly modelId: string;
+    private _modelId: string;
 
     constructor(model: TModel, update: (model: TModel) => Required<TState>) {
         this._stateful = Stateful.create(update(model));
-        this.modelId = model.id;
+        this._modelId = model.id;
 
         model.subscribe((_) => {
             this._stateful.setState(update(model));
@@ -17,6 +17,10 @@ class ViewModel<TModel extends Model<any>, TState extends object> {
         });
 
         this._subscribable.notifySubscribers();
+    }
+
+    get modelId() {
+        return this._modelId;
     }
 
     get state(): Required<TState> {
