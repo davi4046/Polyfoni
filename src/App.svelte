@@ -28,8 +28,8 @@
 
     const shortcutManager = new ShortcutManager();
 
-    shortcutManager.register("ControlLeft+KeyV", () => {
-        console.log("shortcut!");
+    shortcutManager.register("Delete", () => {
+        selectionCtx.deleteSelection();
     });
 </script>
 

@@ -1,3 +1,5 @@
+import { getParent, removeChildren } from "../../../shared/state/state_utils";
+
 import type Item from "../models/item/Item";
 
 class SelectionContext {
@@ -33,6 +35,13 @@ class SelectionContext {
 
     readonly isSelected = (item: Item) => {
         return this._selectedItems.includes(item);
+    };
+
+    readonly deleteSelection = () => {
+        this._selectedItems.forEach((item) => {
+            removeChildren(getParent(item), item);
+        });
+        this.deselectAll();
     };
 }
 
