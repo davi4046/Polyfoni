@@ -7,6 +7,7 @@
     import CursorContext from "./lib/features/timeline/contexts/CursorContext";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
     import MoveContext from "./lib/features/timeline/contexts/MoveContext";
+    import ShortcutManager from "./lib/shared/shortcut_manager/ShortcutManager";
 
     const timeline = makeDemoTimeline();
 
@@ -24,6 +25,12 @@
     );
 
     const timelineVM = createTimelineVM(timeline, timelineCtx);
+
+    const shortcutManager = new ShortcutManager();
+
+    shortcutManager.register("ControlLeft+KeyV", () => {
+        console.log("shortcut!");
+    });
 </script>
 
 <main class="h-full">
