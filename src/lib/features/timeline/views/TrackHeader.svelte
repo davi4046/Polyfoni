@@ -3,7 +3,7 @@
 
     export let trackVM: TrackVM;
 
-    trackVM.subscribable.subscribe((_) => (trackVM = trackVM));
+    trackVM.subscribe((_) => (trackVM = trackVM));
 </script>
 
 <div

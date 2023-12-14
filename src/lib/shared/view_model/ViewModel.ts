@@ -3,7 +3,7 @@ import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
 class ViewModel<TModel extends Model<any>, TState extends object> {
-    readonly subscribable = new Subscribable(this);
+    private _subscribable = new Subscribable(this);
     readonly state: Stateful<TState> & Required<TState>;
     readonly modelId: string;
 
@@ -13,10 +13,18 @@ class ViewModel<TModel extends Model<any>, TState extends object> {
 
         model.subscribe((_) => {
             this.state.setState(update(model));
-            this.subscribable.notifySubscribers();
+            this._subscribable.notifySubscribers();
         });
 
-        this.subscribable.notifySubscribers();
+        this._subscribable.notifySubscribers();
+    }
+
+    subscribe(callback: (value: this) => void) {
+        this._subscribable.subscribe(callback);
+    }
+
+    notifySubscribers() {
+        this._subscribable.notifySubscribers();
     }
 }
 
