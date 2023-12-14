@@ -3,8 +3,10 @@ import {
     getParent,
     removeChildren,
 } from "../../../shared/state/state_utils";
+import clearTrackInterval from "../utils/clear_track_interval/clearTrackInterval";
 
 import type Item from "../models/item/Item";
+
 class MoveContext {
     private _ghostPairs: readonly [legit: Item, ghost: Item][] = [];
 
@@ -36,6 +38,12 @@ class MoveContext {
             const newTrack = getParent(pair[1]);
 
             pair[0].state = pair[1].state;
+
+            clearTrackInterval(
+                newTrack,
+                pair[0].state.start,
+                pair[0].state.end
+            );
 
             removeChildren(oldTrack, pair[0]);
             addChildren(newTrack, pair[0]);
