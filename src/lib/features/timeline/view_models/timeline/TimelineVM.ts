@@ -1,8 +1,8 @@
-import ViewModel from "../../../../shared/view_model/ViewModel";
+import BoundModel from "../../../../shared/bound_model/BoundModel";
 
 import type Timeline from "../../models/timeline/Timeline";
 import type { TimelineVMState } from "./TimelineVMState";
 
-class TimelineVM extends ViewModel<Timeline, TimelineVMState> {}
+class TimelineVM extends BoundModel<Timeline, TimelineVMState> {}
 
 export default TimelineVM;

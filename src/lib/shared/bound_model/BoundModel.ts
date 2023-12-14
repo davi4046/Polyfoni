@@ -2,7 +2,7 @@ import type Model from "../model/Model";
 import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
-class ViewModel<TModel extends Model<any>, TState extends object> {
+class BoundModel<TModel extends Model<any>, TState extends object> {
     private _modelId: string;
     private _stateful: Stateful<TState> & Required<TState>;
     private _subscribable = new Subscribable(this);
@@ -36,4 +36,4 @@ class ViewModel<TModel extends Model<any>, TState extends object> {
     }
 }
 
-export default ViewModel;
+export default BoundModel;
