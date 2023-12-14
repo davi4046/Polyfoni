@@ -4,7 +4,7 @@ import Interval from "./Interval";
  * Adjusts intervals in the provided list so that none overlap the specified interval.
  * Removes intervals that are completely overlapped by the specified interval.
  */
-function clearInterval(list: Interval[], interval: Interval): void {
+function clearInterval(list: Interval<any>[], interval: Interval<any>): void {
     if (list.length === 0) return;
 
     list.sort((a, b) => a.start - b.start);
@@ -20,7 +20,7 @@ function clearInterval(list: Interval[], interval: Interval): void {
 
     if (i === j && i) {
         //because i and j is the same interval, we split it
-        const newInterval = new Interval(interval.end, i.end);
+        const newInterval = new Interval(interval.end, i.end, i.data);
         i.end = interval.start;
         list.push(newInterval);
     } else {
