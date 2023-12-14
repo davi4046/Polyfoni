@@ -3,7 +3,7 @@ import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
 class Model<TState extends object> {
-    readonly subscribable = new Subscribable(this);
+    private _subscribable = new Subscribable(this);
     private _id = IdProvider.generateId();
     private _state: Stateful<TState> & Required<TState>;
 
@@ -13,7 +13,7 @@ class Model<TState extends object> {
 
     set state(newState: Partial<TState>) {
         this._state.setState(newState);
-        this.subscribable.notifySubscribers();
+        this._subscribable.notifySubscribers();
     }
 
     get state(): Required<TState> {
@@ -22,6 +22,14 @@ class Model<TState extends object> {
 
     get id() {
         return this._id;
+    }
+
+    subscribe(callback: (value: this) => void) {
+        this._subscribable.subscribe(callback);
+    }
+
+    notifySubscribers() {
+        this._subscribable.notifySubscribers();
     }
 }
 

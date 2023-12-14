@@ -11,7 +11,7 @@ class ViewModel<TModel extends Model<any>, TState extends object> {
         this.state = Stateful.create(update(model));
         this.modelId = model.id;
 
-        model.subscribable.subscribe((_) => {
+        model.subscribe((_) => {
             this.state.setState(update(model));
             this.subscribable.notifySubscribers();
         });

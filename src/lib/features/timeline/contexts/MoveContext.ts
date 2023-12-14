@@ -14,7 +14,7 @@ class MoveContext {
 
         this._ghostPairs = newGhostPairs;
 
-        tracks.forEach((track) => track.subscribable.notifySubscribers());
+        tracks.forEach((track) => track.notifySubscribers());
     }
 
     get ghostPairs() {
