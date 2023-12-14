@@ -2,32 +2,56 @@ import type ChildState from "./ChildState";
 import type ParentChildState from "./ParentChildState";
 import type ParentState from "./ParentState";
 
-type HasParent<TParent> = GetState<
-    ChildState<TParent> | ParentChildState<TParent, any>
->;
+type HasParent<TParent> = ChildState<TParent> | ParentChildState<TParent, any>;
 
-type HasChildren<TChild> = GetState<
-    ParentState<TChild> | ParentChildState<any, TChild>
->;
+type HasChildren<TChild> = ParentState<TChild> | ParentChildState<any, TChild>;
 
-function getParent<T>(obj: HasParent<T>) {
+type HasGettableParent<TParent> = GetState<HasParent<TParent>>;
+
+type HasGettableChildren<TChild> = GetState<HasChildren<TChild>>;
+
+type HasSettableParent<TParent> = SetState<HasParent<TParent>>;
+
+type HasSettableChildren<TParent> = SetState<HasChildren<TParent>>;
+
+function getParent<T>(obj: HasGettableParent<T>) {
     return obj.state.parent;
 }
 
-function getGrandparent<T>(obj: HasParent<HasParent<T>>) {
+function getGrandparent<T>(obj: HasGettableParent<HasGettableParent<T>>) {
     return obj.state.parent.state.parent;
 }
 
-function getGreatGrandparent<T>(obj: HasParent<HasParent<HasParent<T>>>) {
+function getGreatGrandparent<T>(
+    obj: HasGettableParent<HasGettableParent<HasGettableParent<T>>>
+) {
     return obj.state.parent.state.parent.state.parent;
 }
 
-function getChildren<T>(obj: HasChildren<T>) {
+function getChildren<T>(obj: HasGettableChildren<T>) {
     return obj.state.children;
 }
 
-function getIndex(obj: HasParent<HasChildren<any>>) {
+function getIndex(obj: HasGettableParent<HasGettableChildren<any>>) {
     return obj.state.parent.state.children.indexOf(obj);
+}
+
+function addChild<T>(
+    obj: HasSettableChildren<T> & HasGettableChildren<T>,
+    child: T
+) {
+    obj.state = {
+        children: [...obj.state.children, child],
+    };
+}
+
+function removeChild<T>(
+    obj: HasSettableChildren<T> & HasGettableChildren<T>,
+    child: T
+) {
+    obj.state = {
+        children: obj.state.children.filter((other) => other !== child),
+    };
 }
 
 export {
@@ -36,4 +60,6 @@ export {
     getGreatGrandparent,
     getChildren,
     getIndex,
+    addChild,
+    removeChild,
 };
