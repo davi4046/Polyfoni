@@ -1,4 +1,9 @@
-import { getChildren, getParent } from "../../../shared/state/state_utils";
+import {
+    addChild,
+    getChildren,
+    getParent,
+    removeChild,
+} from "../../../shared/state/state_utils";
 
 import type Item from "../models/item/Item";
 
@@ -29,19 +34,13 @@ class MoveContext {
 
     readonly placeGhostItems = () => {
         this._ghostPairs.forEach((pair) => {
-            const oldTrack = pair[0].state.parent;
-            const newTrack = pair[1].state.parent;
+            const oldTrack = getParent(pair[0]);
+            const newTrack = getParent(pair[1]);
 
             pair[0].state = pair[1].state;
 
-            oldTrack.state = {
-                children: getChildren(oldTrack).filter(
-                    (item) => item !== pair[0]
-                ),
-            };
-            newTrack.state = {
-                children: [pair[0], ...getChildren(newTrack)],
-            };
+            removeChild(oldTrack, pair[0]);
+            addChild(newTrack, pair[0]);
         });
         this.ghostPairs = [];
     };
