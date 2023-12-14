@@ -3,9 +3,9 @@ import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
 class ViewModel<TModel extends Model<any>, TState extends object> {
-    private _subscribable = new Subscribable(this);
-    private _stateful: Stateful<TState> & Required<TState>;
     private _modelId: string;
+    private _stateful: Stateful<TState> & Required<TState>;
+    private _subscribable = new Subscribable(this);
 
     constructor(model: TModel, update: (model: TModel) => Required<TState>) {
         this._stateful = Stateful.create(update(model));
