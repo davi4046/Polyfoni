@@ -35,10 +35,10 @@ class ItemDrag extends TimelineDrag {
         /* Calculate Voice Offset */
 
         const fromVoiceIndex =
-            fromVoice.state.section.state.voices.indexOf(fromVoice);
+            fromVoice.state.section.state.children.indexOf(fromVoice);
 
         const toVoiceIndex =
-            toVoice.state.section.state.voices.indexOf(toVoice);
+            toVoice.state.section.state.children.indexOf(toVoice);
 
         const voiceOffset = toVoiceIndex - fromVoiceIndex;
 

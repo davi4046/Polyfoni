@@ -41,14 +41,14 @@ function makeDemoTimeline(): Timeline {
         createTimelineState({
             top: new Section((section) =>
                 createSectionState({
-                    timeline: timeline,
-                    voices: [],
+                    parent: timeline,
+                    children: [],
                 })
             ),
             center: new Section((section) =>
                 createSectionState({
-                    timeline: timeline,
-                    voices: [
+                    parent: timeline,
+                    children: [
                         new Voice((voice) =>
                             createVoiceState({
                                 section: section,
@@ -96,8 +96,8 @@ function makeDemoTimeline(): Timeline {
             ),
             bottom: new Section((section) =>
                 createSectionState({
-                    timeline: timeline,
-                    voices: [
+                    parent: timeline,
+                    children: [
                         new Voice((voice) =>
                             createVoiceState({
                                 section: section,
