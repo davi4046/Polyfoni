@@ -36,21 +36,23 @@ function getIndex(obj: HasGettableParent<HasGettableChildren<any>>) {
     return obj.state.parent.state.children.indexOf(obj);
 }
 
-function addChild<T>(
+function addChildren<T>(
     obj: HasSettableChildren<T> & HasGettableChildren<T>,
-    child: T
+    ...children: T[]
 ) {
     obj.state = {
-        children: [...obj.state.children, child],
+        children: [...obj.state.children, ...children],
     };
 }
 
-function removeChild<T>(
+function removeChildren<T>(
     obj: HasSettableChildren<T> & HasGettableChildren<T>,
-    child: T
+    ...children: T[]
 ) {
     obj.state = {
-        children: obj.state.children.filter((other) => other !== child),
+        children: obj.state.children.filter(
+            (other) => !children.includes(other)
+        ),
     };
 }
 
@@ -60,6 +62,6 @@ export {
     getGreatGrandparent,
     getChildren,
     getIndex,
-    addChild,
-    removeChild,
+    addChildren,
+    removeChildren,
 };

@@ -1,12 +1,10 @@
 import {
-    addChild,
-    getChildren,
+    addChildren,
     getParent,
-    removeChild,
+    removeChildren,
 } from "../../../shared/state/state_utils";
 
 import type Item from "../models/item/Item";
-
 class MoveContext {
     private _ghostPairs: readonly [legit: Item, ghost: Item][] = [];
 
@@ -39,8 +37,8 @@ class MoveContext {
 
             pair[0].state = pair[1].state;
 
-            removeChild(oldTrack, pair[0]);
-            addChild(newTrack, pair[0]);
+            removeChildren(oldTrack, pair[0]);
+            addChildren(newTrack, pair[0]);
         });
         this.ghostPairs = [];
     };
