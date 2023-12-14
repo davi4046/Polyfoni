@@ -4,7 +4,7 @@ import Subscribable from "../subscribable/Subscribable";
 
 class Model<TState extends object> {
     readonly subscribable = new Subscribable(this);
-    readonly id = IdProvider.generateId();
+    private _id = IdProvider.generateId();
     private _state: Stateful<TState> & Required<TState>;
 
     constructor(state: (model: Model<TState>) => Required<TState>) {
@@ -18,6 +18,10 @@ class Model<TState extends object> {
 
     get state(): Required<TState> {
         return this._state.getState() as Required<TState>;
+    }
+
+    get id() {
+        return this._id;
     }
 }
 
