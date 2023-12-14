@@ -2,7 +2,9 @@ import IdProvider from "../id_provider/IdProvider";
 import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
-class Model<TState extends object> implements GetState<TState> {
+class Model<TState extends object>
+    implements GetState<TState>, SetState<TState>
+{
     private _id = IdProvider.generateId();
     private _stateful: Stateful<TState> & Required<TState>;
     private _subscribable = new Subscribable(this);
