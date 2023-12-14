@@ -8,10 +8,10 @@ function offsetItems(
     trackOffset: number,
     voiceOffset: number
 ) {
-    const section = items[0].state.parent.state.parent.state.section;
+    const section = items[0].state.parent.state.parent.state.parent;
 
     items.forEach((item) => {
-        if (item.state.parent.state.parent.state.section !== section)
+        if (item.state.parent.state.parent.state.parent !== section)
             throw new Error(
                 "Failed to offset items, all items' voices must reference the same section"
             );
@@ -29,14 +29,14 @@ function offsetItems(
     /* Clamp Track Offset */
 
     const minTrackIndex = items.reduce((min, item) => {
-        const index = item.state.parent.state.parent.state.tracks.indexOf(
+        const index = item.state.parent.state.parent.state.children.indexOf(
             item.state.parent
         );
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxTrackIndex = items.reduce((max, item) => {
-        const index = item.state.parent.state.parent.state.tracks.indexOf(
+        const index = item.state.parent.state.parent.state.children.indexOf(
             item.state.parent
         );
 
@@ -49,7 +49,7 @@ function offsetItems(
 
     const minVoiceIndex = items.reduce((min, item) => {
         const index =
-            item.state.parent.state.parent.state.section.state.children.indexOf(
+            item.state.parent.state.parent.state.parent.state.children.indexOf(
                 item.state.parent.state.parent
             );
         return Math.min(min, index);
@@ -57,7 +57,7 @@ function offsetItems(
 
     const maxVoiceIndex = items.reduce((max, item) => {
         const index =
-            item.state.parent.state.parent.state.section.state.children.indexOf(
+            item.state.parent.state.parent.state.parent.state.children.indexOf(
                 item.state.parent.state.parent
             );
         return Math.max(max, index);
@@ -79,16 +79,16 @@ function offsetItems(
 
         const track = item.state.parent;
         const voice = track.state.parent;
-        const section = voice.state.section;
+        const section = voice.state.parent;
 
-        const trackIndex = voice.state.tracks.indexOf(track);
+        const trackIndex = voice.state.children.indexOf(track);
         const voiceIndex = section.state.children.indexOf(voice);
 
         const newTrackIndex = trackIndex + trackOffset;
         const newVoiceIndex = voiceIndex + voiceOffset;
 
         const newTrack =
-            section.state.children[newVoiceIndex].state.tracks[newTrackIndex];
+            section.state.children[newVoiceIndex].state.children[newTrackIndex];
 
         item.state = {
             parent: newTrack,

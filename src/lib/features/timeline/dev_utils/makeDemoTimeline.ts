@@ -51,8 +51,8 @@ function makeDemoTimeline(): Timeline {
                     children: [
                         new Voice((voice) =>
                             createVoiceState({
-                                section: section,
-                                tracks: [
+                                parent: section,
+                                children: [
                                     new Track((track) =>
                                         createTrackState({
                                             parent: voice,
@@ -100,8 +100,8 @@ function makeDemoTimeline(): Timeline {
                     children: [
                         new Voice((voice) =>
                             createVoiceState({
-                                section: section,
-                                tracks: [
+                                parent: section,
+                                children: [
                                     new Track((track) =>
                                         createTrackState({
                                             parent: voice,
