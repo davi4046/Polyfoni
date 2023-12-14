@@ -55,37 +55,37 @@ function makeDemoTimeline(): Timeline {
                                 tracks: [
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Piano 1",
-                                            items: makeRandomItems(track),
+                                            children: makeRandomItems(track),
                                         })
                                     ),
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Pitch",
-                                            items: makeRandomItems(track),
+                                            children: makeRandomItems(track),
                                         })
                                     ),
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Duration",
-                                            items: makeRandomItems(track),
+                                            children: makeRandomItems(track),
                                         })
                                     ),
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Rest",
-                                            items: makeRandomItems(track),
+                                            children: makeRandomItems(track),
                                         })
                                     ),
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Harmony",
-                                            items: makeRandomItems(track),
+                                            children: makeRandomItems(track),
                                         })
                                     ),
                                 ],
@@ -104,9 +104,9 @@ function makeDemoTimeline(): Timeline {
                                 tracks: [
                                     new Track((track) =>
                                         createTrackState({
-                                            voice: voice,
+                                            parent: voice,
                                             label: "Harmonic Sum",
-                                            items: [],
+                                            children: [],
                                         })
                                     ),
                                 ],

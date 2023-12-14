@@ -8,10 +8,10 @@ function offsetItems(
     trackOffset: number,
     voiceOffset: number
 ) {
-    const section = items[0].state.parent.state.voice.state.section;
+    const section = items[0].state.parent.state.parent.state.section;
 
     items.forEach((item) => {
-        if (item.state.parent.state.voice.state.section !== section)
+        if (item.state.parent.state.parent.state.section !== section)
             throw new Error(
                 "Failed to offset items, all items' voices must reference the same section"
             );
@@ -29,14 +29,14 @@ function offsetItems(
     /* Clamp Track Offset */
 
     const minTrackIndex = items.reduce((min, item) => {
-        const index = item.state.parent.state.voice.state.tracks.indexOf(
+        const index = item.state.parent.state.parent.state.tracks.indexOf(
             item.state.parent
         );
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxTrackIndex = items.reduce((max, item) => {
-        const index = item.state.parent.state.voice.state.tracks.indexOf(
+        const index = item.state.parent.state.parent.state.tracks.indexOf(
             item.state.parent
         );
 
@@ -49,16 +49,16 @@ function offsetItems(
 
     const minVoiceIndex = items.reduce((min, item) => {
         const index =
-            item.state.parent.state.voice.state.section.state.children.indexOf(
-                item.state.parent.state.voice
+            item.state.parent.state.parent.state.section.state.children.indexOf(
+                item.state.parent.state.parent
             );
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxVoiceIndex = items.reduce((max, item) => {
         const index =
-            item.state.parent.state.voice.state.section.state.children.indexOf(
-                item.state.parent.state.voice
+            item.state.parent.state.parent.state.section.state.children.indexOf(
+                item.state.parent.state.parent
             );
         return Math.max(max, index);
     }, Number.MIN_VALUE);
@@ -78,7 +78,7 @@ function offsetItems(
         const newEnd = newStart + item.state.end - item.state.start;
 
         const track = item.state.parent;
-        const voice = track.state.voice;
+        const voice = track.state.parent;
         const section = voice.state.section;
 
         const trackIndex = voice.state.tracks.indexOf(track);

@@ -33,10 +33,12 @@ class MoveContext {
             pair[0].state = pair[1].state;
 
             oldTrack.state = {
-                items: oldTrack.state.items.filter((item) => item !== pair[0]),
+                children: oldTrack.state.children.filter(
+                    (item) => item !== pair[0]
+                ),
             };
             newTrack.state = {
-                items: [pair[0], ...newTrack.state.items],
+                children: [pair[0], ...newTrack.state.children],
             };
         });
         this.ghostPairs = [];

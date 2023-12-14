@@ -24,8 +24,8 @@ class ItemDrag extends TimelineDrag {
 
         /* Calculate Track Offset */
 
-        const fromVoice = fromTrack.state.voice;
-        const toVoice = toTrack.state.voice;
+        const fromVoice = fromTrack.state.parent;
+        const toVoice = toTrack.state.parent;
 
         const fromTrackIndex = fromVoice.state.tracks.indexOf(fromTrack);
         const toTrackIndex = toVoice.state.tracks.indexOf(toTrack);

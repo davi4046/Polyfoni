@@ -8,7 +8,7 @@ import type Track from "../models/track/Track";
 
 function createTrackVM(model: Track, context: TimelineContext): TrackVM {
     const update = (model: Track) => {
-        const items = model.state.items.map((item) => {
+        const items = model.state.children.map((item) => {
             return createItemVM(item, context);
         });
 
