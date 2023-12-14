@@ -4,11 +4,11 @@ import Subscribable from "../subscribable/Subscribable";
 
 class Model<TState extends object> {
     private _id = IdProvider.generateId();
-    private _state: Stateful<TState> & Required<TState>;
+    private _stateful: Stateful<TState> & Required<TState>;
     private _subscribable = new Subscribable(this);
 
     constructor(state: (model: Model<TState>) => Required<TState>) {
-        this._state = Stateful.create(state(this));
+        this._stateful = Stateful.create(state(this));
     }
 
     get id() {
@@ -16,12 +16,12 @@ class Model<TState extends object> {
     }
 
     set state(newState: Partial<TState>) {
-        this._state.setState(newState);
+        this._stateful.setState(newState);
         this._subscribable.notifySubscribers();
     }
 
     get state(): Required<TState> {
-        return this._state.getState() as Required<TState>;
+        return this._stateful.getState() as Required<TState>;
     }
 
     subscribe(callback: (value: this) => void) {
