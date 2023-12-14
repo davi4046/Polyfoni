@@ -4,19 +4,27 @@ import Subscribable from "../subscribable/Subscribable";
 
 class ViewModel<TModel extends Model<any>, TState extends object> {
     private _subscribable = new Subscribable(this);
-    readonly state: Stateful<TState> & Required<TState>;
+    private _state: Stateful<TState> & Required<TState>;
     readonly modelId: string;
 
     constructor(model: TModel, update: (model: TModel) => Required<TState>) {
-        this.state = Stateful.create(update(model));
+        this._state = Stateful.create(update(model));
         this.modelId = model.id;
 
         model.subscribe((_) => {
-            this.state.setState(update(model));
+            this._state.setState(update(model));
             this._subscribable.notifySubscribers();
         });
 
         this._subscribable.notifySubscribers();
+    }
+
+    set state(newState: Partial<TState>) {
+        this._state.setState(newState);
+    }
+
+    get state(): Required<TState> {
+        return this._state.getState() as Required<TState>;
     }
 
     subscribe(callback: (value: this) => void) {
