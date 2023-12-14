@@ -22,7 +22,7 @@ function makeRandomItems(track: Track): Item[] {
             items.push(
                 new Item((item) =>
                     createItemState({
-                        track: track,
+                        parent: track,
                         start: beat,
                         end: end,
                         content: "blahblahlblahblah",

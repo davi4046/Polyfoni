@@ -8,10 +8,10 @@ function offsetItems(
     trackOffset: number,
     voiceOffset: number
 ) {
-    const section = items[0].state.track.state.voice.state.section;
+    const section = items[0].state.parent.state.voice.state.section;
 
     items.forEach((item) => {
-        if (item.state.track.state.voice.state.section !== section)
+        if (item.state.parent.state.voice.state.section !== section)
             throw new Error(
                 "Failed to offset items, all items' voices must reference the same section"
             );
@@ -29,15 +29,15 @@ function offsetItems(
     /* Clamp Track Offset */
 
     const minTrackIndex = items.reduce((min, item) => {
-        const index = item.state.track.state.voice.state.tracks.indexOf(
-            item.state.track
+        const index = item.state.parent.state.voice.state.tracks.indexOf(
+            item.state.parent
         );
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxTrackIndex = items.reduce((max, item) => {
-        const index = item.state.track.state.voice.state.tracks.indexOf(
-            item.state.track
+        const index = item.state.parent.state.voice.state.tracks.indexOf(
+            item.state.parent
         );
 
         return Math.max(max, index);
@@ -49,16 +49,16 @@ function offsetItems(
 
     const minVoiceIndex = items.reduce((min, item) => {
         const index =
-            item.state.track.state.voice.state.section.state.voices.indexOf(
-                item.state.track.state.voice
+            item.state.parent.state.voice.state.section.state.voices.indexOf(
+                item.state.parent.state.voice
             );
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxVoiceIndex = items.reduce((max, item) => {
         const index =
-            item.state.track.state.voice.state.section.state.voices.indexOf(
-                item.state.track.state.voice
+            item.state.parent.state.voice.state.section.state.voices.indexOf(
+                item.state.parent.state.voice
             );
         return Math.max(max, index);
     }, Number.MIN_VALUE);
@@ -77,7 +77,7 @@ function offsetItems(
         const newStart = item.state.start + beatOffset;
         const newEnd = newStart + item.state.end - item.state.start;
 
-        const track = item.state.track;
+        const track = item.state.parent;
         const voice = track.state.voice;
         const section = voice.state.section;
 
@@ -91,7 +91,7 @@ function offsetItems(
             section.state.voices[newVoiceIndex].state.tracks[newTrackIndex];
 
         item.state = {
-            track: newTrack,
+            parent: newTrack,
             start: newStart,
             end: newEnd,
             content: item.state.content,

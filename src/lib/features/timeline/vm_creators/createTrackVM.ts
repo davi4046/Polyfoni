@@ -13,7 +13,7 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
         });
 
         const ghostItems = context.move.ghostItems
-            .filter((item) => item.state.track === model)
+            .filter((item) => item.state.parent === model)
             .map((item) => createGhostVM(item, context));
 
         return createTrackVMState({

@@ -7,8 +7,8 @@ class MoveContext {
         const oldGhostItems = this._ghostPairs.map((pair) => pair[1]);
         const newGhostItems = newGhostPairs.map((pair) => pair[1]);
 
-        const oldTracks = oldGhostItems.map((item) => item.state.track);
-        const newTracks = newGhostItems.map((item) => item.state.track);
+        const oldTracks = oldGhostItems.map((item) => item.state.parent);
+        const newTracks = newGhostItems.map((item) => item.state.parent);
 
         const tracks = Array.from(new Set([...oldTracks, ...newTracks]));
 
@@ -27,8 +27,8 @@ class MoveContext {
 
     readonly placeGhostItems = () => {
         this._ghostPairs.forEach((pair) => {
-            const oldTrack = pair[0].state.track;
-            const newTrack = pair[1].state.track;
+            const oldTrack = pair[0].state.parent;
+            const newTrack = pair[1].state.parent;
 
             pair[0].state = pair[1].state;
 
