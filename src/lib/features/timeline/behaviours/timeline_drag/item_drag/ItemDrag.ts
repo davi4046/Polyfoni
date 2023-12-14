@@ -1,3 +1,4 @@
+import { getIndex, getParent } from "../../../../../shared/state/state_utils";
 import Item from "../../../models/item/Item";
 import offsetItems from "../../../utils/offset_items/offsetItems";
 import TimelineDrag from "../TimelineDrag";
@@ -18,31 +19,12 @@ class ItemDrag extends TimelineDrag {
             ];
         });
 
-        /* Calculate Beat Offset */
-
         const beatOffset = toBeat - fromBeat;
 
-        /* Calculate Track Offset */
+        const trackOffset = getIndex(toTrack) - getIndex(fromTrack);
 
-        const fromVoice = fromTrack.state.parent;
-        const toVoice = toTrack.state.parent;
-
-        const fromTrackIndex = fromVoice.state.children.indexOf(fromTrack);
-        const toTrackIndex = toVoice.state.children.indexOf(toTrack);
-
-        const trackOffset = toTrackIndex - fromTrackIndex;
-
-        /* Calculate Voice Offset */
-
-        const fromVoiceIndex =
-            fromVoice.state.parent.state.children.indexOf(fromVoice);
-
-        const toVoiceIndex =
-            toVoice.state.parent.state.children.indexOf(toVoice);
-
-        const voiceOffset = toVoiceIndex - fromVoiceIndex;
-
-        /* Offset Items */
+        const voiceOffset =
+            getIndex(getParent(toTrack)) - getIndex(getParent(fromTrack));
 
         offsetItems(
             ghostPairs.map((pair) => pair[1]),

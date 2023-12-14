@@ -1,3 +1,10 @@
+import {
+    getChildren,
+    getGrandparent,
+    getGreatGrandparent,
+    getIndex,
+    getParent,
+} from "../../../../shared/state/state_utils";
 import clamp from "../../../../shared/utils/math_utils/clamp/clamp";
 
 import type Item from "../../models/item/Item";
@@ -8,13 +15,14 @@ function offsetItems(
     trackOffset: number,
     voiceOffset: number
 ) {
-    const section = items[0].state.parent.state.parent.state.parent;
+    const section = getGreatGrandparent(items[0]);
 
     items.forEach((item) => {
-        if (item.state.parent.state.parent.state.parent !== section)
+        if (getGreatGrandparent(item) !== section) {
             throw new Error(
                 "Failed to offset items, all items' voices must reference the same section"
             );
+        }
     });
 
     /* Clamp Beat Offset */
@@ -29,17 +37,12 @@ function offsetItems(
     /* Clamp Track Offset */
 
     const minTrackIndex = items.reduce((min, item) => {
-        const index = item.state.parent.state.parent.state.children.indexOf(
-            item.state.parent
-        );
+        const index = getIndex(getParent(item));
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxTrackIndex = items.reduce((max, item) => {
-        const index = item.state.parent.state.parent.state.children.indexOf(
-            item.state.parent
-        );
-
+        const index = getIndex(getParent(item));
         return Math.max(max, index);
     }, Number.MIN_VALUE);
 
@@ -48,22 +51,16 @@ function offsetItems(
     /* Clamp Voice Offset  */
 
     const minVoiceIndex = items.reduce((min, item) => {
-        const index =
-            item.state.parent.state.parent.state.parent.state.children.indexOf(
-                item.state.parent.state.parent
-            );
+        const index = getIndex(getGrandparent(item));
         return Math.min(min, index);
     }, Number.MAX_VALUE);
 
     const maxVoiceIndex = items.reduce((max, item) => {
-        const index =
-            item.state.parent.state.parent.state.parent.state.children.indexOf(
-                item.state.parent.state.parent
-            );
+        const index = getIndex(getGrandparent(item));
         return Math.max(max, index);
     }, Number.MIN_VALUE);
 
-    const voiceCount = section.state.children.length;
+    const voiceCount = getChildren(section).length;
 
     voiceOffset = clamp(
         voiceOffset,
@@ -77,24 +74,20 @@ function offsetItems(
         const newStart = item.state.start + beatOffset;
         const newEnd = newStart + item.state.end - item.state.start;
 
-        const track = item.state.parent;
-        const voice = track.state.parent;
-        const section = voice.state.parent;
-
-        const trackIndex = voice.state.children.indexOf(track);
-        const voiceIndex = section.state.children.indexOf(voice);
+        const trackIndex = getIndex(getParent(item));
+        const voiceIndex = getIndex(getGrandparent(item));
 
         const newTrackIndex = trackIndex + trackOffset;
         const newVoiceIndex = voiceIndex + voiceOffset;
 
-        const newTrack =
-            section.state.children[newVoiceIndex].state.children[newTrackIndex];
+        const newTrack = getChildren(
+            getChildren(getGreatGrandparent(item))[newVoiceIndex]
+        )[newTrackIndex];
 
         item.state = {
             parent: newTrack,
             start: newStart,
             end: newEnd,
-            content: item.state.content,
         };
     });
 }

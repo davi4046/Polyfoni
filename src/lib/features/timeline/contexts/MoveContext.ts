@@ -1,3 +1,5 @@
+import { getChildren, getParent } from "../../../shared/state/state_utils";
+
 import type Item from "../models/item/Item";
 
 class MoveContext {
@@ -7,8 +9,8 @@ class MoveContext {
         const oldGhostItems = this._ghostPairs.map((pair) => pair[1]);
         const newGhostItems = newGhostPairs.map((pair) => pair[1]);
 
-        const oldTracks = oldGhostItems.map((item) => item.state.parent);
-        const newTracks = newGhostItems.map((item) => item.state.parent);
+        const oldTracks = oldGhostItems.map((item) => getParent(item));
+        const newTracks = newGhostItems.map((item) => getParent(item));
 
         const tracks = Array.from(new Set([...oldTracks, ...newTracks]));
 
@@ -33,12 +35,12 @@ class MoveContext {
             pair[0].state = pair[1].state;
 
             oldTrack.state = {
-                children: oldTrack.state.children.filter(
+                children: getChildren(oldTrack).filter(
                     (item) => item !== pair[0]
                 ),
             };
             newTrack.state = {
-                children: [pair[0], ...newTrack.state.children],
+                children: [pair[0], ...getChildren(newTrack)],
             };
         });
         this.ghostPairs = [];
