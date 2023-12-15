@@ -1,4 +1,4 @@
-import createWithDefaults from '../../../../shared/utils/create_with_defaults/createWithDefaults';
+import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type ItemVM from "../item/ItemVM";
 

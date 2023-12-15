@@ -16,7 +16,7 @@
     data-model-id={itemVM.modelId}
 >
     <div
-        class="flex items-center h-full p-2 font-semibold text-black border-2 border-black outline outline-4"
+        class="flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
         style="
         background-color: {itemVM.state.backgroundColor.css()}; 
         outline-color: {itemVM.state.outlineColor.css()}; 

@@ -36,7 +36,7 @@
 </script>
 
 <div
-    class="h-full grid grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
+    class="grid h-full grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
     on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
     on:mouseup={(event) => timelineVM.state.handleMouseUp(event)}
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
@@ -47,7 +47,7 @@
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
     <!-- MARKERS -->
-    <div class="h-6 col-start-2 row-start-1 overflow-hidden h-scroll">
+    <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
@@ -66,7 +66,7 @@
     </div>
     <!-- TOP HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-2 overflow-hidden"
+        class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
         {#each timelineVM.state.top as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -78,7 +78,7 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-3 overflow-hidden v-scroll"
+        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
         {#each timelineVM.state.center as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -90,7 +90,7 @@
     </div>
     <!-- BOTTOM HEADERS -->
     <div
-        class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] col-start-1 row-start-4 overflow-hidden"
+        class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
         {#each timelineVM.state.bottom as trackVMGroup}
             <div class="space-y-[var(--timeline-track-spacing)]">
@@ -102,11 +102,11 @@
     </div>
     <!-- TOP TRACKS -->
     <div
-        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
         data-type="top"
     >
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-clip"
+            class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
         >
             {#each timelineVM.state.top as trackVMGroup}
@@ -122,11 +122,11 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
         data-type="center"
     >
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden v-scroll"
+            class="v-scroll flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.state.center as trackVMGroup}
@@ -142,11 +142,11 @@
     </div>
     <!-- BOTTOM TRACKS -->
     <div
-        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
         data-type="bottom"
     >
         <div
-            class="flex flex-col h-full space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+            class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.state.bottom as trackVMGroup}
@@ -162,7 +162,7 @@
     </div>
     <!-- SEPARATORS -->
     <div
-        class="col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
+        class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
     >
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}

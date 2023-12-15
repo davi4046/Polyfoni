@@ -1,6 +1,6 @@
-import chroma from 'chroma-js';
+import chroma from "chroma-js";
 
-import createWithDefaults from '../../../../shared/utils/create_with_defaults/createWithDefaults';
+import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 interface ItemVMState {
     readonly start: number;

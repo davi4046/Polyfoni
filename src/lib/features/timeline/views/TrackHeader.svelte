@@ -7,7 +7,7 @@
 </script>
 
 <div
-    class="flex items-center w-full h-[var(--timeline-track-height)] p-2 whitespace-nowrap"
+    class="flex h-[var(--timeline-track-height)] w-full items-center whitespace-nowrap p-2"
     data-type="header"
     data-model-id={trackVM.modelId}
 >
