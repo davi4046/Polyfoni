@@ -22,6 +22,16 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
             event.stopPropagation();
         };
 
+        const handleMouseDown_L = (event: MouseEvent) => {
+            console.log("left handle clicked");
+            event.stopPropagation();
+        };
+
+        const handleMouseDown_R = (event: MouseEvent) => {
+            console.log("right handle clicked");
+            event.stopPropagation();
+        };
+
         return createItemVMState({
             start: model.state.start,
             end: model.state.end,
@@ -30,6 +40,8 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),
             handleMouseDown: handleMouseDown,
+            handleMouseDown_L: handleMouseDown_L,
+            handleMouseDown_R: handleMouseDown_R,
         });
     };
 
