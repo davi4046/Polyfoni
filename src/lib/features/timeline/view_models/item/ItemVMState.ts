@@ -10,6 +10,7 @@ interface ItemVMState {
     readonly outlineColor?: chroma.Color;
     readonly opacity?: number;
     readonly handleMouseDown?: (event: MouseEvent) => void;
+    readonly handleMount?: () => void;
 }
 
 const defaults = {
@@ -17,6 +18,7 @@ const defaults = {
     outlineColor: chroma.rgb(0, 0, 0, 0),
     opacity: 1,
     handleMouseDown: () => {},
+    handleMount: () => {},
 };
 
 function createItemVMState(options: ItemVMState) {
