@@ -1,14 +1,12 @@
-import {
-    addChildren,
-    getParent,
-    removeChildren,
-} from "../../../../../shared/state/state_utils";
+import { getParent } from "../../../../../shared/state/state_utils";
+import clamp from "../../../../../shared/utils/math_utils/clamp/clamp";
 import clearTrackInterval from "../../../utils/clear_track_interval/clearTrackInterval";
 import TimelineDrag from "../TimelineDrag";
 
 import type TimelineContext from "../../../contexts/TimelineContext";
 import type Item from "../../../models/item/Item";
 import type Track from "../../../models/track/Track";
+
 enum HandleType {
     StartHandle,
     EndHandle,
@@ -32,7 +30,7 @@ class ItemHandleDrag extends TimelineDrag {
     ): void {
         if (this._handleType === HandleType.StartHandle) {
             this._item.state = {
-                start: Math.min(toBeat, this._item.state.end - 1),
+                start: clamp(toBeat, 0, this._item.state.end - 1),
             };
         } else {
             this._item.state = {
