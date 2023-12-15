@@ -28,13 +28,13 @@
         role="none"
     >
         <div class="truncate">{itemVM.state.text}</div>
-        <!-- Handle (Left)-->
+        <!-- Left handle-->
         <div
             class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-purple-400"
             on:mousedown={(event) => itemVM.state.handleMouseDown_L(event)}
             role="none"
         />
-        <!-- Handle (Right) -->
+        <!-- Right handle -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
             on:mousedown={(event) => itemVM.state.handleMouseDown_R(event)}
