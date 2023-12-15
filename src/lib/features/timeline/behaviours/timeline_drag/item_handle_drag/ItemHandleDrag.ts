@@ -47,8 +47,6 @@ class ItemHandleDrag extends TimelineDrag {
             [this._item]
         );
     }
-
-    protected handleReset(): void {}
 }
 
 export default ItemHandleDrag;

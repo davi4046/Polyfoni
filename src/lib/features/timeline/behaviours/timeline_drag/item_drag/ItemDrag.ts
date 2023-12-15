@@ -12,6 +12,11 @@ class ItemDrag extends TimelineDrag {
         fromTrack: Track,
         toTrack: Track
     ) {
+        if (fromBeat === toBeat && fromTrack === toTrack) {
+            this.context.move.ghostPairs = [];
+            return;
+        }
+
         const ghostPairs = this.context.selection.selectedItems.map((item) => {
             return [item, new Item(() => item.state)] as [
                 legit: Item,
@@ -38,10 +43,6 @@ class ItemDrag extends TimelineDrag {
 
     protected handleDrop() {
         this.context.move.placeGhostItems();
-    }
-
-    protected handleReset() {
-        this.context.move.ghostPairs = [];
     }
 }
 
