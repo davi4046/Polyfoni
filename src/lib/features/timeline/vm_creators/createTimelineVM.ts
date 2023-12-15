@@ -1,3 +1,4 @@
+import HighlightDrag from "../behaviours/timeline_drag/highlight_drag/HighlightDrag";
 import TimelineContext from "../contexts/TimelineContext";
 import Timeline from "../models/timeline/Timeline";
 import TimelineVM from "../view_models/timeline/TimelineVM";
@@ -8,6 +9,8 @@ function createTimelineVM(
     model: Timeline,
     context: TimelineContext
 ): TimelineVM {
+    const highlightDrag = new HighlightDrag(context);
+
     const update = (model: Timeline) => {
         const top = model.state.children[0].state.children.map((voice) => {
             return voice.state.children.map((track) => {
@@ -28,6 +31,7 @@ function createTimelineVM(
         });
 
         const handleMouseDown = (event: MouseEvent) => {
+            context.cursor.reportMouseDown(highlightDrag);
             if (event.shiftKey) return;
             context.selection.deselectAll();
         };
