@@ -1,7 +1,7 @@
 import TrackVM from "../view_models/track/TrackVM";
 import { createTrackVMState } from "../view_models/track/TrackVMState";
-import createGhostVM from "./createGhostVM";
 import createItemVM from "./createItemVM";
+import createItemVM_ghost from "./createItemVM_ghost";
 
 import type TimelineContext from "../contexts/TimelineContext";
 import type Track from "../models/track/Track";
@@ -14,7 +14,7 @@ function createTrackVM(model: Track, context: TimelineContext): TrackVM {
 
         const ghostItems = context.move.ghostItems
             .filter((item) => item.state.parent === model)
-            .map((item) => createGhostVM(item, context));
+            .map((item) => createItemVM_ghost(item, context));
 
         return createTrackVMState({
             label: model.state.label,
