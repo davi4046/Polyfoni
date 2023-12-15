@@ -9,7 +9,12 @@ import Item from "../../models/item/Item";
 
 import type Track from "../../models/track/Track";
 
-function clearTrackInterval(track: Track, start: number, end: number) {
+function clearTrackInterval(
+    track: Track,
+    start: number,
+    end: number,
+    itemsToIgnore: Item[] = []
+) {
     const items = getChildren(track);
 
     const intervals = items.map((item) => {
@@ -23,6 +28,9 @@ function clearTrackInterval(track: Track, start: number, end: number) {
 
     for (const interval of intervals) {
         const item = interval.data!;
+
+        if (itemsToIgnore.includes(item)) continue;
+
         if (alreadyUpdated.includes(item)) {
             // Item has appeared as interval data before, meaning its interval has been split.
             // We therefore make a new item for the split part.
@@ -42,7 +50,9 @@ function clearTrackInterval(track: Track, start: number, end: number) {
     }
 
     for (const item of items) {
-        if (alreadyUpdated.includes(item)) continue;
+        if (alreadyUpdated.includes(item) || itemsToIgnore.includes(item)) {
+            continue;
+        }
         // The item's interval has been removed. We therefore remove the item.
         removeChildren(track, item);
     }
