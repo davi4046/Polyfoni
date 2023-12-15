@@ -16,7 +16,7 @@
     data-model-id={itemVM.modelId}
 >
     <div
-        class="flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
+        class="relative flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
         style="
         background-color: {itemVM.state.backgroundColor.css()}; 
         outline-color: {itemVM.state.outlineColor.css()}; 
@@ -28,5 +28,17 @@
         role="none"
     >
         <div class="truncate">{itemVM.state.text}</div>
+        <!-- Handle (Left)-->
+        <div
+            class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-purple-400"
+            on:mousedown={(event) => itemVM.state.handleMouseDown_L(event)}
+            role="none"
+        />
+        <!-- Handle (Right) -->
+        <div
+            class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
+            on:mousedown={(event) => itemVM.state.handleMouseDown_R(event)}
+            role="none"
+        />
     </div>
 </div>
