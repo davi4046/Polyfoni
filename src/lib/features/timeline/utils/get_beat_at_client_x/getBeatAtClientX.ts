@@ -9,7 +9,7 @@ function getBeatAtClientX(timeline: Timeline, clientX: number): number {
         "[data-type='center']"
     ) as HTMLElement;
 
-    return clientX / 64 - centerElement.offsetLeft + centerElement.scrollLeft;
+    return (clientX - centerElement.offsetLeft + centerElement.scrollLeft) / 64;
 }
 
 export default getBeatAtClientX;
