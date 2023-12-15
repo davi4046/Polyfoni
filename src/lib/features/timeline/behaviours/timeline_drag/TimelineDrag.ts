@@ -53,12 +53,11 @@ abstract class TimelineDrag implements DragBehaviour {
         this._prevFromTrack = fromTrack;
         this._prevToTrack = toTrack;
 
+        this.handleDrag(fromBeat, toBeat, fromTrack, toTrack);
+
         if (fromBeat === toBeat && fromTrack === toTrack) {
             this.handleReset();
-            return;
         }
-
-        this.handleDrag(fromBeat, toBeat, fromTrack, toTrack);
     };
 
     readonly drop = () => this.handleDrop();
