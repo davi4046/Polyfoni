@@ -1,6 +1,10 @@
 import { clamp } from "lodash";
 
-import { getParent } from "../../../shared/state/state_utils";
+import {
+    addChildren,
+    getParent,
+    removeChildren,
+} from "../../../shared/state/state_utils";
 import clearTrackInterval from "../utils/clear_track_interval/clearTrackInterval";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 

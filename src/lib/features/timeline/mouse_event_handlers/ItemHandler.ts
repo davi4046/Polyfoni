@@ -9,10 +9,18 @@ import type TimelineContext from "../contexts/TimelineContext";
 class ItemHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
-        item: Item
+        readonly item: Item
     ) {}
 
-    handleMouseDown(downEvent: MouseEvent) {}
+    handleMouseDown(downEvent: MouseEvent) {
+        if (downEvent.shiftKey) {
+            this.context.selection.toggleSelected(this.item);
+        } else {
+            this.context.selection.deselectAll();
+            this.context.selection.selectItem(this.item);
+        }
+        downEvent.stopPropagation();
+    }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
         if (!downEvent) return;

@@ -22,30 +22,16 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
 
     const update = (model: Item) => {
         const handleMouseMove = (event: MouseEvent) => {
-            if (event.shiftKey) {
-                context.selection.toggleSelected(model);
-            } else {
-                context.selection.deselectAll();
-                context.selection.selectItem(model);
-            }
             mouseEventListener.handler = itemHandler;
             event.stopPropagation();
         };
 
         const handleMouseMove_startHandle = (event: MouseEvent) => {
-            // Render on top of other items
-            removeChildren(getParent(model), model);
-            addChildren(getParent(model), model);
-
             mouseEventListener.handler = startHandleHandler;
             event.stopPropagation();
         };
 
         const handleMouseMove_endHandle = (event: MouseEvent) => {
-            // Render on top of other items
-            removeChildren(getParent(model), model);
-            addChildren(getParent(model), model);
-
             mouseEventListener.handler = endHandleHandler;
             event.stopPropagation();
         };
