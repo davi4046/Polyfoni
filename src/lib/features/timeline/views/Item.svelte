@@ -28,14 +28,14 @@
         role="none"
     >
         <div class="truncate">{itemVM.state.text}</div>
-        <!-- Left handle-->
+        <!-- start handle-->
         <div
             class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-purple-400"
             on:mousemove={(event) =>
                 itemVM.state.handleMouseMove_startHandle(event)}
             role="none"
         />
-        <!-- Right handle -->
+        <!-- end handle -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
             on:mousemove={(event) =>
