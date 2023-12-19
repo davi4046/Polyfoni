@@ -9,7 +9,6 @@ class TimelineContext {
         readonly timeline: Timeline,
         readonly highlight: HighlightContext,
         readonly selection: SelectionContext,
-        readonly cursor: CursorContext,
         readonly move: MoveContext
     ) {}
 }

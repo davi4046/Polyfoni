@@ -9,18 +9,18 @@ interface ItemVMState {
     readonly backgroundColor?: chroma.Color;
     readonly outlineColor?: chroma.Color;
     readonly opacity?: number;
-    readonly handleMouseDown?: (event: MouseEvent) => void;
-    readonly handleMouseDown_L?: (event: MouseEvent) => void;
-    readonly handleMouseDown_R?: (event: MouseEvent) => void;
+    readonly handleMouseMove?: (event: MouseEvent) => void;
+    readonly handleMouseMove_startHandle?: (event: MouseEvent) => void;
+    readonly handleMouseMove_endHandle?: (event: MouseEvent) => void;
 }
 
 const defaults = {
     backgroundColor: chroma.hcl(0, 0, 80),
     outlineColor: chroma.rgb(0, 0, 0, 0),
     opacity: 1,
-    handleMouseDown: () => {},
-    handleMouseDown_L: () => {},
-    handleMouseDown_R: () => {},
+    handleMouseMove: () => {},
+    handleMouseMove_startHandle: () => {},
+    handleMouseMove_endHandle: () => {},
 };
 
 function createItemVMState(options: ItemVMState) {

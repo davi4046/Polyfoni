@@ -22,8 +22,8 @@
         outline-color: {itemVM.state.outlineColor.css()}; 
         opacity: {itemVM.state.opacity};
         "
-        on:mousedown={(event) => {
-            itemVM.state.handleMouseDown(event);
+        on:mousemove={(event) => {
+            itemVM.state.handleMouseMove(event);
         }}
         role="none"
     >
@@ -31,13 +31,15 @@
         <!-- Left handle-->
         <div
             class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-purple-400"
-            on:mousedown={(event) => itemVM.state.handleMouseDown_L(event)}
+            on:mousemove={(event) =>
+                itemVM.state.handleMouseMove_startHandle(event)}
             role="none"
         />
         <!-- Right handle -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
-            on:mousedown={(event) => itemVM.state.handleMouseDown_R(event)}
+            on:mousemove={(event) =>
+                itemVM.state.handleMouseMove_endHandle(event)}
             role="none"
         />
     </div>

@@ -1,49 +1,52 @@
 import chroma from "chroma-js";
 
+import mouseEventListener from "../../../shared/mouse_event_listener/MouseEventListener";
 import {
     addChildren,
     getParent,
     removeChildren,
 } from "../../../shared/state/state_utils";
-import ItemDrag from "../behaviours/timeline_drag/item_drag/ItemDrag";
-import ItemHandleDrag from "../behaviours/timeline_drag/item_handle_drag/ItemHandleDrag";
+import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
+import ItemHandler from "../mouse_event_handlers/ItemHandler";
+import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
+
 function createItemVM(model: Item, context: TimelineContext): ItemVM {
-    const dragBehaviour = new ItemDrag(context);
-    const leftHandleDrag = new ItemHandleDrag(context, model, 0);
-    const rightHandleDrag = new ItemHandleDrag(context, model, 1);
+    const itemHandler = new ItemHandler(context);
+    const startHandleHandler = new StartHandleHandler(context, model);
+    const endHandleHandler = new EndHandleHandler(context, model);
 
     const update = (model: Item) => {
-        const handleMouseDown = (event: MouseEvent) => {
+        const handleMouseMove = (event: MouseEvent) => {
             if (event.shiftKey) {
                 context.selection.toggleSelected(model);
             } else {
                 context.selection.deselectAll();
                 context.selection.selectItem(model);
             }
-            context.cursor.reportMouseDown(dragBehaviour);
+            mouseEventListener.handler = itemHandler;
             event.stopPropagation();
         };
 
-        const handleMouseDown_L = (event: MouseEvent) => {
+        const handleMouseMove_startHandle = (event: MouseEvent) => {
             // Render on top of other items
             removeChildren(getParent(model), model);
             addChildren(getParent(model), model);
 
-            context.cursor.reportMouseDown(leftHandleDrag);
+            mouseEventListener.handler = startHandleHandler;
             event.stopPropagation();
         };
 
-        const handleMouseDown_R = (event: MouseEvent) => {
+        const handleMouseMove_endHandle = (event: MouseEvent) => {
             // Render on top of other items
             removeChildren(getParent(model), model);
             addChildren(getParent(model), model);
 
-            context.cursor.reportMouseDown(rightHandleDrag);
+            mouseEventListener.handler = endHandleHandler;
             event.stopPropagation();
         };
 
@@ -54,9 +57,9 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
             ...(context.selection.isSelected(model)
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),
-            handleMouseDown: handleMouseDown,
-            handleMouseDown_L: handleMouseDown_L,
-            handleMouseDown_R: handleMouseDown_R,
+            handleMouseMove: handleMouseMove,
+            handleMouseMove_startHandle: handleMouseMove_startHandle,
+            handleMouseMove_endHandle: handleMouseMove_endHandle,
         });
     };
 

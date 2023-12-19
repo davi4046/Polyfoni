@@ -13,14 +13,12 @@
 
     const highlightCtx = new HighlightContext();
     const selectionCtx = new SelectionContext();
-    const cursorCtx = new CursorContext();
     const moveCtx = new MoveContext();
 
     const timelineCtx = new TimelineContext(
         timeline,
         highlightCtx,
         selectionCtx,
-        cursorCtx,
         moveCtx
     );
 
