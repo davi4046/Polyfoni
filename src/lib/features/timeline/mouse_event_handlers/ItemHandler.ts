@@ -28,7 +28,6 @@ class ItemHandler implements MouseEventHandler {
         const hoveredBeat = Math.round(
             getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
-
         const clickedBeat = Math.round(
             getBeatAtClientX(this.context.timeline, downEvent.clientX)
         );
@@ -36,8 +35,7 @@ class ItemHandler implements MouseEventHandler {
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
             moveEvent.clientY
-        ); // TODO: should round up when dragging down and round down when dragging up
-
+        );
         const clickedTrack = findClosestTrack(
             this.context.timeline,
             downEvent.clientY
