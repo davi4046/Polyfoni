@@ -29,7 +29,6 @@ class MouseEventListener {
         document.addEventListener(
             "mousemove",
             (event) => {
-                console.log("mouse move");
                 this._handler?.handleMouseMove(event, this._downEvent);
             },
             true //listen for event in capture phase
