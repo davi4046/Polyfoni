@@ -37,8 +37,6 @@
 
 <div
     class="grid h-full grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
-    on:mousedown={(event) => timelineVM.state.handleMouseDown(event)}
-    on:mouseup={(event) => timelineVM.state.handleMouseUp(event)}
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
     data-type="timeline"
