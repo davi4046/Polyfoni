@@ -1,9 +1,9 @@
 class MouseEventListener {
     private _handler?: MouseEventHandler;
-    private _clickedPoint?: Point;
+    private _downEvent?: MouseEvent;
 
     set handler(newHandler: MouseEventHandler) {
-        if (this._clickedPoint) return; //avoid handler updating when dragging
+        if (this._downEvent) return; //avoid handler updating when dragging
         this._handler = newHandler;
     }
 
@@ -11,8 +11,8 @@ class MouseEventListener {
         document.addEventListener(
             "mousedown",
             (event) => {
-                this._clickedPoint = { x: event.clientX, y: event.clientY };
-                this._handler?.handleMouseDown(this._clickedPoint);
+                this._downEvent = event;
+                this._handler?.handleMouseDown(event);
             },
             true //listen for event in capture phase
         );
@@ -20,11 +20,8 @@ class MouseEventListener {
         document.addEventListener(
             "mouseup",
             (event) => {
-                this._handler?.handleMouseUp(
-                    { x: event.clientX, y: event.clientY },
-                    this._clickedPoint!
-                );
-                this._clickedPoint = undefined;
+                this._handler?.handleMouseUp(event, this._downEvent!);
+                this._downEvent = undefined;
             },
             true //listen for event in capture phase
         );
@@ -33,10 +30,7 @@ class MouseEventListener {
             "mousemove",
             (event) => {
                 console.log("mouse move");
-                this._handler?.handleMouseMove(
-                    { x: event.clientX, y: event.clientY },
-                    this._clickedPoint
-                );
+                this._handler?.handleMouseMove(event, this._downEvent);
             },
             true //listen for event in capture phase
         );

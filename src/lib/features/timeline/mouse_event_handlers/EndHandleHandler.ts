@@ -5,19 +5,19 @@ import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 
-class EndHandleDrag implements MouseEventHandler {
+class EndHandleHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item
     ) {}
 
-    handleMouseDown(clickedPoint: Point) {}
+    handleMouseDown(downEvent: MouseEvent) {}
 
-    handleMouseMove(hoveredPoint: Point, clickedPoint?: Point) {
-        if (!clickedPoint) return;
+    handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+        if (!downEvent) return;
 
         const hoveredBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, hoveredPoint.x)
+            getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
 
         this.item.state = {
@@ -25,7 +25,7 @@ class EndHandleDrag implements MouseEventHandler {
         };
     }
 
-    handleMouseUp(hoveredPoint: Point, clickedPoint: Point) {
+    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
         clearTrackInterval(
             getParent(this.item),
             this.item.state.start,
@@ -35,4 +35,4 @@ class EndHandleDrag implements MouseEventHandler {
     }
 }
 
-export default EndHandleDrag;
+export default EndHandleHandler;

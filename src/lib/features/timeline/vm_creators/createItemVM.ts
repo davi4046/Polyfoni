@@ -16,7 +16,7 @@ import type TimelineContext from "../contexts/TimelineContext";
 import type Item from "../models/item/Item";
 
 function createItemVM(model: Item, context: TimelineContext): ItemVM {
-    const itemHandler = new ItemHandler(context);
+    const itemHandler = new ItemHandler(context, model);
     const startHandleHandler = new StartHandleHandler(context, model);
     const endHandleHandler = new EndHandleHandler(context, model);
 

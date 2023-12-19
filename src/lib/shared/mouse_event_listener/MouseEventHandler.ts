@@ -1,5 +1,5 @@
 interface MouseEventHandler {
-    handleMouseDown: (clickedPoint: Point) => void;
-    handleMouseMove: (hoveredPoint: Point, clickedPoint?: Point) => void;
-    handleMouseUp: (hoveredPoint: Point, clickedPoint: Point) => void;
+    handleMouseDown: (downEvent: MouseEvent) => void;
+    handleMouseMove: (moveEvent: MouseEvent, downEvent?: MouseEvent) => void;
+    handleMouseUp: (upEvent: MouseEvent, downEvent: MouseEvent) => void;
 }

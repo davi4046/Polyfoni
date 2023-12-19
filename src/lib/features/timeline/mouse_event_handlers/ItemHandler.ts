@@ -7,29 +7,32 @@ import offsetItems from "../utils/offset_items/offsetItems";
 import type TimelineContext from "../contexts/TimelineContext";
 
 class ItemHandler implements MouseEventHandler {
-    constructor(readonly context: TimelineContext) {}
+    constructor(
+        readonly context: TimelineContext,
+        item: Item
+    ) {}
 
-    handleMouseDown(clickedPoint: Point) {}
+    handleMouseDown(downEvent: MouseEvent) {}
 
-    handleMouseMove(hoveredPoint: Point, clickedPoint?: Point) {
-        if (!clickedPoint) return;
+    handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+        if (!downEvent) return;
 
         const hoveredBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, hoveredPoint.x)
+            getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
 
         const clickedBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, clickedPoint.x)
+            getBeatAtClientX(this.context.timeline, downEvent.clientX)
         );
 
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
-            hoveredPoint.y
+            moveEvent.clientY
         ); // TODO: should round up when dragging down and round down when dragging up
 
         const clickedTrack = findClosestTrack(
             this.context.timeline,
-            clickedPoint.y
+            downEvent.clientY
         );
 
         if (
@@ -66,7 +69,7 @@ class ItemHandler implements MouseEventHandler {
         this.context.move.ghostPairs = ghostPairs;
     }
 
-    handleMouseUp(hoveredPoint: Point, clickedPoint: Point) {
+    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
         this.context.move.placeGhostItems();
     }
 }

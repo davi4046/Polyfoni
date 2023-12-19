@@ -13,14 +13,13 @@ class StartHandleHandler implements MouseEventHandler {
         readonly item: Item
     ) {}
 
-    handleMouseDown(clickedPoint: Point) {}
+    handleMouseDown(downEvent: MouseEvent) {}
 
-    handleMouseMove(hoveredPoint: Point, clickedPoint?: Point) {
-        console.log("start handle!");
-        if (!clickedPoint) return;
+    handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+        if (!downEvent) return;
 
         const hoveredBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, hoveredPoint.x)
+            getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
 
         this.item.state = {
@@ -28,7 +27,7 @@ class StartHandleHandler implements MouseEventHandler {
         };
     }
 
-    handleMouseUp(hoveredPoint: Point, clickedPoint: Point) {
+    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
         clearTrackInterval(
             getParent(this.item),
             this.item.state.start,
