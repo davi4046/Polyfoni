@@ -1,4 +1,5 @@
 import type Model from "../model/Model";
+import type { GetState } from "../state/state_utils";
 import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 

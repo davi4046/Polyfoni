@@ -2,6 +2,8 @@ import IdProvider from "../id_provider/IdProvider";
 import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
+import type { GetState, SetState } from "../state/state_utils";
+
 class Model<TState extends object>
     implements GetState<TState>, SetState<TState>
 {

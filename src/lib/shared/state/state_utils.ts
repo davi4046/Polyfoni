@@ -2,6 +2,14 @@ import type ChildState from "./ChildState";
 import type ParentChildState from "./ParentChildState";
 import type ParentState from "./ParentState";
 
+interface GetState<TState> {
+    get state(): TState;
+}
+
+interface SetState<TState> {
+    set state(newState: Partial<TState>);
+}
+
 type HasParent<TParent> = ChildState<TParent> | ParentChildState<TParent, any>;
 
 type HasChildren<TChild> = ParentState<TChild> | ParentChildState<any, TChild>;
@@ -57,6 +65,8 @@ function removeChildren<T>(
 }
 
 export {
+    type GetState,
+    type SetState,
     getParent,
     getGrandparent,
     getGreatGrandparent,
