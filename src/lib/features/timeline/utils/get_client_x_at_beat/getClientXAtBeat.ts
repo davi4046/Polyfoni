@@ -1,12 +1,14 @@
-import findElementByModelId from "../../../../shared/utils/find_element_by_model_id/findElementByModelId";
+import Attribute from "../../../../shared/utils/AttributeEnum";
 
 import type Timeline from "../../models/timeline/Timeline";
 
 function getClientXAtBeat(timeline: Timeline, beat: number): number {
-    const timelineElement = findElementByModelId(timeline.id)!;
+    const timelineElement = document.querySelector(
+        `[${Attribute.ModelId}='${timeline.id}']`
+    )!;
 
     const centerElement = timelineElement.querySelector(
-        "[data-type='center']"
+        `[${Attribute.Type}='center']`
     ) as HTMLElement;
 
     return beat * 64 + centerElement.offsetLeft - centerElement.scrollLeft;
