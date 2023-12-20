@@ -5,7 +5,7 @@
     import SelectionContext from "./lib/features/timeline/contexts/SelectionContext";
     import HighlightManager from "./lib/features/timeline/contexts/highlight_manager/HighlightManager";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
-    import MoveManager from "./lib/features/timeline/contexts/MoveManager";
+    import MoveManager from "./lib/features/timeline/contexts/move_manager/MoveManager";
     import ShortcutManager from "./lib/shared/shortcut_manager/ShortcutManager";
 
     const timeline = makeDemoTimeline();

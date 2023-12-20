@@ -2,10 +2,10 @@ import {
     addChildren,
     getParent,
     removeChildren,
-} from "../../../shared/state/state_utils";
-import clearTrackInterval from "../utils/clear_track_interval/clearTrackInterval";
+} from "../../../../shared/state/state_utils";
+import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
 
-import type Item from "../models/item/Item";
+import type Item from "../../models/item/Item";
 
 class MoveManager {
     private _ghostPairs: readonly [legit: Item, ghost: Item][] = [];

@@ -1,6 +1,6 @@
 import type Timeline from "../models/timeline/Timeline";
 import type HighlightManager from "./highlight_manager/HighlightManager";
-import type MoveManager from "./MoveManager";
+import type MoveManager from "./move_manager/MoveManager";
 import type SelectionContext from "./SelectionContext";
 
 class TimelineContext {
