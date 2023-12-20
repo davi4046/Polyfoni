@@ -1,6 +1,6 @@
 import type Highlight from "./utils/Highlight";
 
-class HighlightContext {
+class HighlightManager {
     private _highlights: Highlight[] = [];
 
     set highlights(newHighlights: Highlight[]) {
@@ -21,4 +21,4 @@ class HighlightContext {
     }
 }
 
-export default HighlightContext;
+export default HighlightManager;
