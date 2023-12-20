@@ -1,6 +1,4 @@
-import type Track from "../../models/track/Track";
-
-type Highlight = { track: Track; start: number; end: number };
+import type Highlight from "./utils/Highlight";
 
 class HighlightContext {
     private _highlights: Highlight[] = [];
