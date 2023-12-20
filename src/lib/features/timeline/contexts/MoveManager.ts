@@ -7,7 +7,7 @@ import clearTrackInterval from "../utils/clear_track_interval/clearTrackInterval
 
 import type Item from "../models/item/Item";
 
-class MoveContext {
+class MoveManager {
     private _ghostPairs: readonly [legit: Item, ghost: Item][] = [];
 
     set ghostPairs(newGhostPairs: readonly [legit: Item, ghost: Item][]) {
@@ -52,4 +52,4 @@ class MoveContext {
     };
 }
 
-export default MoveContext;
+export default MoveManager;

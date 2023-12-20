@@ -5,14 +5,14 @@
     import SelectionContext from "./lib/features/timeline/contexts/SelectionContext";
     import HighlightManager from "./lib/features/timeline/contexts/highlight_manager/HighlightManager";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
-    import MoveContext from "./lib/features/timeline/contexts/MoveContext";
+    import MoveManager from "./lib/features/timeline/contexts/MoveManager";
     import ShortcutManager from "./lib/shared/shortcut_manager/ShortcutManager";
 
     const timeline = makeDemoTimeline();
 
     const highlightCtx = new HighlightManager();
     const selectionCtx = new SelectionContext();
-    const moveCtx = new MoveContext();
+    const moveCtx = new MoveManager();
 
     const timelineCtx = new TimelineContext(
         timeline,
