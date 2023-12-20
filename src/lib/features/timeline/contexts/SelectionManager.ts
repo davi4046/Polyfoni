@@ -2,7 +2,7 @@ import { getParent, removeChildren } from "../../../shared/state/state_utils";
 
 import type Item from "../models/item/Item";
 
-class SelectionContext {
+class SelectionManager {
     private _selectedItems: Item[] = [];
 
     get selectedItems() {
@@ -45,4 +45,4 @@ class SelectionContext {
     };
 }
 
-export default SelectionContext;
+export default SelectionManager;
