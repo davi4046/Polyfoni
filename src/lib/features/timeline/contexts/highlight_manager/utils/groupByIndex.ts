@@ -1,5 +1,6 @@
 import { getIndex } from "../../../../../shared/state/state_utils";
-import Highlight from "./Highlight";
+
+import type Highlight from "./Highlight";
 
 function groupByIndex(highlights: Highlight[]): Highlight[][] {
     const groups: Highlight[][] = [];
