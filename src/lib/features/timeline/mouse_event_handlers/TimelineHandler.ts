@@ -8,7 +8,7 @@ class TimelineHandler implements MouseEventHandler {
 
     handleMouseDown(downEvent: MouseEvent) {
         if (downEvent.shiftKey) return;
-        this.context.selection.deselectAll();
+        this.context.selectionManager.deselectAll();
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
@@ -38,7 +38,7 @@ class TimelineHandler implements MouseEventHandler {
             return;
         }
 
-        this.context.highlight.highlights = getTracksInRange(
+        this.context.highlightManager.highlights = getTracksInRange(
             clickedTrack,
             hoveredTrack
         ).map((track) => {

@@ -6,9 +6,9 @@ import type SelectionManager from "./selection_manager/SelectionManager";
 class TimelineContext {
     constructor(
         readonly timeline: Timeline,
-        readonly highlight: HighlightManager,
-        readonly selection: SelectionManager,
-        readonly move: MoveManager
+        readonly highlightManager: HighlightManager,
+        readonly selectionManager: SelectionManager,
+        readonly moveManager: MoveManager
     ) {}
 }
 

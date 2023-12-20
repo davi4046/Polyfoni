@@ -35,7 +35,7 @@ function createItemVM(model: Item, context: TimelineContext): ItemVM {
             start: model.state.start,
             end: model.state.end,
             text: model.state.content,
-            ...(context.selection.isSelected(model)
+            ...(context.selectionManager.isSelected(model)
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),
             handleMouseMove: handleMouseMove,

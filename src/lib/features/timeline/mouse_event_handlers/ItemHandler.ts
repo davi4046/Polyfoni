@@ -14,10 +14,10 @@ class ItemHandler implements MouseEventHandler {
 
     handleMouseDown(downEvent: MouseEvent) {
         if (downEvent.shiftKey) {
-            this.context.selection.toggleSelected(this.item);
+            this.context.selectionManager.toggleSelected(this.item);
         } else {
-            this.context.selection.deselectAll();
-            this.context.selection.selectItem(this.item);
+            this.context.selectionManager.deselectAll();
+            this.context.selectionManager.selectItem(this.item);
         }
         downEvent.stopPropagation();
     }
@@ -46,16 +46,18 @@ class ItemHandler implements MouseEventHandler {
             !clickedTrack ||
             (hoveredBeat === clickedBeat && hoveredTrack === clickedTrack)
         ) {
-            this.context.move.ghostPairs = [];
+            this.context.moveManager.ghostPairs = [];
             return;
         }
 
-        const ghostPairs = this.context.selection.selectedItems.map((item) => {
-            return [item, new Item(() => item.state)] as [
-                legit: Item,
-                ghost: Item,
-            ];
-        });
+        const ghostPairs = this.context.selectionManager.selectedItems.map(
+            (item) => {
+                return [item, new Item(() => item.state)] as [
+                    legit: Item,
+                    ghost: Item,
+                ];
+            }
+        );
 
         const beatOffset = hoveredBeat - clickedBeat;
 
@@ -72,11 +74,11 @@ class ItemHandler implements MouseEventHandler {
             voiceOffset
         );
 
-        this.context.move.ghostPairs = ghostPairs;
+        this.context.moveManager.ghostPairs = ghostPairs;
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
-        this.context.move.placeGhostItems();
+        this.context.moveManager.placeGhostItems();
     }
 }
 
