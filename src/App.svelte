@@ -10,23 +10,23 @@
 
     const timeline = makeDemoTimeline();
 
-    const highlightCtx = new HighlightManager();
-    const selectionCtx = new SelectionManager();
-    const moveCtx = new MoveManager();
+    const highlightManager = new HighlightManager();
+    const selectionManager = new SelectionManager();
+    const moveManager = new MoveManager();
 
-    const timelineCtx = new TimelineContext(
+    const timelineContext = new TimelineContext(
         timeline,
-        highlightCtx,
-        selectionCtx,
-        moveCtx
+        highlightManager,
+        selectionManager,
+        moveManager
     );
 
-    const timelineVM = createTimelineVM(timeline, timelineCtx);
+    const timelineVM = createTimelineVM(timeline, timelineContext);
 
     const shortcutManager = new ShortcutManager();
 
     shortcutManager.register("Delete", () => {
-        selectionCtx.deleteSelection();
+        selectionManager.deleteSelection();
     });
 </script>
 
