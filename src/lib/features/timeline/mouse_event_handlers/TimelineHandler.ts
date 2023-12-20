@@ -1,4 +1,4 @@
-import findClosestTrack from "../utils/find_closest_track.ts/findClosestTrack";
+import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import getTracksInRange from "../utils/get_tracks_in_range/getTracksInRange";
 

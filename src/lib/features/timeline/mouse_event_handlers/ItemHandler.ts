@@ -1,6 +1,6 @@
 import { getIndex, getParent } from "../../../shared/state/state_utils";
 import Item from "../models/item/Item";
-import findClosestTrack from "../utils/find_closest_track.ts/findClosestTrack";
+import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import offsetItems from "../utils/offset_items/offsetItems";
 
