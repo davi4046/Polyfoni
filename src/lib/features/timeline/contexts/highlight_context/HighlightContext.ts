@@ -1,4 +1,4 @@
-import type Track from "../models/track/Track";
+import type Track from "../../models/track/Track";
 
 type Highlight = { track: Track; start: number; end: number };
 

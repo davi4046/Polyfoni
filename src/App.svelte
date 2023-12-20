@@ -3,7 +3,7 @@
     import makeDemoTimeline from "./lib/features/timeline/dev_utils/makeDemoTimeline";
     import TimelineContext from "./lib/features/timeline/contexts/TimelineContext";
     import SelectionContext from "./lib/features/timeline/contexts/SelectionContext";
-    import HighlightContext from "./lib/features/timeline/contexts/HighlightContext";
+    import HighlightContext from "./lib/features/timeline/contexts/highlight_context/HighlightContext";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
     import MoveContext from "./lib/features/timeline/contexts/MoveContext";
     import ShortcutManager from "./lib/shared/shortcut_manager/ShortcutManager";

@@ -1,6 +1,5 @@
 import type Timeline from "../models/timeline/Timeline";
-import type CursorContext from "./CursorContext";
-import type HighlightContext from "./HighlightContext";
+import type HighlightContext from "./highlight_context/HighlightContext";
 import type MoveContext from "./MoveContext";
 import type SelectionContext from "./SelectionContext";
 
