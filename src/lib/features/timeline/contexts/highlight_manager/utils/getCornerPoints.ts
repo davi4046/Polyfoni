@@ -4,7 +4,7 @@ import getClientXAtBeat from "../../../utils/get_client_x_at_beat/getClientXAtBe
 
 import type Highlight from "./Highlight";
 
-function getBox(highlight: Highlight) {
+function getCornerPoints(highlight: Highlight) {
     const x1 = getClientXAtBeat(
         getGreatGrandparent(highlight.track),
         highlight.start
@@ -21,7 +21,12 @@ function getBox(highlight: Highlight) {
     const y1 = rect.top;
     const y2 = rect.bottom;
 
-    return { x1, y1, x2, y2 };
+    return [
+        { x: x1, y: y1 },
+        { x: x1, y: y2 },
+        { x: x2, y: y1 },
+        { x: x2, y: y2 },
+    ];
 }
 
-export default getBox;
+export default getCornerPoints;
