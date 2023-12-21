@@ -3,6 +3,7 @@ import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import getTracksInRange from "../utils/get_tracks_in_range/getTracksInRange";
 
 import type TimelineContext from "../contexts/TimelineContext";
+
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
 
@@ -14,12 +15,18 @@ class TimelineHandler implements MouseEventHandler {
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
         if (!downEvent) return;
 
-        const hoveredBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, moveEvent.clientX)
+        const hoveredBeat = getBeatAtClientX(
+            this.context.timeline,
+            moveEvent.clientX
         );
-        const clickedBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, downEvent.clientX)
+
+        const clickedBeat = getBeatAtClientX(
+            this.context.timeline,
+            downEvent.clientX
         );
+
+        const minBeat = Math.floor(Math.min(hoveredBeat, clickedBeat));
+        const maxBeat = Math.ceil(Math.max(hoveredBeat, clickedBeat));
 
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
@@ -42,7 +49,7 @@ class TimelineHandler implements MouseEventHandler {
             clickedTrack,
             hoveredTrack
         ).map((track) => {
-            return { track: track, start: clickedBeat, end: hoveredBeat };
+            return { track: track, start: minBeat, end: maxBeat };
         });
     }
 
