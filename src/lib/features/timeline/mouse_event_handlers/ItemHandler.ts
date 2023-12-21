@@ -4,6 +4,7 @@ import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import offsetItems from "../utils/offset_items/offsetItems";
 
+import type MouseEventHandler from "../../../shared/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../contexts/TimelineContext";
 
 class ItemHandler implements MouseEventHandler {

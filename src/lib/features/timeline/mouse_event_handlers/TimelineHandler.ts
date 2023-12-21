@@ -1,7 +1,9 @@
+import MouseEventHandler from "../../../shared/mouse_event_listener/MouseEventHandler";
 import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import getTracksInRange from "../utils/get_tracks_in_range/getTracksInRange";
 
+import type MouseEventHandler from "../../../shared/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../contexts/TimelineContext";
 
 class TimelineHandler implements MouseEventHandler {
