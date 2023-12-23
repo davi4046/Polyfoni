@@ -1,9 +1,6 @@
-import { makeHull } from "../../../../shared/point/utils/convexHull";
 import createSvgPath from "../../../../shared/point/utils/createSvgPath";
 import Path from "../../views/components/Path.svelte";
-import getCornerPoints from "./utils/getCornerPoints";
-import groupByIndex from "./utils/groupByIndex";
-import groupByVoice from "./utils/groupByVoice";
+import createPaths from "./utils/createPaths";
 
 import type Highlight from "./utils/Highlight";
 
@@ -18,37 +15,50 @@ class HighlightManager {
     }
 
     addHighlight(newHighlight: Highlight) {
-        const highlight = this._highlights.find(
-            (highlight) => highlight.track === newHighlight.track
-        );
+        const highlight = this._highlights.find((highlight) => {
+            return highlight.track === newHighlight.track;
+        });
+
+        let isOverlapping = false;
+
         if (highlight) {
+            isOverlapping =
+                (highlight.start >= newHighlight.start &&
+                    highlight.start <= newHighlight.end) ||
+                (highlight.end >= newHighlight.start &&
+                    highlight.end <= newHighlight.end);
+        }
+
+        if (highlight && isOverlapping) {
             highlight.start = Math.min(highlight.start, newHighlight.start);
             highlight.end = Math.max(highlight.end, newHighlight.end);
         } else {
             this._highlights.push(newHighlight);
         }
+
         this.renderHighlights();
     }
 
     renderHighlights() {
-        const groups = groupByVoice(this._highlights).map(groupByIndex).flat();
-
         for (const path of this._paths) {
             path.$destroy();
         }
+        this._paths = [];
 
-        this._paths = groups.map((group) => {
-            const points = group.map(getCornerPoints).flat();
-            const convexHull = makeHull(points);
-            const appElement = document.getElementById("app")!;
+        const appElement = document.getElementById("app")!;
 
-            return new Path({
-                target: appElement,
-                props: {
-                    path: createSvgPath(convexHull),
-                },
-            });
-        });
+        const paths = createPaths(this._highlights);
+
+        for (const path of paths) {
+            this._paths.push(
+                new Path({
+                    target: appElement,
+                    props: {
+                        path: createSvgPath(path),
+                    },
+                })
+            );
+        }
     }
 }
 

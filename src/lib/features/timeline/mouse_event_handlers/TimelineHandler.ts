@@ -1,4 +1,3 @@
-import MouseEventHandler from "../../../shared/mouse_event_listener/MouseEventHandler";
 import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
 import getTracksInRange from "../utils/get_tracks_in_range/getTracksInRange";
@@ -47,12 +46,19 @@ class TimelineHandler implements MouseEventHandler {
             return;
         }
 
-        this.context.highlightManager.highlights = getTracksInRange(
-            clickedTrack,
-            hoveredTrack
-        ).map((track) => {
-            return { track: track, start: minBeat, end: maxBeat };
-        });
+        const newHighlights = getTracksInRange(clickedTrack, hoveredTrack).map(
+            (track) => {
+                return { track: track, start: minBeat, end: maxBeat };
+            }
+        );
+
+        if (downEvent.shiftKey) {
+            newHighlights.forEach((highlight) => {
+                this.context.highlightManager.addHighlight(highlight);
+            });
+        } else {
+            this.context.highlightManager.highlights = newHighlights;
+        }
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {}
