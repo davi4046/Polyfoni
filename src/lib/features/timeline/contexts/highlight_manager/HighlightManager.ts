@@ -1,6 +1,6 @@
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
-import Path from "../../views/components/Path.svelte";
+import Path from "../../views/components/Highlight.svelte";
 import createPaths from "./utils/createPaths";
 
 import type Highlight from "./utils/Highlight";
