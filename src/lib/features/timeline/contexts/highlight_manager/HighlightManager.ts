@@ -1,3 +1,4 @@
+import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
 import Path from "../../views/components/Path.svelte";
 import createPaths from "./utils/createPaths";
@@ -15,26 +16,25 @@ class HighlightManager {
     }
 
     addHighlight(newHighlight: Highlight) {
-        const highlight = this._highlights.find((highlight) => {
-            return highlight.track === newHighlight.track;
-        });
+        const highlights = this._highlights.filter(
+            (highlight) => highlight.track === newHighlight.track
+        );
 
-        let isOverlapping = false;
+        this._highlights = this._highlights.filter(
+            (highlight) => !highlights.includes(highlight)
+        );
 
-        if (highlight) {
-            isOverlapping =
-                (highlight.start >= newHighlight.start &&
-                    highlight.start <= newHighlight.end) ||
-                (highlight.end >= newHighlight.start &&
-                    highlight.end <= newHighlight.end);
-        }
+        highlights.push(newHighlight);
 
-        if (highlight && isOverlapping) {
-            highlight.start = Math.min(highlight.start, newHighlight.start);
-            highlight.end = Math.max(highlight.end, newHighlight.end);
-        } else {
-            this._highlights.push(newHighlight);
-        }
+        this._highlights.push(
+            ...mergeIntervals(highlights).map((interval) => {
+                return {
+                    track: newHighlight.track,
+                    start: interval.start,
+                    end: interval.end,
+                };
+            })
+        );
 
         this.renderHighlights();
     }
