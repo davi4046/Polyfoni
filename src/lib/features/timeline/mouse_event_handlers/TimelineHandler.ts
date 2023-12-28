@@ -80,8 +80,6 @@ class TimelineHandler implements MouseEventHandler {
             this.context.highlightManager.highlights = newHighlights;
         }
     }
-
-    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {}
 }
 
 export default TimelineHandler;

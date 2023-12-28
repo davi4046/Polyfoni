@@ -12,8 +12,6 @@ class EndHandleHandler implements MouseEventHandler {
         readonly item: Item
     ) {}
 
-    handleMouseDown(downEvent: MouseEvent) {}
-
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
         if (!downEvent) return;
 
