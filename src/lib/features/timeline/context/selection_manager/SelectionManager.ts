@@ -1,8 +1,3 @@
-import {
-    getParent,
-    removeChildren,
-} from "../../../../shared/architecture/state/state_utils";
-
 import type Item from "../../models/item/Item";
 
 class SelectionManager {
@@ -38,13 +33,6 @@ class SelectionManager {
 
     readonly isSelected = (item: Item) => {
         return this._selectedItems.includes(item);
-    };
-
-    readonly deleteSelection = () => {
-        this._selectedItems.forEach((item) => {
-            removeChildren(getParent(item), item);
-        });
-        this.deselectAll();
     };
 }
 

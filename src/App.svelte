@@ -7,6 +7,9 @@
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
     import MoveManager from "./lib/features/timeline/context/move_manager/MoveManager";
     import ShortcutManager from "./lib/shared/architecture/shortcut_manager/ShortcutManager";
+    import deleteSelectedItems from "./lib/features/timeline/context/operations/deleteSelectedItems";
+    import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
+    import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";
 
     const timeline = makeDemoTimeline();
 
@@ -26,12 +29,12 @@
     const shortcutManager = new ShortcutManager();
 
     shortcutManager.register("Delete", () => {
-        selectionManager.deleteSelection();
-        highlightManager.deleteSection();
+        deleteSelectedItems(timelineContext);
+        cropHighlightedItems(timelineContext);
     });
 
     shortcutManager.register("Insert", () => {
-        highlightManager.insertSection();
+        insertEmptyItems(timelineContext);
     });
 </script>
 
