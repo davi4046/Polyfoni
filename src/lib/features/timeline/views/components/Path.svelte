@@ -3,7 +3,7 @@
 </script>
 
 <svg
-    class="absolute overflow-visible"
+    class="absolute z-50 overflow-visible"
     shape-rendering="crispEdges"
     style="
     left: 0px; 
