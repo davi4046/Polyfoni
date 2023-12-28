@@ -84,22 +84,15 @@ function createPaths(highlights: Highlight[]): Point[][] {
         ],
     ]) as polygonClipping.Polygon[];
 
-    let joinedPolys = [polygons[0]];
+    let joinedPolygons = polygonClipping.union(polygons[0], polygons.slice(1));
 
-    for (let i = 1; i < polygons.length; i++) {
-        joinedPolys = polygonClipping.union(joinedPolys, polygons[i]);
-    }
-
-    const paths: Point[][] = [];
-
-    for (const polygon of joinedPolys) {
-        const path = polygon.flatMap((ring) =>
-            ring.map((pair) => {
+    const paths = joinedPolygons.flatMap((polygon) => {
+        return polygon.map((ring) => {
+            return ring.map((pair) => {
                 return { x: pair[0], y: pair[1] };
-            })
-        );
-        paths.push(path);
-    }
+            });
+        });
+    });
 
     return paths;
 }
