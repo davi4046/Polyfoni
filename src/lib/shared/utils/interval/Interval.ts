@@ -1,9 +1,6 @@
-class Interval<T = undefined> {
-    constructor(
-        public start: number,
-        public end: number,
-        public data?: T
-    ) {}
+interface Interval {
+    start: number;
+    end: number;
 }
 
-export default Interval;
+export type { Interval as default };

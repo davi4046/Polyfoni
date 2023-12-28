@@ -4,7 +4,6 @@ import {
     removeChildren,
 } from "../../../../shared/architecture/state/state_utils";
 import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
-import Interval from "../../../../shared/utils/interval/Interval";
 import Item from "../../models/item/Item";
 
 import type Track from "../../models/track/Track";
@@ -18,34 +17,36 @@ function clearTrackInterval(
     const items = getChildren(track);
 
     const intervals = items.map((item) => {
-        return new Interval(item.state.start, item.state.end, item);
+        return {
+            start: item.state.start,
+            end: item.state.end,
+            item: item,
+        };
     });
 
-    clearInterval(intervals, new Interval(start, end));
+    clearInterval(intervals, { start, end });
 
     const alreadyUpdated: Item[] = [];
     const newItems: Item[] = [];
 
     for (const interval of intervals) {
-        const item = interval.data!;
+        if (itemsToIgnore.includes(interval.item)) continue;
 
-        if (itemsToIgnore.includes(item)) continue;
-
-        if (alreadyUpdated.includes(item)) {
+        if (alreadyUpdated.includes(interval.item)) {
             // Item has appeared as interval data before, meaning its interval has been split.
             // We therefore make a new item for the split part.
-            const newItem = new Item(() => item.state);
+            const newItem = new Item(() => interval.item.state);
             newItem.state = {
                 start: interval.start,
                 end: interval.end,
             };
             newItems.push(newItem);
         } else {
-            item.state = {
+            interval.item.state = {
                 start: interval.start,
                 end: interval.end,
             };
-            alreadyUpdated.push(item);
+            alreadyUpdated.push(interval.item);
         }
     }
 
