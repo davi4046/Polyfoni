@@ -15,8 +15,8 @@ class TimelineHandler implements MouseEventHandler {
     private prevHoveredTrack?: Track;
 
     handleMouseDown(downEvent: MouseEvent) {
-        if (downEvent.shiftKey) return;
         this.context.selectionManager.deselectAll();
+        this.context.highlightManager.highlights = [];
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
@@ -72,13 +72,7 @@ class TimelineHandler implements MouseEventHandler {
             }
         );
 
-        if (downEvent.shiftKey) {
-            newHighlights.forEach((highlight) => {
-                this.context.highlightManager.addHighlight(highlight);
-            });
-        } else {
-            this.context.highlightManager.highlights = newHighlights;
-        }
+        this.context.highlightManager.highlights = newHighlights;
     }
 }
 
