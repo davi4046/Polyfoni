@@ -2,6 +2,7 @@ import Attribute from "../../../../shared/architecture/AttributeEnum";
 import MultiViewManager from "../../../../shared/architecture/multi_view_manager/MultiViewManager";
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
+import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
 import Path from "../../views/components/Highlight.svelte";
 import createPaths from "./highlight/create_paths/createPaths";
 
@@ -58,6 +59,13 @@ class HighlightManager {
                 });
             })
         );
+    }
+
+    deleteSection() {
+        this._highlights.forEach((highlight) => {
+            clearTrackInterval(highlight.track, highlight.start, highlight.end);
+        });
+        this.highlights = [];
     }
 }
 

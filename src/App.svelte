@@ -27,6 +27,7 @@
 
     shortcutManager.register("Delete", () => {
         selectionManager.deleteSelection();
+        highlightManager.deleteSection();
     });
 </script>
 
