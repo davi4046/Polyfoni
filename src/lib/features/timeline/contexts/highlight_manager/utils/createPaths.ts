@@ -42,8 +42,6 @@ function createPaths(highlights: Highlight[]): Point[][] {
         )
     );
 
-    console.log(groups);
-
     const rects: Rectangle[] = [];
 
     for (const sectionGroup of groups) {
