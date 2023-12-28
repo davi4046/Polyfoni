@@ -1,10 +1,10 @@
-import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
-import TimelineContext from "../contexts/TimelineContext";
-import Timeline from "../models/timeline/Timeline";
-import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
-import TimelineVM from "../view_models/timeline/TimelineVM";
-import { createTimelineVMState } from "../view_models/timeline/TimelineVMState";
-import createTrackVM from "./createTrackVM";
+import mouseEventListener from '../../../shared/architecture/mouse_event_listener/MouseEventListener';
+import TimelineContext from '../context/TimelineContext';
+import Timeline from '../models/timeline/Timeline';
+import TimelineHandler from '../mouse_event_handlers/TimelineHandler';
+import TimelineVM from '../view_models/timeline/TimelineVM';
+import { createTimelineVMState } from '../view_models/timeline/TimelineVMState';
+import createTrackVM from './createTrackVM';
 
 function createTimelineVM(
     model: Timeline,

@@ -3,7 +3,7 @@ import { createTrackVMState } from "../view_models/track/TrackVMState";
 import createItemVM from "./createItemVM";
 import createItemVM_ghost from "./createItemVM_ghost";
 
-import type TimelineContext from "../contexts/TimelineContext";
+import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/track/Track";
 
 function createTrackVM(model: Track, context: TimelineContext): TrackVM {

@@ -1,7 +1,7 @@
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
-import type TimelineContext from "../contexts/TimelineContext";
+import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/item/Item";
 
 function createItemVM_ghost(model: Item, context: TimelineContext): ItemVM {
