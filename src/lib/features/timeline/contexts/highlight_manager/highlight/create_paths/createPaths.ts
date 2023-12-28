@@ -32,6 +32,8 @@ function getVerticalFiller(
 }
 
 function createPaths(highlights: Highlight[]): Point[][] {
+    if (highlights.length === 0) return [];
+
     const groups = groupByVoice(highlights).map((group) =>
         groupByTrack(group).sort(
             // sort track groups by track index
@@ -79,7 +81,10 @@ function createPaths(highlights: Highlight[]): Point[][] {
         ],
     ]) as polygonClipping.Polygon[];
 
-    let joinedPolygons = polygonClipping.union(polygons[0], polygons.slice(1));
+    let joinedPolygons =
+        polygons.length > 1
+            ? polygonClipping.union(polygons[0], polygons.slice(1))
+            : [polygons[0]];
 
     const paths = joinedPolygons.flatMap((polygon) => {
         return polygon.map((ring) => {
