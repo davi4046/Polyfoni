@@ -1,4 +1,4 @@
-import Model from "../../model/Model";
+import Model from "../../architecture/model/Model";
 
 function findModelById<TModel extends Model>(
     object: Object,

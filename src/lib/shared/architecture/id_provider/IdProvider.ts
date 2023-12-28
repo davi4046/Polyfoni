@@ -1,4 +1,4 @@
-import randomId from "../utils/random_id/randomId";
+import randomId from "../../utils/random_id/randomId";
 
 abstract class IdProvider {
     private static _usedIds: string[] = [];

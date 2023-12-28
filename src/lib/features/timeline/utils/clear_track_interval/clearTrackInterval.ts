@@ -2,7 +2,7 @@ import {
     addChildren,
     getChildren,
     removeChildren,
-} from "../../../../shared/state/state_utils";
+} from "../../../../shared/architecture/state/state_utils";
 import clearInterval from "../../../../shared/utils/interval/clearInterval";
 import Interval from "../../../../shared/utils/interval/Interval";
 import Item from "../../models/item/Item";

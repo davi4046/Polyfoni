@@ -6,7 +6,7 @@
     import HighlightManager from "./lib/features/timeline/contexts/highlight_manager/HighlightManager";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
     import MoveManager from "./lib/features/timeline/contexts/move_manager/MoveManager";
-    import ShortcutManager from "./lib/shared/shortcut_manager/ShortcutManager";
+    import ShortcutManager from "./lib/shared/architecture/shortcut_manager/ShortcutManager";
 
     const timeline = makeDemoTimeline();
 

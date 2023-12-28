@@ -1,4 +1,4 @@
-import type ParentChildState from "../../../../shared/state/ParentChildState";
+import type ParentChildState from "../../../../shared/architecture/state/ParentChildState";
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type Timeline from "../timeline/Timeline";

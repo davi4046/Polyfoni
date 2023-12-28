@@ -1,4 +1,4 @@
-import type ChildState from "../../../../shared/state/ChildState";
+import type ChildState from "../../../../shared/architecture/state/ChildState";
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type Track from "../track/Track";

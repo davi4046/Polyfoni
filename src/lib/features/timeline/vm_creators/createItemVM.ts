@@ -1,6 +1,6 @@
 import chroma from "chroma-js";
 
-import mouseEventListener from "../../../shared/mouse_event_listener/MouseEventListener";
+import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";

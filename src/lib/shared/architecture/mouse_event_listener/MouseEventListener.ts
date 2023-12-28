@@ -1,3 +1,5 @@
+import type MouseEventHandler from "./MouseEventHandler";
+
 class MouseEventListener {
     private _handler?: MouseEventHandler;
     private _downEvent?: MouseEvent;

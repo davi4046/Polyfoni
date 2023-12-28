@@ -4,7 +4,7 @@ import {
     getGreatGrandparent,
     getIndex,
     getParent,
-} from "../../../../shared/state/state_utils";
+} from "../../../../shared/architecture/state/state_utils";
 
 import type Track from "../../models/track/Track";
 

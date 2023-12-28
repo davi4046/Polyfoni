@@ -1,7 +1,7 @@
-import type Point from "../../../../../shared/point/Point";
+import type Point from "../../../../../shared/utils/point/Point";
 import polygonClipping from "polygon-clipping";
 
-import { getIndex } from "../../../../../shared/state/state_utils";
+import { getIndex } from "../../../../../shared/architecture/state/state_utils";
 import getRect from "./getRect";
 import groupBySection from "./groupBySection";
 import groupByTrack from "./groupByTrack";

@@ -1,4 +1,4 @@
-import type ParentState from "../../../../shared/state/ParentState";
+import type ParentState from "../../../../shared/architecture/state/ParentState";
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type Section from "../section/Section";

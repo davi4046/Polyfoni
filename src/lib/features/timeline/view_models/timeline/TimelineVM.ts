@@ -1,4 +1,4 @@
-import BoundModel from "../../../../shared/bound_model/BoundModel";
+import BoundModel from "../../../../shared/architecture/bound_model/BoundModel";
 
 import type Timeline from "../../models/timeline/Timeline";
 import type { TimelineVMState } from "./TimelineVMState";

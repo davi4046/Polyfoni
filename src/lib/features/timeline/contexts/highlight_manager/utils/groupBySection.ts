@@ -1,4 +1,4 @@
-import { getGrandparent } from "../../../../../shared/state/state_utils";
+import { getGrandparent } from "../../../../../shared/architecture/state/state_utils";
 
 import type Highlight from "./Highlight";
 

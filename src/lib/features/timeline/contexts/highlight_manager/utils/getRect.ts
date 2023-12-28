@@ -1,5 +1,5 @@
-import { getGreatGrandparent } from "../../../../../shared/state/state_utils";
-import Attribute from "../../../../../shared/utils/AttributeEnum";
+import Attribute from "../../../../../shared/architecture/AttributeEnum";
+import { getGreatGrandparent } from "../../../../../shared/architecture/state/state_utils";
 import getClientXAtBeat from "../../../utils/get_client_x_at_beat/getClientXAtBeat";
 
 import type Highlight from "./Highlight";

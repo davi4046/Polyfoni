@@ -1,4 +1,4 @@
-import Model from "../../../../shared/model/Model";
+import Model from "../../../../shared/architecture/model/Model";
 
 import type { SectionState } from "./SectionState";
 

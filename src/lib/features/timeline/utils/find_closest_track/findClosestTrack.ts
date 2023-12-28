@@ -1,4 +1,4 @@
-import Attribute from "../../../../shared/utils/AttributeEnum";
+import Attribute from "../../../../shared/architecture/AttributeEnum";
 import findClosestElement from "../../../../shared/utils/find_closest_element/findClosestElement";
 import getModelById from "../../../../shared/utils/find_model_by_id/findModelById";
 

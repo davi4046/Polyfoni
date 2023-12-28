@@ -2,7 +2,7 @@ import {
     addChildren,
     getParent,
     removeChildren,
-} from "../../../../shared/state/state_utils";
+} from "../../../../shared/architecture/state/state_utils";
 import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
 
 import type Item from "../../models/item/Item";
