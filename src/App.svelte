@@ -10,6 +10,7 @@
     import deleteSelectedItems from "./lib/features/timeline/context/operations/deleteSelectedItems";
     import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";
+    import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
 
     const timeline = makeDemoTimeline();
 
@@ -35,6 +36,10 @@
 
     shortcutManager.register("Insert", () => {
         insertEmptyItems(timelineContext);
+    });
+
+    shortcutManager.register("Enter", () => {
+        selectHighlightedItems(timelineContext);
     });
 </script>
 
