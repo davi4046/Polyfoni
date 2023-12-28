@@ -1,3 +1,4 @@
+import MultiViewManager from "../../../../shared/architecture/multi_view_manager/MultiViewManager";
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
 import Path from "../../views/components/Highlight.svelte";
@@ -8,7 +9,7 @@ import type Highlight from "./utils/Highlight";
 class HighlightManager {
     private _highlights: Highlight[] = [];
 
-    private _paths: Path[] = [];
+    private _viewManager = new MultiViewManager();
 
     set highlights(newHighlights: Highlight[]) {
         this._highlights = newHighlights;
@@ -40,25 +41,20 @@ class HighlightManager {
     }
 
     renderHighlights() {
-        for (const path of this._paths) {
-            path.$destroy();
-        }
-        this._paths = [];
-
         const appElement = document.getElementById("app")!;
 
         const paths = createPaths(this._highlights);
 
-        for (const path of paths) {
-            this._paths.push(
-                new Path({
+        this._viewManager.setViews(
+            paths.map((path) => {
+                return new Path({
                     target: appElement,
                     props: {
                         path: createSvgPath(path),
                     },
-                })
-            );
-        }
+                });
+            })
+        );
     }
 }
 
