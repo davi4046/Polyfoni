@@ -1,4 +1,4 @@
-import type Item from "../../models/item/Item";
+import type Item from "../../../models/item/Item";
 
 class SelectionManager {
     private _selectedItems: Item[] = [];

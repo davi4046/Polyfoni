@@ -1,9 +1,9 @@
-import Attribute from '../../../../shared/architecture/AttributeEnum';
-import MultiViewManager from '../../../../shared/architecture/multi_view_manager/MultiViewManager';
-import mergeIntervals from '../../../../shared/utils/interval/merge_intervals/mergeIntervals';
-import createSvgPath from '../../../../shared/utils/point/create_svg_path/createSvgPath';
-import Path from '../../views/components/Highlight.svelte';
-import createPaths from './highlight/create_paths/createPaths';
+import Attribute from "../../../../../shared/architecture/AttributeEnum";
+import MultiViewManager from "../../../../../shared/architecture/multi_view_manager/MultiViewManager";
+import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
+import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
+import Path from "../../../views/components/Highlight.svelte";
+import createPaths from "./highlight/create_paths/createPaths";
 
 import type Highlight from "./highlight/Highlight";
 

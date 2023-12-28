@@ -1,4 +1,4 @@
-import Attribute from "../../../../../../../../shared/architecture/AttributeEnum";
+import Attribute from "../../../../../../../../../shared/architecture/AttributeEnum";
 import getRelativeRect from "./get_relative_rect/getRelativeRect";
 
 import type Highlight from "../../../Highlight";

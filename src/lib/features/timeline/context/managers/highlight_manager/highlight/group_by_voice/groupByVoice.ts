@@ -1,4 +1,4 @@
-import { getParent } from "../../../../../../shared/architecture/state/state_utils";
+import { getParent } from "../../../../../../../shared/architecture/state/state_utils";
 
 import type Highlight from "../Highlight";
 
