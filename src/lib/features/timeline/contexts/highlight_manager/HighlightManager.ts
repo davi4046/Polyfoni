@@ -1,3 +1,4 @@
+import Attribute from "../../../../shared/architecture/AttributeEnum";
 import MultiViewManager from "../../../../shared/architecture/multi_view_manager/MultiViewManager";
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
@@ -41,14 +42,16 @@ class HighlightManager {
     }
 
     renderHighlights() {
-        const appElement = document.getElementById("app")!;
+        const overlayElement = document.querySelector(
+            `[${Attribute.Type}='overlay']`
+        )!;
 
         const paths = createPaths(this._highlights);
 
         this._viewManager.setViews(
             paths.map((path) => {
                 return new Path({
-                    target: appElement,
+                    target: overlayElement,
                     props: {
                         path: createSvgPath(path),
                     },

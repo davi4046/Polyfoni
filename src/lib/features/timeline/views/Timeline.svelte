@@ -162,7 +162,11 @@
     <div
         class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
     >
-        <div class="relative h-full overflow-clip" style="width: 4096px;">
+        <div
+            class="relative h-full overflow-clip"
+            style="width: 4096px;"
+            data-type="overlay"
+        >
             {#each Array(64) as _, index}
                 <div
                     class="absolute h-full text-[var(--timeline-vline-color)]"
