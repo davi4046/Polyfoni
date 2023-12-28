@@ -1,7 +1,10 @@
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 import MultiViewManager from "../../../../shared/architecture/multi_view_manager/MultiViewManager";
+import { addChildren } from "../../../../shared/architecture/state/state_utils";
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
+import Item from "../../models/item/Item";
+import { createItemState } from "../../models/item/ItemState";
 import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
 import Path from "../../views/components/Highlight.svelte";
 import createPaths from "./highlight/create_paths/createPaths";
@@ -64,6 +67,24 @@ class HighlightManager {
     deleteSection() {
         this._highlights.forEach((highlight) => {
             clearTrackInterval(highlight.track, highlight.start, highlight.end);
+        });
+        this.highlights = [];
+    }
+
+    insertSection() {
+        this._highlights.forEach((highlight) => {
+            clearTrackInterval(highlight.track, highlight.start, highlight.end);
+            addChildren(
+                highlight.track,
+                new Item(() =>
+                    createItemState({
+                        parent: highlight.track,
+                        start: highlight.start,
+                        end: highlight.end,
+                        content: "empty",
+                    })
+                )
+            );
         });
         this.highlights = [];
     }

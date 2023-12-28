@@ -29,6 +29,10 @@
         selectionManager.deleteSelection();
         highlightManager.deleteSection();
     });
+
+    shortcutManager.register("Insert", () => {
+        highlightManager.insertSection();
+    });
 </script>
 
 <main class="h-full">
