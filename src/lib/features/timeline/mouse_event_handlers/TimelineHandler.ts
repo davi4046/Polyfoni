@@ -4,9 +4,15 @@ import getTracksInRange from "../utils/get_tracks_in_range/getTracksInRange";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../contexts/TimelineContext";
+import type Track from "../models/track/Track";
 
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
+
+    private prevClickedBeat?: number;
+    private prevHoveredBeat?: number;
+    private prevClickedTrack?: Track;
+    private prevHoveredTrack?: Track;
 
     handleMouseDown(downEvent: MouseEvent) {
         if (downEvent.shiftKey) return;
@@ -37,6 +43,20 @@ class TimelineHandler implements MouseEventHandler {
             this.context.timeline,
             downEvent.clientY
         );
+
+        if (
+            clickedBeat === this.prevClickedBeat &&
+            hoveredBeat === this.prevHoveredBeat &&
+            clickedTrack === this.prevClickedTrack &&
+            hoveredTrack === this.prevHoveredTrack
+        ) {
+            return;
+        }
+
+        this.prevClickedBeat = clickedBeat;
+        this.prevHoveredBeat = hoveredBeat;
+        this.prevClickedTrack = clickedTrack;
+        this.prevHoveredTrack = hoveredTrack;
 
         if (
             !hoveredTrack ||
