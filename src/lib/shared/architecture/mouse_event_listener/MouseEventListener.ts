@@ -14,7 +14,8 @@ class MouseEventListener {
             "mousedown",
             (event) => {
                 this._downEvent = event;
-                this._handler?.handleMouseDown(event);
+                if (this._handler?.handleMouseDown)
+                    this._handler.handleMouseDown(event);
             },
             true //listen for event in capture phase
         );
@@ -22,7 +23,8 @@ class MouseEventListener {
         document.addEventListener(
             "mouseup",
             (event) => {
-                this._handler?.handleMouseUp(event, this._downEvent!);
+                if (this._handler?.handleMouseUp)
+                    this._handler.handleMouseUp(event, this._downEvent!);
                 this._downEvent = undefined;
             },
             true //listen for event in capture phase
@@ -31,7 +33,8 @@ class MouseEventListener {
         document.addEventListener(
             "mousemove",
             (event) => {
-                this._handler?.handleMouseMove(event, this._downEvent);
+                if (this._handler?.handleMouseMove)
+                    this._handler.handleMouseMove(event, this._downEvent);
             },
             true //listen for event in capture phase
         );
