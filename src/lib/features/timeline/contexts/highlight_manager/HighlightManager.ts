@@ -1,4 +1,4 @@
-import createSvgPath from "../../../../shared/utils/point/utils/createSvgPath";
+import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
 import Path from "../../views/components/Path.svelte";
 import createPaths from "./utils/createPaths";
 
