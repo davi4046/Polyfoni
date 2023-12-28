@@ -3,9 +3,9 @@ import MultiViewManager from "../../../../shared/architecture/multi_view_manager
 import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
 import Path from "../../views/components/Highlight.svelte";
-import createPaths from "./utils/createPaths";
+import createPaths from "./highlight/create_paths/createPaths";
 
-import type Highlight from "./utils/Highlight";
+import type Highlight from "./highlight/Highlight";
 
 class HighlightManager {
     private _highlights: Highlight[] = [];

@@ -1,18 +1,15 @@
-import { getGrandparent } from "../../../../../shared/architecture/state/state_utils";
+import { getParent } from "../../../../../../shared/architecture/state/state_utils";
 
-import type Highlight from "./Highlight";
+import type Highlight from "../Highlight";
 
-function groupBySection(highlights: Highlight[]): Highlight[][] {
+function groupByVoice(highlights: Highlight[]): Highlight[][] {
     const groups: Highlight[][] = [];
 
     if (highlights.length === 0) return groups;
 
     for (const highlight of highlights) {
         const group = groups.find((group) => {
-            return (
-                getGrandparent(group[0].track) ===
-                getGrandparent(highlight.track)
-            );
+            return getParent(group[0].track) === getParent(highlight.track);
         });
         if (group) {
             group.push(highlight); //add to existing group
@@ -23,4 +20,4 @@ function groupBySection(highlights: Highlight[]): Highlight[][] {
     return groups;
 }
 
-export default groupBySection;
+export default groupByVoice;

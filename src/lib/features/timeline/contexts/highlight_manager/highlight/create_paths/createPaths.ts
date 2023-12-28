@@ -1,14 +1,14 @@
-import type Point from "../../../../../shared/utils/point/Point";
+import type Point from "../../../../../../shared/utils/point/Point";
 import polygonClipping from "polygon-clipping";
 
-import { getIndex } from "../../../../../shared/architecture/state/state_utils";
-import getRect from "./getRect";
-import groupBySection from "./groupBySection";
-import groupByTrack from "./groupByTrack";
-import groupByVoice from "./groupByVoice";
+import { getIndex } from "../../../../../../shared/architecture/state/state_utils";
+import groupBySection from "../group_by_section/groupBySection";
+import groupByTrack from "../group_by_track/groupByTrack";
+import groupByVoice from "../group_by_voice/groupByVoice";
+import getRect from "./rectangle/get_rect/getRect";
 
-import type Highlight from "./Highlight";
-import type Rectangle from "./Rectangle";
+import type Highlight from "../Highlight";
+import type Rectangle from "./rectangle/Rectangle";
 
 function getVerticalFiller(
     upper: Rectangle,
