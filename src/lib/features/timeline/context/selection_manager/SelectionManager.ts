@@ -7,33 +7,33 @@ class SelectionManager {
         return this._selectedItems;
     }
 
-    readonly selectItem = (item: Item) => {
+    selectItem(item: Item) {
         if (this._selectedItems.includes(item)) return;
         this._selectedItems.push(item);
         item.notifySubscribers();
-    };
+    }
 
-    readonly deselectItem = (item: Item) => {
+    deselectItem(item: Item) {
         let index = this._selectedItems.indexOf(item);
         this._selectedItems.splice(index, 1);
         item.notifySubscribers();
-    };
+    }
 
-    readonly toggleSelected = (item: Item) => {
+    toggleSelected(item: Item) {
         if (this._selectedItems.includes(item)) {
             this.deselectItem(item);
         } else {
             this.selectItem(item);
         }
-    };
+    }
 
-    readonly deselectAll = () => {
+    deselectAll() {
         this._selectedItems.slice().forEach((item) => this.deselectItem(item));
-    };
+    }
 
-    readonly isSelected = (item: Item) => {
+    isSelected(item: Item) {
         return this._selectedItems.includes(item);
-    };
+    }
 }
 
 export default SelectionManager;
