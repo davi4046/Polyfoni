@@ -3,7 +3,7 @@ import {
     getChildren,
     removeChildren,
 } from "../../../../shared/architecture/state/state_utils";
-import clearInterval from "../../../../shared/utils/interval/clearInterval";
+import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
 import Interval from "../../../../shared/utils/interval/Interval";
 import Item from "../../models/item/Item";
 

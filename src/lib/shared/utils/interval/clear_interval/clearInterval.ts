@@ -1,4 +1,4 @@
-import Interval from "./Interval";
+import Interval from "../Interval";
 
 /**
  * Adjusts intervals in the provided list so that none overlap the specified interval.
