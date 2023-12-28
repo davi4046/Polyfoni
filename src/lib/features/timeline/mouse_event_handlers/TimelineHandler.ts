@@ -9,10 +9,10 @@ import type Track from "../models/track/Track";
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
 
-    private prevClickedBeat?: number;
-    private prevHoveredBeat?: number;
-    private prevClickedTrack?: Track;
-    private prevHoveredTrack?: Track;
+    private _prevClickedBeat?: number;
+    private _prevHoveredBeat?: number;
+    private _prevClickedTrack?: Track;
+    private _prevHoveredTrack?: Track;
 
     handleMouseDown(downEvent: MouseEvent) {
         this.context.selectionManager.deselectAll();
@@ -45,18 +45,18 @@ class TimelineHandler implements MouseEventHandler {
         );
 
         if (
-            clickedBeat === this.prevClickedBeat &&
-            hoveredBeat === this.prevHoveredBeat &&
-            clickedTrack === this.prevClickedTrack &&
-            hoveredTrack === this.prevHoveredTrack
+            clickedBeat === this._prevClickedBeat &&
+            hoveredBeat === this._prevHoveredBeat &&
+            clickedTrack === this._prevClickedTrack &&
+            hoveredTrack === this._prevHoveredTrack
         ) {
             return;
         }
 
-        this.prevClickedBeat = clickedBeat;
-        this.prevHoveredBeat = hoveredBeat;
-        this.prevClickedTrack = clickedTrack;
-        this.prevHoveredTrack = hoveredTrack;
+        this._prevClickedBeat = clickedBeat;
+        this._prevHoveredBeat = hoveredBeat;
+        this._prevClickedTrack = clickedTrack;
+        this._prevHoveredTrack = hoveredTrack;
 
         if (
             !hoveredTrack ||
