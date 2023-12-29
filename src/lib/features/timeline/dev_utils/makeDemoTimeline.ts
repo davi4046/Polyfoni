@@ -1,6 +1,6 @@
 import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
-import Item from "../models/item/Item";
 import { createItemState } from "../models/item/ItemState";
+import StringItem from "../models/item/string_item/StringItem";
 import Section from "../models/section/Section";
 import { createSectionState } from "../models/section/SectionState";
 import Timeline from "../models/timeline/Timeline";
@@ -10,8 +10,8 @@ import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
 
-function makeRandomItems<T>(track: Track<Item<T>>): Item<T>[] {
-    const items: Item<T>[] = [];
+function makeRandomItems(track: Track<StringItem>): StringItem[] {
+    const items: StringItem[] = [];
 
     let beat = 0;
 
@@ -20,7 +20,7 @@ function makeRandomItems<T>(track: Track<Item<T>>): Item<T>[] {
         const end = beat + length;
         if (Math.random() > 0.2) {
             items.push(
-                new Item((item) =>
+                new StringItem((item) =>
                     createItemState({
                         parent: track,
                         start: beat,
@@ -53,7 +53,7 @@ function makeDemoTimeline(): Timeline {
                                 createVoiceState({
                                     parent: section,
                                     children: [
-                                        new Track<Item<string>>((track) =>
+                                        new Track<StringItem>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Piano 1",
@@ -61,7 +61,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track<Item<string>>((track) =>
+                                        new Track<StringItem>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Pitch",
@@ -69,7 +69,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track<Item<string>>((track) =>
+                                        new Track<StringItem>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Duration",
@@ -77,7 +77,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track<Item<string>>((track) =>
+                                        new Track<StringItem>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Rest",
@@ -85,7 +85,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track<Item<string>>((track) =>
+                                        new Track<StringItem>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Harmony",
