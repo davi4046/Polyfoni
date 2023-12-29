@@ -10,8 +10,8 @@ import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
 
-function makeRandomItems(track: Track): Item[] {
-    const items: Item[] = [];
+function makeRandomItems<T>(track: Track<Item<T>>): Item<T>[] {
+    const items: Item<T>[] = [];
 
     let beat = 0;
 
@@ -25,7 +25,6 @@ function makeRandomItems(track: Track): Item[] {
                         parent: track,
                         start: beat,
                         end: end,
-                        content: "blahblahlblahblah",
                     })
                 )
             );
@@ -54,7 +53,7 @@ function makeDemoTimeline(): Timeline {
                                 createVoiceState({
                                     parent: section,
                                     children: [
-                                        new Track((track) =>
+                                        new Track<Item<string>>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Piano 1",
@@ -62,7 +61,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track((track) =>
+                                        new Track<Item<string>>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Pitch",
@@ -70,7 +69,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track((track) =>
+                                        new Track<Item<string>>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Duration",
@@ -78,7 +77,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track((track) =>
+                                        new Track<Item<string>>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Rest",
@@ -86,7 +85,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track((track) =>
+                                        new Track<Item<string>>((track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Harmony",

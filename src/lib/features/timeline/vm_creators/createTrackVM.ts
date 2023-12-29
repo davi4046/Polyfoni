@@ -6,8 +6,11 @@ import createItemVM_ghost from "./createItemVM_ghost";
 import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/track/Track";
 
-function createTrackVM(model: Track, context: TimelineContext): TrackVM {
-    const update = (model: Track) => {
+function createTrackVM<TModel extends Track<any>>(
+    model: TModel,
+    context: TimelineContext
+): TrackVM {
+    const update = (model: TModel) => {
         const items = model.state.children.map((item) => {
             return createItemVM(item, context);
         });
