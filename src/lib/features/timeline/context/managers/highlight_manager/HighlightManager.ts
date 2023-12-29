@@ -1,8 +1,7 @@
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
-import MultiViewManager from "../../../../../shared/architecture/multi_view_manager/MultiViewManager";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
-import Path from "../../../views/components/Highlight.svelte";
+import Highlight__SvelteComponent_ from "../../../views/components/Highlight.svelte";
 import createPaths from "./highlight/create_paths/createPaths";
 
 import type Highlight from "./highlight/Highlight";
@@ -10,7 +9,7 @@ import type Highlight from "./highlight/Highlight";
 class HighlightManager {
     private _highlights: Highlight[] = [];
 
-    private _viewManager = new MultiViewManager();
+    private _component?: Highlight__SvelteComponent_;
 
     set highlights(newHighlights: Highlight[]) {
         this._highlights = newHighlights;
@@ -50,18 +49,18 @@ class HighlightManager {
             `[${Attribute.Type}='overlay']`
         )!;
 
-        const paths = createPaths(this._highlights);
+        const path = createPaths(this._highlights)
+            .map((path) => createSvgPath(path))
+            .join(" ");
 
-        this._viewManager.setViews(
-            paths.map((path) => {
-                return new Path({
-                    target: overlayElement,
-                    props: {
-                        path: createSvgPath(path),
-                    },
-                });
-            })
-        );
+        this._component?.$destroy();
+
+        this._component = new Highlight__SvelteComponent_({
+            target: overlayElement,
+            props: {
+                path: path,
+            },
+        });
     }
 }
 
