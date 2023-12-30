@@ -11,8 +11,8 @@ class Model<TState extends object>
     private _stateful: Stateful<TState> & Required<TState>;
     private _subscribable = new Subscribable(this);
 
-    constructor(state: (model: Model<TState>) => Required<TState>) {
-        this._stateful = Stateful.create(state(this));
+    constructor(createState: (model: Model<TState>) => Required<TState>) {
+        this._stateful = Stateful.create(createState(this));
     }
 
     get id() {
