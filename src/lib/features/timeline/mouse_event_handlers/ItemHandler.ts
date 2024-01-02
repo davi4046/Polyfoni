@@ -13,7 +13,7 @@ import type TimelineContext from "../context/TimelineContext";
 class ItemHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
-        readonly item: Item
+        readonly item: Item<any>
     ) {}
 
     handleMouseDown(downEvent: MouseEvent) {
@@ -56,9 +56,9 @@ class ItemHandler implements MouseEventHandler {
 
         const ghostPairs = this.context.selectionManager.selectedItems.map(
             (item) => {
-                return [item, new Item(() => item.state)] as [
-                    legit: Item,
-                    ghost: Item,
+                return [item, new Item(item.itemType, () => item.state)] as [
+                    legit: typeof item,
+                    ghost: typeof item,
                 ];
             }
         );

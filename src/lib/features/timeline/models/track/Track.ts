@@ -1,9 +1,16 @@
 import Model from "../../../../shared/architecture/model/Model";
 
-import type Item from "../item/Item";
+import type ItemTypes from "../shared/ItemTypes";
 
 import type { TrackState } from "./TrackState";
 
-class Track<TItem extends Item<any>> extends Model<TrackState<TItem>> {}
+class Track<T extends keyof ItemTypes> extends Model<TrackState<T>> {
+    constructor(
+        readonly itemType: T,
+        createState: (model: Model<TrackState<T>>) => Required<TrackState<T>>
+    ) {
+        super(createState);
+    }
+}
 
 export default Track;

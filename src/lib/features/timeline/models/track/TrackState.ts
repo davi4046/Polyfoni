@@ -2,15 +2,16 @@ import type ParentChildState from "../../../../shared/architecture/state/ParentC
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type Item from "../item/Item";
+import type ItemTypes from "../shared/ItemTypes";
 
 import type Voice from "../voice/Voice";
 
-interface TrackState<TItem extends Item<any>>
-    extends ParentChildState<Voice, TItem> {
+interface TrackState<T extends keyof ItemTypes>
+    extends ParentChildState<Voice, Item<T>> {
     readonly label: string;
 }
 
-function createTrackState<TItem extends Item<any>>(options: TrackState<TItem>) {
+function createTrackState<T extends keyof ItemTypes>(options: TrackState<T>) {
     return createWithDefaults(options, {});
 }
 

@@ -6,11 +6,14 @@ import {
 import clearTrackInterval from "../../../utils/clear_track_interval/clearTrackInterval";
 
 import type Item from "../../../models/item/Item";
+import type ItemTypes from "../../../models/shared/ItemTypes";
+
+type GhostPair<T extends keyof ItemTypes> = [legit: Item<T>, ghost: Item<T>];
 
 class MoveManager {
-    private _ghostPairs: readonly [legit: Item, ghost: Item][] = [];
+    private _ghostPairs: readonly GhostPair<any>[] = [];
 
-    set ghostPairs(newGhostPairs: readonly [legit: Item, ghost: Item][]) {
+    set ghostPairs(newGhostPairs: readonly GhostPair<any>[]) {
         const oldGhostItems = this._ghostPairs.map((pair) => pair[1]);
         const newGhostItems = newGhostPairs.map((pair) => pair[1]);
 

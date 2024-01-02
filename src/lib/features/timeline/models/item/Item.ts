@@ -1,26 +1,15 @@
-import type { SvelteComponent } from "svelte";
 import Model from "../../../../shared/architecture/model/Model";
+
+import type ItemTypes from "../shared/ItemTypes";
 
 import type { ItemState } from "./ItemState";
 
-class Item<TContent> extends Model<ItemState<TContent>> {
-    readonly EditorWidget;
-
+class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
     constructor(
-        state: (
-            model: Model<ItemState<TContent>>
-        ) => Required<ItemState<TContent>>,
-
-        EditorWidget?: typeof SvelteComponent<
-            {
-                update: (value: TContent) => void;
-            },
-            {},
-            {}
-        >
+        readonly itemType: T,
+        createState: (model: Model<ItemState<T>>) => Required<ItemState<T>>
     ) {
-        super(state);
-        this.EditorWidget = EditorWidget;
+        super(createState);
     }
 }
 
