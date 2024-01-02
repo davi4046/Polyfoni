@@ -1,5 +1,7 @@
 import type { SvelteComponent } from "svelte";
 import type StringEditorWidget from "../../views/editor_widgets/StringEditorWidget.svelte";
+import type Chord from "../../utils/chord/Chord";
+import type ChordEditorWidget from "../../views/editor_widgets/ChordEditorWidget.svelte";
 
 type ItemType<
     TContent,
@@ -15,6 +17,7 @@ type ItemType<
 
 type ItemTypes = {
     StringItem: ItemType<string, StringEditorWidget>;
+    ChordItem: ItemType<Chord, ChordEditorWidget>;
 };
 
 export type { ItemTypes as default };
