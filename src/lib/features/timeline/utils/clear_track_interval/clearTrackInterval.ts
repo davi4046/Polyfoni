@@ -6,13 +6,15 @@ import {
 import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
 import Item from "../../models/item/Item";
 
+import type ItemTypes from "../../models/shared/ItemTypes";
+
 import type Track from "../../models/track/Track";
 
-function clearTrackInterval(
-    track: Track,
+function clearTrackInterval<T extends keyof ItemTypes>(
+    track: Track<T>,
     start: number,
     end: number,
-    itemsToIgnore: Item[] = []
+    itemsToIgnore: Item<T>[] = []
 ) {
     const items = getChildren(track);
 
@@ -26,8 +28,8 @@ function clearTrackInterval(
 
     clearInterval(intervals, { start, end });
 
-    const alreadyUpdated: Item[] = [];
-    const newItems: Item[] = [];
+    const alreadyUpdated: Item<T>[] = [];
+    const newItems: Item<T>[] = [];
 
     for (const interval of intervals) {
         if (itemsToIgnore.includes(interval.item)) continue;
@@ -35,7 +37,7 @@ function clearTrackInterval(
         if (alreadyUpdated.includes(interval.item)) {
             // Item has appeared as interval data before, meaning its interval has been split.
             // We therefore make a new item for the split part.
-            const newItem = new Item(() => interval.item.state);
+            const newItem = new Item(track.itemType, () => interval.item.state);
             newItem.state = {
                 start: interval.start,
                 end: interval.end,
