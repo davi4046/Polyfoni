@@ -9,9 +9,9 @@ type ToStringFunctions = {
 };
 
 const toStringFunctions: ToStringFunctions = {
-    StringItem: (value) => (value ? value : ""),
+    StringItem: (value) => (value ? value : "empty string item"),
     ChordItem: (value) => {
-        if (!value) return "";
+        if (!value) return "empty chord item";
         const root = pitchNames[value.pitchClassSet[0] % 12];
         const decimal = value.getDecimal();
         return root + "-" + decimal;

@@ -1,6 +1,6 @@
 import Model from "../../architecture/model/Model";
 
-function findModelById<TModel extends Model<any>>(
+function findModelById<TModel extends Model<any, any>>(
     object: Object,
     id: string
 ): TModel | null {

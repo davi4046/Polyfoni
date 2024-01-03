@@ -8,7 +8,7 @@ import {
 
 import type Track from "../../models/track/Track";
 
-function getTracksInRange(start: Track, end: Track): Track[] {
+function getTracksInRange(start: Track<any>, end: Track<any>): Track<any>[] {
     if (getGreatGrandparent(start) !== getGreatGrandparent(end)) {
         throw new Error("start and end must reference the same Timeline");
     }
@@ -36,7 +36,7 @@ function getTracksInRange(start: Track, end: Track): Track[] {
         );
     }
 
-    const tracks: Track[] = [];
+    const tracks: Track<any>[] = [];
 
     tracks.push(
         ...getChildren(minVoice).slice(

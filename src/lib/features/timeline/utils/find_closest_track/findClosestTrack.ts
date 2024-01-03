@@ -1,6 +1,6 @@
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 import findClosestElement from "../../../../shared/utils/find_closest_element/findClosestElement";
-import getModelById from "../../../../shared/utils/find_model_by_id/findModelById";
+import findModelById from "../../../../shared/utils/find_model_by_id/findModelById";
 
 import type Timeline from "../../models/timeline/Timeline";
 import type Track from "../../models/track/Track";
@@ -8,7 +8,7 @@ import type Track from "../../models/track/Track";
 function findClosestTrack(
     timeline: Timeline,
     clientY: number
-): Track | undefined {
+): Track<any> | undefined {
     const timelineElement = document.querySelector(
         `[${Attribute.ModelId}='${timeline.id}']`
     )!;
@@ -20,7 +20,7 @@ function findClosestTrack(
 
     const trackElement = findClosestElement(0, clientY, trackElements);
     const modelId = trackElement.getAttribute(Attribute.ModelId)!;
-    const model = getModelById(timeline, modelId) as Track;
+    const model = findModelById(timeline, modelId) as Track<any>;
 
     return model;
 }

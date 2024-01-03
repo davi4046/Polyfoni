@@ -10,7 +10,7 @@ import clamp from "../../../../shared/utils/math_utils/clamp/clamp";
 import type Item from "../../models/item/Item";
 
 function offsetItems(
-    items: Item[],
+    items: Item<any>[],
     beatOffset: number,
     trackOffset: number,
     voiceOffset: number
