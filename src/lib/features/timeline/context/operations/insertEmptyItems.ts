@@ -10,12 +10,11 @@ function insertEmptyItems(context: TimelineContext) {
         clearTrackInterval(highlight.track, highlight.start, highlight.end);
         addChildren(
             highlight.track,
-            new Item(() =>
+            new Item(highlight.track.itemType, () =>
                 createItemState({
                     parent: highlight.track,
                     start: highlight.start,
                     end: highlight.end,
-                    content: "empty",
                 })
             )
         );
