@@ -1,3 +1,4 @@
+import { toStringFunctions } from "../models/_shared/toStringFunctions";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
@@ -10,10 +11,12 @@ function createItemVM_ghost<T extends keyof ItemTypes>(
     context: TimelineContext
 ): ItemVM {
     const update = (model: Item<T>) => {
+        const createText = toStringFunctions[model.itemType];
+
         return createItemVMState({
             start: model.state.start,
             end: model.state.end,
-            text: model.state.content,
+            text: createText(model.state.content),
             opacity: 0.75,
         });
     };

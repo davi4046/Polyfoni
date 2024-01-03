@@ -1,12 +1,14 @@
 import chroma from "chroma-js";
 
 import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
+import { toStringFunctions } from "../models/_shared/toStringFunctions";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
+import type { ToStringFunctions } from "../models/_shared/toStringFunctions";
 import type TimelineContext from "../context/TimelineContext";
 import type ItemTypes from "../models/_shared/ItemTypes";
 import type Item from "../models/item/Item";
@@ -35,10 +37,12 @@ function createItemVM<T extends keyof ItemTypes>(
             event.stopPropagation();
         };
 
+        const createText = toStringFunctions[model.itemType];
+
         return createItemVMState({
             start: model.state.start,
             end: model.state.end,
-            text: model.state.content,
+            text: createText(model.state.content),
             ...(context.selectionManager.isSelected(model)
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),

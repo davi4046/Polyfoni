@@ -13,6 +13,7 @@ import { createVoiceState } from "../models/voice/VoiceState";
 import type ItemTypes from "../models/_shared/ItemTypes";
 
 function makeRandomItems<T extends keyof ItemTypes>(
+    itemType: T,
     track: Track<T>
 ): Item<T>[] {
     const items: Item<T>[] = [];
@@ -24,7 +25,7 @@ function makeRandomItems<T extends keyof ItemTypes>(
         const end = beat + length;
         if (Math.random() > 0.2) {
             items.push(
-                new Item(track.itemType, (item) =>
+                new Item(itemType, (item) =>
                     createItemState({
                         parent: track,
                         start: beat,
@@ -61,40 +62,50 @@ function makeDemoTimeline(): Timeline {
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Piano 1",
-                                                children:
-                                                    makeRandomItems(track),
+                                                children: makeRandomItems(
+                                                    "StringItem",
+                                                    track
+                                                ),
                                             })
                                         ),
                                         new Track("StringItem", (track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Pitch",
-                                                children:
-                                                    makeRandomItems(track),
+                                                children: makeRandomItems(
+                                                    "StringItem",
+                                                    track
+                                                ),
                                             })
                                         ),
                                         new Track("StringItem", (track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Duration",
-                                                children:
-                                                    makeRandomItems(track),
+                                                children: makeRandomItems(
+                                                    "StringItem",
+                                                    track
+                                                ),
                                             })
                                         ),
                                         new Track("StringItem", (track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Rest",
-                                                children:
-                                                    makeRandomItems(track),
+                                                children: makeRandomItems(
+                                                    "StringItem",
+                                                    track
+                                                ),
                                             })
                                         ),
                                         new Track("ChordItem", (track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Harmony",
-                                                children:
-                                                    makeRandomItems(track),
+                                                children: makeRandomItems(
+                                                    "ChordItem",
+                                                    track
+                                                ),
                                             })
                                         ),
                                     ],
