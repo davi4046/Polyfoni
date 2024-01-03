@@ -1,4 +1,4 @@
-import { toStringFunctions } from "../models/_shared/toStringFunctions";
+import { toStringFunctions } from "../models/_shared/item_types/toStringFunctions";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 

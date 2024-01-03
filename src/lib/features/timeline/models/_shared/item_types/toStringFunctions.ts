@@ -1,6 +1,6 @@
-import pitchNames from "../../utils/pitchNames";
+import pitchNames from "../../../utils/pitchNames";
 
-import type ItemTypes from "./item_types/ItemTypes";
+import type ItemTypes from "./ItemTypes";
 
 type ToStringFunctions = {
     [K in keyof ItemTypes]: (
