@@ -4,7 +4,6 @@ import createWithDefaults from "../../../../shared/utils/create_with_defaults/cr
 
 import type ItemTypes from "../_shared/ItemTypes";
 
-import type Track from "../track/Track";
 import type { TrackState } from "../track/TrackState";
 
 interface ItemState<T extends keyof ItemTypes>
