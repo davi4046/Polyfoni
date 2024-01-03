@@ -6,7 +6,7 @@ import {
 import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
 import Item from "../../models/item/Item";
 
-import type ItemTypes from "../../models/_shared/ItemTypes";
+import type ItemTypes from "../../models/_shared/item_types/ItemTypes";
 
 import type Track from "../../models/track/Track";
 

@@ -1,6 +1,6 @@
 import Model from "../../../../shared/architecture/model/Model";
 
-import type ItemTypes from "../_shared/ItemTypes";
+import type ItemTypes from "../_shared/item_types/ItemTypes";
 
 import type { ItemState } from "./ItemState";
 

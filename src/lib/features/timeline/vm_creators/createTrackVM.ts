@@ -5,7 +5,7 @@ import createItemVM_ghost from "./createItemVM_ghost";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/track/Track";
-import type ItemTypes from "../models/_shared/ItemTypes";
+import type ItemTypes from "../models/_shared/item_types/ItemTypes";
 
 function createTrackVM<T extends keyof ItemTypes>(
     model: Track<T>,

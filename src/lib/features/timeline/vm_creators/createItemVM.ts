@@ -10,7 +10,7 @@ import { createItemVMState } from "../view_models/item/ItemVMState";
 
 import type { ToStringFunctions } from "../models/_shared/toStringFunctions";
 import type TimelineContext from "../context/TimelineContext";
-import type ItemTypes from "../models/_shared/ItemTypes";
+import type ItemTypes from "../models/_shared/item_types/ItemTypes";
 import type Item from "../models/item/Item";
 
 function createItemVM<T extends keyof ItemTypes>(

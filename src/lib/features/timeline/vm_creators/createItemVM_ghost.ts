@@ -4,7 +4,7 @@ import { createItemVMState } from "../view_models/item/ItemVMState";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/item/Item";
-import type ItemTypes from "../models/_shared/ItemTypes";
+import type ItemTypes from "../models/_shared/item_types/ItemTypes";
 
 function createItemVM_ghost<T extends keyof ItemTypes>(
     model: Item<T>,

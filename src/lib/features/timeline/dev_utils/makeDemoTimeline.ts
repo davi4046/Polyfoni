@@ -10,7 +10,7 @@ import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
 
-import type ItemTypes from "../models/_shared/ItemTypes";
+import type ItemTypes from "../models/_shared/item_types/ItemTypes";
 
 function makeRandomItems<T extends keyof ItemTypes>(
     itemType: T,
