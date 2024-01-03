@@ -3,12 +3,13 @@ import { createItemVMState } from "../view_models/item/ItemVMState";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/item/Item";
+import type ItemTypes from "../models/_shared/ItemTypes";
 
-function createItemVM_ghost<TModel extends Item<any>>(
-    model: TModel,
+function createItemVM_ghost<T extends keyof ItemTypes>(
+    model: Item<T>,
     context: TimelineContext
 ): ItemVM {
-    const update = (model: TModel) => {
+    const update = (model: Item<T>) => {
         return createItemVMState({
             start: model.state.start,
             end: model.state.end,

@@ -8,17 +8,18 @@ import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
 
 import type TimelineContext from "../context/TimelineContext";
+import type ItemTypes from "../models/_shared/ItemTypes";
 import type Item from "../models/item/Item";
 
-function createItemVM<TModel extends Item<any>>(
-    model: TModel,
+function createItemVM<T extends keyof ItemTypes>(
+    model: Item<T>,
     context: TimelineContext
 ): ItemVM {
     const itemHandler = new ItemHandler(context, model);
     const startHandleHandler = new StartHandleHandler(context, model);
     const endHandleHandler = new EndHandleHandler(context, model);
 
-    const update = (model: TModel) => {
+    const update = (model: Item<T>) => {
         const handleMouseMove = (event: MouseEvent) => {
             mouseEventListener.handler = itemHandler;
             event.stopPropagation();
