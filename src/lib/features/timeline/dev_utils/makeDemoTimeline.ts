@@ -1,4 +1,3 @@
-import type Model from "../../../shared/architecture/model/Model";
 import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
 import Item from "../models/item/Item";
 import { createItemState } from "../models/item/ItemState";
@@ -11,11 +10,7 @@ import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
 
-import type { TrackState } from "../models/track/TrackState";
-
-function makeRandomItems(
-    track: Model<TrackState<"StringItem">>
-): Item<"StringItem">[] {
+function makeRandomItems(track: Track<"StringItem">): Item<"StringItem">[] {
     const items: Item<"StringItem">[] = [];
 
     let beat = 0;

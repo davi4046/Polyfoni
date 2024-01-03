@@ -8,11 +8,10 @@ import Item from "../../models/item/Item";
 
 import type ItemTypes from "../../models/_shared/ItemTypes";
 
-import type Model from "../../../../shared/architecture/model/Model";
-import type { TrackState } from "../../models/track/TrackState";
+import type Track from "../../models/track/Track";
 
 function clearTrackInterval<T extends keyof ItemTypes>(
-    track: Model<TrackState<T>>,
+    track: Track<T>,
     start: number,
     end: number,
     itemsToIgnore: Item<T>[] = []
