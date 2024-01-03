@@ -10,8 +10,12 @@ import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
 
-function makeRandomItems(track: Track<"StringItem">): Item<"StringItem">[] {
-    const items: Item<"StringItem">[] = [];
+import type ItemTypes from "../models/_shared/ItemTypes";
+
+function makeRandomItems<T extends keyof ItemTypes>(
+    track: Track<T>
+): Item<T>[] {
+    const items: Item<T>[] = [];
 
     let beat = 0;
 
@@ -19,14 +23,15 @@ function makeRandomItems(track: Track<"StringItem">): Item<"StringItem">[] {
         const length = Math.round(mapRange(Math.random(), 0, 1, 1, 4));
         const end = beat + length;
         if (Math.random() > 0.2) {
-            const newItem = new Item("StringItem", (item) =>
-                createItemState({
-                    parent: track,
-                    start: beat,
-                    end: end,
-                })
+            items.push(
+                new Item(track.itemType, (item) =>
+                    createItemState({
+                        parent: track,
+                        start: beat,
+                        end: end,
+                    })
+                )
             );
-            items.push(newItem);
         }
         beat = end;
     }
@@ -84,7 +89,7 @@ function makeDemoTimeline(): Timeline {
                                                     makeRandomItems(track),
                                             })
                                         ),
-                                        new Track("StringItem", (track) =>
+                                        new Track("ChordItem", (track) =>
                                             createTrackState({
                                                 parent: voice,
                                                 label: "Harmony",
