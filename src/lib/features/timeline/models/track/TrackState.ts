@@ -2,7 +2,7 @@ import type ParentChildState from "../../../../shared/architecture/state/ParentC
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
 import type Item from "../item/Item";
-import type ItemTypes from "../shared/ItemTypes";
+import type ItemTypes from "../_shared/ItemTypes";
 
 import type Voice from "../voice/Voice";
 

@@ -6,7 +6,7 @@ import {
 import clearTrackInterval from "../../../utils/clear_track_interval/clearTrackInterval";
 
 import type Item from "../../../models/item/Item";
-import type ItemTypes from "../../../models/shared/ItemTypes";
+import type ItemTypes from "../../../models/_shared/ItemTypes";
 
 type GhostPair<T extends keyof ItemTypes> = [legit: Item<T>, ghost: Item<T>];
 

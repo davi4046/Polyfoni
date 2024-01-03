@@ -2,7 +2,7 @@ import type Model from "../../../../shared/architecture/model/Model";
 import type ChildState from "../../../../shared/architecture/state/ChildState";
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
-import type ItemTypes from "../shared/ItemTypes";
+import type ItemTypes from "../_shared/ItemTypes";
 
 import type Track from "../track/Track";
 import type { TrackState } from "../track/TrackState";
