@@ -8,10 +8,11 @@ import Item from "../../models/item/Item";
 
 import type ItemTypes from "../../models/_shared/ItemTypes";
 
-import type Track from "../../models/track/Track";
+import type Model from "../../../../shared/architecture/model/Model";
+import type { TrackState } from "../../models/track/TrackState";
 
 function clearTrackInterval<T extends keyof ItemTypes>(
-    track: Track<T>,
+    track: Model<TrackState<T>>,
     start: number,
     end: number,
     itemsToIgnore: Item<T>[] = []
@@ -37,7 +38,10 @@ function clearTrackInterval<T extends keyof ItemTypes>(
         if (alreadyUpdated.includes(interval.item)) {
             // Item has appeared as interval data before, meaning its interval has been split.
             // We therefore make a new item for the split part.
-            const newItem = new Item(track.itemType, () => interval.item.state);
+            const newItem = new Item(
+                interval.item.itemType,
+                () => interval.item.state
+            );
             newItem.state = {
                 start: interval.start,
                 end: interval.end,
