@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Track from "./Track.svelte";
-    import TrackHeader from "./TrackHeader.svelte";
-    import MarkerBig from "./components/MarkerBig.svelte";
-    import MarkerSmall from "./components/MarkerSmall.svelte";
-    import VerticalLine from "./components/VerticalLine.svelte";
-    import type TimelineVM from "../view_models/timeline/TimelineVM";
+    import Track from "../Track.svelte";
+    import TrackHeader from "../TrackHeader.svelte";
+    import MarkerBig from "./MarkerBig.svelte";
+    import MarkerSmall from "./MarkerSmall.svelte";
+    import VerticalLine from "./VerticalLine.svelte";
+    import type TimelineVM from "../../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
 
     export let timelineVM: TimelineVM;
