@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Timeline from "./lib/features/timeline/views/timeline/Timeline.svelte";
+    import Timeline from "./lib/features/timeline/views/timeline/_Timeline.svelte";
     import makeDemoTimeline from "./lib/features/timeline/dev_utils/makeDemoTimeline";
     import TimelineContext from "./lib/features/timeline/context/TimelineContext";
     import SelectionManager from "./lib/features/timeline/context/managers/selection_manager/SelectionManager";
