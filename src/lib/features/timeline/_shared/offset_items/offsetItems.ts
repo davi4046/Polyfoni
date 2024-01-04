@@ -6,15 +6,14 @@ import {
     getParent,
 } from "../../../../shared/architecture/state/state_utils";
 import clamp from "../../../../shared/utils/math_utils/clamp/clamp";
-
-import type Item from "../../models/item/Item";
+import Item from "../../models/item/Item";
 
 function offsetItems(
     items: Item<any>[],
     beatOffset: number,
     trackOffset: number,
     voiceOffset: number
-) {
+): Item<any>[] {
     const section = getGreatGrandparent(items[0]);
 
     items.forEach((item) => {
@@ -70,7 +69,7 @@ function offsetItems(
 
     /* Offset Items */
 
-    items.forEach((item) => {
+    return items.map((item) => {
         const newStart = item.state.start + beatOffset;
         const newEnd = newStart + item.state.end - item.state.start;
 
@@ -84,11 +83,12 @@ function offsetItems(
             getChildren(getGreatGrandparent(item))[newVoiceIndex]
         )[newTrackIndex];
 
-        item.state = {
+        return new Item(newTrack.itemType, {
             parent: newTrack,
             start: newStart,
             end: newEnd,
-        };
+            content: null,
+        });
     });
 }
 

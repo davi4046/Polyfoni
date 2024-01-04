@@ -43,12 +43,12 @@ class MoveManager {
 
             clearTrackInterval(
                 newTrack,
-                pair[0].state.start,
-                pair[0].state.end
+                pair[1].state.start,
+                pair[1].state.end
             );
 
             removeChildren(oldTrack, pair[0]);
-            addChildren(newTrack, pair[0]);
+            addChildren(newTrack, pair[1]);
         });
         this.ghostPairs = [];
     };

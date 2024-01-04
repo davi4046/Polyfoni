@@ -1,8 +1,11 @@
-import { getIndex, getParent } from '../../../shared/architecture/state/state_utils';
-import findClosestTrack from '../_shared/find_closest_track/findClosestTrack';
-import getBeatAtClientX from '../_shared/get_beat_at_client_x/getBeatAtClientX';
-import offsetItems from '../_shared/offset_items/offsetItems';
-import Item from '../models/item/Item';
+import {
+    getIndex,
+    getParent,
+} from "../../../shared/architecture/state/state_utils";
+import findClosestTrack from "../_shared/find_closest_track/findClosestTrack";
+import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
+import offsetItems from "../_shared/offset_items/offsetItems";
+import Item from "../models/item/Item";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
@@ -71,15 +74,6 @@ class ItemHandler implements MouseEventHandler {
             return;
         }
 
-        const ghostPairs = this.context.selectionManager.selectedItems.map(
-            (item) => {
-                return [item, new Item(item.itemType, item.state)] as [
-                    legit: typeof item,
-                    ghost: typeof item,
-                ];
-            }
-        );
-
         const beatOffset = hoveredBeat - clickedBeat;
 
         const trackOffset = getIndex(hoveredTrack) - getIndex(clickedTrack);
@@ -88,12 +82,18 @@ class ItemHandler implements MouseEventHandler {
             getIndex(getParent(hoveredTrack)) -
             getIndex(getParent(clickedTrack));
 
-        offsetItems(
-            ghostPairs.map((pair) => pair[1]),
+        const items = this.context.selectionManager.selectedItems;
+
+        const movedItems = offsetItems(
+            items,
             beatOffset,
             trackOffset,
             voiceOffset
         );
+
+        const ghostPairs: [legit: Item<any>, ghost: Item<any>][] = [];
+
+        items.map((item, index) => ghostPairs.push([item, movedItems[index]]));
 
         this.context.moveManager.ghostPairs = ghostPairs;
     }
