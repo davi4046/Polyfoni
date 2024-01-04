@@ -4,7 +4,7 @@ import Subscribable from "../subscribable/Subscribable";
 
 import type { GetState, SetState } from "../state/state_utils";
 
-class Model<TState extends object>
+class Model<TState extends Readonly<object>>
     implements GetState<TState>, SetState<TState>
 {
     private _id = IdProvider.generateId();

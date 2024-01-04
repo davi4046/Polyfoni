@@ -6,7 +6,7 @@ import Subscribable from "../subscribable/Subscribable";
 /**
  * A model which state is bound to the state of another model.
  */
-class BoundModel<TModel extends Model<any>, TState extends object>
+class BoundModel<TModel extends Model<any>, TState extends Readonly<object>>
     implements GetState<TState>
 {
     private _modelId: string;
