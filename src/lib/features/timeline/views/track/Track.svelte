@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Item from "../item/Item.svelte";
+    import Item from "../item/_Item.svelte";
     import type TrackVM from "../../view_models/track/TrackVM";
 
     export let trackVM: TrackVM;
