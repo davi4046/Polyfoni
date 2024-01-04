@@ -4,12 +4,12 @@ import type ItemTypes from "../_shared/item_types/ItemTypes";
 
 import type { TrackState } from "./TrackState";
 
-class Track<T extends keyof ItemTypes> extends Model<Track<T>, TrackState<T>> {
+class Track<T extends keyof ItemTypes> extends Model<TrackState<T>> {
     constructor(
         readonly itemType: T,
-        createState: (model: Track<T>) => Required<TrackState<T>>
+        state: Required<TrackState<T>>
     ) {
-        super(createState);
+        super(state);
     }
 }
 
