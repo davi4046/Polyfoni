@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Track from "../Track.svelte";
+    import Track from "../track/Track.svelte";
     import TrackHeader from "../TrackHeader.svelte";
     import MarkerBig from "./MarkerBig.svelte";
     import MarkerSmall from "./MarkerSmall.svelte";
