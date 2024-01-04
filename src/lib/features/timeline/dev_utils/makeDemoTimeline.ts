@@ -25,7 +25,8 @@ function makeRandomItems<T extends keyof ItemTypes>(
         const end = beat + length;
         if (Math.random() > 0.2) {
             items.push(
-                new Item(itemType, (item) =>
+                new Item(
+                    itemType,
                     createItemState({
                         parent: track,
                         start: beat,
@@ -40,104 +41,86 @@ function makeRandomItems<T extends keyof ItemTypes>(
     return items;
 }
 
-function makeDemoTimeline(): Timeline {
-    return new Timeline((timeline) =>
-        createTimelineState({
-            children: [
-                new Section((section) =>
-                    createSectionState({
-                        parent: timeline,
-                        children: [],
-                    })
-                ),
-                new Section((section) =>
-                    createSectionState({
-                        parent: timeline,
-                        children: [
-                            new Voice((voice) =>
-                                createVoiceState({
-                                    parent: section,
-                                    children: [
-                                        new Track("StringItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Piano 1",
-                                                children: makeRandomItems(
-                                                    "StringItem",
-                                                    track
-                                                ),
-                                            })
-                                        ),
-                                        new Track("StringItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Pitch",
-                                                children: makeRandomItems(
-                                                    "StringItem",
-                                                    track
-                                                ),
-                                            })
-                                        ),
-                                        new Track("StringItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Duration",
-                                                children: makeRandomItems(
-                                                    "StringItem",
-                                                    track
-                                                ),
-                                            })
-                                        ),
-                                        new Track("StringItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Rest",
-                                                children: makeRandomItems(
-                                                    "StringItem",
-                                                    track
-                                                ),
-                                            })
-                                        ),
-                                        new Track("ChordItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Harmony",
-                                                children: makeRandomItems(
-                                                    "ChordItem",
-                                                    track
-                                                ),
-                                            })
-                                        ),
-                                    ],
-                                })
-                            ),
-                        ],
-                    })
-                ),
-                new Section((section) =>
-                    createSectionState({
-                        parent: timeline,
-                        children: [
-                            new Voice((voice) =>
-                                createVoiceState({
-                                    parent: section,
-                                    children: [
-                                        new Track("StringItem", (track) =>
-                                            createTrackState({
-                                                parent: voice,
-                                                label: "Harmonic Sum",
-                                                children: [],
-                                            })
-                                        ),
-                                    ],
-                                })
-                            ),
-                        ],
-                    })
-                ),
-            ],
-        })
+function populateTrack(track: Track<any>) {
+    const items = makeRandomItems(track.itemType, track);
+    track.state = { children: items };
+}
+
+function createDefaultTracks(voice: Voice): Track<any>[] {
+    const tracks: Track<any>[] = [];
+
+    tracks.push(
+        new Track(
+            "StringItem",
+            createTrackState({
+                parent: voice,
+                label: "Piano 1",
+                children: [],
+            })
+        ),
+        new Track(
+            "StringItem",
+            createTrackState({
+                parent: voice,
+                label: "Pitch",
+                children: [],
+            })
+        ),
+        new Track(
+            "StringItem",
+            createTrackState({
+                parent: voice,
+                label: "Duration",
+                children: [],
+            })
+        ),
+        new Track(
+            "StringItem",
+            createTrackState({
+                parent: voice,
+                label: "Rest",
+                children: [],
+            })
+        ),
+        new Track(
+            "ChordItem",
+            createTrackState({
+                parent: voice,
+                label: "Harmony",
+                children: [],
+            })
+        )
     );
+
+    tracks.forEach(populateTrack);
+
+    return tracks;
+}
+
+function makeDemoTimeline(): Timeline {
+    const timeline = new Timeline(createTimelineState({ children: [] }));
+
+    const sections = Array.from({ length: 3 }, () => {
+        return new Section(
+            createSectionState({ parent: timeline, children: [] })
+        );
+    });
+
+    timeline.state = { children: sections };
+
+    const voices = Array.from({ length: 3 }, () => {
+        const voice = new Voice(
+            createVoiceState({ parent: sections[1], children: [] })
+        );
+
+        voice.state = { children: createDefaultTracks(voice) };
+
+        return voice;
+    });
+
+    sections[1].state = { children: voices };
+
+    return timeline;
 }
 
 export default makeDemoTimeline;
