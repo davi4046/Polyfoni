@@ -9,7 +9,7 @@ import type Item from "../models/item/Item";
 class EndHandleHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
-        readonly item: Item
+        readonly item: Item<any>
     ) {}
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {

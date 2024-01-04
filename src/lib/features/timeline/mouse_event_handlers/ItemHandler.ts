@@ -9,12 +9,18 @@ import offsetItems from "../utils/offset_items/offsetItems";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
+import type Track from "../models/track/Track";
 
 class ItemHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
     ) {}
+
+    private _prevClickedBeat?: number;
+    private _prevHoveredBeat?: number;
+    private _prevClickedTrack?: Track<any>;
+    private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
         if (downEvent.shiftKey) {
@@ -46,6 +52,20 @@ class ItemHandler implements MouseEventHandler {
         );
 
         if (
+            clickedBeat === this._prevClickedBeat &&
+            hoveredBeat === this._prevHoveredBeat &&
+            clickedTrack === this._prevClickedTrack &&
+            hoveredTrack === this._prevHoveredTrack
+        ) {
+            return;
+        }
+
+        this._prevClickedBeat = clickedBeat;
+        this._prevHoveredBeat = hoveredBeat;
+        this._prevClickedTrack = clickedTrack;
+        this._prevHoveredTrack = hoveredTrack;
+
+        if (
             !hoveredTrack ||
             !clickedTrack ||
             (hoveredBeat === clickedBeat && hoveredTrack === clickedTrack)
@@ -56,7 +76,7 @@ class ItemHandler implements MouseEventHandler {
 
         const ghostPairs = this.context.selectionManager.selectedItems.map(
             (item) => {
-                return [item, new Item(item.itemType, () => item.state)] as [
+                return [item, new Item(item.itemType, item.state)] as [
                     legit: typeof item,
                     ghost: typeof item,
                 ];

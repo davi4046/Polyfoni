@@ -11,8 +11,8 @@ class TimelineHandler implements MouseEventHandler {
 
     private _prevClickedBeat?: number;
     private _prevHoveredBeat?: number;
-    private _prevClickedTrack?: Track;
-    private _prevHoveredTrack?: Track;
+    private _prevClickedTrack?: Track<any>;
+    private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
         this.context.selectionManager.deselectAll();
