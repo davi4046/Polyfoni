@@ -1,7 +1,7 @@
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
-import Highlight__SvelteComponent_ from "../../../views/components/Highlight.svelte";
+import Highlight__SvelteComponent_ from "../../../views/_spawned/Highlight.svelte";
 import createPaths from "./highlight/create_paths/createPaths";
 
 import type Highlight from "./highlight/Highlight";
