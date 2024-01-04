@@ -12,7 +12,10 @@ function getRect(highlight: Highlight): Rectangle {
         `[${Attribute.ModelId}='${highlight.track.id}']`
     ) as HTMLElement;
 
-    const rect = getRelativeRect(trackElement, trackElement.parentElement!);
+    const rect = getRelativeRect(
+        trackElement,
+        trackElement.parentElement!.parentElement!
+    );
 
     const y1 = rect.top;
     const y2 = rect.bottom;
