@@ -39,7 +39,7 @@ function clearTrackInterval<T extends keyof ItemTypes>(
             // We therefore make a new item for the split part.
             const newItem = new Item(
                 interval.item.itemType,
-                () => interval.item.state
+                interval.item.state
             );
             newItem.state = {
                 start: interval.start,

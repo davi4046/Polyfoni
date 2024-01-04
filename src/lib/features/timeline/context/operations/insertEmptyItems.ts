@@ -1,7 +1,7 @@
 import { addChildren } from "../../../../shared/architecture/state/state_utils";
+import clearTrackInterval from "../../_shared/clear_track_interval/clearTrackInterval";
 import Item from "../../models/item/Item";
 import { createItemState } from "../../models/item/ItemState";
-import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
 
 import type TimelineContext from "../TimelineContext";
 

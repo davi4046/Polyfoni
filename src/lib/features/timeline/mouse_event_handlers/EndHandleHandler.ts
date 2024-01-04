@@ -1,6 +1,6 @@
 import { getParent } from "../../../shared/architecture/state/state_utils";
-import clearTrackInterval from "../utils/clear_track_interval/clearTrackInterval";
-import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
+import clearTrackInterval from "../_shared/clear_track_interval/clearTrackInterval";
+import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";

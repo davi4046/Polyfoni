@@ -1,4 +1,4 @@
-import clearTrackInterval from "../../utils/clear_track_interval/clearTrackInterval";
+import clearTrackInterval from "../../_shared/clear_track_interval/clearTrackInterval";
 
 import type TimelineContext from "../TimelineContext";
 

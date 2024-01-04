@@ -1,6 +1,6 @@
 import type { SvelteComponent } from "svelte";
 import type StringEditorWidget from "../../../views/_spawned/editor_widgets/StringEditorWidget.svelte";
-import Chord from "../../../utils/chord/Chord";
+import Chord from "../../../_shared/chord/Chord";
 
 import type ChordEditorWidget from "../../../views/_spawned/editor_widgets/ChordEditorWidget.svelte";
 

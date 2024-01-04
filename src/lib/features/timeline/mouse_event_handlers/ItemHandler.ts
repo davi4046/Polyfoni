@@ -1,11 +1,8 @@
-import {
-    getIndex,
-    getParent,
-} from "../../../shared/architecture/state/state_utils";
-import Item from "../models/item/Item";
-import findClosestTrack from "../utils/find_closest_track/findClosestTrack";
-import getBeatAtClientX from "../utils/get_beat_at_client_x/getBeatAtClientX";
-import offsetItems from "../utils/offset_items/offsetItems";
+import { getIndex, getParent } from '../../../shared/architecture/state/state_utils';
+import findClosestTrack from '../_shared/find_closest_track/findClosestTrack';
+import getBeatAtClientX from '../_shared/get_beat_at_client_x/getBeatAtClientX';
+import offsetItems from '../_shared/offset_items/offsetItems';
+import Item from '../models/item/Item';
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
