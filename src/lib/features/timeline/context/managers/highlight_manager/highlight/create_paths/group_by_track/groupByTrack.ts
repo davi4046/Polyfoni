@@ -1,15 +1,13 @@
-import { getParent } from "../../../../../../../shared/architecture/state/state_utils";
+import type Highlight from "../../Highlight";
 
-import type Highlight from "../Highlight";
-
-function groupByVoice(highlights: Highlight[]): Highlight[][] {
+function groupByTrack(highlights: Highlight[]): Highlight[][] {
     const groups: Highlight[][] = [];
 
     if (highlights.length === 0) return groups;
 
     for (const highlight of highlights) {
         const group = groups.find((group) => {
-            return getParent(group[0].track) === getParent(highlight.track);
+            return group[0].track === highlight.track;
         });
         if (group) {
             group.push(highlight); //add to existing group
@@ -20,4 +18,4 @@ function groupByVoice(highlights: Highlight[]): Highlight[][] {
     return groups;
 }
 
-export default groupByVoice;
+export default groupByTrack;
