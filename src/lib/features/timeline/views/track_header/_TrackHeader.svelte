@@ -11,5 +11,8 @@
     data-type="header"
     data-model-id={trackVM.modelId}
 >
+    <div class="mr-2 h-6 w-6 overflow-clip">
+        <slot name="icon" />
+    </div>
     {trackVM.state.label}
 </div>
