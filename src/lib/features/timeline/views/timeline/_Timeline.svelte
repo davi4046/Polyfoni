@@ -36,7 +36,7 @@
 </script>
 
 <div
-    class="grid h-full grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto]"
+    class="grid h-full grid-cols-[8rem,auto] grid-rows-[auto,auto,1fr,auto]"
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
     data-type="timeline"
