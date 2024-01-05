@@ -4,7 +4,7 @@
 
     export let voiceVM: VoiceVM;
 
-    voiceVM.subscribe((_) => (voiceVM = voiceVM));
+    voiceVM.subscribe(() => (voiceVM = voiceVM));
 </script>
 
 <div

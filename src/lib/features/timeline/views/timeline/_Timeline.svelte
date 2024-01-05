@@ -1,17 +1,15 @@
 <script lang="ts">
-    import Track from "../track/_Track.svelte";
-    import TrackHeader from "../track_header/_TrackHeader.svelte";
     import MarkerBig from "./MarkerBig.svelte";
     import MarkerSmall from "./MarkerSmall.svelte";
+    import Voice from "../voice/_Voice.svelte";
+    import VoiceHeader from "../voice_header/_VoiceHeader.svelte";
     import VerticalLine from "./VerticalLine.svelte";
     import type TimelineVM from "../../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
-    import Voice from "../voice/_Voice.svelte";
-    import VoiceHeader from "../voice_header/_VoiceHeader.svelte";
 
     export let timelineVM: TimelineVM;
 
-    timelineVM.subscribe((_) => (timelineVM = timelineVM));
+    timelineVM.subscribe(() => (timelineVM = timelineVM));
 
     onMount(() => {
         for (let element of document.getElementsByClassName("h-scroll")) {

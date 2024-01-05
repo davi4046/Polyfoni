@@ -38,7 +38,9 @@ function createTimelineVM(
         });
     };
 
-    return new TimelineVM(model, update);
+    return new TimelineVM(model, update, () => {
+        return {};
+    });
 }
 
 export default createTimelineVM;

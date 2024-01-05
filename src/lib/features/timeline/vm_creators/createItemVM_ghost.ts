@@ -21,7 +21,7 @@ function createItemVM_ghost<T extends keyof ItemTypes>(
         });
     };
 
-    return new ItemVM(model, update);
+    return new ItemVM(model, update, {});
 }
 
 export default createItemVM_ghost;

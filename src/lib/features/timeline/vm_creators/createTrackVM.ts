@@ -26,7 +26,7 @@ function createTrackVM<T extends keyof ItemTypes>(
         });
     };
 
-    return new TrackVM(model, update);
+    return new TrackVM(model, update, {});
 }
 
 export default createTrackVM;

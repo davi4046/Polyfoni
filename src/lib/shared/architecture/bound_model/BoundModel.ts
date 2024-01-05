@@ -1,44 +1,43 @@
-import type Model from "../model/Model";
-import type { GetState } from "../state/state_utils";
-import Stateful from "../stateful/Stateful";
-import Subscribable from "../subscribable/Subscribable";
+import Model from "../model/Model";
 
 /**
  * A model which state is bound to the state of another model.
  */
-class BoundModel<TModel extends Model<any>, TState extends object>
-    implements GetState<TState>
-{
-    private _modelId: string;
-    private _stateful: Stateful<TState> & Required<TState>;
-    private _subscribable = new Subscribable(this);
+class BoundModel<
+    TModel extends Model<any>,
+    TBound extends object,
+    TUnbound extends object,
+> {
+    readonly modelId;
 
-    constructor(model: TModel, update: (model: TModel) => Required<TState>) {
-        this._stateful = Stateful.create(update(model));
-        this._modelId = model.id;
+    private _boundModel: Model<TBound>;
+    private _unboundModel: Model<TUnbound>;
+
+    constructor(
+        model: TModel,
+        updateBoundState: (model: TModel) => Required<TBound>,
+        initUnboundState: Required<TUnbound>
+    ) {
+        this.modelId = model.id;
+        this._boundModel = new Model<TBound>(updateBoundState(model));
+        this._unboundModel = new Model<TUnbound>(initUnboundState);
 
         model.subscribe((_) => {
-            this._stateful.setState(update(model));
-            this._subscribable.notifySubscribers();
+            this._boundModel.state = updateBoundState(model);
         });
-
-        this._subscribable.notifySubscribers();
     }
 
-    get modelId() {
-        return this._modelId;
+    get state(): TBound & TUnbound {
+        return { ...this._boundModel.state, ...this._unboundModel.state };
     }
 
-    get state(): Required<TState> {
-        return this._stateful.getState() as Required<TState>;
+    set state(newState: TUnbound) {
+        this._unboundModel.state = newState;
     }
 
-    subscribe(callback: (value: this) => void) {
-        this._subscribable.subscribe(callback);
-    }
-
-    notifySubscribers() {
-        this._subscribable.notifySubscribers();
+    subscribe(callback: () => void) {
+        this._boundModel.subscribe(callback);
+        this._unboundModel.subscribe(callback);
     }
 }
 

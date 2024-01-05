@@ -15,7 +15,9 @@ function createVoiceVM(model: Voice, context: TimelineContext): VoiceVM {
         });
     };
 
-    return new VoiceVM(model, update);
+    return new VoiceVM(model, update, () => {
+        return {};
+    });
 }
 
 export default createVoiceVM;
