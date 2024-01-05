@@ -66,9 +66,9 @@
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.top as trackVMGroup}
+        {#each timelineVM.state.top as group}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM (trackVM.modelId)}
+                {#each group as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -78,9 +78,9 @@
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.center as trackVMGroup}
+        {#each timelineVM.state.center as group}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM (trackVM.modelId)}
+                {#each group as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -90,9 +90,9 @@
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.bottom as trackVMGroup}
+        {#each timelineVM.state.bottom as group}
             <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each trackVMGroup as trackVM (trackVM.modelId)}
+                {#each group as trackVM (trackVM.modelId)}
                     <TrackHeader {trackVM}></TrackHeader>
                 {/each}
             </div>
@@ -107,11 +107,11 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.top as trackVMGroup}
+            {#each timelineVM.state.top as group}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM (trackVM.modelId)}
+                    {#each group as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>
@@ -127,11 +127,11 @@
             class="v-scroll flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.center as trackVMGroup}
+            {#each timelineVM.state.center as group}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM (trackVM.modelId)}
+                    {#each group as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>
@@ -147,11 +147,11 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.bottom as trackVMGroup}
+            {#each timelineVM.state.bottom as group}
                 <div
                     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
                 >
-                    {#each trackVMGroup as trackVM (trackVM.modelId)}
+                    {#each group as trackVM (trackVM.modelId)}
                         <Track {trackVM}></Track>
                     {/each}
                 </div>
