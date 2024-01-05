@@ -3,8 +3,8 @@ import createWithDefaults from "../../../../shared/utils/create_with_defaults/cr
 import type TrackVM from "../track/TrackVM";
 
 interface VoiceVMState {
-    tracks: TrackVM[];
-    isCollapsed?: boolean;
+    readonly tracks: TrackVM[];
+    readonly isCollapsed?: boolean;
 }
 
 const defaults = {
