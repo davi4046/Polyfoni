@@ -64,6 +64,45 @@ function removeChildren<T>(
     };
 }
 
+type Position<T extends HasGettableParent<HasGettableChildren<any>>> = {
+    index: number;
+    parentPos: T extends HasGettableParent<infer K>
+        ? K extends HasGettableParent<HasGettableChildren<any>>
+            ? Position<K>
+            : null
+        : null;
+};
+
+function getPosition<T extends HasGettableParent<HasGettableChildren<any>>>(
+    obj: T
+): Position<T> {
+    const grandparent = getGrandparent(obj as any) as any;
+    return {
+        index: getIndex(obj),
+        parentPos: (grandparent
+            ? getPosition(getParent(obj) as any)
+            : null) as any,
+    };
+}
+
+function isGreaterPos<T extends Position<any>>(a: T, b: T): boolean {
+    return isGreaterPosRecursive(a, b, false);
+}
+
+function isGreaterPosRecursive<T extends Position<any>>(
+    a: T,
+    b: T,
+    prevResult: boolean
+): boolean {
+    const result = a.index === b.index ? prevResult : a.index > b.index;
+
+    if (a.parentPos && b.parentPos) {
+        return isGreaterPosRecursive(a.parentPos, b.parentPos, result);
+    } else {
+        return result;
+    }
+}
+
 export {
     type GetState,
     type SetState,
@@ -74,4 +113,6 @@ export {
     getIndex,
     addChildren,
     removeChildren,
+    getPosition,
+    isGreaterPos,
 };

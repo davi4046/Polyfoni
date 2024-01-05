@@ -1,78 +1,56 @@
 import {
-    getChildren,
     getGrandparent,
     getGreatGrandparent,
     getIndex,
     getParent,
+    getPosition,
+    isGreaterPos,
 } from "../../../../shared/architecture/state/state_utils";
 
 import type Track from "../../models/track/Track";
 
-function getTracksInRange(start: Track<any>, end: Track<any>): Track<any>[] {
-    if (getGreatGrandparent(start) !== getGreatGrandparent(end)) {
-        throw new Error("start and end must reference the same Timeline");
-    }
+function getTracksInRange(
+    startTrack: Track<any>,
+    endTrack: Track<any>
+): Track<any>[] {
+    const timeline = getGreatGrandparent(startTrack);
 
-    const [minTrack, maxTrack] = [start, end].sort(
-        (a, b) => getIndex(a) - getIndex(b)
-    );
-
-    const [minVoice, maxVoice] = [start, end]
-        .map(getParent)
-        .sort((a, b) => getIndex(a) - getIndex(b));
-
-    const [minSection, maxSection] = [start, end]
-        .map(getGrandparent)
-        .sort((a, b) => getIndex(a) - getIndex(b));
-
-    if (minTrack === maxTrack) {
-        return [minTrack];
-    }
-
-    if (minVoice === maxVoice) {
-        return getChildren(getParent(minTrack)).slice(
-            getIndex(minTrack),
-            getIndex(maxTrack) + 1
+    if (getGreatGrandparent(endTrack) !== timeline) {
+        throw new Error(
+            "startTrack and endTrack must reference the same Timeline as parent"
         );
     }
 
-    const tracks: Track<any>[] = [];
+    const startPos = getPosition(startTrack);
+    const endPos = getPosition(endTrack);
 
-    tracks.push(
-        ...getChildren(minVoice).slice(
-            getIndex(minTrack),
-            getChildren(minVoice).length
-        )
+    const isStartTrackFirst = isGreaterPos(endPos, startPos);
+
+    const minTrack = isStartTrackFirst ? startTrack : endTrack;
+    const maxTrack = isStartTrackFirst ? endTrack : startTrack;
+
+    const minVoice = getParent(minTrack);
+    const maxVoice = getParent(maxTrack);
+
+    const minSection = getGrandparent(minTrack);
+    const maxSection = getGrandparent(maxTrack);
+
+    const sections = timeline.state.children.slice(
+        getIndex(minSection),
+        getIndex(maxSection) + 1
     );
 
-    tracks.push(...getChildren(maxVoice).slice(0, getIndex(maxTrack) + 1));
+    const voices = sections.flatMap((section) => {
+        const start = section === minSection ? getIndex(minVoice) : undefined;
+        const end = section === maxSection ? getIndex(maxVoice) + 1 : undefined;
+        return section.state.children.slice(start, end);
+    });
 
-    if (minSection === maxSection) {
-        tracks.push(
-            ...getChildren(getParent(minVoice))
-                .slice(getIndex(minVoice) + 1, getIndex(maxVoice))
-                .map(getChildren)
-                .flat()
-        );
-        return tracks;
-    }
-
-    tracks.push(
-        ...getChildren(minSection)
-            .slice(
-                getIndex(minSection),
-                getChildren(getParent(minSection)).length
-            )
-            .map(getChildren)
-            .flat()
-    );
-
-    tracks.push(
-        ...getChildren(maxSection)
-            .slice(0, getIndex(maxVoice) + 1)
-            .map(getChildren)
-            .flat()
-    );
+    const tracks = voices.flatMap((voice) => {
+        const start = voice === minVoice ? getIndex(minTrack) : undefined;
+        const end = voice === maxVoice ? getIndex(maxTrack) + 1 : undefined;
+        return voice.state.children.slice(start, end);
+    });
 
     return tracks;
 }
