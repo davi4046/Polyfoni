@@ -1,11 +1,11 @@
 import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
 
-import type TrackVM from "../track/TrackVM";
+import type VoiceVM from "../voice/VoiceVM";
 
 interface TimelineVMState {
-    readonly top?: TrackVM[][];
-    readonly center?: TrackVM[][];
-    readonly bottom?: TrackVM[][];
+    readonly top?: VoiceVM[];
+    readonly center?: VoiceVM[];
+    readonly bottom?: VoiceVM[];
     readonly handleMouseMove?: (event: MouseEvent) => void;
 }
 

@@ -6,6 +6,8 @@
     import VerticalLine from "./VerticalLine.svelte";
     import type TimelineVM from "../../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
+    import Voice from "../voice/_Voice.svelte";
+    import VoiceHeader from "../voice_header/_VoiceHeader.svelte";
 
     export let timelineVM: TimelineVM;
 
@@ -66,36 +68,24 @@
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.top as group}
-            <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each group as trackVM (trackVM.modelId)}
-                    <TrackHeader {trackVM}></TrackHeader>
-                {/each}
-            </div>
+        {#each timelineVM.state.top as voiceVM}
+            <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- CENTER HEADERS -->
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.center as group}
-            <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each group as trackVM (trackVM.modelId)}
-                    <TrackHeader {trackVM}></TrackHeader>
-                {/each}
-            </div>
+        {#each timelineVM.state.center as voiceVM}
+            <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- BOTTOM HEADERS -->
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.bottom as group}
-            <div class="space-y-[var(--timeline-track-spacing)]">
-                {#each group as trackVM (trackVM.modelId)}
-                    <TrackHeader {trackVM}></TrackHeader>
-                {/each}
-            </div>
+        {#each timelineVM.state.bottom as voiceVM}
+            <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- TOP TRACKS -->
@@ -107,14 +97,8 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.top as group}
-                <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
-                >
-                    {#each group as trackVM (trackVM.modelId)}
-                        <Track {trackVM}></Track>
-                    {/each}
-                </div>
+            {#each timelineVM.state.top as voiceVM}
+                <Voice {voiceVM}></Voice>
             {/each}
         </div>
     </div>
@@ -127,14 +111,8 @@
             class="v-scroll flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.center as group}
-                <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[var(--timeline-voice-color)]"
-                >
-                    {#each group as trackVM (trackVM.modelId)}
-                        <Track {trackVM}></Track>
-                    {/each}
-                </div>
+            {#each timelineVM.state.center as voiceVM}
+                <Voice {voiceVM}></Voice>
             {/each}
         </div>
     </div>
@@ -147,14 +125,8 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.bottom as group}
-                <div
-                    class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
-                >
-                    {#each group as trackVM (trackVM.modelId)}
-                        <Track {trackVM}></Track>
-                    {/each}
-                </div>
+            {#each timelineVM.state.bottom as voiceVM}
+                <Voice {voiceVM}></Voice>
             {/each}
         </div>
     </div>
