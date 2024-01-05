@@ -4,13 +4,15 @@ import getRelativeRect from "./get_relative_rect/getRelativeRect";
 import type Highlight from "../../../Highlight";
 import type Rectangle from "../Rectangle";
 
-function getRect(highlight: Highlight): Rectangle {
+function getRect(highlight: Highlight): Rectangle | undefined {
     const x1 = highlight.start * 64;
     const x2 = highlight.end * 64;
 
     const trackElement = document.querySelector(
         `[${Attribute.ModelId}='${highlight.track.id}']`
     ) as HTMLElement;
+
+    if (!trackElement) return;
 
     const rect = getRelativeRect(
         trackElement,

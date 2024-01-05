@@ -46,7 +46,9 @@ function createPaths(highlights: Highlight[]): Point[][] {
     for (const voiceGroup of groups) {
         for (let i = 0; i < voiceGroup.length; i++) {
             const currTrackGroup = voiceGroup[i];
-            const currTrackRects = currTrackGroup.map(getRect);
+            const currTrackRects = currTrackGroup
+                .map(getRect)
+                .filter((rect): rect is Rectangle => rect !== undefined);
 
             currTrackRects.forEach((rect) => rects.push(rect));
 
@@ -61,7 +63,9 @@ function createPaths(highlights: Highlight[]): Point[][] {
                 continue;
             }
 
-            const nextTrackRects = nextTrackGroup.map(getRect);
+            const nextTrackRects = nextTrackGroup
+                .map(getRect)
+                .filter((rect): rect is Rectangle => rect !== undefined);
 
             for (const upper of currTrackRects) {
                 for (const lower of nextTrackRects) {
