@@ -40,7 +40,7 @@
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
     data-type="timeline"
-    data-model-id={timelineVM.modelId}
+    data-model-id={timelineVM.id}
 >
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
@@ -66,7 +66,7 @@
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.top as voiceVM}
+        {#each timelineVM.state.top as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
@@ -74,7 +74,7 @@
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.center as voiceVM}
+        {#each timelineVM.state.center as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
@@ -82,7 +82,7 @@
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
     >
-        {#each timelineVM.state.bottom as voiceVM}
+        {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
         {/each}
     </div>
@@ -95,7 +95,7 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.top as voiceVM}
+            {#each timelineVM.state.top as voiceVM (voiceVM.id)}
                 <Voice {voiceVM}></Voice>
             {/each}
         </div>
@@ -109,7 +109,7 @@
             class="v-scroll flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.center as voiceVM}
+            {#each timelineVM.state.center as voiceVM (voiceVM.id)}
                 <Voice {voiceVM}></Voice>
             {/each}
         </div>
@@ -123,7 +123,7 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.bottom as voiceVM}
+            {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
                 <Voice {voiceVM}></Voice>
             {/each}
         </div>

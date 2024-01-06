@@ -1,3 +1,4 @@
+import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 import TrackVM from "../view_models/track/TrackVM";
 import { createTrackVMState } from "../view_models/track/TrackVMState";
 import createItemVM from "./createItemVM";
@@ -11,7 +12,7 @@ function createTrackVM<T extends keyof ItemTypes>(
     model: Track<T>,
     context: TimelineContext
 ): TrackVM {
-    const update = (model: Track<T>) => {
+    return createBoundModel(TrackVM, model, () => {
         const items = model.state.children.map((item) => {
             return createItemVM(item, context);
         });
@@ -24,9 +25,7 @@ function createTrackVM<T extends keyof ItemTypes>(
             label: model.state.label,
             items: [...items, ...ghostItems],
         });
-    };
-
-    return new TrackVM(model, update, {});
+    });
 }
 
 export default createTrackVM;

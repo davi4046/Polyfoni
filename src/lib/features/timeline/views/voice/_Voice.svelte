@@ -14,7 +14,7 @@
 <div
     class="space-y-[var(--timeline-track-spacing)] bg-[color:var(--timeline-voice-color)]"
 >
-    {#each tracksToDisplay as trackVM (trackVM.modelId)}
+    {#each tracksToDisplay as trackVM (trackVM.id)}
         <Track {trackVM}></Track>
     {/each}
 </div>

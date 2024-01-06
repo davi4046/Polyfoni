@@ -1,8 +1,7 @@
-import BoundModel from "../../../../shared/architecture/bound_model/BoundModel";
+import Model from "../../../../shared/architecture/model/Model";
 
-import type Timeline from "../../models/timeline/Timeline";
 import type { TimelineVMState } from "./TimelineVMState";
 
-class TimelineVM extends BoundModel<Timeline, Required<TimelineVMState>, {}> {}
+class TimelineVM extends Model<Required<TimelineVMState>> {}
 
 export default TimelineVM;

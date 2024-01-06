@@ -4,7 +4,7 @@ import type ItemTypes from "../_shared/item_types/ItemTypes";
 
 import type { ItemState } from "./ItemState";
 
-class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
+class Item<T extends keyof ItemTypes> extends Model<Required<ItemState<T>>> {
     constructor(
         readonly itemType: T,
         state: Required<ItemState<T>>

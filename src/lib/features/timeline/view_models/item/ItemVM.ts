@@ -1,9 +1,7 @@
-import BoundModel from "../../../../shared/architecture/bound_model/BoundModel";
+import Model from "../../../../shared/architecture/model/Model";
 
-import type Item from "../../models/item/Item";
 import type { ItemVMState } from "./ItemVMState";
 
-//@ts-ignore
-class ItemVM extends BoundModel<Item<any>, Required<ItemVMState>, {}> {}
+class ItemVM extends Model<Required<ItemVMState>> {}
 
 export default ItemVM;

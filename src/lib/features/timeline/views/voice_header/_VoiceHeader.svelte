@@ -21,7 +21,7 @@
 </script>
 
 <div class="space-y-[var(--timeline-track-spacing)]">
-    {#each tracksToDisplay as trackVM, index (trackVM.modelId)}
+    {#each tracksToDisplay as trackVM, index (trackVM.id)}
         <TrackHeader {trackVM}>
             <span slot="icon">
                 {#if index === 0}

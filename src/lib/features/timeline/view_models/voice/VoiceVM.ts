@@ -1,13 +1,7 @@
-import BoundModel from "../../../../shared/architecture/bound_model/BoundModel";
+import Model from "../../../../shared/architecture/model/Model";
 
-import type Voice from "../../models/voice/Voice";
-import type { VoiceVMState_bound } from "./VoiceVMState_bound";
-import type { VoiceVMState_unbound } from "./VoiceVMState_unbound";
+import type { VoiceVMState } from "./VoiceVMState";
 
-class VoiceVM extends BoundModel<
-    Voice,
-    Required<VoiceVMState_bound>,
-    Required<VoiceVMState_unbound>
-> {}
+class VoiceVM extends Model<Required<VoiceVMState>> {}
 
 export default VoiceVM;

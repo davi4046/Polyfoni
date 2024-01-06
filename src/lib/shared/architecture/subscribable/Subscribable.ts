@@ -1,14 +1,12 @@
-class Subscribable<T extends object> {
-    constructor(private _obj: T) {}
+class Subscribable {
+    private _callbacks: (() => void)[] = [];
 
-    private _callbacks: ((value: T) => void)[] = [];
-
-    readonly subscribe = (callback: (value: T) => void) => {
+    readonly subscribe = (callback: () => void) => {
         this._callbacks.push(callback);
     };
 
     readonly notifySubscribers = () => {
-        this._callbacks.forEach((callback) => callback(this._obj));
+        this._callbacks.forEach((callback) => callback());
     };
 }
 

@@ -1,5 +1,4 @@
 import IdProvider from "../id_provider/IdProvider";
-import Stateful from "../stateful/Stateful";
 import Subscribable from "../subscribable/Subscribable";
 
 import type { GetState, SetState } from "../state/state_utils";
@@ -7,28 +6,26 @@ import type { GetState, SetState } from "../state/state_utils";
 class Model<TState extends object>
     implements GetState<TState>, SetState<TState>
 {
-    private _id = IdProvider.generateId();
-    private _stateful: Stateful<TState> & Required<TState>;
-    private _subscribable = new Subscribable(this);
+    private _state: TState;
+    private _subscribable = new Subscribable();
 
-    constructor(state: Required<TState>) {
-        this._stateful = Stateful.create(state);
-    }
-
-    get id() {
-        return this._id;
+    constructor(
+        state: TState,
+        readonly id = IdProvider.generateId()
+    ) {
+        this._state = state;
     }
 
     set state(newState: Partial<TState>) {
-        this._stateful.setState(newState);
+        Object.assign(this._state, newState);
         this._subscribable.notifySubscribers();
     }
 
-    get state(): Required<TState> {
-        return this._stateful.getState() as Required<TState>;
+    get state(): TState {
+        return Object.assign({}, this._state);
     }
 
-    subscribe(callback: (value: this) => void) {
+    subscribe(callback: () => void) {
         this._subscribable.subscribe(callback);
     }
 

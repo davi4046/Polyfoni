@@ -13,7 +13,7 @@
     class="absolute z-50 h-full py-1"
     style="width: {width}px; left: {left}px;"
     data-type="item"
-    data-model-id={itemVM.modelId}
+    data-model-id={itemVM.id}
 >
     <div
         class="relative flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
