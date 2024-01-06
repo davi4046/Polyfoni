@@ -17,6 +17,7 @@ class TimelineHandler implements MouseEventHandler {
     handleMouseDown(downEvent: MouseEvent) {
         this.context.selectionManager.deselectAll();
         this.context.highlightManager.highlights = [];
+        this.context.editorWidgetManager.closeEditorWigdet();
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {

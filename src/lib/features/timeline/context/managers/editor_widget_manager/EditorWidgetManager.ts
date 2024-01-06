@@ -29,6 +29,7 @@ class EditorWidgetManager {
         this._editorWidget = new editorWidgets[item.itemType]({
             target: editorWidgetContainer,
             props: {
+                value: item.state.content,
                 update: (value) => {
                     item.state = { content: value };
                 },

@@ -6,14 +6,16 @@ interface TimelineVMState {
     readonly top?: VoiceVM[];
     readonly center?: VoiceVM[];
     readonly bottom?: VoiceVM[];
-    readonly handleMouseMove?: (event: MouseEvent) => void;
+    readonly handleMouseMove_tracks?: (event: MouseEvent) => void;
+    readonly handleMouseMove_others?: (event: MouseEvent) => void;
 }
 
 const defaults = {
     top: [],
     center: [],
     bottom: [],
-    handleMouseMove: () => {},
+    handleMouseMove_tracks: () => {},
+    handleMouseMove_others: () => {},
 };
 
 function createTimelineVMState(options: TimelineVMState) {

@@ -37,7 +37,7 @@
 
 <div
     class="grid h-full grid-cols-[8rem,auto] grid-rows-[auto,auto,1fr,auto,auto]"
-    on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
+    on:mousemove={timelineVM.state.handleMouseMove_tracks}
     role="none"
     data-type="timeline"
     data-model-id={timelineVM.id}
@@ -65,6 +65,8 @@
     <!-- TOP HEADERS -->
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        on:mousemove={timelineVM.state.handleMouseMove_others}
+        role="none"
     >
         {#each timelineVM.state.top as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
@@ -73,6 +75,8 @@
     <!-- CENTER HEADERS -->
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        on:mousemove={timelineVM.state.handleMouseMove_others}
+        role="none"
     >
         {#each timelineVM.state.center as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
@@ -81,6 +85,8 @@
     <!-- BOTTOM HEADERS -->
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        on:mousemove={timelineVM.state.handleMouseMove_others}
+        role="none"
     >
         {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
             <VoiceHeader {voiceVM}></VoiceHeader>
@@ -151,5 +157,7 @@
     <div
         data-type="editor-widget-container"
         class="col-start-1 col-end-3 row-start-5 row-end-6 bg-green-500"
+        on:mousemove={timelineVM.state.handleMouseMove_others}
+        role="none"
     ></div>
 </div>

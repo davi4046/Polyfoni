@@ -9,7 +9,11 @@ type ItemTypes = {
 };
 
 type EditorWidget<T extends keyof ItemTypes> = ComponentType<
-    SvelteComponent<{ update: (value: ItemTypes[T]) => void }, {}, {}>
+    SvelteComponent<
+        { value: ItemTypes[T]; update: (value: ItemTypes[T]) => void },
+        {},
+        {}
+    >
 >;
 
 const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {

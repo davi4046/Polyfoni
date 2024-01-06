@@ -14,8 +14,14 @@ function createTimelineVM(
 ): TimelineVM {
     const mouseEventHandler = new TimelineHandler(context);
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove_tracks = (event: MouseEvent) => {
         mouseEventListener.handler = mouseEventHandler;
+        event.stopPropagation();
+    };
+
+    const handleMouseMove_others = (event: MouseEvent) => {
+        mouseEventListener.handler = undefined;
+        event.stopPropagation();
     };
 
     return createBoundModel(TimelineVM, model, () => {
@@ -35,7 +41,8 @@ function createTimelineVM(
             top: top,
             center: center,
             bottom: bottom,
-            handleMouseMove: handleMouseMove,
+            handleMouseMove_tracks: handleMouseMove_tracks,
+            handleMouseMove_others: handleMouseMove_others,
         });
     });
 }

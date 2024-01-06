@@ -4,7 +4,7 @@ class MouseEventListener {
     private _handler?: MouseEventHandler;
     private _downEvent?: MouseEvent;
 
-    set handler(newHandler: MouseEventHandler) {
+    set handler(newHandler: MouseEventHandler | undefined) {
         if (this._downEvent) return; //avoid handler updating when dragging
         this._handler = newHandler;
     }
