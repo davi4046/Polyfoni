@@ -1,24 +1,20 @@
-import type { SvelteComponent } from "svelte";
-import type StringEditorWidget from "../../../views/_spawned/editor_widgets/StringEditorWidget.svelte";
+import type { ComponentType, SvelteComponent } from "svelte";
 import Chord from "../../../_shared/chord/Chord";
-
-import type ChordEditorWidget from "../../../views/_spawned/editor_widgets/ChordEditorWidget.svelte";
-
-type ItemType<
-    TContent,
-    TEditorWidget extends SvelteComponent<
-        { update: (value: TContent) => void },
-        {},
-        {}
-    >,
-> = {
-    ContentType: TContent;
-    EditorWidgetType: TEditorWidget;
-};
+import ChordEditorWidget from "../../../views/_spawned/editor_widgets/ChordEditorWidget.svelte";
+import StringEditorWidget from "../../../views/_spawned/editor_widgets/StringEditorWidget.svelte";
 
 type ItemTypes = {
-    StringItem: ItemType<string, StringEditorWidget>;
-    ChordItem: ItemType<Chord, ChordEditorWidget>;
+    StringItem: string;
+    ChordItem: Chord;
 };
 
-export type { ItemTypes as default };
+type EditorWidget<T extends keyof ItemTypes> = ComponentType<
+    SvelteComponent<{ update: (value: ItemTypes[T]) => void }, {}, {}>
+>;
+
+const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
+    StringItem: StringEditorWidget,
+    ChordItem: ChordEditorWidget,
+};
+
+export { type ItemTypes, editorWidgets };

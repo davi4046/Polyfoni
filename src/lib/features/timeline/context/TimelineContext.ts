@@ -1,15 +1,19 @@
 import type Timeline from "../models/timeline/Timeline";
-import type HighlightManager from "./managers/highlight_manager/HighlightManager";
-import type MoveManager from "./managers/move_manager/MoveManager";
-import type SelectionManager from "./managers/selection_manager/SelectionManager";
+import EditorWidgetManager from "./managers/editor_widget_manager/EditorWidgetManager";
+import HighlightManager from "./managers/highlight_manager/HighlightManager";
+import MoveManager from "./managers/move_manager/MoveManager";
+import SelectionManager from "./managers/selection_manager/SelectionManager";
 
 class TimelineContext {
-    constructor(
-        readonly timeline: Timeline,
-        readonly highlightManager: HighlightManager,
-        readonly selectionManager: SelectionManager,
-        readonly moveManager: MoveManager
-    ) {}
+    readonly highlightManager = new HighlightManager();
+    readonly selectionManager = new SelectionManager();
+    readonly moveManager = new MoveManager();
+
+    readonly editorWidgetManager;
+
+    constructor(readonly timeline: Timeline) {
+        this.editorWidgetManager = new EditorWidgetManager(this.timeline);
+    }
 }
 
 export default TimelineContext;

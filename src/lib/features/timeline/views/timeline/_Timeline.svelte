@@ -36,7 +36,7 @@
 </script>
 
 <div
-    class="grid h-full grid-cols-[8rem,auto] grid-rows-[auto,auto,1fr,auto]"
+    class="grid h-full grid-cols-[8rem,auto] grid-rows-[auto,auto,1fr,auto,auto]"
     on:mousemove={(event) => timelineVM.state.handleMouseMove(event)}
     role="none"
     data-type="timeline"
@@ -147,4 +147,9 @@
             {/each}
         </div>
     </div>
+    <!-- EDITOR WIDGET CONTAINER -->
+    <div
+        data-type="editor-widget-container"
+        class="col-start-1 col-end-3 row-start-5 row-end-6 bg-green-500"
+    ></div>
 </div>

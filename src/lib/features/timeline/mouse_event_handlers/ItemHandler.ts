@@ -1,15 +1,19 @@
+import Attribute from "../../../shared/architecture/AttributeEnum";
 import {
+    getGreatGrandparent,
     getIndex,
     getParent,
 } from "../../../shared/architecture/state/state_utils";
 import findClosestTrack from "../_shared/find_closest_track/findClosestTrack";
 import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
 import offsetItems from "../_shared/offset_items/offsetItems";
+import { editorWidgets } from "../models/_shared/item_types/ItemTypes";
 import Item from "../models/item/Item";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/track/Track";
+import type { ItemTypes } from "../models/_shared/item_types/ItemTypes";
 
 class ItemHandler implements MouseEventHandler {
     constructor(
@@ -28,6 +32,9 @@ class ItemHandler implements MouseEventHandler {
         } else {
             this.context.selectionManager.deselectAll();
             this.context.selectionManager.selectItem(this.item);
+        }
+        if (this.context.selectionManager.isSelected(this.item)) {
+            this.context.editorWidgetManager.openItemEditorWidget(this.item);
         }
         downEvent.stopPropagation();
     }

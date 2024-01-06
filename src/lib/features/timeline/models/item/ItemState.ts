@@ -7,7 +7,7 @@ import type Track from "../track/Track";
 interface ItemState<T extends keyof ItemTypes> extends ChildState<Track<T>> {
     readonly start: number;
     readonly end: number;
-    readonly content?: ItemTypes[T]["ContentType"] | null;
+    readonly content?: ItemTypes[T] | null;
 }
 
 const defaults = {
