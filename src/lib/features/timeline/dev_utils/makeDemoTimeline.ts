@@ -1,4 +1,4 @@
-import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
+import type { ItemTypes } from "../utils/ItemTypes";
 import Item from "../models/item/Item";
 import { createItemState } from "../models/item/ItemState";
 import Section from "../models/section/Section";
@@ -9,8 +9,7 @@ import Track from "../models/track/Track";
 import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
 import { createVoiceState } from "../models/voice/VoiceState";
-
-import type ItemTypes from "../models/_shared/item_types/ItemTypes";
+import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
 
 function makeRandomItems<T extends keyof ItemTypes>(
     itemType: T,
