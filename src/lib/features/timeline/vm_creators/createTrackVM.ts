@@ -1,8 +1,7 @@
 import type TimelineContext from "../context/TimelineContext";
-import type { ItemTypes } from "../utils/ItemTypes";
 import type Track from "../models/Track";
+import type { ItemTypes } from "../utils/ItemTypes";
 import TrackVM from "../view_models/track/TrackVM";
-import { createTrackVMState } from "../view_models/track/TrackVMState";
 
 import createItemVM from "./createItemVM";
 import createItemVM_ghost from "./createItemVM_ghost";
@@ -24,10 +23,10 @@ function createTrackVM<T extends keyof ItemTypes>(
     };
 
     const vm = new TrackVM(
-        createTrackVMState({
+        {
             label: model.state.label,
             items: createItems(),
-        }),
+        },
         model.id
     );
 

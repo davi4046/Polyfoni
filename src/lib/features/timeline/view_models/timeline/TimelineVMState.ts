@@ -1,5 +1,3 @@
-import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
-
 import type VoiceVM from "../voice/VoiceVM";
 
 interface TimelineVMState {
@@ -10,16 +8,4 @@ interface TimelineVMState {
     readonly handleMouseMove_others?: (event: MouseEvent) => void;
 }
 
-const defaults = {
-    top: [],
-    center: [],
-    bottom: [],
-    handleMouseMove_tracks: () => {},
-    handleMouseMove_others: () => {},
-};
-
-function createTimelineVMState(options: TimelineVMState) {
-    return createWithDefaults(options, defaults);
-}
-
-export { type TimelineVMState, createTimelineVMState };
+export { type TimelineVMState };

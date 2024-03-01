@@ -1,5 +1,3 @@
-import createWithDefaults from "../../../../shared/utils/create_with_defaults/createWithDefaults";
-
 import type ItemVM from "../item/ItemVM";
 
 interface TrackVMState {
@@ -7,8 +5,4 @@ interface TrackVMState {
     readonly items: ItemVM[];
 }
 
-function createTrackVMState(options: TrackVMState) {
-    return createWithDefaults(options, {});
-}
-
-export { type TrackVMState, createTrackVMState };
+export { type TrackVMState };
