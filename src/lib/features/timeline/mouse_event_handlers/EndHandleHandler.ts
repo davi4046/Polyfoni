@@ -1,4 +1,4 @@
-import { getParent } from "../../../shared/architecture/state/state_utils";
+import { getParent } from "../../../shared/architecture/state/state-hierarchy-utils";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";

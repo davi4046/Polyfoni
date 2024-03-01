@@ -1,5 +1,5 @@
 import type Track from "../../models/Track";
-import { getParent } from "../../../../shared/architecture/state/state_utils";
+import { getParent } from "../../../../shared/architecture/state/state-hierarchy-utils";
 
 function groupByVoice<T extends { track: Track<any> }>(objs: T[]): T[][] {
     const groups: T[][] = [];

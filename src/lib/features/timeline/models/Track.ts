@@ -11,7 +11,7 @@ import {
     getPosition,
     isGreaterPos,
     removeChildren,
-} from "../../../shared/architecture/state/state_utils";
+} from "../../../shared/architecture/state/state-hierarchy-utils";
 import clearInterval from "../../../shared/utils/interval/clear_interval/clearInterval";
 
 import Item from "./Item";

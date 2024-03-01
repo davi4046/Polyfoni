@@ -9,7 +9,7 @@ import {
     getGreatGrandparent,
     getIndex,
     getParent,
-} from "../../../shared/architecture/state/state_utils";
+} from "../../../shared/architecture/state/state-hierarchy-utils";
 
 import type Track from "./Track";
 

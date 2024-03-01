@@ -2,7 +2,7 @@ import type TimelineContext from "../TimelineContext";
 import {
     getParent,
     removeChildren,
-} from "../../../../shared/architecture/state/state_utils";
+} from "../../../../shared/architecture/state/state-hierarchy-utils";
 
 function deleteSelectedItems(context: TimelineContext) {
     context.selectionManager.state.selectedItems.forEach((item) => {
