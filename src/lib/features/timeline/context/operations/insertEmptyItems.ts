@@ -1,6 +1,6 @@
 import type TimelineContext from "../TimelineContext";
 import Item from "../../models/Item";
-import { addChildren } from "../../../../shared/architecture/state/state-hierarchy-utils";
+import { addChildren } from "../../../../shared/architecture/state-hierarchy-utils";
 
 function insertEmptyItems(context: TimelineContext) {
     context.highlightManager.highlights.forEach((highlight) => {

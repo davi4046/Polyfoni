@@ -1,4 +1,4 @@
-import Model from "../../../shared/architecture/model/Model";
+import Model from "../../../shared/architecture/Model";
 
 import type ItemVM from "./ItemVM";
 

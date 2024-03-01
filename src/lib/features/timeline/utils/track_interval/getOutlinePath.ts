@@ -2,7 +2,7 @@ import polygonClipping from "polygon-clipping";
 
 import type Track from "../../models/Track";
 import Attribute from "../../../../shared/architecture/AttributeEnum";
-import { getIndex } from "../../../../shared/architecture/state/state-hierarchy-utils";
+import { getIndex } from "../../../../shared/architecture/state-hierarchy-utils";
 import type Interval from "../../../../shared/utils/interval/Interval";
 
 import groupByTrack from "./groupByTrack";

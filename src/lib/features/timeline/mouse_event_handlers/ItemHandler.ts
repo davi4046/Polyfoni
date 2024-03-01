@@ -7,7 +7,7 @@ import type MouseEventHandler from "../../../shared/architecture/mouse_event_lis
 import {
     getIndex,
     getParent,
-} from "../../../shared/architecture/state/state-hierarchy-utils";
+} from "../../../shared/architecture/state-hierarchy-utils";
 
 class ItemHandler implements MouseEventHandler {
     constructor(

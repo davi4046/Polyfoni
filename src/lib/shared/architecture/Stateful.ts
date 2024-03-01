@@ -1,4 +1,4 @@
-import type { GetState, SetState } from "../state/state-hierarchy-utils";
+import type { GetState, SetState } from "./state-hierarchy-utils";
 
 export default class Stateful<TState extends object>
     implements GetState<TState>, SetState<TState>

@@ -5,7 +5,7 @@ import Timeline from "./../../models/Timeline";
 import { editorWidgets } from "./../../utils/ItemTypes";
 import type { ItemTypes } from "./../../utils/ItemTypes";
 import Attribute from "./../../../../shared/architecture/AttributeEnum";
-import { getGrandparent } from "../../../../shared/architecture/state/state-hierarchy-utils";
+import { getGrandparent } from "../../../../shared/architecture/state-hierarchy-utils";
 
 class EditorWidgetManager {
     constructor(timeline: Timeline) {
