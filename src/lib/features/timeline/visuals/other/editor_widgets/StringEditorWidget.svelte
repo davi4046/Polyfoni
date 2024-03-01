@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let value: string;
-    export let update: (value: string) => void;
+    export let value: string | null;
+    export let update: (value: string | null) => void;
 
     let inputField: HTMLInputElement;
 

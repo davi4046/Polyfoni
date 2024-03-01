@@ -16,7 +16,7 @@ import type Track from "./Track";
 interface ItemState<T extends keyof ItemTypes> extends ChildState<Track<T>> {
     start: number;
     end: number;
-    content: ItemTypes[T] | null;
+    content: ItemTypes[T];
 }
 
 class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {

@@ -8,8 +8,8 @@ import pitchNames from "./pitchNames";
 import Chord from "./chord/Chord";
 
 export type ItemTypes = {
-    StringItem: string;
-    ChordItem: Chord;
+    StringItem: string | null;
+    ChordItem: Chord | null;
 };
 
 export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
@@ -19,7 +19,10 @@ export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
 
 type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     SvelteComponent<
-        { value: ItemTypes[T]; update: (value: ItemTypes[T]) => void },
+        {
+            value: ItemTypes[T];
+            update: (value: ItemTypes[T]) => void;
+        },
         {},
         {}
     >
