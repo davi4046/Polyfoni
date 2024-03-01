@@ -1,5 +1,3 @@
-import Item from "./Item";
-import type Voice from "./Voice";
 import type { ItemTypes } from "../utils/ItemTypes";
 import Model from "../../../shared/architecture/model/Model";
 import type ParentChildState from "../../../shared/architecture/state/ParentChildState";
@@ -16,9 +14,12 @@ import {
 } from "../../../shared/architecture/state/state_utils";
 import clearInterval from "../../../shared/utils/interval/clear_interval/clearInterval";
 
+import Item from "./Item";
+import type Voice from "./Voice";
+
 interface TrackState<T extends keyof ItemTypes>
     extends ParentChildState<Voice, Item<T>> {
-    readonly label: string;
+    label: string;
 }
 
 export default class Track<T extends keyof ItemTypes> extends Model<
