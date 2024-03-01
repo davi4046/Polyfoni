@@ -1,21 +1,28 @@
-import createBoundModel from "../../../shared/architecture/model/createBoundModel";
-import VoiceVM from "../view_models/voice/VoiceVM";
-import { createVoiceVMState } from "../view_models/voice/VoiceVMState";
-import createTrackVM from "./createTrackVM";
-
 import type TimelineContext from "../context/TimelineContext";
 import type Voice from "../models/voice/Voice";
+import VoiceVM from "../view_models/voice/VoiceVM";
+import { createVoiceVMState } from "../view_models/voice/VoiceVMState";
+
+import createTrackVM from "./createTrackVM";
 
 function createVoiceVM(model: Voice, context: TimelineContext): VoiceVM {
-    return createBoundModel(VoiceVM, model, () => {
-        const tracks = model.state.children.map((track) => {
-            return createTrackVM(track, context);
-        });
+    const vm = new VoiceVM(
+        createVoiceVMState({
+            tracks: model.state.children.map((track) => {
+                return createTrackVM(track, context);
+            }),
+        })
+    );
 
-        return createVoiceVMState({
-            tracks: tracks,
-        });
+    model.subscribe(() => {
+        vm.state = {
+            tracks: model.state.children.map((track) => {
+                return createTrackVM(track, context);
+            }),
+        };
     });
+
+    return vm;
 }
 
 export default createVoiceVM;

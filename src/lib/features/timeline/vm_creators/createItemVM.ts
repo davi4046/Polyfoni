@@ -8,7 +8,6 @@ import { stringConversionFunctions, type ItemTypes } from "../utils/ItemTypes";
 import type Item from "../models/item/Item";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
-import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 
 function createItemVM<T extends keyof ItemTypes>(
@@ -34,8 +33,8 @@ function createItemVM<T extends keyof ItemTypes>(
         event.stopPropagation();
     };
 
-    return createBoundModel(ItemVM, model, () => {
-        return createItemVMState({
+    const vm = new ItemVM(
+        createItemVMState({
             start: model.state.start,
             end: model.state.end,
             text: stringConversionFunctions[model.itemType](
@@ -47,8 +46,23 @@ function createItemVM<T extends keyof ItemTypes>(
             handleMouseMove: handleMouseMove,
             handleMouseMove_startHandle: handleMouseMove_startHandle,
             handleMouseMove_endHandle: handleMouseMove_endHandle,
-        });
+        })
+    );
+
+    model.subscribe(() => {
+        vm.state = {
+            start: model.state.start,
+            end: model.state.end,
+            text: stringConversionFunctions[model.itemType](
+                model.state.content
+            ),
+            ...(context.selectionManager.isSelected(model)
+                ? { outlineColor: chroma.hcl(240, 80, 80) }
+                : {}),
+        };
     });
+
+    return vm;
 }
 
 export default createItemVM;

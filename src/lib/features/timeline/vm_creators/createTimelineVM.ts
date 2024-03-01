@@ -1,11 +1,10 @@
-import createBoundModel from "../../../shared/architecture/model/createBoundModel";
-import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 import TimelineContext from "../context/TimelineContext";
-import Timeline from "../models/timeline/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
+import Timeline from "../models/timeline/Timeline";
 import TimelineVM from "../view_models/timeline/TimelineVM";
 import { createTimelineVMState } from "../view_models/timeline/TimelineVMState";
-import createTrackVM from "./createTrackVM";
+import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
+
 import createVoiceVM from "./createVoiceVM";
 
 function createTimelineVM(
@@ -24,7 +23,7 @@ function createTimelineVM(
         event.stopPropagation();
     };
 
-    return createBoundModel(TimelineVM, model, () => {
+    const createSections = () => {
         const top = model.state.children[0].state.children.map((voice) => {
             return createVoiceVM(voice, context);
         });
@@ -37,14 +36,31 @@ function createTimelineVM(
             return createVoiceVM(voice, context);
         });
 
-        return createTimelineVMState({
+        return { top, center, bottom };
+    };
+
+    const { top, center, bottom } = createSections();
+
+    const vm = new TimelineVM(
+        createTimelineVMState({
             top: top,
             center: center,
             bottom: bottom,
             handleMouseMove_tracks: handleMouseMove_tracks,
             handleMouseMove_others: handleMouseMove_others,
-        });
+        })
+    );
+
+    model.subscribe(() => {
+        const { top, center, bottom } = createSections();
+        vm.state = {
+            top: top,
+            center: center,
+            bottom: bottom,
+        };
     });
+
+    return vm;
 }
 
 export default createTimelineVM;

@@ -1,13 +1,10 @@
 import IdProvider from "../id_provider/IdProvider";
-import Subscribable from "../subscribable/Subscribable";
-
 import type { GetState, SetState } from "../state/state_utils";
 
 class Model<TState extends object>
     implements GetState<TState>, SetState<TState>
 {
     private _state: TState;
-    private _subscribable = new Subscribable();
 
     constructor(
         state: TState,
@@ -18,19 +15,17 @@ class Model<TState extends object>
 
     set state(newState: Partial<TState>) {
         Object.assign(this._state, newState);
-        this._subscribable.notifySubscribers();
+        this._callbacks.forEach((callback) => callback()); //notify subscribers
     }
 
     get state(): TState {
         return Object.assign({}, this._state);
     }
 
-    subscribe(callback: () => void) {
-        this._subscribable.subscribe(callback);
-    }
+    private _callbacks: (() => void)[] = [];
 
-    notifySubscribers() {
-        this._subscribable.notifySubscribers();
+    subscribe(callback: () => void) {
+        this._callbacks.push(callback);
     }
 }
 
