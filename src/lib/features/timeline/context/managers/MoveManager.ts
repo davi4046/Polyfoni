@@ -3,8 +3,8 @@ import {
     addChildren,
     getParent,
     removeChildren,
-} from "../../../../shared/architecture/state-hierarchy-utils";
-import Stateful from "../../../../shared/architecture/Stateful";
+} from "../../../../architecture/state-hierarchy-utils";
+import Stateful from "../../../../architecture/Stateful";
 
 type ItemPair = [legit: Item<any>, ghost: Item<any>];
 

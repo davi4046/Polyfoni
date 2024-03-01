@@ -1,5 +1,5 @@
 import type Item from "../../models/Item";
-import Stateful from "../../../../shared/architecture/Stateful";
+import Stateful from "../../../../architecture/Stateful";
 
 interface SelectionManagerState {
     selectedItems: Item<any>[];

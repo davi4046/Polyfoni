@@ -1,4 +1,4 @@
-import Model from "../../../shared/architecture/Model";
+import Model from "../../../architecture/Model";
 import type { ParentChildState } from "../../../shared/architecture/state-hierarchy-utils";
 
 import type Timeline from "./Timeline";

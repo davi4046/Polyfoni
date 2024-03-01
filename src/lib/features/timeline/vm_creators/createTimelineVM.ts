@@ -2,7 +2,7 @@ import TimelineContext from "../context/TimelineContext";
 import Timeline from "../models/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
-import { mouseEventListener } from "../../../shared/architecture/mouse-event-handling";
+import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 
 import createVoiceVM from "./createVoiceVM";
 

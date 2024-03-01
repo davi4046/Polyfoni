@@ -1,4 +1,4 @@
-import Attribute from "../../../../shared/architecture/AttributeEnum";
+import Attribute from "../../../../architecture/AttributeEnum";
 
 import type Timeline from "../../models/Timeline";
 

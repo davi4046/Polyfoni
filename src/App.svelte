@@ -3,7 +3,7 @@
     import makeDemoTimeline from "./lib/features/timeline/dev_utils/makeDemoTimeline";
     import TimelineContext from "./lib/features/timeline/context/TimelineContext";
     import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
-    import ShortcutManager from "./lib/shared/architecture/ShortcutManager";
+    import ShortcutManager from "./lib/architecture/ShortcutManager";
     import deleteSelectedItems from "./lib/features/timeline/context/operations/deleteSelectedItems";
     import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";

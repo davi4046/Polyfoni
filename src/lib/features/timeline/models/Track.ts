@@ -1,6 +1,6 @@
 import type { ItemTypes } from "../utils/ItemTypes";
-import Model from "../../../shared/architecture/Model";
-import * as stateHierarchyUtils from "../../../shared/architecture/state-hierarchy-utils";
+import Model from "../../../architecture/Model";
+import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 import clearInterval from "../../../shared/utils/interval/clear_interval/clearInterval";
 
 import Item from "./Item";

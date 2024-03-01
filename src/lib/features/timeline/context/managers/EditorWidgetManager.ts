@@ -4,8 +4,8 @@ import type Item from "./../../models/Item";
 import Timeline from "./../../models/Timeline";
 import { editorWidgets } from "./../../utils/ItemTypes";
 import type { ItemTypes } from "./../../utils/ItemTypes";
-import Attribute from "./../../../../shared/architecture/AttributeEnum";
-import { getGrandparent } from "../../../../shared/architecture/state-hierarchy-utils";
+import Attribute from "../../../../architecture/AttributeEnum";
+import { getGrandparent } from "../../../../architecture/state-hierarchy-utils";
 
 class EditorWidgetManager {
     constructor(timeline: Timeline) {
