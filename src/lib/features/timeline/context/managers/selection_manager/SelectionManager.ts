@@ -1,26 +1,32 @@
 import type Item from "../../../models/item/Item";
+import Stateful from "../../../../../shared/architecture/model/Stateful";
 
-class SelectionManager {
-    private _selectedItems: Item<any>[] = [];
+interface SelectionManagerState {
+    selectedItems: Item<any>[];
+}
 
-    get selectedItems() {
-        return this._selectedItems;
+class SelectionManager extends Stateful<SelectionManagerState> {
+    constructor() {
+        super({ selectedItems: [] });
     }
 
     selectItem(item: Item<any>) {
-        if (this._selectedItems.includes(item)) return;
-        this._selectedItems.push(item);
-        item.notifySubscribers();
+        if (this.state.selectedItems.includes(item)) return;
+        this.state = {
+            selectedItems: this.state.selectedItems.concat(item),
+        };
     }
 
     deselectItem(item: Item<any>) {
-        let index = this._selectedItems.indexOf(item);
-        this._selectedItems.splice(index, 1);
-        item.notifySubscribers();
+        this.state = {
+            selectedItems: this.state.selectedItems.filter(
+                (selectedItem) => selectedItem !== item
+            ),
+        };
     }
 
     toggleSelected(item: Item<any>) {
-        if (this._selectedItems.includes(item)) {
+        if (this.state.selectedItems.includes(item)) {
             this.deselectItem(item);
         } else {
             this.selectItem(item);
@@ -28,11 +34,13 @@ class SelectionManager {
     }
 
     deselectAll() {
-        this._selectedItems.slice().forEach((item) => this.deselectItem(item));
+        this.state = {
+            selectedItems: [],
+        };
     }
 
     isSelected(item: Item<any>) {
-        return this._selectedItems.includes(item);
+        return this.state.selectedItems.includes(item);
     }
 }
 

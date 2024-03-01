@@ -1,40 +1,34 @@
+import type Item from "../../../models/item/Item";
+import Stateful from "../../../../../shared/architecture/model/Stateful";
 import {
     addChildren,
     getParent,
     removeChildren,
 } from "../../../../../shared/architecture/state/state_utils";
 
-import type Item from "../../../models/item/Item";
-
 type ItemPair = [legit: Item<any>, ghost: Item<any>];
 
-class MoveManager {
-    private _ghostPairs: readonly ItemPair[] = [];
+interface MoveManagerState {
+    ghostPairs: readonly ItemPair[];
+}
 
-    set ghostPairs(newGhostPairs: readonly ItemPair[]) {
-        const oldGhostItems = this._ghostPairs.map((pair) => pair[1]);
-        const newGhostItems = newGhostPairs.map((pair) => pair[1]);
-
-        const oldTracks = oldGhostItems.map((item) => getParent(item));
-        const newTracks = newGhostItems.map((item) => getParent(item));
-
-        const tracks = Array.from(new Set([...oldTracks, ...newTracks]));
-
-        this._ghostPairs = newGhostPairs;
-
-        tracks.forEach((track) => track.notifySubscribers());
+class MoveManager extends Stateful<MoveManagerState> {
+    constructor() {
+        super({ ghostPairs: [] });
     }
 
-    get ghostPairs() {
-        return this._ghostPairs;
+    set ghostPairs(newGhostPairs: readonly ItemPair[]) {
+        this.state = {
+            ghostPairs: newGhostPairs,
+        };
     }
 
     get ghostItems() {
-        return this._ghostPairs.map((pair) => pair[1]);
+        return this.state.ghostPairs.map((pair) => pair[1]);
     }
 
     readonly placeGhostItems = () => {
-        this._ghostPairs.forEach((pair) => {
+        this.state.ghostPairs.forEach((pair) => {
             const oldTrack = getParent(pair[0]);
             const newTrack = getParent(pair[1]);
 
@@ -48,7 +42,9 @@ class MoveManager {
             removeChildren(oldTrack, pair[0]);
             addChildren(newTrack, pair[1]);
         });
-        this.ghostPairs = [];
+        this.state = {
+            ghostPairs: [],
+        };
     };
 }
 

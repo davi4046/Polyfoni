@@ -38,6 +38,12 @@ function createTrackVM<T extends keyof ItemTypes>(
         };
     });
 
+    context.moveManager.subscribe(() => {
+        vm.state = {
+            items: createItems(),
+        };
+    });
+
     return vm;
 }
 

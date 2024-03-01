@@ -57,9 +57,14 @@ function createItemVM<T extends keyof ItemTypes>(
             text: stringConversionFunctions[model.itemType](
                 model.state.content
             ),
-            ...(context.selectionManager.isSelected(model)
-                ? { outlineColor: chroma.hcl(240, 80, 80) }
-                : {}),
+        };
+    });
+
+    context.selectionManager.subscribe(() => {
+        vm.state = {
+            outlineColor: context.selectionManager.isSelected(model)
+                ? chroma.hcl(240, 80, 80)
+                : chroma.hcl(0, 0, 0, 0),
         };
     });
 
