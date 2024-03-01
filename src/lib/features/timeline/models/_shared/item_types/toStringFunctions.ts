@@ -1,4 +1,4 @@
-import pitchNames from "../../../_shared/pitchNames";
+import pitchNames from "../../../utils/pitchNames";
 
 import type ItemTypes from "./ItemTypes";
 
