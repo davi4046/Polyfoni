@@ -1,5 +1,5 @@
-import type VoiceVM from "../voice/VoiceVM";
-import Model from "../../../../shared/architecture/model/Model";
+import type VoiceVM from "./VoiceVM";
+import Model from "../../../shared/architecture/model/Model";
 
 interface TimelineVMState {
     readonly top?: VoiceVM[];

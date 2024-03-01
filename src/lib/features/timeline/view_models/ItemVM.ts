@@ -1,4 +1,4 @@
-import Model from "../../../../shared/architecture/model/Model";
+import Model from "../../../shared/architecture/model/Model";
 
 interface ItemVMState {
     readonly start: number;

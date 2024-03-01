@@ -1,5 +1,5 @@
-import type ItemVM from "../item/ItemVM";
-import Model from "../../../../shared/architecture/model/Model";
+import type ItemVM from "./ItemVM";
+import Model from "../../../shared/architecture/model/Model";
 
 interface TrackVMState {
     readonly label: string;

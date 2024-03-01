@@ -1,5 +1,6 @@
-import type TrackVM from "../track/TrackVM";
-import Model from "../../../../shared/architecture/model/Model";
+import Model from "../../../shared/architecture/model/Model";
+
+import type TrackVM from "./TrackVM";
 
 interface VoiceVMState {
     readonly tracks: TrackVM[];

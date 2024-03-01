@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
 import type Voice from "../models/Voice";
-import VoiceVM from "../view_models/voice/VoiceVM";
+import VoiceVM from "../view_models/VoiceVM";
 
 import createTrackVM from "./createTrackVM";
 
