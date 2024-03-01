@@ -1,9 +1,11 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
-import pitchNames from './pitchNames';
-import Chord from './chord/Chord';
-import ChordEditorWidget from '../views/_spawned/editor_widgets/ChordEditorWidget.svelte';
-import StringEditorWidget from '../views/_spawned/editor_widgets/StringEditorWidget.svelte';
+import ChordEditorWidget from "../views/_spawned/editor_widgets/ChordEditorWidget.svelte";
+import StringEditorWidget from "../views/_spawned/editor_widgets/StringEditorWidget.svelte";
+
+import pitchNames from "./pitchNames";
+
+import Chord from "./chord/Chord";
 
 export type ItemTypes = {
     StringItem: string;
@@ -23,7 +25,7 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     >
 >;
 
-export const toStringFunctions: ToStringFunctions = {
+export const stringConversionFunctions: StringConversionFunctions = {
     StringItem: (value) => (value ? value : "empty"),
     ChordItem: (value) => {
         if (!value) return "empty";
@@ -33,8 +35,6 @@ export const toStringFunctions: ToStringFunctions = {
     },
 };
 
-type ToStringFunctions = {
+type StringConversionFunctions = {
     [K in keyof ItemTypes]: (value: ItemTypes[K] | null) => string;
 };
-
-

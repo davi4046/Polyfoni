@@ -4,13 +4,10 @@ import type TimelineContext from "../context/TimelineContext";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
+import { stringConversionFunctions, type ItemTypes } from "../utils/ItemTypes";
 import type Item from "../models/item/Item";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
-import {
-    toStringFunctions,
-    type ItemTypes,
-} from "../utils/ItemTypes";
 import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 
@@ -41,7 +38,9 @@ function createItemVM<T extends keyof ItemTypes>(
         return createItemVMState({
             start: model.state.start,
             end: model.state.end,
-            text: toStringFunctions[model.itemType](model.state.content),
+            text: stringConversionFunctions[model.itemType](
+                model.state.content
+            ),
             ...(context.selectionManager.isSelected(model)
                 ? { outlineColor: chroma.hcl(240, 80, 80) }
                 : {}),
