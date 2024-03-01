@@ -48,7 +48,8 @@ function createTimelineVM(
             bottom: bottom,
             handleMouseMove_tracks: handleMouseMove_tracks,
             handleMouseMove_others: handleMouseMove_others,
-        })
+        }),
+        model.id
     );
 
     model.subscribe(() => {

@@ -11,7 +11,8 @@ function createVoiceVM(model: Voice, context: TimelineContext): VoiceVM {
             tracks: model.state.children.map((track) => {
                 return createTrackVM(track, context);
             }),
-        })
+        }),
+        model.id
     );
 
     model.subscribe(() => {

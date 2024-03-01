@@ -46,7 +46,8 @@ function createItemVM<T extends keyof ItemTypes>(
             handleMouseMove: handleMouseMove,
             handleMouseMove_startHandle: handleMouseMove_startHandle,
             handleMouseMove_endHandle: handleMouseMove_endHandle,
-        })
+        }),
+        model.id
     );
 
     model.subscribe(() => {

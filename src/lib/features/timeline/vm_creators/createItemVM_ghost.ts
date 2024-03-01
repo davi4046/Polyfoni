@@ -16,7 +16,8 @@ function createItemVM_ghost<T extends keyof ItemTypes>(
                 model.state.content
             ),
             opacity: 0.75,
-        })
+        }),
+        model.id
     );
 
     model.subscribe(() => {

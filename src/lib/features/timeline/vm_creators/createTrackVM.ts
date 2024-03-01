@@ -27,7 +27,8 @@ function createTrackVM<T extends keyof ItemTypes>(
         createTrackVMState({
             label: model.state.label,
             items: createItems(),
-        })
+        }),
+        model.id
     );
 
     model.subscribe(() => {
