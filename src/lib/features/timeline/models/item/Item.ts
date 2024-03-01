@@ -1,7 +1,9 @@
 import { clamp } from "lodash";
 
+import type Track from "../track/Track";
 import type { ItemTypes } from "../../utils/ItemTypes";
 import Model from "../../../../shared/architecture/model/Model";
+import type ChildState from "../../../../shared/architecture/state/ChildState";
 import {
     getChildren,
     getGrandparent,
@@ -10,7 +12,11 @@ import {
     getParent,
 } from "../../../../shared/architecture/state/state_utils";
 
-import type ItemState from "./ItemState";
+interface ItemState<T extends keyof ItemTypes> extends ChildState<Track<T>> {
+    readonly start: number;
+    readonly end: number;
+    readonly content?: ItemTypes[T] | null;
+}
 
 class Item<T extends keyof ItemTypes> extends Model<Required<ItemState<T>>> {
     constructor(

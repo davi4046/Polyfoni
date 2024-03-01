@@ -1,6 +1,8 @@
+import type Section from "../section/Section";
 import Model from "../../../../shared/architecture/model/Model";
+import type ParentState from "../../../../shared/architecture/state/ParentState";
 
-import type TimelineState from "./TimelineState";
+interface TimelineState extends ParentState<Section> {}
 
 class Timeline extends Model<Required<TimelineState>> {}
 
