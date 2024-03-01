@@ -1,8 +1,8 @@
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 
-import type TrackMember from "./TrackMember";
+import type TrackInterval from "./TrackInterval";
 
-function getBounds(highlight: TrackMember): Bounds | undefined {
+function getBounds(highlight: TrackInterval): Bounds | undefined {
     const x1 = highlight.start * 64;
     const x2 = highlight.end * 64;
 

@@ -1,17 +1,16 @@
+import type TrackInterval from "../../../utils/track_interval/TrackInterval";
+import getOutlinePath from "../../../utils/track_interval/getOutlinePath";
+import Highlight__SvelteComponent_ from "../../../views/_spawned/Highlight.svelte";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
-import getOutlinePath from "../../../utils/track_member/getOutlinePath";
-import Highlight__SvelteComponent_ from "../../../views/_spawned/Highlight.svelte";
-
-import type TrackMember from "../../../utils/track_member/TrackMember";
 
 export default class HighlightManager {
-    private _highlights: TrackMember[] = [];
+    private _highlights: TrackInterval[] = [];
 
     private _component?: Highlight__SvelteComponent_;
 
-    set highlights(newHighlights: TrackMember[]) {
+    set highlights(newHighlights: TrackInterval[]) {
         this._highlights = newHighlights;
         this.renderHighlights();
     }
@@ -20,7 +19,7 @@ export default class HighlightManager {
         return this._highlights;
     }
 
-    addHighlight(newHighlight: TrackMember) {
+    addHighlight(newHighlight: TrackInterval) {
         const highlights = this._highlights.filter(
             (highlight) => highlight.track === newHighlight.track
         );

@@ -1,7 +1,7 @@
-import type TrackMember from "./TrackMember";
+import type TrackInterval from "./TrackInterval";
 
-function groupByTrack(highlights: TrackMember[]): TrackMember[][] {
-    const groups: TrackMember[][] = [];
+function groupByTrack(highlights: TrackInterval[]): TrackInterval[][] {
+    const groups: TrackInterval[][] = [];
 
     if (highlights.length === 0) return groups;
 

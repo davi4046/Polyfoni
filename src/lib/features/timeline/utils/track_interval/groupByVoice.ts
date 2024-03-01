@@ -1,6 +1,6 @@
 import { getParent } from "../../../../shared/architecture/state/state_utils";
 
-import type TrackMember from "./TrackMember";
+import type TrackMember from "./TrackInterval";
 
 function groupByVoice(highlights: TrackMember[]): TrackMember[][] {
     const groups: TrackMember[][] = [];

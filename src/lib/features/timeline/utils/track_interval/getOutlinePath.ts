@@ -2,12 +2,12 @@ import polygonClipping from "polygon-clipping";
 
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 import { getIndex } from "../../../../shared/architecture/state/state_utils";
+
+import type TrackInterval from "./TrackInterval";
 import groupByTrack from "./groupByTrack";
 import groupByVoice from "./groupByVoice";
 
-import type TrackMember from "./TrackMember";
-
-export default function getOutlinePath(highlights: TrackMember[]): Point[][] {
+export default function getOutlinePath(highlights: TrackInterval[]): Point[][] {
     if (highlights.length === 0) return [];
 
     const groups = groupByVoice(highlights).map((group) =>
@@ -84,7 +84,7 @@ type Point = {
     y: number;
 };
 
-function getBoundingBox(highlight: TrackMember): BoundingBox | undefined {
+function getBoundingBox(highlight: TrackInterval): BoundingBox | undefined {
     const x1 = highlight.start * 64;
     const x2 = highlight.end * 64;
 
