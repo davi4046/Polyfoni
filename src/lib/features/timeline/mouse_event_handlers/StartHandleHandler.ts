@@ -1,11 +1,10 @@
 import { clamp } from "lodash";
 
-import { getParent } from "../../../shared/architecture/state/state-hierarchy-utils";
-import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
-
-import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
-import type Item from "../models/item/Item";
+import type Item from "../models/Item";
+import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
+import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
+import { getParent } from "../../../shared/architecture/state/state-hierarchy-utils";
 
 class StartHandleHandler implements MouseEventHandler {
     constructor(

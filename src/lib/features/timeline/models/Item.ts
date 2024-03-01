@@ -2,18 +2,12 @@ import { clamp } from "lodash";
 
 import type { ItemTypes } from "./../utils/ItemTypes";
 import Model from "../../../shared/architecture/model/Model";
-import {
-    type ChildState,
-    getChildren,
-    getGrandparent,
-    getGreatGrandparent,
-    getIndex,
-    getParent,
-} from "../../../shared/architecture/state/state-hierarchy-utils";
+import * as stateHierarchyUtils from "../../../shared/architecture/state/state-hierarchy-utils";
 
 import type Track from "./Track";
 
-interface ItemState<T extends keyof ItemTypes> extends ChildState<Track<T>> {
+interface ItemState<T extends keyof ItemTypes>
+    extends stateHierarchyUtils.ChildState<Track<T>> {
     start: number;
     end: number;
     content: ItemTypes[T];
@@ -33,10 +27,10 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
         trackOffset: number,
         voiceOffset: number
     ): Item<any>[] {
-        const section = getGreatGrandparent(items[0]);
+        const section = stateHierarchyUtils.getGreatGrandparent(items[0]);
 
         items.forEach((item) => {
-            if (getGreatGrandparent(item) !== section) {
+            if (stateHierarchyUtils.getGreatGrandparent(item) !== section) {
                 throw new Error(
                     "Failed to offset items, all items' voices must reference the same section"
                 );
@@ -55,12 +49,16 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
         /* Clamp Track Offset */
 
         const minTrackIndex = items.reduce((min, item) => {
-            const index = getIndex(getParent(item));
+            const index = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getParent(item)
+            );
             return Math.min(min, index);
         }, Number.MAX_VALUE);
 
         const maxTrackIndex = items.reduce((max, item) => {
-            const index = getIndex(getParent(item));
+            const index = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getParent(item)
+            );
             return Math.max(max, index);
         }, Number.MIN_VALUE);
 
@@ -69,16 +67,20 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
         /* Clamp Voice Offset  */
 
         const minVoiceIndex = items.reduce((min, item) => {
-            const index = getIndex(getGrandparent(item));
+            const index = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getGrandparent(item)
+            );
             return Math.min(min, index);
         }, Number.MAX_VALUE);
 
         const maxVoiceIndex = items.reduce((max, item) => {
-            const index = getIndex(getGrandparent(item));
+            const index = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getGrandparent(item)
+            );
             return Math.max(max, index);
         }, Number.MIN_VALUE);
 
-        const voiceCount = getChildren(section).length;
+        const voiceCount = stateHierarchyUtils.getChildren(section).length;
 
         voiceOffset = clamp(
             voiceOffset,
@@ -92,14 +94,20 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
             const newStart = item.state.start + beatOffset;
             const newEnd = newStart + item.state.end - item.state.start;
 
-            const trackIndex = getIndex(getParent(item));
-            const voiceIndex = getIndex(getGrandparent(item));
+            const trackIndex = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getParent(item)
+            );
+            const voiceIndex = stateHierarchyUtils.getIndex(
+                stateHierarchyUtils.getGrandparent(item)
+            );
 
             const newTrackIndex = trackIndex + trackOffset;
             const newVoiceIndex = voiceIndex + voiceOffset;
 
-            const newTrack = getChildren(
-                getChildren(getGreatGrandparent(item))[newVoiceIndex]
+            const newTrack = stateHierarchyUtils.getChildren(
+                stateHierarchyUtils.getChildren(
+                    stateHierarchyUtils.getGreatGrandparent(item)
+                )[newVoiceIndex]
             )[newTrackIndex];
 
             return new Item(newTrack.itemType, {
