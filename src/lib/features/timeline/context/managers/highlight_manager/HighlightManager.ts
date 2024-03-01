@@ -1,6 +1,6 @@
 import type Track from "../../../models/track/Track";
 import getOutlinePath from "../../../utils/track_interval/getOutlinePath";
-import Highlight__SvelteComponent_ from "../../../visuals/views/_spawned/Highlight.svelte";
+import Highlight__SvelteComponent_ from "../../../visuals/other/Highlight.svelte";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import type Interval from "../../../../../shared/utils/interval/Interval";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
