@@ -1,9 +1,9 @@
-import { getParent } from "../../../../../../../../shared/architecture/state/state_utils";
+import { getParent } from "../../../../shared/architecture/state/state_utils";
 
-import type Highlight from "../../Highlight";
+import type TrackMember from "./TrackMember";
 
-function groupByVoice(highlights: Highlight[]): Highlight[][] {
-    const groups: Highlight[][] = [];
+function groupByVoice(highlights: TrackMember[]): TrackMember[][] {
+    const groups: TrackMember[][] = [];
 
     if (highlights.length === 0) return groups;
 

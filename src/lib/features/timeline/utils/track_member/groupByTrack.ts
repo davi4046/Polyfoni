@@ -1,7 +1,7 @@
-import type Highlight from "../../Highlight";
+import type TrackMember from "./TrackMember";
 
-function groupByTrack(highlights: Highlight[]): Highlight[][] {
-    const groups: Highlight[][] = [];
+function groupByTrack(highlights: TrackMember[]): TrackMember[][] {
+    const groups: TrackMember[][] = [];
 
     if (highlights.length === 0) return groups;
 

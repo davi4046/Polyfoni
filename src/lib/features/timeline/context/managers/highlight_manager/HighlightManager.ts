@@ -1,17 +1,17 @@
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
+import getOutlinePath from "../../../utils/track_member/getOutlinePath";
 import Highlight__SvelteComponent_ from "../../../views/_spawned/Highlight.svelte";
-import createPaths from "./highlight/create_paths/createPaths";
 
-import type Highlight from "./highlight/Highlight";
+import type TrackMember from "../../../utils/track_member/TrackMember";
 
-class HighlightManager {
-    private _highlights: Highlight[] = [];
+export default class HighlightManager {
+    private _highlights: TrackMember[] = [];
 
     private _component?: Highlight__SvelteComponent_;
 
-    set highlights(newHighlights: Highlight[]) {
+    set highlights(newHighlights: TrackMember[]) {
         this._highlights = newHighlights;
         this.renderHighlights();
     }
@@ -20,14 +20,14 @@ class HighlightManager {
         return this._highlights;
     }
 
-    addHighlight(newHighlight: Highlight) {
+    addHighlight(newHighlight: TrackMember) {
         const highlights = this._highlights.filter(
             (highlight) => highlight.track === newHighlight.track
         );
 
         this._highlights = this._highlights.filter(
             (highlight) => !highlights.includes(highlight)
-        );
+        ); // remove highlights that are on the same track as the new highlight
 
         highlights.push(newHighlight);
 
@@ -49,7 +49,7 @@ class HighlightManager {
             `[${Attribute.Type}='overlay']`
         )!;
 
-        const path = createPaths(this._highlights)
+        const path = getOutlinePath(this._highlights)
             .map((path) => createSvgPath(path))
             .join(" ");
 
@@ -63,5 +63,3 @@ class HighlightManager {
         });
     }
 }
-
-export default HighlightManager;
