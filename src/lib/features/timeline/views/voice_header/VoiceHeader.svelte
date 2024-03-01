@@ -1,9 +1,9 @@
 <script lang="ts">
     import type VoiceVM from "../../view_models/voice/VoiceVM";
-    import TrackHeader from "../track_header/_TrackHeader.svelte";
-    import PipeMid from "./PipeMid.svelte";
-    import PipeEnd from "./PipeEnd.svelte";
-    import ArrowDown from "./ArrowDown.svelte";
+    import TrackHeader from "../track_header/TrackHeader.svelte";
+    import PipeMid from "./assets/PipeMid.svelte";
+    import PipeEnd from "./assets/PipeEnd.svelte";
+    import ArrowDown from "./assets/ArrowDown.svelte";
 
     export let voiceVM: VoiceVM;
 

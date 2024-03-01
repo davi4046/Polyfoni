@@ -1,9 +1,9 @@
 <script lang="ts">
-    import MarkerBig from "./MarkerBig.svelte";
-    import MarkerSmall from "./MarkerSmall.svelte";
-    import Voice from "../voice/_Voice.svelte";
-    import VoiceHeader from "../voice_header/_VoiceHeader.svelte";
-    import VerticalLine from "./VerticalLine.svelte";
+    import MarkerBig from "./assets/MarkerBig.svelte";
+    import MarkerSmall from "./assets/MarkerSmall.svelte";
+    import Voice from "../voice/Voice.svelte";
+    import VoiceHeader from "../voice_header/VoiceHeader.svelte";
+    import VerticalLine from "./assets/VerticalLine.svelte";
     import type TimelineVM from "../../view_models/timeline/TimelineVM";
     import { onMount } from "svelte";
 
