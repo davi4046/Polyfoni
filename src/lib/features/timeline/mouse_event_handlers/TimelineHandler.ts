@@ -1,10 +1,9 @@
+import Track from "../models/track/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
-import getTracksInRange from "../_shared/get_tracks_in_range/getTracksInRange";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
-import type Track from "../models/track/Track";
 
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
@@ -67,11 +66,12 @@ class TimelineHandler implements MouseEventHandler {
             return;
         }
 
-        const newHighlights = getTracksInRange(clickedTrack, hoveredTrack).map(
-            (track) => {
-                return { track: track, start: minBeat, end: maxBeat };
-            }
-        );
+        const newHighlights = Track.getTracksInRange(
+            clickedTrack,
+            hoveredTrack
+        ).map((track) => {
+            return { track: track, start: minBeat, end: maxBeat };
+        });
 
         this.context.highlightManager.highlights = newHighlights;
     }
