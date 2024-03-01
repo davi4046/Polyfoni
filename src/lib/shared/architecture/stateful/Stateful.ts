@@ -14,7 +14,7 @@ export default class Stateful<TState extends object>
         this._callbacks.forEach((callback) => callback()); //notify subscribers
     }
 
-    get state(): TState {
+    get state(): Readonly<TState> {
         return Object.assign({}, this._state);
     }
 
