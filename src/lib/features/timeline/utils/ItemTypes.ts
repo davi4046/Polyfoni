@@ -1,9 +1,9 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
-import pitchNames from '../../../utils/pitchNames';
-import Chord from '../../../utils/chord/Chord';
-import ChordEditorWidget from '../../../views/_spawned/editor_widgets/ChordEditorWidget.svelte';
-import StringEditorWidget from '../../../views/_spawned/editor_widgets/StringEditorWidget.svelte';
+import pitchNames from './pitchNames';
+import Chord from './chord/Chord';
+import ChordEditorWidget from '../views/_spawned/editor_widgets/ChordEditorWidget.svelte';
+import StringEditorWidget from '../views/_spawned/editor_widgets/StringEditorWidget.svelte';
 
 export type ItemTypes = {
     StringItem: string;

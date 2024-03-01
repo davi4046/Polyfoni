@@ -10,7 +10,7 @@ import { createItemVMState } from "../view_models/item/ItemVMState";
 import {
     toStringFunctions,
     type ItemTypes,
-} from "../models/_shared/item_types/ItemTypes";
+} from "../utils/ItemTypes";
 import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 

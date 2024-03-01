@@ -5,7 +5,7 @@ import { createItemVMState } from "../view_models/item/ItemVMState";
 import {
     type ItemTypes,
     toStringFunctions,
-} from "../models/_shared/item_types/ItemTypes";
+} from "../utils/ItemTypes";
 import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 
 function createItemVM_ghost<T extends keyof ItemTypes>(
