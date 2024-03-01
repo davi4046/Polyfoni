@@ -1,11 +1,12 @@
-import createBoundModel from "../../../shared/architecture/model/createBoundModel";
-import { toStringFunctions } from "../models/_shared/item_types/toStringFunctions";
-import ItemVM from "../view_models/item/ItemVM";
-import { createItemVMState } from "../view_models/item/ItemVMState";
-
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/item/Item";
-import type ItemTypes from "../models/_shared/item_types/ItemTypes";
+import ItemVM from "../view_models/item/ItemVM";
+import { createItemVMState } from "../view_models/item/ItemVMState";
+import {
+    type ItemTypes,
+    toStringFunctions,
+} from "../models/_shared/item_types/ItemTypes";
+import createBoundModel from "../../../shared/architecture/model/createBoundModel";
 
 function createItemVM_ghost<T extends keyof ItemTypes>(
     model: Item<T>,
