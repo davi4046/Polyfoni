@@ -2,8 +2,8 @@ import { clamp } from "lodash";
 
 import type { ItemTypes } from "./../utils/ItemTypes";
 import Model from "../../../shared/architecture/model/Model";
-import type ChildState from "./../../../shared/architecture/state/ChildState";
 import {
+    type ChildState,
     getChildren,
     getGrandparent,
     getGreatGrandparent,

@@ -1,7 +1,7 @@
 import type { ItemTypes } from "../utils/ItemTypes";
 import Model from "../../../shared/architecture/model/Model";
-import type ParentChildState from "../../../shared/architecture/state/ParentChildState";
 import {
+    type ParentChildState,
     addChildren,
     getChildren,
     getGrandparent,

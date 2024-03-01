@@ -1,6 +1,15 @@
-import type ChildState from "./ChildState";
-import type ParentChildState from "./ParentChildState";
-import type ParentState from "./ParentState";
+interface ChildState<TParent> {
+    readonly parent: TParent;
+}
+
+interface ParentChildState<TParent, TChild> {
+    readonly parent: TParent;
+    readonly children: readonly TChild[];
+}
+
+interface ParentState<TChild> {
+    readonly children: readonly TChild[];
+}
 
 interface GetState<TState> {
     get state(): TState;
@@ -104,6 +113,9 @@ function isGreaterPosRecursive<T extends Position<any>>(
 }
 
 export {
+    type ChildState,
+    type ParentChildState,
+    type ParentState,
     type GetState,
     type SetState,
     getParent,
