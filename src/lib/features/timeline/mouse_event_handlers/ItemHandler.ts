@@ -1,19 +1,14 @@
-import Attribute from "../../../shared/architecture/AttributeEnum";
 import {
-    getGreatGrandparent,
     getIndex,
     getParent,
 } from "../../../shared/architecture/state/state_utils";
+import Item from "../models/item/Item";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
-import offsetItems from "../_shared/offset_items/offsetItems";
-import { editorWidgets } from "../models/_shared/item_types/ItemTypes";
-import Item from "../models/item/Item";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
 import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/track/Track";
-import type { ItemTypes } from "../models/_shared/item_types/ItemTypes";
 
 class ItemHandler implements MouseEventHandler {
     constructor(
@@ -91,7 +86,7 @@ class ItemHandler implements MouseEventHandler {
 
         const items = this.context.selectionManager.selectedItems;
 
-        const movedItems = offsetItems(
+        const movedItems = Item.offsetBunchOfItems(
             items,
             beatOffset,
             trackOffset,
