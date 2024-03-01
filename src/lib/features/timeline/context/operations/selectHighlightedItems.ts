@@ -1,5 +1,5 @@
 import { getChildren } from "../../../../architecture/state-hierarchy-utils";
-import isWithin from "../../../../shared/utils/interval/is_within/isWithin";
+import isWithin from "../../../../utils/interval/is_within/isWithin";
 
 import type TimelineContext from "../TimelineContext";
 

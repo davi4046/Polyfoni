@@ -3,8 +3,8 @@ import getOutlinePath from "../../utils/track_interval/getOutlinePath";
 import Highlight__SvelteComponent_ from "../../visuals/other/Highlight.svelte";
 import Attribute from "../../../../architecture/AttributeEnum";
 import type Interval from "../../../../shared/utils/interval/Interval";
-import mergeIntervals from "../../../../shared/utils/interval/merge_intervals/mergeIntervals";
-import createSvgPath from "../../../../shared/utils/point/create_svg_path/createSvgPath";
+import mergeIntervals from "../../../../utils/interval/merge_intervals/mergeIntervals";
+import createSvgPath from "../../../../utils/point/create_svg_path/createSvgPath";
 
 export default class HighlightManager {
     private _highlights: Highlight[] = [];
