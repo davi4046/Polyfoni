@@ -1,17 +1,18 @@
 import chroma from "chroma-js";
 
-import createBoundModel from "../../../shared/architecture/model/createBoundModel";
-import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
-import { toStringFunctions } from "../models/_shared/item_types/toStringFunctions";
+import type TimelineContext from "../context/TimelineContext";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
+import type Item from "../models/item/Item";
 import ItemVM from "../view_models/item/ItemVM";
 import { createItemVMState } from "../view_models/item/ItemVMState";
-
-import type TimelineContext from "../context/TimelineContext";
-import type ItemTypes from "../models/_shared/item_types/ItemTypes";
-import type Item from "../models/item/Item";
+import {
+    toStringFunctions,
+    type ItemTypes,
+} from "../models/_shared/item_types/ItemTypes";
+import createBoundModel from "../../../shared/architecture/model/createBoundModel";
+import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
 
 function createItemVM<T extends keyof ItemTypes>(
     model: Item<T>,

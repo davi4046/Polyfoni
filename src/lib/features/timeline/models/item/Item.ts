@@ -1,5 +1,6 @@
 import { clamp } from "lodash";
 
+import type { ItemTypes } from "../_shared/item_types/ItemTypes";
 import Model from "../../../../shared/architecture/model/Model";
 import {
     getChildren,
@@ -9,10 +10,7 @@ import {
     getParent,
 } from "../../../../shared/architecture/state/state_utils";
 
-import type { ItemTypes } from "../_shared/item_types/ItemTypes";
-
 import type { ItemState } from "./ItemState";
-import type Chord from "../../utils/chord/Chord";
 
 class Item<T extends keyof ItemTypes> extends Model<Required<ItemState<T>>> {
     constructor(
@@ -21,11 +19,6 @@ class Item<T extends keyof ItemTypes> extends Model<Required<ItemState<T>>> {
     ) {
         super(state);
     }
-
-    static Type: {
-        StringItem: string;
-        ChordItem: Chord;
-    };
 
     static offsetBunchOfItems(
         items: Item<any>[],
