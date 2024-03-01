@@ -10,7 +10,7 @@ import {
     getParent,
 } from "../../../../shared/architecture/state/state_utils";
 
-import type { ItemState } from "./ItemState";
+import type ItemState from "./ItemState";
 
 class Item<T extends keyof ItemTypes> extends Model<Required<ItemState<T>>> {
     constructor(

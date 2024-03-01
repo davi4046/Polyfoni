@@ -1,3 +1,5 @@
+import Item from "../item/Item";
+import type { ItemTypes } from "../../utils/ItemTypes";
 import Model from "../../../../shared/architecture/model/Model";
 import {
     addChildren,
@@ -11,10 +13,8 @@ import {
     removeChildren,
 } from "../../../../shared/architecture/state/state_utils";
 import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
-import Item from "../item/Item";
 
-import type { ItemTypes } from "../_shared/item_types/ItemTypes";
-import type { TrackState } from "./TrackState";
+import type TrackState from "./TrackState";
 
 export default class Track<T extends keyof ItemTypes> extends Model<
     Required<TrackState<T>>

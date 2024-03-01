@@ -1,14 +1,9 @@
 import type { ItemTypes } from "../utils/ItemTypes";
 import Item from "../models/item/Item";
-import { createItemState } from "../models/item/ItemState";
 import Section from "../models/section/Section";
-import { createSectionState } from "../models/section/SectionState";
 import Timeline from "../models/timeline/Timeline";
-import { createTimelineState } from "../models/timeline/TimelineState";
 import Track from "../models/track/Track";
-import { createTrackState } from "../models/track/TrackState";
 import Voice from "../models/voice/Voice";
-import { createVoiceState } from "../models/voice/VoiceState";
 import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
 
 function makeRandomItems<T extends keyof ItemTypes>(
@@ -24,14 +19,12 @@ function makeRandomItems<T extends keyof ItemTypes>(
         const end = beat + length;
         if (Math.random() > 0.2) {
             items.push(
-                new Item(
-                    itemType,
-                    createItemState({
-                        parent: track,
-                        start: beat,
-                        end: end,
-                    })
-                )
+                new Item(itemType, {
+                    parent: track,
+                    start: beat,
+                    end: end,
+                    content: null,
+                })
             );
         }
         beat = end;
@@ -49,46 +42,31 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
     const tracks: Track<any>[] = [];
 
     tracks.push(
-        new Track(
-            "StringItem",
-            createTrackState({
-                parent: voice,
-                label: "Piano 1",
-                children: [],
-            })
-        ),
-        new Track(
-            "StringItem",
-            createTrackState({
-                parent: voice,
-                label: "Pitch",
-                children: [],
-            })
-        ),
-        new Track(
-            "StringItem",
-            createTrackState({
-                parent: voice,
-                label: "Duration",
-                children: [],
-            })
-        ),
-        new Track(
-            "StringItem",
-            createTrackState({
-                parent: voice,
-                label: "Rest",
-                children: [],
-            })
-        ),
-        new Track(
-            "ChordItem",
-            createTrackState({
-                parent: voice,
-                label: "Harmony",
-                children: [],
-            })
-        )
+        new Track("StringItem", {
+            parent: voice,
+            label: "Piano 1",
+            children: [],
+        }),
+        new Track("StringItem", {
+            parent: voice,
+            label: "Pitch",
+            children: [],
+        }),
+        new Track("StringItem", {
+            parent: voice,
+            label: "Duration",
+            children: [],
+        }),
+        new Track("StringItem", {
+            parent: voice,
+            label: "Rest",
+            children: [],
+        }),
+        new Track("ChordItem", {
+            parent: voice,
+            label: "Harmony",
+            children: [],
+        })
     );
 
     tracks.forEach(populateTrack);
@@ -97,20 +75,16 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
 }
 
 function makeDemoTimeline(): Timeline {
-    const timeline = new Timeline(createTimelineState({ children: [] }));
+    const timeline = new Timeline({ children: [] });
 
     const sections = Array.from({ length: 3 }, () => {
-        return new Section(
-            createSectionState({ parent: timeline, children: [] })
-        );
+        return new Section({ parent: timeline, children: [] });
     });
 
     timeline.state = { children: sections };
 
     const voices = Array.from({ length: 3 }, () => {
-        const voice = new Voice(
-            createVoiceState({ parent: sections[1], children: [] })
-        );
+        const voice = new Voice({ parent: sections[1], children: [] });
 
         voice.state = { children: createDefaultTracks(voice) };
 
