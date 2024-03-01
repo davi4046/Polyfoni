@@ -1,6 +1,6 @@
 import { clamp } from "lodash";
 
-import type { ItemTypes } from "../_shared/item_types/ItemTypes";
+import type { ItemTypes } from "../../utils/ItemTypes";
 import Model from "../../../../shared/architecture/model/Model";
 import {
     getChildren,
