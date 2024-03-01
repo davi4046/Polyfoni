@@ -1,11 +1,11 @@
 import type { SvelteComponent } from "svelte";
+
+import { editorWidgets } from "../../../utils/ItemTypes";
+import type { ItemTypes } from "../../../utils/ItemTypes";
+import type Item from "../../../models/item/Item";
+import Timeline from "../../../models/timeline/Timeline";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import { getGrandparent } from "../../../../../shared/architecture/state/state_utils";
-import { editorWidgets } from "../../../utils/ItemTypes";
-import Timeline from "../../../models/timeline/Timeline";
-
-import type { ItemTypes } from "../../../models/_shared/item_types/ItemTypes";
-import type Item from "../../../models/item/Item";
 
 class EditorWidgetManager {
     constructor(timeline: Timeline) {
