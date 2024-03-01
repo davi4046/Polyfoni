@@ -1,14 +1,14 @@
 interface ChildState<TParent> {
-    readonly parent: TParent;
+    parent: TParent;
 }
 
 interface ParentChildState<TParent, TChild> {
-    readonly parent: TParent;
-    readonly children: readonly TChild[];
+    parent: TParent;
+    children: readonly TChild[];
 }
 
 interface ParentState<TChild> {
-    readonly children: readonly TChild[];
+    children: readonly TChild[];
 }
 
 interface GetState<TState> {
