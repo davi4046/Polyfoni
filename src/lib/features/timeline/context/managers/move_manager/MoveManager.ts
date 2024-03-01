@@ -1,5 +1,5 @@
 import type Item from "../../../models/item/Item";
-import Stateful from "../../../../../shared/architecture/model/Stateful";
+import Stateful from "../../../../../shared/architecture/stateful/Stateful";
 import {
     addChildren,
     getParent,

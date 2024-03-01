@@ -1,6 +1,6 @@
 import IdProvider from "../id_provider/IdProvider";
 
-import Stateful from "./Stateful";
+import Stateful from "../stateful/Stateful";
 
 const modelIdProvider = new IdProvider();
 
