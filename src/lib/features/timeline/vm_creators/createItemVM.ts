@@ -7,7 +7,7 @@ import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
 import { stringConversionFunctions, type ItemTypes } from "../utils/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
-import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";
+import { mouseEventListener } from "../../../shared/architecture/mouse_event_listener/mouse-event-handling";
 
 export default function createItemVM<T extends keyof ItemTypes>(
     model: Item<T>,

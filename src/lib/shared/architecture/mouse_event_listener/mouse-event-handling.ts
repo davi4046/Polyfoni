@@ -1,5 +1,3 @@
-import type MouseEventHandler from "./MouseEventHandler";
-
 class MouseEventListener {
     private _handler?: MouseEventHandler;
     private _downEvent?: MouseEvent;
@@ -41,4 +39,10 @@ class MouseEventListener {
     }
 }
 
-export default new MouseEventListener();
+export const mouseEventListener = new MouseEventListener();
+
+export interface MouseEventHandler {
+    handleMouseDown?: (downEvent: MouseEvent) => void;
+    handleMouseMove?: (moveEvent: MouseEvent, downEvent?: MouseEvent) => void;
+    handleMouseUp?: (upEvent: MouseEvent, downEvent: MouseEvent) => void;
+}
