@@ -3,7 +3,7 @@ import type { SvelteComponent } from "svelte";
 import { editorWidgets } from "../../../utils/ItemTypes";
 import type { ItemTypes } from "../../../utils/ItemTypes";
 import type Item from "../../../models/item/Item";
-import Timeline from "../../../models/timeline/Timeline";
+import Timeline from "../../../models/Timeline";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
 import { getGrandparent } from "../../../../../shared/architecture/state/state_utils";
 

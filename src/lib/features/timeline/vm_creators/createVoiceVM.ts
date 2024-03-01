@@ -1,5 +1,5 @@
 import type TimelineContext from "../context/TimelineContext";
-import type Voice from "../models/voice/Voice";
+import type Voice from "../models/Voice";
 import VoiceVM from "../view_models/voice/VoiceVM";
 import { createVoiceVMState } from "../view_models/voice/VoiceVMState";
 

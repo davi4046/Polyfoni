@@ -1,6 +1,6 @@
 import polygonClipping from "polygon-clipping";
 
-import type Track from "../../models/track/Track";
+import type Track from "../../models/Track";
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 import { getIndex } from "../../../../shared/architecture/state/state_utils";
 import type Interval from "../../../../shared/utils/interval/Interval";

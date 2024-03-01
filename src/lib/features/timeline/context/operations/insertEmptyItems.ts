@@ -1,5 +1,5 @@
 import type TimelineContext from "../TimelineContext";
-import Item from "../../models/item/Item";
+import Item from "../../models/Item";
 import { addChildren } from "../../../../shared/architecture/state/state_utils";
 
 function insertEmptyItems(context: TimelineContext) {

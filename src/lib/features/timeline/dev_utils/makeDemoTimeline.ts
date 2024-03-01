@@ -1,9 +1,9 @@
 import type { ItemTypes } from "../utils/ItemTypes";
-import Item from "../models/item/Item";
-import Section from "../models/section/Section";
-import Timeline from "../models/timeline/Timeline";
-import Track from "../models/track/Track";
-import Voice from "../models/voice/Voice";
+import Item from "../models/Item";
+import Section from "../models/Section";
+import Timeline from "../models/Timeline";
+import Track from "../models/Track";
+import Voice from "../models/Voice";
 import mapRange from "../../../shared/utils/math_utils/map_range/mapRange";
 
 function makeRandomItems<T extends keyof ItemTypes>(

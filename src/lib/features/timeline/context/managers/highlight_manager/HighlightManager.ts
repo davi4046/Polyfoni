@@ -1,4 +1,4 @@
-import type Track from "../../../models/track/Track";
+import type Track from "../../../models/Track";
 import getOutlinePath from "../../../utils/track_interval/getOutlinePath";
 import Highlight__SvelteComponent_ from "../../../visuals/other/Highlight.svelte";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";

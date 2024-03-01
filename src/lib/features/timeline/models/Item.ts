@@ -1,16 +1,17 @@
 import { clamp } from "lodash";
 
-import type Track from "../track/Track";
-import type { ItemTypes } from "../../utils/ItemTypes";
-import Model from "../../../../shared/architecture/model/Model";
-import type ChildState from "../../../../shared/architecture/state/ChildState";
+import type { ItemTypes } from "./../utils/ItemTypes";
+import Model from "../../../shared/architecture/model/Model";
+import type ChildState from "./../../../shared/architecture/state/ChildState";
 import {
     getChildren,
     getGrandparent,
     getGreatGrandparent,
     getIndex,
     getParent,
-} from "../../../../shared/architecture/state/state_utils";
+} from "../../../shared/architecture/state/state_utils";
+
+import type Track from "./Track";
 
 interface ItemState<T extends keyof ItemTypes> extends ChildState<Track<T>> {
     readonly start: number;

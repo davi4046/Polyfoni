@@ -1,4 +1,4 @@
-import type Timeline from "../models/timeline/Timeline";
+import type Timeline from "../models/Timeline";
 import EditorWidgetManager from "./managers/editor_widget_manager/EditorWidgetManager";
 import HighlightManager from "./managers/highlight_manager/HighlightManager";
 import MoveManager from "./managers/move_manager/MoveManager";

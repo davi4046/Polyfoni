@@ -1,4 +1,4 @@
-import type Track from "../../models/track/Track";
+import type Track from "../../models/Track";
 import { getParent } from "../../../../shared/architecture/state/state_utils";
 
 function groupByVoice<T extends { track: Track<any> }>(objs: T[]): T[][] {

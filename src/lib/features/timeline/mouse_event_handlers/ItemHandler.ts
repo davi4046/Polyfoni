@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
-import Item from "../models/item/Item";
-import type Track from "../models/track/Track";
+import Item from "../models/Item";
+import type Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";

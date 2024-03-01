@@ -2,8 +2,8 @@ import Attribute from "../../../../shared/architecture/AttributeEnum";
 import findClosestElement from "../../../../shared/utils/find_closest_element/findClosestElement";
 import findModelById from "../../../../shared/utils/find_model_by_id/findModelById";
 
-import type Timeline from "../../models/timeline/Timeline";
-import type Track from "../../models/track/Track";
+import type Timeline from "../../models/Timeline";
+import type Track from "../../models/Track";
 
 function findClosestTrack(
     timeline: Timeline,

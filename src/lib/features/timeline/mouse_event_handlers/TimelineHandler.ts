@@ -1,4 +1,4 @@
-import Track from "../models/track/Track";
+import Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 

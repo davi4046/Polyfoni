@@ -1,6 +1,6 @@
 import TimelineContext from "../context/TimelineContext";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
-import Timeline from "../models/timeline/Timeline";
+import Timeline from "../models/Timeline";
 import TimelineVM from "../view_models/timeline/TimelineVM";
 import { createTimelineVMState } from "../view_models/timeline/TimelineVMState";
 import mouseEventListener from "../../../shared/architecture/mouse_event_listener/MouseEventListener";

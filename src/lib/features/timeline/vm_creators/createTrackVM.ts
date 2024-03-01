@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
 import type { ItemTypes } from "../utils/ItemTypes";
-import type Track from "../models/track/Track";
+import type Track from "../models/Track";
 import TrackVM from "../view_models/track/TrackVM";
 import { createTrackVMState } from "../view_models/track/TrackVMState";
 

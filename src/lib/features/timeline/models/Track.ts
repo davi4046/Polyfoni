@@ -1,8 +1,8 @@
-import Item from "../item/Item";
-import type Voice from "../voice/Voice";
-import type { ItemTypes } from "../../utils/ItemTypes";
-import Model from "../../../../shared/architecture/model/Model";
-import type ParentChildState from "../../../../shared/architecture/state/ParentChildState";
+import Item from "./Item";
+import type Voice from "./Voice";
+import type { ItemTypes } from "../utils/ItemTypes";
+import Model from "../../../shared/architecture/model/Model";
+import type ParentChildState from "../../../shared/architecture/state/ParentChildState";
 import {
     addChildren,
     getChildren,
@@ -13,8 +13,8 @@ import {
     getPosition,
     isGreaterPos,
     removeChildren,
-} from "../../../../shared/architecture/state/state_utils";
-import clearInterval from "../../../../shared/utils/interval/clear_interval/clearInterval";
+} from "../../../shared/architecture/state/state_utils";
+import clearInterval from "../../../shared/utils/interval/clear_interval/clearInterval";
 
 interface TrackState<T extends keyof ItemTypes>
     extends ParentChildState<Voice, Item<T>> {

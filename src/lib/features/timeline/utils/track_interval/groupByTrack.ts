@@ -1,4 +1,4 @@
-import type Track from "../../models/track/Track";
+import type Track from "../../models/Track";
 
 function groupByTrack<T extends { track: Track<any> }>(objs: T[]): T[][] {
     const groups: T[][] = [];
