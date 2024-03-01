@@ -4,8 +4,8 @@ import {
     getIndex,
     getParent,
 } from "../../../shared/architecture/state/state_utils";
-import findClosestTrack from "../_shared/find_closest_track/findClosestTrack";
-import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
+import findClosestTrack from "../utils/screen_utils/findClosestTrack";
+import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import offsetItems from "../_shared/offset_items/offsetItems";
 import { editorWidgets } from "../models/_shared/item_types/ItemTypes";
 import Item from "../models/item/Item";

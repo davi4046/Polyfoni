@@ -1,5 +1,5 @@
-import findClosestTrack from "../_shared/find_closest_track/findClosestTrack";
-import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
+import findClosestTrack from "../utils/screen_utils/findClosestTrack";
+import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import getTracksInRange from "../_shared/get_tracks_in_range/getTracksInRange";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
