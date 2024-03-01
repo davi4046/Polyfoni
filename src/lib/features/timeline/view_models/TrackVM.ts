@@ -7,6 +7,6 @@ interface TrackVMState {
     items: ItemVM[];
 }
 
-class TrackVM extends Model<Required<TrackVMState>> {}
+class TrackVM extends Model<TrackVMState> {}
 
 export default TrackVM;

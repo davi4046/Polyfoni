@@ -4,9 +4,9 @@ import type TrackVM from "./TrackVM";
 
 interface VoiceVMState {
     tracks: TrackVM[];
-    isCollapsed?: boolean;
+    isCollapsed: boolean;
 }
 
-class VoiceVM extends Model<Required<VoiceVMState>> {}
+class VoiceVM extends Model<VoiceVMState> {}
 
 export default VoiceVM;

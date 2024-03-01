@@ -6,6 +6,6 @@ import type Track from "./Track";
 
 interface VoiceState extends ParentChildState<Section, Track<any>> {}
 
-class Voice extends Model<Required<VoiceState>> {}
+class Voice extends Model<VoiceState> {}
 
 export default Voice;

@@ -23,11 +23,11 @@ interface TrackState<T extends keyof ItemTypes>
 }
 
 export default class Track<T extends keyof ItemTypes> extends Model<
-    Required<TrackState<T>>
+    TrackState<T>
 > {
     constructor(
         readonly itemType: T,
-        state: Required<TrackState<T>>
+        state: TrackState<T>
     ) {
         super(state);
     }
