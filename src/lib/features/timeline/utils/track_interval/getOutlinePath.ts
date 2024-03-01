@@ -1,16 +1,19 @@
 import polygonClipping from "polygon-clipping";
 
+import type Track from "../../models/track/Track";
 import Attribute from "../../../../shared/architecture/AttributeEnum";
 import { getIndex } from "../../../../shared/architecture/state/state_utils";
+import type Interval from "../../../../shared/utils/interval/Interval";
 
-import type TrackInterval from "./TrackInterval";
 import groupByTrack from "./groupByTrack";
 import groupByVoice from "./groupByVoice";
 
-export default function getOutlinePath(highlights: TrackInterval[]): Point[][] {
-    if (highlights.length === 0) return [];
+export default function getOutlinePath<
+    T extends { track: Track<any> } & Interval,
+>(objs: T[]): Point[][] {
+    if (objs.length === 0) return [];
 
-    const groups = groupByVoice(highlights).map((group) =>
+    const groups = groupByVoice(objs).map((group) =>
         groupByTrack(group).sort(
             // sort track groups by track index
             (a, b) => getIndex(a[0].track) - getIndex(b[0].track)
@@ -84,12 +87,14 @@ type Point = {
     y: number;
 };
 
-function getBoundingBox(highlight: TrackInterval): BoundingBox | undefined {
-    const x1 = highlight.start * 64;
-    const x2 = highlight.end * 64;
+function getBoundingBox<T extends { track: Track<any> } & Interval>(
+    obj: T
+): BoundingBox | undefined {
+    const x1 = obj.start * 64;
+    const x2 = obj.end * 64;
 
     const trackElement = document.querySelector(
-        `[${Attribute.ModelId}='${highlight.track.id}']`
+        `[${Attribute.ModelId}='${obj.track.id}']`
     ) as HTMLElement;
 
     if (!trackElement) return;

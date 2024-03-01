@@ -1,13 +1,12 @@
+import type Track from "../../models/track/Track";
 import { getParent } from "../../../../shared/architecture/state/state_utils";
 
-import type TrackMember from "./TrackInterval";
+function groupByVoice<T extends { track: Track<any> }>(objs: T[]): T[][] {
+    const groups: T[][] = [];
 
-function groupByVoice(highlights: TrackMember[]): TrackMember[][] {
-    const groups: TrackMember[][] = [];
+    if (objs.length === 0) return groups;
 
-    if (highlights.length === 0) return groups;
-
-    for (const highlight of highlights) {
+    for (const highlight of objs) {
         const group = groups.find((group) => {
             return getParent(group[0].track) === getParent(highlight.track);
         });

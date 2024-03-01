@@ -1,16 +1,17 @@
-import type TrackInterval from "../../../utils/track_interval/TrackInterval";
+import type Track from "../../../models/track/Track";
 import getOutlinePath from "../../../utils/track_interval/getOutlinePath";
 import Highlight__SvelteComponent_ from "../../../views/_spawned/Highlight.svelte";
 import Attribute from "../../../../../shared/architecture/AttributeEnum";
+import type Interval from "../../../../../shared/utils/interval/Interval";
 import mergeIntervals from "../../../../../shared/utils/interval/merge_intervals/mergeIntervals";
 import createSvgPath from "../../../../../shared/utils/point/create_svg_path/createSvgPath";
 
 export default class HighlightManager {
-    private _highlights: TrackInterval[] = [];
+    private _highlights: Highlight[] = [];
 
     private _component?: Highlight__SvelteComponent_;
 
-    set highlights(newHighlights: TrackInterval[]) {
+    set highlights(newHighlights: Highlight[]) {
         this._highlights = newHighlights;
         this.renderHighlights();
     }
@@ -19,7 +20,7 @@ export default class HighlightManager {
         return this._highlights;
     }
 
-    addHighlight(newHighlight: TrackInterval) {
+    addHighlight(newHighlight: Highlight) {
         const highlights = this._highlights.filter(
             (highlight) => highlight.track === newHighlight.track
         );
@@ -62,3 +63,5 @@ export default class HighlightManager {
         });
     }
 }
+
+type Highlight = { track: Track<any> } & Interval;
