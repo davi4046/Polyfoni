@@ -1,10 +1,10 @@
-import type Item from "../../../models/item/Item";
-import Stateful from "../../../../../shared/architecture/stateful/Stateful";
+import type Item from "./../../models/Item";
 import {
     addChildren,
     getParent,
     removeChildren,
-} from "../../../../../shared/architecture/state/state_utils";
+} from "../../../../shared/architecture/state/state_utils";
+import Stateful from "../../../../shared/architecture/stateful/Stateful";
 
 type ItemPair = [legit: Item<any>, ghost: Item<any>];
 

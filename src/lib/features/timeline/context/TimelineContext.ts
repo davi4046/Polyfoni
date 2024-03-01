@@ -1,8 +1,9 @@
 import type Timeline from "../models/Timeline";
-import EditorWidgetManager from "./managers/editor_widget_manager/EditorWidgetManager";
-import HighlightManager from "./managers/highlight_manager/HighlightManager";
-import MoveManager from "./managers/move_manager/MoveManager";
-import SelectionManager from "./managers/selection_manager/SelectionManager";
+
+import EditorWidgetManager from "./managers/EditorWidgetManager";
+import HighlightManager from "./managers/HighlightManager";
+import MoveManager from "./managers/MoveManager";
+import SelectionManager from "./managers/SelectionManager";
 
 class TimelineContext {
     readonly highlightManager = new HighlightManager();
