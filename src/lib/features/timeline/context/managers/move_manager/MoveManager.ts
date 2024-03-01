@@ -3,7 +3,6 @@ import {
     getParent,
     removeChildren,
 } from "../../../../../shared/architecture/state/state_utils";
-import clearTrackInterval from "../../../_shared/clear_track_interval/clearTrackInterval";
 
 import type Item from "../../../models/item/Item";
 
@@ -41,8 +40,7 @@ class MoveManager {
 
             pair[0].state = pair[1].state;
 
-            clearTrackInterval(
-                newTrack,
+            newTrack.cropItemsByInterval(
                 pair[1].state.start,
                 pair[1].state.end
             );

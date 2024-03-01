@@ -1,5 +1,4 @@
 import { getParent } from "../../../shared/architecture/state/state_utils";
-import clearTrackInterval from "../_shared/clear_track_interval/clearTrackInterval";
 import getBeatAtClientX from "../_shared/get_beat_at_client_x/getBeatAtClientX";
 
 import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
@@ -25,8 +24,7 @@ class EndHandleHandler implements MouseEventHandler {
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
-        clearTrackInterval(
-            getParent(this.item),
+        getParent(this.item).cropItemsByInterval(
             this.item.state.start,
             this.item.state.end,
             [this.item]
