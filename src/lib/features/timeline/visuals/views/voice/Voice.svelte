@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type VoiceVM from "../../view_models/voice/VoiceVM";
+    import type VoiceVM from "../../../view_models/VoiceVM";
     import Track from "../track/Track.svelte";
 
     export let voiceVM: VoiceVM;

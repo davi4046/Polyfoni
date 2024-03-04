@@ -1,6 +1,6 @@
 <script lang="ts">
     import Item from "../item/Item.svelte";
-    import type TrackVM from "../../view_models/track/TrackVM";
+    import type TrackVM from "../../../view_models/TrackVM";
 
     export let trackVM: TrackVM;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type VoiceVM from "../../view_models/voice/VoiceVM";
+    import type VoiceVM from "../../../view_models/VoiceVM";
     import TrackHeader from "../track_header/TrackHeader.svelte";
     import PipeMid from "./assets/PipeMid.svelte";
     import PipeEnd from "./assets/PipeEnd.svelte";

@@ -4,7 +4,7 @@
     import Voice from "../voice/Voice.svelte";
     import VoiceHeader from "../voice_header/VoiceHeader.svelte";
     import VerticalLine from "./assets/VerticalLine.svelte";
-    import type TimelineVM from "../../view_models/timeline/TimelineVM";
+    import TimelineVM from "../../../view_models/TimelineVM";
     import { onMount } from "svelte";
 
     export let timelineVM: TimelineVM;
