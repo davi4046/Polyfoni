@@ -1,10 +1,10 @@
 import type Item from "./../../models/Item";
+import Stateful from "../../../../architecture/Stateful";
 import {
     addChildren,
     getParent,
     removeChildren,
 } from "../../../../architecture/state-hierarchy-utils";
-import Stateful from "../../../../architecture/Stateful";
 
 type ItemPair = [legit: Item<any>, ghost: Item<any>];
 
@@ -40,7 +40,7 @@ class MoveManager extends Stateful<MoveManagerState> {
             );
 
             removeChildren(oldTrack, pair[0]);
-            addChildren(newTrack, pair[1]);
+            addChildren(newTrack, pair[0]);
         });
         this.state = {
             ghostPairs: [],
