@@ -1,0 +1,10 @@
+:root {
+    --timeline-track-color: theme("colors.gray.200");
+    --timeline-track-spacing: theme("spacing.2");
+    --timeline-track-height: theme("height.12");
+
+    --timeline-voice-color: theme("colors.gray.50");
+    --timeline-voice-spacing: theme("spacing.4");
+
+    --timeline-vline-color: theme("colors.gray.400");
+}

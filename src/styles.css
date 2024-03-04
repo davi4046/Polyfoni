@@ -1,14 +1,10 @@
 @import "tailwindcss/base";
+@import "./custom-css/base-styles.css";
+
 @import "tailwindcss/components";
+@import "./custom-css/components.css";
+
 @import "tailwindcss/utilities";
+@import "./custom-css/utilities.css";
 
-:root {
-    --timeline-track-color: theme("colors.gray.200");
-    --timeline-track-spacing: theme("spacing.2");
-    --timeline-track-height: theme("height.12");
-
-    --timeline-voice-color: theme("colors.gray.50");
-    --timeline-voice-spacing: theme("spacing.4");
-
-    --timeline-vline-color: theme("colors.gray.400");
-}
+@import "./custom-css/variables.css";
