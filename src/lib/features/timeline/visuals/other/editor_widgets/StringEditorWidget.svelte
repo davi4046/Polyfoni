@@ -8,7 +8,6 @@
 
     onMount(() => {
         setTimeout(() => {
-            inputField.focus();
             inputField.select();
         }, 0);
     });
