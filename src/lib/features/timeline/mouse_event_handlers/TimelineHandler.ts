@@ -1,9 +1,8 @@
+import type TimelineContext from "../context/TimelineContext";
 import Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
-
-import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
-import type TimelineContext from "../context/TimelineContext";
+import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}

@@ -1,5 +1,5 @@
 import Model from "../../../architecture/Model";
-import type { ParentChildState } from "../../../shared/architecture/state-hierarchy-utils";
+import type { ParentChildState } from "../../../architecture/state-hierarchy-utils";
 
 import type Section from "./Section";
 import type Track from "./Track";

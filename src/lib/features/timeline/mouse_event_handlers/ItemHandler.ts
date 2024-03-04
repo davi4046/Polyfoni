@@ -3,7 +3,7 @@ import Item from "../models/Item";
 import type Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
-import type MouseEventHandler from "../../../shared/architecture/mouse_event_listener/MouseEventHandler";
+import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import {
     getIndex,
     getParent,
