@@ -156,8 +156,8 @@
     <!-- EDITOR WIDGET CONTAINER -->
     <div
         data-type="editor-widget-container"
-        class="col-start-1 col-end-3 row-start-5 row-end-6 bg-green-500"
+        class="col-start-1 col-end-3 row-start-5 row-end-6 border-t-2 border-black"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
-    ></div>
+    />
 </div>

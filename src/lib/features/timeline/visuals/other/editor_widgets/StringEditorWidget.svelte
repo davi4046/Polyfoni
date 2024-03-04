@@ -24,7 +24,8 @@
         on:keydown={handleKeyDown}
         bind:this={inputField}
         bind:value
-        class="h-10 w-full pl-2 text-lg"
+        placeholder="Input..."
+        class="w-full p-1 text-lg font-medium focus:outline-none"
         type="text"
     />
 </div>
