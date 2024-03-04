@@ -8,7 +8,7 @@ import type Interval from "../../../../utils/interval/Interval";
 import groupByTrack from "./groupByTrack";
 import groupByVoice from "./groupByVoice";
 
-export default function getOutlinePath<
+export default function getOutlinePaths<
     T extends { track: Track<any> } & Interval,
 >(objs: T[]): Point[][] {
     if (objs.length === 0) return [];

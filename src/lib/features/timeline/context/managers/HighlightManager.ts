@@ -1,5 +1,5 @@
 import type Track from "../../models/Track";
-import getOutlinePath from "../../utils/track_interval/getOutlinePath";
+import getOutlinePaths from "../../utils/track_interval/getOutlinePaths";
 import Highlight__SvelteComponent_ from "../../visuals/other/Highlight.svelte";
 import Attribute from "../../../../architecture/AttributeEnum";
 import type Interval from "../../../../utils/interval/Interval";
@@ -49,7 +49,7 @@ export default class HighlightManager {
             `[${Attribute.Type}='overlay']`
         )!;
 
-        const path = getOutlinePath(this._highlights)
+        const path = getOutlinePaths(this._highlights)
             .map((path) => createSvgPath(path))
             .join(" ");
 
