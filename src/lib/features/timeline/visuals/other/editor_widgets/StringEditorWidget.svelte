@@ -6,10 +6,11 @@
 
     let inputField: HTMLInputElement;
 
-    onMount(async () => {
-        inputField.focus();
-        // TODO: implement some sort of focus lock,
-        // otherwise focus is immediately lost
+    onMount(() => {
+        setTimeout(() => {
+            inputField.focus();
+            inputField.select();
+        }, 0);
     });
 
     function handleKeyDown(event: KeyboardEvent) {
