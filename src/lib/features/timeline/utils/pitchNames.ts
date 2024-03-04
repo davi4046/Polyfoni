@@ -11,6 +11,6 @@ const pitchNames = [
     "F#",
     "G",
     "G#",
-];
+] as const;
 
 export default pitchNames;

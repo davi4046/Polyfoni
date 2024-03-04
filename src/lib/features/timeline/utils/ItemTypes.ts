@@ -5,11 +5,11 @@ import StringEditorWidget from "../visuals/other/editor_widgets/StringEditorWidg
 
 import pitchNames from "./pitchNames";
 
-import Chord from "./chord/Chord";
+import type ChordBuilder from "./chord/ChordBuilder";
 
 export type ItemTypes = {
-    StringItem: string | null;
-    ChordItem: Chord | null;
+    StringItem: string;
+    ChordItem: ChordBuilder;
 };
 
 export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
@@ -29,15 +29,16 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
 >;
 
 export const stringConversionFunctions: StringConversionFunctions = {
-    StringItem: (value) => (value ? value : "empty"),
+    StringItem: (value) => value,
     ChordItem: (value) => {
-        if (!value) return "empty";
-        const root = pitchNames[value.pitchClassSet[0] % 12];
-        const decimal = value.getDecimal();
-        return root + "-" + decimal;
+        if (value.root && value.decimal) {
+            return `${value.root}-${value.decimal}`;
+        } else {
+            return "Unfinished";
+        }
     },
 };
 
 type StringConversionFunctions = {
-    [K in keyof ItemTypes]: (value: ItemTypes[K] | null) => string;
+    [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
 };
