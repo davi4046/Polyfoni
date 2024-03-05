@@ -70,14 +70,22 @@
     </div>
     <div class="flex space-x-2">
         <button
-            class="flex h-12 items-center space-x-1 rounded bg-gray-500 p-1.5 font-medium text-white hover:bg-gray-600"
+            class="h-12 text-gray-500 hover:text-gray-600"
             title="Rotate Right"
+            on:click={(_) => {
+                value.rotate("R");
+                value = value; // Reactivity hack, do not remove
+            }}
         >
             <RotateRightIcon />
         </button>
         <button
-            class="flex h-12 items-center space-x-1 rounded bg-gray-500 p-1.5 font-medium text-white hover:bg-gray-600"
+            class="h-12 text-gray-500 hover:text-gray-600"
             title="Rotate Left"
+            on:click={(_) => {
+                value.rotate("L");
+                value = value; // Reactivity hack, do not remove
+            }}
         >
             <RotateLeftIcon />
         </button>

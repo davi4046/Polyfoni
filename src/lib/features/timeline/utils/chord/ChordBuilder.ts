@@ -30,18 +30,10 @@ export default class ChordBuilder {
                     // Find a new root
                 }
 
-                // --- Update decimal ---
-
-                const rootIndex = pitchNames.indexOf(builder._root!);
-
-                let binary = Object.values(target)
-                    .reverse()
-                    .map((value) => (value ? "1" : "0"))
-                    .join("");
-
-                binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Shift binary according to root
-
-                builder._decimal = parseInt(binary, 2);
+                builder._decimal = getDecimalFromRootAndPitches(
+                    builder._root!,
+                    target
+                );
 
                 return true;
             },
@@ -69,6 +61,45 @@ export default class ChordBuilder {
             );
         }
     }
+
+    rotate(direction: "L" | "R") {
+        if (!this._root) return;
+
+        const rootIndex = pitchNames.indexOf(this._root);
+
+        let pitchEntries = Object.entries(this._pitches);
+
+        pitchEntries = [
+            ...pitchEntries.slice(rootIndex),
+            ...pitchEntries.slice(0, rootIndex),
+        ].slice(1); // Make root the first entry
+
+        if (direction === "L") pitchEntries.reverse();
+
+        for (const [pitch, value] of pitchEntries) {
+            if (value) {
+                this._root = pitch as Pitch;
+                this._decimal = getDecimalFromRootAndPitches(
+                    this._root,
+                    this._pitches
+                );
+                break;
+            }
+        }
+    }
+}
+
+function getDecimalFromRootAndPitches(root: Pitch, pitches: PitchMap): number {
+    const rootIndex = pitchNames.indexOf(root);
+
+    let binary = Object.values(pitches)
+        .reverse()
+        .map((value) => (value ? "1" : "0"))
+        .join("");
+
+    binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Shift binary according to root
+
+    return parseInt(binary, 2);
 }
 
 function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
