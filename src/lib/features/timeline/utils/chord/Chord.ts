@@ -119,6 +119,7 @@ function getDecimalFromRootAndPitches(root: Pitch, pitches: PitchMap): number {
     //            |
     //            root
 
+    // solution:
     binary =
         binary.slice(binary.length - rootIndex) +
         binary.slice(0, binary.length - rootIndex); // Shift binary according to root
