@@ -53,19 +53,17 @@
             bind:value={value.decimal}
         />
     </div>
-    <div class="grid grid-flow-col gap-2 auto-cols-fr">
+    <div class="grid grid-flow-col gap-1 auto-cols-fr">
         {#each sortedPitchEntries as [pitch, isChecked]}
-            <div>
-                <div>{pitch}</div>
-                <input
-                    type="checkbox"
-                    bind:checked={isChecked}
-                    on:change={(_) => {
-                        // @ts-ignore
-                        value.pitches[pitch] = !isChecked;
-                    }}
-                />
-            </div>
+            <button
+                class="h-12 w-12 rounded-full border-black text-xl font-medium hover:bg-gray-200 {isChecked
+                    ? 'border-2'
+                    : ''}"
+                on:click={(_) => {
+                    // @ts-ignore
+                    value.pitches[pitch] = !isChecked;
+                }}>{pitch}</button
+            >
         {/each}
     </div>
     <div class="flex space-x-2">
