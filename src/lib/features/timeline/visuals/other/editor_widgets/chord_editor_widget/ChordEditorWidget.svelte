@@ -1,6 +1,8 @@
 <script lang="ts">
-    import type ChordBuilder from "../../../utils/chord/ChordBuilder";
-    import pitchNames from "../../../utils/pitchNames";
+    import type ChordBuilder from "../../../../utils/chord/ChordBuilder";
+    import pitchNames from "../../../../utils/pitchNames";
+    import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
+    import RotateRightIcon from "./assets/RotateRightIcon.svelte";
 
     export let value: ChordBuilder;
     export let update: (value: ChordBuilder) => void;
@@ -66,7 +68,18 @@
             </div>
         {/each}
     </div>
-    <div>
-        <button>Play</button>
+    <div class="flex space-x-2">
+        <button
+            class="flex h-12 items-center space-x-1 rounded bg-gray-500 p-1.5 font-medium text-white hover:bg-gray-600"
+            title="Rotate Right"
+        >
+            <RotateRightIcon />
+        </button>
+        <button
+            class="flex h-12 items-center space-x-1 rounded bg-gray-500 p-1.5 font-medium text-white hover:bg-gray-600"
+            title="Rotate Left"
+        >
+            <RotateLeftIcon />
+        </button>
     </div>
 </div>
