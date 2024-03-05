@@ -58,6 +58,10 @@
     <div class="grid grid-flow-col grid-rows-2 gap-2 p-2 auto-cols-fr">
         <button
             class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            on:click={(_) => {
+                value.rotate("L");
+                value = value; // Reactivity hack
+            }}
         >
             <div class="h-5">
                 <RotateLeftIcon />
@@ -66,6 +70,10 @@
         </button>
         <button
             class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            on:click={(_) => {
+                value.rotate("R");
+                value = value; // Reactivity hack
+            }}
         >
             <div class="h-5">
                 <RotateRightIcon />
