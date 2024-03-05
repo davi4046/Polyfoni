@@ -1,7 +1,5 @@
 import pitchNames from "../pitchNames";
 
-import type Chord from "./Chord";
-
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 

@@ -6,14 +6,21 @@
     export let update: (value: ChordBuilder) => void;
 
     let filter: string;
+
+    $: pitchEntries = Object.entries(value.pitches);
+    $: rootIndex = value.root ? pitchNames.indexOf(value.root) : 0;
+    $: sortedPitchEntries = [
+        ...pitchEntries.slice(rootIndex),
+        ...pitchEntries.slice(0, rootIndex),
+    ];
 </script>
 
-<div class="flex space-x-4 p-2">
+<div class="flex p-2 space-x-4">
     <div>
         <p class="font-medium">Filter</p>
-        <div class="flex w-min rounded-sm border-2 border-gray-400">
+        <div class="flex border-2 border-gray-400 rounded-sm w-min">
             <input
-                class="w-16 border-r-2 border-gray-400 pl-1"
+                class="w-16 pl-1 border-r-2 border-gray-400"
                 type="text"
                 bind:value={filter}
             />
@@ -28,7 +35,7 @@
     <div>
         <p class="font-medium">Root</p>
         <select
-            class="rounded-sm border-2 border-gray-400"
+            class="border-2 border-gray-400 rounded-sm"
             bind:value={value.root}
         >
             {#each pitchNames as pitch}
@@ -39,13 +46,13 @@
     <div>
         <p class="font-medium">Decimal</p>
         <input
-            class="border-2 border-gray-400 pl-1"
+            class="pl-1 border-2 border-gray-400"
             type="text"
             bind:value={value.decimal}
         />
     </div>
-    <div class="grid auto-cols-fr grid-flow-col gap-2">
-        {#each Object.entries(value.pitches) as [pitch, checked]}
+    <div class="grid grid-flow-col gap-2 auto-cols-fr">
+        {#each sortedPitchEntries as [pitch, checked]}
             <div>
                 <div>{pitch}</div>
                 <input
