@@ -4,7 +4,7 @@ import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
 import type { ItemTypes } from "../utils/ItemTypes";
-import { ChordBuilder } from "../utils/chord/Chord";
+import { Chord, ChordBuilder } from "../utils/chord/Chord";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline({ children: [] });
@@ -57,7 +57,9 @@ function makeRandomItems<T extends keyof ItemTypes>(
 
 const defaultContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     StringItem: () => "",
-    ChordItem: () => new ChordBuilder(),
+    ChordItem: () => {
+        return { builder: new ChordBuilder(), filter: undefined };
+    },
 };
 
 function populateTrack(track: Track<any>) {
