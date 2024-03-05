@@ -1,7 +1,8 @@
 <script lang="ts">
     import type { ItemTypes } from "../../../../utils/ItemTypes";
-    import type { Chord, ChordBuilder } from "../../../../utils/chord/Chord";
     import pitchNames from "../../../../utils/pitchNames";
+    import { onDestroy } from "svelte";
+
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
@@ -17,6 +18,8 @@
         ...pitchEntries.slice(rootIndex),
         ...pitchEntries.slice(0, rootIndex),
     ];
+
+    onDestroy(() => update(value));
 </script>
 
 <div class="flex">

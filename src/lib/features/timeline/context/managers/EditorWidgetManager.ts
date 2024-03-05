@@ -1,5 +1,7 @@
 import type { SvelteComponent } from "svelte";
 
+import { cloneDeep } from "lodash";
+
 import type Item from "./../../models/Item";
 import Timeline from "./../../models/Timeline";
 import { editorWidgets } from "./../../utils/ItemTypes";
@@ -29,7 +31,7 @@ class EditorWidgetManager {
         this._editorWidget = new editorWidgets[item.itemType]({
             target: editorWidgetContainer,
             props: {
-                value: item.state.content,
+                value: cloneDeep(item.state.content),
                 update: (value) => {
                     item.state = { content: value };
                 },
