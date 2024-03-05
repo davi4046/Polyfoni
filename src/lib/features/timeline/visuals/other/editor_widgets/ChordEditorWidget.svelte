@@ -52,15 +52,15 @@
         />
     </div>
     <div class="grid grid-flow-col gap-2 auto-cols-fr">
-        {#each sortedPitchEntries as [pitch, checked]}
+        {#each sortedPitchEntries as [pitch, isChecked]}
             <div>
                 <div>{pitch}</div>
                 <input
                     type="checkbox"
-                    bind:checked
+                    bind:checked={isChecked}
                     on:change={(_) => {
                         // @ts-ignore
-                        value.pitches[pitch] = !checked;
+                        value.pitches[pitch] = !isChecked;
                     }}
                 />
             </div>
