@@ -3,9 +3,7 @@ import type { ComponentType, SvelteComponent } from "svelte";
 import StringEditorWidget from "../visuals/other/editor_widgets/StringEditorWidget.svelte";
 import ChordEditorWidget from "../visuals/other/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 
-import pitchNames from "./pitchNames";
-
-import type ChordBuilder from "./chord/ChordBuilder";
+import type { ChordBuilder } from "./chord/ChordBuilder";
 
 export type ItemTypes = {
     StringItem: string;

@@ -3,7 +3,15 @@ import pitchNames from "../pitchNames";
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
-export default class ChordBuilder {
+export class Chord {
+    constructor(
+        readonly pitch: Pitch,
+        readonly decimal: number,
+        readonly pitches: PitchMap
+    ) {}
+}
+
+export class ChordBuilder {
     private _root: Pitch | undefined;
 
     private _decimal: number | undefined;

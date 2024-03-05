@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ChordBuilder from "../../../../utils/chord/ChordBuilder";
+    import type { ChordBuilder } from "../../../../utils/chord/ChordBuilder";
     import pitchNames from "../../../../utils/pitchNames";
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
