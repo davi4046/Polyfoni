@@ -6,17 +6,11 @@ type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
 export default class ChordBuilder {
-    private _filter: Chord | undefined;
-
     private _root: Pitch | undefined;
 
     private _decimal: number | undefined;
 
     private _pitches = this._initPitches();
-
-    get filter() {
-        return this._filter;
-    }
 
     get root() {
         return this._root;
@@ -28,11 +22,6 @@ export default class ChordBuilder {
 
     get pitches() {
         return this._pitches;
-    }
-
-    set filter(newFilter) {
-        this._filter = newFilter;
-        // Don't update anything based on filter
     }
 
     set root(newRoot) {
