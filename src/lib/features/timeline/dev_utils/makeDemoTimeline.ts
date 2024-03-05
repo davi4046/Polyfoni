@@ -4,7 +4,7 @@ import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
 import type { ItemTypes } from "../utils/ItemTypes";
-import { ChordBuilder } from "../utils/chord/ChordBuilder";
+import { ChordBuilder } from "../utils/chord/Chord";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline({ children: [] });
