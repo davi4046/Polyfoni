@@ -8,8 +8,6 @@
     export let value: ChordBuilder;
     export let update: (value: ChordBuilder) => void;
 
-    let filter: string;
-
     $: pitchEntries = Object.entries(value.pitches);
     $: rootIndex = value.root ? pitchNames.indexOf(value.root) : 0;
     $: sortedPitchEntries = [
@@ -28,7 +26,7 @@
             title="Root"
             bind:value={value.root}
         >
-            <option>---</option>
+            <option value={undefined}>---</option>
             {#each pitchNames as pitch}
                 <option>{pitch}</option>
             {/each}

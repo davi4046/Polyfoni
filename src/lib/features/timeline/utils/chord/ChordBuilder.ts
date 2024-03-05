@@ -27,13 +27,15 @@ export default class ChordBuilder {
                 target[key as keyof PitchMap] = value;
 
                 if (key === builder._root && value === false) {
-                    // Find a new root
+                    builder._root = undefined;
                 }
 
-                builder._decimal = getDecimalFromRootAndPitches(
-                    builder._root!,
-                    target
-                );
+                if (builder._root !== undefined) {
+                    builder._decimal = getDecimalFromRootAndPitches(
+                        builder._root,
+                        target
+                    );
+                }
 
                 return true;
             },
@@ -97,7 +99,21 @@ function getDecimalFromRootAndPitches(root: Pitch, pitches: PitchMap): number {
         .map((value) => (value ? "1" : "0"))
         .join("");
 
-    binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Shift binary according to root
+    // --- Example ---
+
+    // what we have:
+    // 000000001111
+    //         |
+    //         root (index 3)
+
+    // what we want: (root must be last)
+    // 111000000001
+    //            |
+    //            root
+
+    binary =
+        binary.slice(binary.length - rootIndex) +
+        binary.slice(0, binary.length - rootIndex); // Shift binary according to root
 
     return parseInt(binary, 2);
 }
@@ -111,7 +127,7 @@ function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
         binary = "0" + binary;
     }
 
-    binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Shift binary according to root
+    binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Unshift binary according to root
 
     return Object.fromEntries(
         pitchNames.map((pitch, index) => {
