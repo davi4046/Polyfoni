@@ -47,7 +47,7 @@
         <p class="font-medium">Decimal</p>
         <input
             class="pl-1 border-2 border-gray-400"
-            type="text"
+            type="number"
             bind:value={value.decimal}
         />
     </div>
