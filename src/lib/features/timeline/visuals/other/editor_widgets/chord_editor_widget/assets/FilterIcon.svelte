@@ -1,0 +1,9 @@
+<svg
+    class="h-full"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 -960 960 960"
+    fill="currentColor"
+    ><path
+        d="M432-188v-262L179-772h602L528-450v262h-96Zm48-290 188-240H292l188 240Zm0 0Z"
+    /></svg
+>

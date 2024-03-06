@@ -6,6 +6,9 @@
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
+    import FilterIcon from "./assets/FilterIcon.svelte";
+    import AddIcon from "./assets/AddIcon.svelte";
+    import FilterOffIcon from "./assets/FilterOffIcon.svelte";
 
     export let value: ItemTypes["ChordItem"];
     export let update: (value: ItemTypes["ChordItem"]) => void;
@@ -23,6 +26,39 @@
 </script>
 
 <div class="flex">
+    <div
+        class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-4 p-2"
+    >
+        <div class="flex text-sm font-medium">
+            Filter
+            <div><FilterIcon /></div>
+        </div>
+        <select
+            class="w-24 p-2 text-xl font-medium bg-gray-200"
+            title="Root"
+            bind:value={value.builder.root}
+        >
+            <option value={undefined}>---</option>
+        </select>
+    </div>
+    <div class="grid grid-flow-col grid-rows-2 gap-2 p-2 auto-cols-fr">
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+        >
+            <div class="h-5">
+                <AddIcon />
+            </div>
+            <div>Apply as Filter</div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+        >
+            <div class="h-5">
+                <FilterOffIcon />
+            </div>
+            <div>Remove Filter</div>
+        </button>
+    </div>
     <div
         class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-4 p-2"
     >
@@ -45,7 +81,7 @@
             bind:value={value.builder.decimal}
         />
         <div class="text-sm font-medium">Pitches</div>
-        <div class="grid grid-flow-col gap-1 auto-cols-min place-items-center">
+        <div class="flex gap-1 place-items-center">
             {#each sortedPitchEntries as [pitch, isChecked]}
                 <button
                     class="h-12 w-12 rounded-full text-xl font-medium hover:brightness-105 {isChecked
