@@ -22,6 +22,8 @@
         ...pitchEntries.slice(0, rootIndex),
     ];
 
+    $: filterDisplayValue = value.filter ? value.filter.name : undefined;
+
     onDestroy(() => update(value));
 
     onMount(() => {
@@ -65,8 +67,12 @@
                 </div>
             </button>
             <button
+                disabled={value.builder.result === undefined}
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Create Filter"
+                on:click={(_) => {
+                    value.filter = value.builder.result;
+                }}
             >
                 <div class="h-5">
                     <AddIcon />
@@ -75,6 +81,9 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Remove Filter"
+                on:click={(_) => {
+                    value.filter = undefined;
+                }}
             >
                 <div class="h-5">
                     <FilterOffIcon />
@@ -107,8 +116,16 @@
             <select
                 class="w-24 p-2 text-xl font-medium bg-gray-200"
                 title="Filter"
+                bind:value={filterDisplayValue}
+                on:change={(e) => {
+                    // @ts-ignore
+                    value.filter = e.target.value;
+                }}
             >
                 <option value={undefined}>---</option>
+                {#if filterDisplayValue}
+                    <option>{filterDisplayValue}</option>
+                {/if}
             </select>
             <div class="text-sm font-medium">Root</div>
             <select
