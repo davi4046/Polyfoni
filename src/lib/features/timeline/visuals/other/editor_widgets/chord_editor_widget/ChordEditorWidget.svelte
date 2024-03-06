@@ -35,29 +35,6 @@
             availablePitches = pitchNames as unknown as string[];
         }
     }
-
-    onDestroy(() => update(value));
-
-    onMount(() => {
-        // This code is used set the width of the pitch buttons equal to their height.
-        // No, it could not be achieved with pure css. Trust me, I tried.
-        const observer = new MutationObserver((mutationsList) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type === "childList") {
-                    mutation.addedNodes.forEach((node) => {
-                        if (
-                            node instanceof HTMLElement &&
-                            node.matches(".adjust-width-to-height")
-                        ) {
-                            node.style.width = `${node.clientHeight}px`;
-                        }
-                    });
-                }
-            }
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-    });
 </script>
 
 <div class="grid grid-cols-[1fr,auto]">
