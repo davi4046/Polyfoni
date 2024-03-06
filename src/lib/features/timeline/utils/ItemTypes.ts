@@ -3,7 +3,7 @@ import type { ComponentType, SvelteComponent } from "svelte";
 import StringEditorWidget from "../visuals/other/editor_widgets/StringEditorWidget.svelte";
 import ChordEditorWidget from "../visuals/other/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 
-import type { Chord, ChordBuilder } from "./chord/Chord";
+import { ChordBuilder, type Chord } from "./chord/Chord";
 
 export type ItemTypes = {
     StringItem: string;
@@ -39,4 +39,11 @@ export const stringConversionFunctions: StringConversionFunctions = {
 
 type StringConversionFunctions = {
     [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
+};
+
+export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
+    StringItem: () => "",
+    ChordItem: () => {
+        return { builder: new ChordBuilder(), filter: undefined };
+    },
 };

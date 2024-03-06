@@ -3,8 +3,8 @@ import Section from "../models/Section";
 import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
-import type { ItemTypes } from "../utils/ItemTypes";
-import { Chord, ChordBuilder } from "../utils/chord/Chord";
+import { initialContent, type ItemTypes } from "../utils/ItemTypes";
+import { ChordBuilder } from "../utils/chord/Chord";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline({ children: [] });
@@ -41,11 +41,11 @@ function makeRandomItems<T extends keyof ItemTypes>(
         const end = beat + length;
         if (Math.random() > 0.2) {
             items.push(
-                new Item(itemType, {
+                new Item<T>(itemType, {
                     parent: track,
                     start: beat,
                     end: end,
-                    content: defaultContent[itemType](),
+                    content: initialContent[itemType](),
                 })
             );
         }
@@ -54,13 +54,6 @@ function makeRandomItems<T extends keyof ItemTypes>(
 
     return items;
 }
-
-const defaultContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
-    StringItem: () => "",
-    ChordItem: () => {
-        return { builder: new ChordBuilder(), filter: undefined };
-    },
-};
 
 function populateTrack(track: Track<any>) {
     const items = makeRandomItems(track.itemType, track);

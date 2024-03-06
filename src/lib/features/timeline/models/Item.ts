@@ -1,6 +1,6 @@
 import { clamp } from "lodash";
 
-import type { ItemTypes } from "./../utils/ItemTypes";
+import { initialContent, type ItemTypes } from "./../utils/ItemTypes";
 import Model from "../../../architecture/Model";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
@@ -110,11 +110,16 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
                 )[newVoiceIndex]
             )[newTrackIndex];
 
+            const content =
+                item.itemType === newTrack.itemType
+                    ? item.state.content
+                    : initialContent[newTrack.itemType as keyof ItemTypes]();
+
             return new Item(newTrack.itemType, {
                 parent: newTrack,
                 start: newStart,
                 end: newEnd,
-                content: null,
+                content: content,
             });
         });
     }
