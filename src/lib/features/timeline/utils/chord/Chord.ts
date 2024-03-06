@@ -34,15 +34,23 @@ export class ChordBuilder {
             set(target, key, value) {
                 target[key as keyof PitchMap] = value;
 
-                if (key === builder._root && value === false) {
+                if (!builder._root && value) {
+                    // There is no root and a new pitch has been checked
+                    // Use the new pitch as the root
+                    builder._root = key as Pitch;
+                } else if (key === builder._root && !value) {
+                    // Reflect that the root pitch has been unchecked
                     builder._root = undefined;
                 }
 
-                if (builder._root !== undefined) {
+                if (builder._root) {
                     builder._decimal = getDecimalFromRootAndPitches(
                         builder._root,
-                        target
+                        builder._pitches
                     );
+                } else {
+                    // There is no root so the decimal cannot be told
+                    builder._decimal = undefined;
                 }
 
                 return true;
