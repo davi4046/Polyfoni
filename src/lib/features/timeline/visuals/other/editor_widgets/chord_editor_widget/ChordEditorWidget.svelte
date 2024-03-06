@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ItemTypes } from "../../../../utils/ItemTypes";
     import pitchNames from "../../../../utils/pitchNames";
-    import { onMount, onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
@@ -24,16 +24,39 @@
 
     $: filterDisplayValue = value.filter ? value.filter.name : undefined;
 
+    let availablePitches: string[];
+
+    $: {
+        if (value.filter) {
+            availablePitches = Object.entries(value.filter.pitches)
+                .filter(([_, isChecked]) => isChecked)
+                .map(([pitch]) => pitch);
+        } else {
+            availablePitches = pitchNames as unknown as string[];
+        }
+    }
+
     onDestroy(() => update(value));
 
     onMount(() => {
-        document
-            .querySelectorAll(".adjust-width-to-height") // Used on pitch buttons
-            .forEach((element) => {
-                if (element instanceof HTMLElement) {
-                    element.style.width = `${element.clientHeight}px`;
+        // This code is used set the width of the pitch buttons equal to their height.
+        // No, it could not be achieved with pure css. Trust me, I tried.
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "childList") {
+                    mutation.addedNodes.forEach((node) => {
+                        if (
+                            node instanceof HTMLElement &&
+                            node.matches(".adjust-width-to-height")
+                        ) {
+                            node.style.width = `${node.clientHeight}px`;
+                        }
+                    });
                 }
-            });
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
     });
 </script>
 
@@ -148,15 +171,17 @@
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
                 {#each sortedPitchEntries as [pitch, isChecked]}
-                    <button
-                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
-                            ? 'bg-gray-300'
-                            : 'opacity-50'}"
-                        on:click={(_) => {
-                            // @ts-ignore
-                            value.builder.pitches[pitch] = !isChecked;
-                        }}>{pitch}</button
-                    >
+                    {#if availablePitches.includes(pitch)}
+                        <button
+                            class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
+                                ? 'bg-gray-300'
+                                : 'opacity-50'}"
+                            on:click={(_) => {
+                                // @ts-ignore
+                                value.builder.pitches[pitch] = !isChecked;
+                            }}>{pitch}</button
+                        >
+                    {/if}
                 {/each}
             </div>
         </div>
