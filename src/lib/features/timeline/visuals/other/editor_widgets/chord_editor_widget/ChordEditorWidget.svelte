@@ -25,43 +25,75 @@
     onDestroy(() => update(value));
 </script>
 
-<div class="flex">
+<div class="flex p-2 space-x-2">
+    <div class="grid grid-flow-col grid-rows-2 gap-1 auto-cols-fr">
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Rotate Left"
+            on:click={(_) => {
+                value.builder.rotate("L");
+                value = value; // Reactivity hack
+            }}
+        >
+            <div class="h-5">
+                <RotateLeftIcon />
+            </div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Rotate Right"
+            on:click={(_) => {
+                value.builder.rotate("R");
+                value = value; // Reactivity hack
+            }}
+        >
+            <div class="h-5">
+                <RotateRightIcon />
+            </div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Create Filter"
+        >
+            <div class="h-5">
+                <AddIcon />
+            </div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Remove Filter"
+        >
+            <div class="h-5">
+                <FilterOffIcon />
+            </div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Listen as Chord"
+        >
+            <div class="h-5">
+                <SpeakerIcon />
+            </div>
+        </button>
+        <button
+            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
+            title="Listen as Scale"
+        >
+            <div class="h-5">
+                <SpeakerIcon />
+            </div>
+        </button>
+    </div>
     <div
-        class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-4 p-2"
+        class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-2"
     >
         <div class="flex text-sm font-medium">
             Filter
             <div><FilterIcon /></div>
         </div>
-        <select
-            class="w-24 p-2 text-xl font-medium bg-gray-200"
-            title="Root"
-            bind:value={value.builder.root}
-        >
+        <select class="w-24 p-2 text-xl font-medium bg-gray-200" title="Filter">
             <option value={undefined}>---</option>
         </select>
-    </div>
-    <div class="grid grid-flow-col grid-rows-2 gap-2 p-2 auto-cols-fr">
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-        >
-            <div class="h-5">
-                <AddIcon />
-            </div>
-            <div>Apply as Filter</div>
-        </button>
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-        >
-            <div class="h-5">
-                <FilterOffIcon />
-            </div>
-            <div>Remove Filter</div>
-        </button>
-    </div>
-    <div
-        class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-4 p-2"
-    >
         <div class="text-sm font-medium">Root</div>
         <select
             class="w-24 p-2 text-xl font-medium bg-gray-200"
@@ -94,47 +126,5 @@
                 >
             {/each}
         </div>
-    </div>
-    <div class="grid grid-flow-col grid-rows-2 gap-2 p-2 auto-cols-fr">
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-            on:click={(_) => {
-                value.builder.rotate("L");
-                value = value; // Reactivity hack
-            }}
-        >
-            <div class="h-5">
-                <RotateLeftIcon />
-            </div>
-            <div>Rotate Left</div>
-        </button>
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-            on:click={(_) => {
-                value.builder.rotate("R");
-                value = value; // Reactivity hack
-            }}
-        >
-            <div class="h-5">
-                <RotateRightIcon />
-            </div>
-            <div>Rotate Right</div>
-        </button>
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-        >
-            <div class="h-5">
-                <SpeakerIcon />
-            </div>
-            <div>Listen Chord</div>
-        </button>
-        <button
-            class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-        >
-            <div class="h-5">
-                <SpeakerIcon />
-            </div>
-            <div>Listen Scale</div>
-        </button>
     </div>
 </div>
