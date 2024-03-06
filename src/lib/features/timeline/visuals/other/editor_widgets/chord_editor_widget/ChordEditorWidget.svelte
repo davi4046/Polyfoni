@@ -141,6 +141,8 @@
             </div>
             <!-- test -->
             <div>★A-2741</div>
+        {:else}
+            <div class="text-4xl">???</div>
         {/if}
     </div>
 </div>
