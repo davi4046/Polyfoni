@@ -1,40 +1,43 @@
 <script lang="ts">
     import type { ItemTypes } from "../../../../utils/ItemTypes";
     import pitchNames from "../../../../utils/pitchNames";
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy } from "svelte";
 
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import FilterIcon from "./assets/FilterIcon.svelte";
-    import AddIcon from "./assets/AddIcon.svelte";
     import FilterOffIcon from "./assets/FilterOffIcon.svelte";
+    import { cloneDeep } from "lodash";
 
     export let value: ItemTypes["ChordItem"];
     export let update: (value: ItemTypes["ChordItem"]) => void;
 
-    $: pitchEntries = Object.entries(value.builder.pitches);
-    $: rootIndex = value.builder.root
-        ? pitchNames.indexOf(value.builder.root)
-        : 0;
-    $: sortedPitchEntries = [
-        ...pitchEntries.slice(rootIndex),
-        ...pitchEntries.slice(0, rootIndex),
-    ];
-
-    $: filterDisplayValue = value.filter ? value.filter.name : undefined;
-
-    let availablePitches: string[];
+    let sortedPitchEntries: [string, boolean][];
 
     $: {
-        if (value.filter) {
-            availablePitches = Object.entries(value.filter.pitches)
-                .filter(([_, isChecked]) => isChecked)
-                .map(([pitch]) => pitch);
-        } else {
-            availablePitches = pitchNames as unknown as string[];
-        }
+        let pitchEntries = Object.entries(value.builder.pitches);
+
+        const rootIndex = value.builder.root
+            ? pitchNames.indexOf(value.builder.root)
+            : 0;
+
+        pitchEntries = [
+            ...pitchEntries.slice(rootIndex),
+            ...pitchEntries.slice(0, rootIndex),
+        ];
+
+        sortedPitchEntries = value.filter
+            ? pitchEntries.filter(([pitch]) => {
+                  // @ts-ignore
+                  return value.filter!.pitches[pitch];
+              })
+            : pitchEntries;
     }
+
+    $: filterDisplayText = value.filter ? value.filter.name : undefined;
+
+    onDestroy(() => update(value));
 </script>
 
 <div class="grid grid-cols-[1fr,auto]">
@@ -49,6 +52,7 @@
                     value.builder.rotate("L");
                     value = value; // Reactivity hack
                 }}
+                disabled={value.builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateLeftIcon />
@@ -61,29 +65,31 @@
                     value.builder.rotate("R");
                     value = value; // Reactivity hack
                 }}
+                disabled={value.builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateRightIcon />
                 </div>
             </button>
             <button
-                disabled={value.builder.result === undefined}
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-                title="Create Filter"
+                title="Filter"
                 on:click={(_) => {
-                    value.filter = value.builder.result;
+                    value.filter = cloneDeep(value.builder.result);
                 }}
+                disabled={value.builder.result === undefined}
             >
                 <div class="h-5">
-                    <AddIcon />
+                    <FilterIcon />
                 </div>
             </button>
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-                title="Remove Filter"
+                title="Clear Filter"
                 on:click={(_) => {
                     value.filter = undefined;
                 }}
+                disabled={value.filter === undefined}
             >
                 <div class="h-5">
                     <FilterOffIcon />
@@ -92,6 +98,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Chord"
+                disabled={value.builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -100,6 +107,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Scale"
+                disabled={value.builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -109,22 +117,19 @@
         <div
             class="grid auto-cols-min grid-flow-col grid-rows-[min-content,auto] gap-x-2"
         >
-            <div class="flex text-sm font-medium">
-                Filter
-                <div><FilterIcon /></div>
-            </div>
+            <div class="flex text-sm font-medium">Filter</div>
             <select
                 class="w-24 p-2 text-xl font-medium bg-gray-200"
                 title="Filter"
-                bind:value={filterDisplayValue}
+                bind:value={value.filter}
                 on:change={(e) => {
                     // @ts-ignore
                     value.filter = e.target.value;
                 }}
             >
                 <option value={undefined}>---</option>
-                {#if filterDisplayValue}
-                    <option>{filterDisplayValue}</option>
+                {#if filterDisplayText}
+                    <option value={value.filter}>{filterDisplayText}</option>
                 {/if}
             </select>
             <div class="text-sm font-medium">Root</div>
@@ -148,17 +153,15 @@
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
                 {#each sortedPitchEntries as [pitch, isChecked]}
-                    {#if availablePitches.includes(pitch)}
-                        <button
-                            class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
-                                ? 'bg-gray-300'
-                                : 'opacity-50'}"
-                            on:click={(_) => {
-                                // @ts-ignore
-                                value.builder.pitches[pitch] = !isChecked;
-                            }}>{pitch}</button
-                        >
-                    {/if}
+                    <button
+                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
+                            ? 'bg-gray-300'
+                            : 'opacity-50'}"
+                        on:click={(_) => {
+                            // @ts-ignore
+                            value.builder.pitches[pitch] = !isChecked;
+                        }}>{pitch}</button
+                    >
                 {/each}
             </div>
         </div>
