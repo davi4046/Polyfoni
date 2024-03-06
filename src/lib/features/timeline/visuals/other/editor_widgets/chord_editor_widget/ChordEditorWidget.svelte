@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ItemTypes } from "../../../../utils/ItemTypes";
     import pitchNames from "../../../../utils/pitchNames";
-    import { onDestroy } from "svelte";
+    import { onMount, onDestroy } from "svelte";
 
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
@@ -23,6 +23,16 @@
     ];
 
     onDestroy(() => update(value));
+
+    onMount(() => {
+        document
+            .querySelectorAll(".adjust-width-to-height") // Used on pitch buttons
+            .forEach((element) => {
+                if (element instanceof HTMLElement) {
+                    element.style.width = `${element.clientHeight}px`;
+                }
+            });
+    });
 </script>
 
 <div class="flex">
@@ -120,7 +130,7 @@
             <div class="flex gap-1 place-items-center">
                 {#each sortedPitchEntries as [pitch, isChecked]}
                     <button
-                        class="h-12 w-12 rounded-full text-xl font-medium hover:brightness-105 {isChecked
+                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
                             ? 'bg-gray-300'
                             : 'opacity-50'}"
                         on:click={(_) => {
