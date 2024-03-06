@@ -5,10 +5,14 @@ type PitchMap = { [K in Pitch]: boolean };
 
 export class Chord {
     constructor(
-        readonly pitch: Pitch,
+        readonly root: Pitch,
         readonly decimal: number,
         readonly pitches: PitchMap
     ) {}
+
+    get name() {
+        return `${this.root}-${this.decimal}`;
+    }
 }
 
 export class ChordBuilder {
@@ -19,6 +23,8 @@ export class ChordBuilder {
     private _pitches = Object.fromEntries(
         pitchNames.map((pitch) => [pitch, false])
     ) as PitchMap;
+
+    private _result: Chord | undefined;
 
     get root() {
         return this._root;
@@ -53,9 +59,15 @@ export class ChordBuilder {
                     builder._decimal = undefined;
                 }
 
+                builder._updateResult();
+
                 return true;
             },
         });
+    }
+
+    get result() {
+        return this._result;
     }
 
     set root(newRoot) {
@@ -67,6 +79,8 @@ export class ChordBuilder {
                 this._decimal
             );
         }
+
+        this._updateResult();
     }
 
     set decimal(newDecimal) {
@@ -78,6 +92,8 @@ export class ChordBuilder {
                 this._decimal
             );
         }
+
+        this._updateResult();
     }
 
     rotate(direction: "L" | "R") {
@@ -104,6 +120,15 @@ export class ChordBuilder {
                 break;
             }
         }
+
+        this._updateResult();
+    }
+
+    private _updateResult() {
+        this._result =
+            this._root && this._decimal
+                ? new Chord(this._root, this._decimal, this._pitches)
+                : undefined;
     }
 }
 
