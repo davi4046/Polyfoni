@@ -35,9 +35,11 @@
     });
 </script>
 
-<div class="flex">
-    <div class="flex p-2 space-x-2">
-        <div class="grid grid-flow-col grid-rows-2 gap-1 auto-cols-fr">
+<div class="grid grid-cols-[1fr,auto]">
+    <div class="flex p-2 space-x-2 overflow-x-auto">
+        <div
+            class="grid grid-flow-col grid-rows-2 gap-1 min-w-fit auto-cols-fr"
+        >
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Rotate Left"
@@ -143,7 +145,7 @@
         </div>
     </div>
     <div
-        class="flex flex-col items-center justify-center flex-1 max-w-sm ml-auto bg-green-400 border-l-2 border-black"
+        class="flex flex-col items-center justify-center px-4 bg-green-400 border-l-2 border-black w-42 xl:w-72"
     >
         {#if value.builder.result}
             <div class="text-4xl">
