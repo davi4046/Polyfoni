@@ -73,11 +73,19 @@ export class ChordBuilder {
     set root(newRoot) {
         this._root = newRoot;
 
-        if (this._root && this._decimal) {
-            this._pitches = getPitchesFromRootAndDecimal(
-                this._root,
-                this._decimal
-            );
+        if (this._root) {
+            if (this._decimal) {
+                this._pitches = getPitchesFromRootAndDecimal(
+                    this._root,
+                    this._decimal
+                );
+            } else {
+                this._pitches[this._root] = true;
+                this._decimal = getDecimalFromRootAndPitches(
+                    this._root,
+                    this._pitches
+                );
+            }
         }
 
         this._updateResult();
