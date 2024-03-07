@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ItemVM from "../../view_models/item/ItemVM";
+    import type ItemVM from "../../../view_models/ItemVM";
 
     export let itemVM: ItemVM;
 
@@ -10,13 +10,13 @@
 </script>
 
 <div
-    class="absolute z-50 h-full py-1"
+    class="absolute z-10 h-full py-1"
     style="width: {width}px; left: {left}px;"
     data-type="item"
     data-model-id={itemVM.id}
 >
     <div
-        class="relative flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
+        class="relative flex items-center h-full p-2 font-semibold text-black border-2 border-black outline outline-4"
         style="
         background-color: {itemVM.state.backgroundColor.css()}; 
         outline-color: {itemVM.state.outlineColor.css()}; 

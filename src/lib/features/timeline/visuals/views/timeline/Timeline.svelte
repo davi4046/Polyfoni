@@ -74,7 +74,7 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
+        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
     >
@@ -112,7 +112,7 @@
         data-type="center"
     >
         <div
-            class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden"
+            class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
             style="width: 4096px;"
         >
             {#each timelineVM.state.center as voiceVM (voiceVM.id)}
@@ -159,5 +159,21 @@
         class="col-start-1 col-end-3 row-start-5 row-end-6 border-t-2 border-black"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
+    />
+    <!-- TOP HEADERS SHADOW -->
+    <div
+        class="bottom-0 z-20 self-end h-1 col-start-1 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
+    />
+    <!-- BOTTOM HEADERS SHADOW -->
+    <div
+        class="bottom-0 z-20 h-1 col-start-1 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+    />
+    <!-- TOP TRACKS SHADOW -->
+    <div
+        class="bottom-0 z-20 self-end h-1 col-start-2 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
+    />
+    <!-- BOTTOM TRACKS SHADOW -->
+    <div
+        class="bottom-0 z-20 h-1 col-start-2 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
 </div>

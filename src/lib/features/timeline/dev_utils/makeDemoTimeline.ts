@@ -4,7 +4,7 @@ import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
 import { initialContent, type ItemTypes } from "../utils/ItemTypes";
-import { ChordBuilder } from "../utils/chord/Chord";
+import { addChildren } from "../../../architecture/state-hierarchy-utils";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline({ children: [] });
@@ -15,15 +15,35 @@ export default function makeDemoTimeline(): Timeline {
 
     timeline.state = { children: sections };
 
+    const scaleVoice = new Voice({ parent: sections[0], children: [] });
+    const scaleTrack = new Track("ChordItem", {
+        label: "Scale",
+        parent: scaleVoice,
+        children: [],
+    });
+
+    addChildren(scaleVoice, scaleTrack);
+    addChildren(sections[0], scaleVoice);
+
+    const totalHarmonyVoice = new Voice({ parent: sections[2], children: [] });
+    const totalHarmonyTrack = new Track("ChordItem", {
+        label: "Total Harmony",
+        parent: totalHarmonyVoice,
+        children: [],
+    });
+
+    addChildren(totalHarmonyVoice, totalHarmonyTrack);
+    addChildren(sections[2], totalHarmonyVoice);
+
     const voices = Array.from({ length: 3 }, () => {
         const voice = new Voice({ parent: sections[1], children: [] });
 
-        voice.state = { children: createDefaultTracks(voice) };
+        addChildren(voice, ...createDefaultTracks(voice));
 
         return voice;
     });
 
-    sections[1].state = { children: voices };
+    addChildren(sections[1], ...voices);
 
     return timeline;
 }
