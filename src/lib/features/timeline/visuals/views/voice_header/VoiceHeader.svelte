@@ -20,13 +20,13 @@
         : voiceVM.state.tracks;
 </script>
 
-<div class="space-y-[var(--timeline-track-spacing)]">
+<div class="space-y-[var(--timeline-track-gap)]">
     {#each tracksToDisplay as trackVM, index (trackVM.id)}
         <TrackHeader {trackVM}>
             <span slot="icon">
                 {#if index === 0}
                     <button
-                        class="h-full w-full"
+                        class="w-full h-full"
                         class:-rotate-90={voiceVM.state.isCollapsed}
                         on:click={(_) => toggleCollapsed()}
                     >

@@ -45,7 +45,7 @@
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
     <!-- MARKERS -->
-    <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
+    <div class="h-6 col-start-2 row-start-1 overflow-hidden h-scroll">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
@@ -64,7 +64,7 @@
     </div>
     <!-- TOP HEADERS -->
     <div
-        class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
     >
@@ -74,7 +74,7 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
     >
@@ -84,7 +84,7 @@
     </div>
     <!-- BOTTOM HEADERS -->
     <div
-        class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+        class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
         on:mousemove={timelineVM.state.handleMouseMove_others}
         role="none"
     >
@@ -94,11 +94,11 @@
     </div>
     <!-- TOP TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
         data-type="top"
     >
         <div
-            class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-clip"
+            class="flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-clip"
             style="width: 4096px;"
         >
             {#each timelineVM.state.top as voiceVM (voiceVM.id)}
@@ -108,11 +108,11 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
         data-type="center"
     >
         <div
-            class="v-scroll flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+            class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.state.center as voiceVM (voiceVM.id)}
@@ -122,11 +122,11 @@
     </div>
     <!-- BOTTOM TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
         data-type="bottom"
     >
         <div
-            class="flex h-full flex-col space-y-[var(--timeline-voice-spacing)] overflow-hidden"
+            class="flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
             style="width: 4096px;"
         >
             {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
@@ -136,7 +136,7 @@
     </div>
     <!-- SEPARATORS -->
     <div
-        class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
+        class="col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
     >
         <div
             class="relative h-full overflow-clip"
