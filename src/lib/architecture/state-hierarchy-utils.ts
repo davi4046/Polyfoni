@@ -1,21 +1,21 @@
-interface ChildState<TParent> {
+export interface ChildState<TParent> {
     parent: TParent;
 }
 
-interface ParentChildState<TParent, TChild> {
+export interface ParentChildState<TParent, TChild> {
     parent: TParent;
     children: readonly TChild[];
 }
 
-interface ParentState<TChild> {
+export interface ParentState<TChild> {
     children: readonly TChild[];
 }
 
-interface GetState<TState> {
+export interface GetState<TState> {
     get state(): TState;
 }
 
-interface SetState<TState> {
+export interface SetState<TState> {
     set state(newState: Partial<TState>);
 }
 
@@ -31,29 +31,31 @@ type HasSettableParent<TParent> = SetState<HasParent<TParent>>;
 
 type HasSettableChildren<TParent> = SetState<HasChildren<TParent>>;
 
-function getParent<T>(obj: HasGettableParent<T>) {
+export function getParent<T>(obj: HasGettableParent<T>) {
     return obj.state.parent;
 }
 
-function getGrandparent<T>(obj: HasGettableParent<HasGettableParent<T>>) {
+export function getGrandparent<T>(
+    obj: HasGettableParent<HasGettableParent<T>>
+) {
     return obj.state.parent.state.parent;
 }
 
-function getGreatGrandparent<T>(
+export function getGreatGrandparent<T>(
     obj: HasGettableParent<HasGettableParent<HasGettableParent<T>>>
 ) {
     return obj.state.parent.state.parent.state.parent;
 }
 
-function getChildren<T>(obj: HasGettableChildren<T>) {
+export function getChildren<T>(obj: HasGettableChildren<T>) {
     return obj.state.children;
 }
 
-function getIndex(obj: HasGettableParent<HasGettableChildren<any>>) {
+export function getIndex(obj: HasGettableParent<HasGettableChildren<any>>) {
     return obj.state.parent.state.children.indexOf(obj);
 }
 
-function addChildren<T>(
+export function addChildren<T>(
     obj: HasSettableChildren<T> & HasGettableChildren<T>,
     ...children: T[]
 ) {
@@ -62,7 +64,7 @@ function addChildren<T>(
     };
 }
 
-function removeChildren<T>(
+export function removeChildren<T>(
     obj: HasSettableChildren<T> & HasGettableChildren<T>,
     ...children: T[]
 ) {
@@ -82,9 +84,9 @@ type Position<T extends HasGettableParent<HasGettableChildren<any>>> = {
         : null;
 };
 
-function getPosition<T extends HasGettableParent<HasGettableChildren<any>>>(
-    obj: T
-): Position<T> {
+export function getPosition<
+    T extends HasGettableParent<HasGettableChildren<any>>,
+>(obj: T): Position<T> {
     const grandparent = getGrandparent(obj as any) as any;
     return {
         index: getIndex(obj),
@@ -94,7 +96,7 @@ function getPosition<T extends HasGettableParent<HasGettableChildren<any>>>(
     };
 }
 
-function isGreaterPos<T extends Position<any>>(a: T, b: T): boolean {
+export function isGreaterPos<T extends Position<any>>(a: T, b: T): boolean {
     return isGreaterPosRecursive(a, b, false);
 }
 
@@ -111,20 +113,3 @@ function isGreaterPosRecursive<T extends Position<any>>(
         return result;
     }
 }
-
-export {
-    type ChildState,
-    type ParentChildState,
-    type ParentState,
-    type GetState,
-    type SetState,
-    getParent,
-    getGrandparent,
-    getGreatGrandparent,
-    getChildren,
-    getIndex,
-    addChildren,
-    removeChildren,
-    getPosition,
-    isGreaterPos,
-};
