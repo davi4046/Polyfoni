@@ -1,15 +1,10 @@
 import type Track from "../../models/Track";
-import getOutlinePaths from "../../utils/track_interval/getOutlinePaths";
-import Highlight__SvelteComponent_ from "../../visuals/other/Highlight.svelte";
+import HighlightComponent from "../../visuals/other/Highlight.svelte";
 import Attribute from "../../../../architecture/AttributeEnum";
-import type Interval from "../../../../utils/interval/Interval";
-import mergeIntervals from "../../../../utils/interval/merge_intervals/mergeIntervals";
-import createSvgPath from "../../../../utils/point/create_svg_path/createSvgPath";
 
 export default class HighlightManager {
     private _highlights: Highlight[] = [];
-
-    private _component?: Highlight__SvelteComponent_;
+    private _components: HighlightComponent[] = [];
 
     set highlights(newHighlights: Highlight[]) {
         this._highlights = newHighlights;
@@ -20,48 +15,26 @@ export default class HighlightManager {
         return this._highlights;
     }
 
-    addHighlight(newHighlight: Highlight) {
-        const highlights = this._highlights.filter(
-            (highlight) => highlight.track === newHighlight.track
-        );
-
-        this._highlights = this._highlights.filter(
-            (highlight) => !highlights.includes(highlight)
-        ); // remove highlights that are on the same track as the new highlight
-
-        highlights.push(newHighlight);
-
-        this._highlights.push(
-            ...mergeIntervals(highlights).map((interval) => {
-                return {
-                    track: newHighlight.track,
-                    start: interval.start,
-                    end: interval.end,
-                };
-            })
-        );
-
-        this.renderHighlights();
-    }
-
     renderHighlights() {
-        const overlayElement = document.querySelector(
-            `[${Attribute.Type}='overlay']`
-        )!;
+        this._components.forEach((component) => component.$destroy());
 
-        const path = getOutlinePaths(this._highlights)
-            .map((path) => createSvgPath(path))
-            .join(" ");
+        this._components = this._highlights.map((highlight) => {
+            const trackElement = document.querySelector(
+                `[${Attribute.ModelId}='${highlight.track.id}'][${Attribute.Type}='track']`
+            ) as HTMLElement;
 
-        this._component?.$destroy();
+            const x1 = highlight.start * 64;
+            const x2 = highlight.end * 64;
 
-        this._component = new Highlight__SvelteComponent_({
-            target: overlayElement,
-            props: {
-                path: path,
-            },
+            return new HighlightComponent({
+                target: trackElement,
+                props: {
+                    left: x1,
+                    width: x2 - x1,
+                },
+            });
         });
     }
 }
 
-type Highlight = { track: Track<any> } & Interval;
+type Highlight = { track: Track<any>; start: number; end: number };
