@@ -18,7 +18,7 @@
     }
 </script>
 
-<div class="p-2">
+<div class="border-t-2 border-black p-2">
     <input
         on:keydown={handleKeyDown}
         bind:this={inputField}

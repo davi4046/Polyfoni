@@ -29,10 +29,10 @@
     onDestroy(() => update(value));
 </script>
 
-<div class="grid grid-cols-[1fr,auto]">
-    <div class="flex p-2 space-x-2 overflow-x-auto">
+<div class="grid grid-cols-[1fr,auto] border-t-2 border-black">
+    <div class="flex space-x-2 overflow-x-auto p-2">
         <div
-            class="grid grid-flow-col grid-rows-2 gap-1 min-w-fit auto-cols-fr"
+            class="grid min-w-fit auto-cols-fr grid-flow-col grid-rows-2 gap-1"
         >
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
@@ -84,7 +84,7 @@
         >
             <div class="text-sm font-medium">Root</div>
             <select
-                class="w-24 p-2 text-xl font-medium bg-gray-200"
+                class="w-24 bg-gray-200 p-2 text-xl font-medium"
                 title="Root"
                 bind:value={value.root}
             >
@@ -95,13 +95,13 @@
             </select>
             <div class="text-sm font-medium">Decimal</div>
             <input
-                class="w-24 p-2 text-xl font-medium bg-gray-200"
+                class="w-24 bg-gray-200 p-2 text-xl font-medium"
                 type="number"
                 title="Decimal"
                 bind:value={value.decimal}
             />
             <div class="text-sm font-medium">Pitches</div>
-            <div class="flex gap-1 place-items-center">
+            <div class="flex place-items-center gap-1">
                 {#each sortedPitchEntries as [pitch, isChecked]}
                     <button
                         class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
@@ -117,7 +117,7 @@
         </div>
     </div>
     <div
-        class="flex flex-col items-center justify-center px-4 bg-green-400 border-l-2 border-black w-42 xl:w-72"
+        class="w-42 flex flex-col items-center justify-center border-l-2 border-black bg-green-400 px-4 xl:w-72"
     >
         {#if value.result}
             <div class="text-4xl">
