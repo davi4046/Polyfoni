@@ -1,5 +1,6 @@
 import type TimelineContext from "../TimelineContext";
 import Item from "../../models/Item";
+import { initialContent, type ItemTypes } from "../../utils/ItemTypes";
 import { addChildren } from "../../../../architecture/state-hierarchy-utils";
 
 function insertEmptyItems(context: TimelineContext) {
@@ -11,7 +12,7 @@ function insertEmptyItems(context: TimelineContext) {
                 parent: highlight.track,
                 start: highlight.start,
                 end: highlight.end,
-                content: null,
+                content: initialContent[highlight.track.itemType as keyof ItemTypes](),
             })
         );
     });
