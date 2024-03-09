@@ -6,9 +6,6 @@
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
-    import FilterIcon from "./assets/FilterIcon.svelte";
-    import FilterOffIcon from "./assets/FilterOffIcon.svelte";
-    import { cloneDeep } from "lodash";
 
     export let value: ItemTypes["ChordItem"];
     export let update: (value: ItemTypes["ChordItem"]) => void;
