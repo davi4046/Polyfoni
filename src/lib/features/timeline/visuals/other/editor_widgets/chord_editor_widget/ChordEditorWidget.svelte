@@ -1,21 +1,23 @@
 <script lang="ts">
-    import type { ItemTypes } from "../../../../utils/ItemTypes";
     import pitchNames from "../../../../utils/pitchNames";
-    import { onDestroy } from "svelte";
 
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
+    import type Item from "../../../../models/Item";
+    import { cloneDeep } from "lodash";
+    import { onDestroy } from "svelte";
 
-    export let value: ItemTypes["ChordItem"];
-    export let update: (value: ItemTypes["ChordItem"]) => void;
+    export let item: Item<"ChordItem">;
 
     let sortedPitchEntries: [string, boolean][];
 
-    $: {
-        const pitchEntries = Object.entries(value.pitches);
+    let builder = cloneDeep(item.state.content);
 
-        const rootIndex = value.root ? pitchNames.indexOf(value.root) : 0;
+    $: {
+        const pitchEntries = Object.entries(builder.pitches);
+
+        const rootIndex = builder.root ? pitchNames.indexOf(builder.root) : 0;
 
         sortedPitchEntries = [
             ...pitchEntries.slice(rootIndex),
@@ -23,7 +25,11 @@
         ];
     }
 
-    onDestroy(() => update(value));
+    onDestroy(() => {
+        item.state = {
+            content: builder,
+        };
+    });
 </script>
 
 <div class="grid grid-cols-[1fr,auto] border-t-2 border-black">
@@ -35,10 +41,10 @@
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Rotate Left"
                 on:click={(_) => {
-                    value.rotate("L");
-                    value = value; // Reactivity hack
+                    builder.rotate("L");
+                    builder = builder; // Reactivity hack
                 }}
-                disabled={value.root === undefined}
+                disabled={builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateLeftIcon />
@@ -48,10 +54,10 @@
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Rotate Right"
                 on:click={(_) => {
-                    value.rotate("R");
-                    value = value; // Reactivity hack
+                    builder.rotate("R");
+                    builder = builder; // Reactivity hack
                 }}
-                disabled={value.root === undefined}
+                disabled={builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateRightIcon />
@@ -60,7 +66,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Chord"
-                disabled={value.result === undefined}
+                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -69,7 +75,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Scale"
-                disabled={value.result === undefined}
+                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -83,7 +89,7 @@
             <select
                 class="w-24 bg-gray-200 p-2 text-xl font-medium"
                 title="Root"
-                bind:value={value.root}
+                bind:value={builder.root}
             >
                 <option value={undefined}>---</option>
                 {#each pitchNames as pitch}
@@ -95,7 +101,7 @@
                 class="w-24 bg-gray-200 p-2 text-xl font-medium"
                 type="number"
                 title="Decimal"
-                bind:value={value.decimal}
+                bind:value={builder.decimal}
             />
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex place-items-center gap-1">
@@ -106,7 +112,7 @@
                             : 'opacity-50'}"
                         on:click={(_) => {
                             // @ts-ignore
-                            value.pitches[pitch] = !isChecked;
+                            builder.pitches[pitch] = !isChecked;
                         }}>{pitch}</button
                     >
                 {/each}
@@ -116,9 +122,9 @@
     <div
         class="w-42 flex flex-col items-center justify-center border-l-2 border-black bg-green-400 px-4 xl:w-72"
     >
-        {#if value.result}
+        {#if builder.result}
             <div class="text-4xl">
-                {value.result.name}
+                {builder.result.name}
             </div>
             <!-- test -->
             <div>★A-2741</div>

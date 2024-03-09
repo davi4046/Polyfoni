@@ -1,5 +1,6 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
+import type Item from "../models/Item";
 import StringEditorWidget from "../visuals/other/editor_widgets/StringEditorWidget.svelte";
 import ChordEditorWidget from "../visuals/other/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 
@@ -18,8 +19,7 @@ export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
 type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     SvelteComponent<
         {
-            value: ItemTypes[T];
-            update: (value: ItemTypes[T]) => void;
+            item: Item<T>;
         },
         {},
         {}

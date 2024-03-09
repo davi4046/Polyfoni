@@ -1,8 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import type Item from "../../../models/Item";
 
-    export let value: string;
-    export let update: (value: string) => void;
+    export let item: Item<"StringItem">;
+
+    let value = item.state.content;
+
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key !== "Enter") return;
+        item.state = {
+            content: value,
+        };
+    }
 
     let inputField: HTMLInputElement;
 
@@ -11,11 +20,6 @@
             inputField.select();
         }, 0);
     });
-
-    function handleKeyDown(event: KeyboardEvent) {
-        if (event.key !== "Enter") return;
-        update(value);
-    }
 </script>
 
 <div class="border-t-2 border-black p-2">
