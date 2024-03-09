@@ -1,4 +1,11 @@
 import pitchNames from "../pitchNames";
+import type Item from "../../models/Item";
+import {
+    getChildren,
+    getGreatGreatGrandparent,
+    getParent,
+} from "../../../../architecture/state-hierarchy-utils";
+import isOverlapping from "../../../../utils/interval/is_overlapping/isOverlapping";
 
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
@@ -13,6 +20,21 @@ export class Chord {
     get name() {
         return `${this.root}-${this.decimal}`;
     }
+
+    static getCommonPitches(chords: Chord[]): string[] {
+        if (chords.length > 0) {
+            const pitchesInChords = chords.map((chord) => {
+                return Object.keys(chord.pitches).filter(
+                    (pitch) => chord.pitches[pitch as Pitch]
+                );
+            });
+            return pitchesInChords.reduce((prev, curr) =>
+                prev.filter((commonPitch) => curr.includes(commonPitch))
+            );
+        } else {
+            return [];
+        }
+    }
 }
 
 export class ChordBuilder {
@@ -22,6 +44,10 @@ export class ChordBuilder {
 
     private _pitches = Object.fromEntries(
         pitchNames.map((pitch) => [pitch, false])
+    ) as PitchMap;
+
+    private _filter = Object.fromEntries(
+        pitchNames.map((pitch) => [pitch, true])
     ) as PitchMap;
 
     private _result: Chord | undefined;
@@ -66,6 +92,10 @@ export class ChordBuilder {
         });
     }
 
+    get filter() {
+        return this._filter;
+    }
+
     get result() {
         return this._result;
     }
@@ -102,6 +132,10 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+    }
+
+    set filter(newFilter) {
+        this._filter = newFilter;
     }
 
     rotate(direction: "L" | "R") {
@@ -185,4 +219,76 @@ function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
             return [pitch, isPresent];
         })
     ) as PitchMap;
+}
+
+export function chordItemInitFunc(item: Item<"ChordItem">) {
+    const timeline = getGreatGreatGrandparent(item);
+
+    if (
+        getParent(item) === timeline.scaleTrack ||
+        getParent(item) === timeline.totalTrack
+    ) {
+        return;
+    }
+
+    function updateFilter() {
+        console.log("updated chord filter");
+        const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
+            (scaleItem) => isOverlapping(item.state, scaleItem.state)
+        );
+
+        const scales = overlappingScaleItems
+            .map((scaleItem) => scaleItem.state.content.result as Chord)
+            .filter((value): value is Chord => value !== undefined); // Scale must be specified
+
+        if (scales.length === 0) {
+            item.state.content.filter = Object.fromEntries(
+                pitchNames.map((pitch) => [pitch, true])
+            ) as PitchMap; // No filter
+
+            return;
+        }
+
+        const commonPitches = scales
+            .map((scale) => scale.pitches)
+            .reduce((prev, curr) => {
+                return Object.fromEntries(
+                    pitchNames.map((pitch) => [
+                        pitch,
+                        prev[pitch] && curr[pitch],
+                    ])
+                ) as PitchMap;
+            });
+
+        item.state.content.filter = commonPitches;
+    }
+
+    updateFilter();
+
+    item.subscribe(updateFilter); // For when the item gets moved
+
+    const unsubscribers: (() => void)[] = [];
+
+    // Catch when a new scale item is added
+    timeline.scaleTrack.subscribe(() => {
+        updateFilter();
+
+        unsubscribers.forEach((unsubscribe) => unsubscribe());
+
+        const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
+            (scaleItem) => isOverlapping(item.state, scaleItem.state)
+        );
+
+        overlappingScaleItems.forEach((scaleItem) => {
+            // Catch when the value of an overlapping scale item changes
+            const unsubscribe = scaleItem.subscribe(() => {
+                if (isOverlapping(item.state, scaleItem.state)) {
+                    updateFilter();
+                } else {
+                    unsubscribe();
+                }
+            });
+            unsubscribers.push(unsubscribe);
+        });
+    });
 }

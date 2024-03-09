@@ -10,9 +10,9 @@
 
     export let item: Item<"ChordItem">;
 
-    let sortedPitchEntries: [string, boolean][];
-
     let builder = cloneDeep(item.state.content);
+
+    let sortedPitchEntries: [string, boolean][];
 
     $: {
         const pitchEntries = Object.entries(builder.pitches);
@@ -24,6 +24,8 @@
             ...pitchEntries.slice(0, rootIndex),
         ];
     }
+
+    console.log("filter:", builder.filter);
 
     onDestroy(() => {
         item.state = {
