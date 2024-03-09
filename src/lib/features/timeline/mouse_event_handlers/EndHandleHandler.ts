@@ -17,9 +17,13 @@ class EndHandleHandler implements MouseEventHandler {
             getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
 
-        this.item.state = {
-            end: Math.max(hoveredBeat, this.item.state.start + 1),
-        };
+        const newEnd = Math.max(hoveredBeat, this.item.state.start + 1);
+
+        if (newEnd !== this.item.state.end) {
+            this.item.state = {
+                end: newEnd,
+            };
+        }
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {

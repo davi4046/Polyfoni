@@ -19,9 +19,13 @@ class StartHandleHandler implements MouseEventHandler {
             getBeatAtClientX(this.context.timeline, moveEvent.clientX)
         );
 
-        this.item.state = {
-            start: clamp(hoveredBeat, 0, this.item.state.end - 1),
-        };
+        const newStart = clamp(hoveredBeat, 0, this.item.state.end - 1);
+
+        if (newStart !== this.item.state.start) {
+            this.item.state = {
+                start: newStart,
+            };
+        }
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
