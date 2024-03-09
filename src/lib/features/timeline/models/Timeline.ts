@@ -48,6 +48,20 @@ class Timeline extends Model<TimelineState> {
         addChildren(voice, track);
         addChildren(sections[2], voice);
     }
+
+    set state(newState: Partial<TimelineState>) {
+        super.state = newState;
+
+        if (newState.children) {
+            console.warn(
+                "Children of Timeline state are not supposed to be updated but have been"
+            );
+        }
+    }
+
+    get state(): Readonly<TimelineState> {
+        return super.state;
+    }
 }
 
 export default Timeline;
