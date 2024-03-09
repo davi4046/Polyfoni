@@ -1,49 +1,28 @@
 import Item from "../models/Item";
-import Section from "../models/Section";
 import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
 import { initialContent, type ItemTypes } from "../utils/ItemTypes";
-import { addChildren } from "../../../architecture/state-hierarchy-utils";
+import {
+    addChildren,
+    getChildren,
+} from "../../../architecture/state-hierarchy-utils";
 
 export default function makeDemoTimeline(): Timeline {
-    const timeline = new Timeline({ children: [] });
-
-    const sections = Array.from({ length: 3 }, () => {
-        return new Section({ parent: timeline, children: [] });
-    });
-
-    timeline.state = { children: sections };
-
-    const scaleVoice = new Voice({ parent: sections[0], children: [] });
-    const scaleTrack = new Track("ChordItem", {
-        label: "Scale",
-        parent: scaleVoice,
-        children: [],
-    });
-
-    addChildren(scaleVoice, scaleTrack);
-    addChildren(sections[0], scaleVoice);
-
-    const totalHarmonyVoice = new Voice({ parent: sections[2], children: [] });
-    const totalHarmonyTrack = new Track("ChordItem", {
-        label: "Total Harmony",
-        parent: totalHarmonyVoice,
-        children: [],
-    });
-
-    addChildren(totalHarmonyVoice, totalHarmonyTrack);
-    addChildren(sections[2], totalHarmonyVoice);
+    const timeline = new Timeline();
 
     const voices = Array.from({ length: 3 }, () => {
-        const voice = new Voice({ parent: sections[1], children: [] });
+        const voice = new Voice({
+            parent: getChildren(timeline)[1],
+            children: [],
+        });
 
         addChildren(voice, ...createDefaultTracks(voice));
 
         return voice;
     });
 
-    addChildren(sections[1], ...voices);
+    addChildren(getChildren(timeline)[1], ...voices);
 
     return timeline;
 }
@@ -73,11 +52,6 @@ function makeRandomItems<T extends keyof ItemTypes>(
     }
 
     return items;
-}
-
-function populateTrack(track: Track<any>) {
-    const items = makeRandomItems(track.itemType, track);
-    track.state = { children: items };
 }
 
 function createDefaultTracks(voice: Voice): Track<any>[] {
@@ -111,7 +85,10 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
         })
     );
 
-    tracks.forEach(populateTrack);
+    tracks.forEach((track) => {
+        const items = makeRandomItems(track.itemType, track);
+        addChildren(track, ...items);
+    });
 
     return tracks;
 }
