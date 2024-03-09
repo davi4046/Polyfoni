@@ -27,7 +27,9 @@ class Timeline extends Model<TimelineState> {
             return new Section({ parent: this, children: [] });
         });
 
-        addChildren(this, ...sections);
+        super.state = {
+            children: sections,
+        };
 
         let voice;
         let track;
