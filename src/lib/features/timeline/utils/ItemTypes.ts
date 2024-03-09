@@ -1,8 +1,8 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
 import type Item from "../models/Item";
-import StringEditorWidget from "../visuals/other/editor_widgets/StringEditorWidget.svelte";
-import ChordEditorWidget from "../visuals/other/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
+import StringEditorWidget from "../visuals/editor_widgets/StringEditorWidget.svelte";
+import ChordEditorWidget from "../visuals/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 
 import { ChordBuilder } from "./chord/Chord";
 

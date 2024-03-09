@@ -1,5 +1,5 @@
 import type Track from "../../models/Track";
-import HighlightComponent from "../../visuals/other/Highlight.svelte";
+import HighlightComponent from "../../visuals/Highlight.svelte";
 import Attribute from "../../../../architecture/AttributeEnum";
 
 export default class HighlightManager {

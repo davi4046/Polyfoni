@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type Item from "../../../models/Item";
+    import type Item from "../../models/Item";
 
     export let item: Item<"StringItem">;
 
@@ -22,7 +22,7 @@
     });
 </script>
 
-<div class="border-t-2 border-black p-2">
+<div class="p-2 border-t-2 border-black">
     <input
         on:keydown={handleKeyDown}
         bind:this={inputField}
