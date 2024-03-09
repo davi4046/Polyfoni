@@ -1,6 +1,10 @@
 import { clamp } from "lodash";
 
-import { initialContent, type ItemTypes } from "./../utils/ItemTypes";
+import {
+    initialContent,
+    postInitFunctions,
+    type ItemTypes,
+} from "./../utils/ItemTypes";
 import Model from "../../../architecture/Model";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
@@ -19,6 +23,8 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
         state: ItemState<T>
     ) {
         super(state);
+
+        if (postInitFunctions[itemType]) postInitFunctions[itemType]!(this);
     }
 
     static offsetBunchOfItems(
