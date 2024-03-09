@@ -1,6 +1,7 @@
 import Model from "../../../architecture/Model";
 import {
     addChildren,
+    getChildren,
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
@@ -11,6 +12,9 @@ import Voice from "./Voice";
 interface TimelineState extends ParentState<Section> {}
 
 class Timeline extends Model<TimelineState> {
+    readonly scaleTrack;
+    readonly totalTrack;
+
     constructor(id?: string) {
         super(
             {
@@ -38,6 +42,8 @@ class Timeline extends Model<TimelineState> {
         addChildren(voice, track);
         addChildren(sections[0], voice);
 
+        this.scaleTrack = track;
+
         voice = new Voice({ parent: sections[2], children: [] });
         track = new Track("ChordItem", {
             label: "Total Harmony",
@@ -47,6 +53,8 @@ class Timeline extends Model<TimelineState> {
 
         addChildren(voice, track);
         addChildren(sections[2], voice);
+
+        this.totalTrack = track;
     }
 
     set state(newState: Partial<TimelineState>) {
