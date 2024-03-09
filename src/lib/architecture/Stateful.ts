@@ -20,7 +20,17 @@ export default class Stateful<TState extends object>
 
     private _callbacks: (() => void)[] = [];
 
+    /**
+     * @param callback Function that will be called when the state updates
+     * @returns Function for unsubscribing
+     */
     subscribe(callback: () => void) {
         this._callbacks.push(callback);
+
+        return () => {
+            this._callbacks = this._callbacks.filter(
+                (func) => func !== callback
+            );
+        };
     }
 }
