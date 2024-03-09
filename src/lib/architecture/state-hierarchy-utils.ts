@@ -47,6 +47,14 @@ export function getGreatGrandparent<T>(
     return obj.state.parent.state.parent.state.parent;
 }
 
+export function getGreatGreatGrandparent<T>(
+    obj: HasGettableParent<
+        HasGettableParent<HasGettableParent<HasGettableParent<T>>>
+    >
+) {
+    return obj.state.parent.state.parent.state.parent.state.parent;
+}
+
 export function getChildren<T>(obj: HasGettableChildren<T>) {
     return obj.state.children;
 }
