@@ -1,5 +1,6 @@
 import pitchNames from "../pitchNames";
 import type Item from "../../models/Item";
+import Stateful from "../../../../architecture/Stateful";
 import {
     getChildren,
     getGreatGreatGrandparent,
@@ -17,12 +18,24 @@ export class Chord {
         readonly pitches: PitchMap
     ) {}
 
-    get name() {
+    getName() {
         return `${this.root}-${this.decimal}`;
     }
 }
 
-export class ChordBuilder {
+interface ChordBuilderState {
+    root?: string;
+    decimal?: number;
+    pitches: [string, boolean][];
+    result?: Chord;
+}
+
+export class ChordBuilder extends Stateful<Readonly<ChordBuilderState>> {
+    constructor() {
+        super({ pitches: [] });
+        this._updateState();
+    }
+
     private _root: Pitch | undefined;
 
     private _decimal: number | undefined;
@@ -35,29 +48,7 @@ export class ChordBuilder {
 
     private _result: Chord | undefined;
 
-    get root() {
-        return this._root;
-    }
-
-    get decimal() {
-        return this._decimal;
-    }
-
-    get pitches() {
-        return Object.entries(this._pitches).filter(([pitch]) =>
-            this._filters.every((scale) => scale.pitches[pitch as Pitch])
-        ); // Only return pitches that are allowed by filters
-    }
-
-    get filters() {
-        return this._filters;
-    }
-
-    get result() {
-        return this._result;
-    }
-
-    set root(newRoot) {
+    setRoot(newRoot: Pitch) {
         this._root = newRoot;
 
         if (this._root) {
@@ -76,9 +67,10 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+        this._updateState();
     }
 
-    set decimal(newDecimal) {
+    setDecimal(newDecimal: number) {
         this._decimal = newDecimal;
 
         if (this._root && this._decimal) {
@@ -89,10 +81,22 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+        this._updateState();
     }
 
-    set filters(newFilters) {
+    setFilters(newFilters: Chord[]) {
         this._filters = newFilters;
+
+        // Toggle pitches that are enabled but disallowed by filters
+        Object.entries(this._pitches).forEach(([pitch, value]) => {
+            if (!value) return;
+
+            if (
+                !this._filters.every((scale) => scale.pitches[pitch as Pitch])
+            ) {
+                this.togglePitch(pitch as Pitch);
+            }
+        });
     }
 
     rotate(direction: "L" | "R") {
@@ -121,6 +125,7 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+        this._updateState();
     }
 
     togglePitch(pitch: Pitch) {
@@ -147,6 +152,7 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+        this._updateState();
     }
 
     private _updateResult() {
@@ -154,6 +160,17 @@ export class ChordBuilder {
             this._root && this._decimal
                 ? new Chord(this._root, this._decimal, this._pitches)
                 : undefined;
+    }
+
+    private _updateState() {
+        this.state = {
+            root: this._root,
+            decimal: this._decimal,
+            pitches: Object.entries(this._pitches).filter(([pitch]) =>
+                this._filters.every((scale) => scale.pitches[pitch as Pitch])
+            ), // Only pitches that are allowed by filters
+            result: this._result,
+        };
     }
 }
 
@@ -198,8 +215,8 @@ function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
 
     return Object.fromEntries(
         pitchNames.map((pitch, index) => {
-            const isPresent = binary[binary.length - index - 1] === "1";
-            return [pitch, isPresent];
+            const value = binary[binary.length - index - 1] === "1";
+            return [pitch, value];
         })
     ) as PitchMap;
 }
@@ -220,10 +237,10 @@ export function chordItemInitFunc(item: Item<"ChordItem">) {
         );
 
         const scales = overlappingScaleItems
-            .map((scaleItem) => scaleItem.state.content.result as Chord)
+            .map((scaleItem) => scaleItem.state.content.state.result as Chord)
             .filter((value): value is Chord => value !== undefined); // Scale must be specified
 
-        item.state.content.filters = scales;
+        item.state.content.setFilters(scales);
     }
 
     updateFilter();
@@ -238,20 +255,16 @@ export function chordItemInitFunc(item: Item<"ChordItem">) {
 
         unsubscribers.forEach((unsubscribe) => unsubscribe());
 
-        const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
-            (scaleItem) => isOverlapping(item.state, scaleItem.state)
-        );
-
-        overlappingScaleItems.forEach((scaleItem) => {
-            // Catch when the value of an overlapping scale item changes
+        getChildren(timeline.scaleTrack).forEach((scaleItem) => {
             const unsubscribe = scaleItem.subscribe(() => {
-                if (isOverlapping(item.state, scaleItem.state)) {
-                    updateFilter();
-                } else {
-                    unsubscribe();
-                }
+                updateFilter();
             });
             unsubscribers.push(unsubscribe);
         });
+    });
+
+    // Notify viewmodels when content state changes
+    item.state.content.subscribe(() => {
+        item.state = item.state;
     });
 }
