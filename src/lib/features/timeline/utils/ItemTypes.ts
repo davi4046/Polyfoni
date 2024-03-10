@@ -29,8 +29,8 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
 export const stringConversionFunctions: StringConversionFunctions = {
     StringItem: (value) => value,
     ChordItem: (value) => {
-        if (value.state.result) {
-            return value.state.result.getName();
+        if (value.root && value.decimal) {
+            return `${value.root}-${value.decimal}`;
         } else {
             return "Unfinished";
         }
