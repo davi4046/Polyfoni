@@ -15,13 +15,13 @@
     let sortedPitchEntries: [string, boolean][];
 
     $: {
-        const pitchEntries = Object.entries(builder.pitches);
-
-        const rootIndex = builder.root ? pitchNames.indexOf(builder.root) : 0;
+        const rootIndex = builder.root
+            ? builder.pitches.findIndex(([pitch]) => pitch === builder.root)
+            : 0;
 
         sortedPitchEntries = [
-            ...pitchEntries.slice(rootIndex),
-            ...pitchEntries.slice(0, rootIndex),
+            ...builder.pitches.slice(rootIndex),
+            ...builder.pitches.slice(0, rootIndex),
         ];
     }
 

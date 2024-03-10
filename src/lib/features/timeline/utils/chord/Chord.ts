@@ -44,7 +44,9 @@ export class ChordBuilder {
     }
 
     get pitches() {
-        return this._pitches;
+        return Object.entries(this._pitches).filter(([pitch]) =>
+            this._filters.every((scale) => scale.pitches[pitch as Pitch])
+        ); // Only return pitches that are allowed by filters
     }
 
     get filters() {
