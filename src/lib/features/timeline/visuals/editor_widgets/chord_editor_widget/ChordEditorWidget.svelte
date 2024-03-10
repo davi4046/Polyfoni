@@ -25,7 +25,7 @@
         ];
     }
 
-    console.log("filter:", builder.filter);
+    console.log("filters:", builder.filters);
 
     onDestroy(() => {
         item.state = {

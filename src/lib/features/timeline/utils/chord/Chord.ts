@@ -20,21 +20,6 @@ export class Chord {
     get name() {
         return `${this.root}-${this.decimal}`;
     }
-
-    static getCommonPitches(chords: Chord[]): string[] {
-        if (chords.length > 0) {
-            const pitchesInChords = chords.map((chord) => {
-                return Object.keys(chord.pitches).filter(
-                    (pitch) => chord.pitches[pitch as Pitch]
-                );
-            });
-            return pitchesInChords.reduce((prev, curr) =>
-                prev.filter((commonPitch) => curr.includes(commonPitch))
-            );
-        } else {
-            return [];
-        }
-    }
 }
 
 export class ChordBuilder {
@@ -46,9 +31,7 @@ export class ChordBuilder {
         pitchNames.map((pitch) => [pitch, false])
     ) as PitchMap;
 
-    private _filter = Object.fromEntries(
-        pitchNames.map((pitch) => [pitch, true])
-    ) as PitchMap;
+    private _filters: readonly Chord[] = [];
 
     private _result: Chord | undefined;
 
@@ -92,8 +75,8 @@ export class ChordBuilder {
         });
     }
 
-    get filter() {
-        return this._filter;
+    get filters() {
+        return this._filters;
     }
 
     get result() {
@@ -134,8 +117,8 @@ export class ChordBuilder {
         this._updateResult();
     }
 
-    set filter(newFilter) {
-        this._filter = newFilter;
+    set filters(newFilters) {
+        this._filters = newFilters;
     }
 
     rotate(direction: "L" | "R") {
@@ -232,7 +215,6 @@ export function chordItemInitFunc(item: Item<"ChordItem">) {
     }
 
     function updateFilter() {
-        console.log("updated chord filter");
         const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
             (scaleItem) => isOverlapping(item.state, scaleItem.state)
         );
@@ -241,26 +223,7 @@ export function chordItemInitFunc(item: Item<"ChordItem">) {
             .map((scaleItem) => scaleItem.state.content.result as Chord)
             .filter((value): value is Chord => value !== undefined); // Scale must be specified
 
-        if (scales.length === 0) {
-            item.state.content.filter = Object.fromEntries(
-                pitchNames.map((pitch) => [pitch, true])
-            ) as PitchMap; // No filter
-
-            return;
-        }
-
-        const commonPitches = scales
-            .map((scale) => scale.pitches)
-            .reduce((prev, curr) => {
-                return Object.fromEntries(
-                    pitchNames.map((pitch) => [
-                        pitch,
-                        prev[pitch] && curr[pitch],
-                    ])
-                ) as PitchMap;
-            });
-
-        item.state.content.filter = commonPitches;
+        item.state.content.filters = scales;
     }
 
     updateFilter();
