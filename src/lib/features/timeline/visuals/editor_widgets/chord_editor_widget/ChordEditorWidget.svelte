@@ -6,11 +6,12 @@
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import type Item from "../../../models/Item";
     import { onDestroy } from "svelte";
-    import { ChordBuilder } from "../../../utils/chord/Chord";
+    import { ChordItemContent } from "../../../utils/chord/Chord";
+    import { cloneDeep } from "lodash";
 
     export let item: Item<"ChordItem">;
 
-    let builder = new ChordBuilder(item.state.content.chord);
+    let builder = cloneDeep(item.state.content.builder);
 
     item.subscribe(() => {
         // Update filters, BUT NOT BUILDER
@@ -30,7 +31,10 @@
 
     onDestroy(() => {
         item.state = {
-            // content: SOMETHING HERE,
+            content: new ChordItemContent(
+                builder,
+                item.state.content.filters as any
+            ),
         };
     });
 </script>

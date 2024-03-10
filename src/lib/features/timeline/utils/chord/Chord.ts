@@ -3,6 +3,55 @@ import pitchNames from "../pitchNames";
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
+type Filter = { chord: Chord; isDisabled: boolean };
+
+export class ChordItemContent {
+    constructor(builder = new ChordBuilder(), filters: Filter[] = []) {
+        this._builder = builder;
+        this._filters = filters;
+        this._applyFilters();
+    }
+
+    private _builder: ChordBuilder;
+    private _filters: Filter[];
+
+    get builder() {
+        return this._builder;
+    }
+
+    get filters() {
+        return this._filters as Readonly<Filter[]>;
+    }
+
+    addFilters(...filters: Filter[]) {
+        this._filters.push(...filters);
+        this._applyFilters();
+    }
+
+    removeFilters(...filters: Filter[]) {
+        filters.forEach((filter) => {
+            this._filters.splice(this._filters.indexOf(filter));
+        });
+        this._applyFilters();
+    }
+
+    private _applyFilters() {
+        Object.entries(this._builder.pitches).forEach(([pitch, value]) => {
+            if (!value) return;
+
+            const filterChords = this._filters.map((filter) => filter.chord);
+
+            const isAllowedPitch = filterChords.every(
+                (chord) => chord.pitches[pitch as Pitch]
+            );
+
+            if (!isAllowedPitch) {
+                this.builder.togglePitch(pitch as Pitch);
+            }
+        });
+    }
+}
+
 export class Chord {
     readonly pitches: PitchMap;
 
@@ -19,15 +68,6 @@ export class Chord {
 }
 
 export class ChordBuilder {
-    constructor(chord?: Chord) {
-        if (chord) {
-            this._root = chord.root;
-            this._decimal = chord.decimal;
-            this._pitches = chord.pitches;
-            this._result = chord;
-        }
-    }
-
     private _root: Pitch | undefined;
 
     private _decimal: number | undefined;
