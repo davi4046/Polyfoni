@@ -1,41 +1,31 @@
 import pitchNames from "../pitchNames";
-import type Item from "../../models/Item";
-import Stateful from "../../../../architecture/Stateful";
-import {
-    getChildren,
-    getGreatGreatGrandparent,
-    getParent,
-} from "../../../../architecture/state-hierarchy-utils";
-import isOverlapping from "../../../../utils/interval/is_overlapping/isOverlapping";
 
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
 export class Chord {
+    readonly pitches: PitchMap;
+
     constructor(
         readonly root: Pitch,
-        readonly decimal: number,
-        readonly pitches: PitchMap
-    ) {}
+        readonly decimal: number
+    ) {
+        this.pitches = getPitchesFromRootAndDecimal(root, decimal);
+    }
 
-    get name() {
+    getName() {
         return `${this.root}-${this.decimal}`;
     }
 }
 
-interface ChordBuilderState {
-    root?: Pitch;
-    decimal?: number;
-    pitches: [Pitch, boolean][];
-    filters: readonly Chord[];
-    result?: Chord;
-}
-
-export class ChordBuilder extends Stateful<ChordBuilderState> {
-    constructor() {
-        super({ pitches: [], filters: [] });
-
-        this._updateResult();
+export class ChordBuilder {
+    constructor(chord?: Chord) {
+        if (chord) {
+            this._root = chord.root;
+            this._decimal = chord.decimal;
+            this._pitches = chord.pitches;
+            this._result = chord;
+        }
     }
 
     private _root: Pitch | undefined;
@@ -46,11 +36,25 @@ export class ChordBuilder extends Stateful<ChordBuilderState> {
         pitchNames.map((pitch) => [pitch, false])
     ) as PitchMap;
 
-    private _filters: readonly Chord[] = [];
-
     private _result: Chord | undefined;
 
-    setRoot(newRoot: Pitch | undefined) {
+    get root() {
+        return this._root;
+    }
+
+    get decimal() {
+        return this._decimal;
+    }
+
+    get pitches() {
+        return this._pitches;
+    }
+
+    get result() {
+        return this._result;
+    }
+
+    set root(newRoot) {
         this._root = newRoot;
 
         if (this._root) {
@@ -71,7 +75,7 @@ export class ChordBuilder extends Stateful<ChordBuilderState> {
         this._updateResult();
     }
 
-    setDecimal(newDecimal: number | undefined) {
+    set decimal(newDecimal: number | undefined) {
         this._decimal = newDecimal;
 
         if (this._root && this._decimal) {
@@ -79,36 +83,6 @@ export class ChordBuilder extends Stateful<ChordBuilderState> {
                 this._root,
                 this._decimal
             );
-        }
-
-        this._updateResult();
-    }
-
-    setFilters(newFilters: Chord[]) {
-        this._filters = newFilters;
-
-        Object.entries(this._pitches).forEach(([pitch, value]) => {
-            if (!value) return;
-
-            const isAllowedByAllFilters = this._filters.every(
-                (scale) => scale.pitches[pitch as Pitch]
-            );
-
-            this._pitches[pitch as Pitch] = isAllowedByAllFilters;
-
-            if (pitch === this._root && !isAllowedByAllFilters) {
-                this._root = undefined;
-            }
-        });
-
-        if (this._root) {
-            this._decimal = getDecimalFromRootAndPitches(
-                this._root,
-                this._pitches
-            );
-        } else {
-            // There is no root so the decimal cannot be told
-            this._decimal = undefined;
         }
 
         this._updateResult();
@@ -143,14 +117,13 @@ export class ChordBuilder extends Stateful<ChordBuilderState> {
     }
 
     togglePitch(pitch: Pitch) {
-        const newValue = !this._pitches[pitch];
-        this._pitches[pitch] = newValue;
+        this._pitches[pitch] = !this._pitches[pitch];
 
-        if (!this._root && newValue) {
+        if (!this._root && this._pitches[pitch]) {
             // There is no root and a new pitch has been checked
             // Use the new pitch as the root
             this._root = pitch;
-        } else if (pitch === this._root && !newValue) {
+        } else if (pitch === this._root && !this._pitches[pitch]) {
             // Reflect that the root pitch has been unchecked
             this._root = undefined;
         }
@@ -171,20 +144,8 @@ export class ChordBuilder extends Stateful<ChordBuilderState> {
     private _updateResult() {
         this._result =
             this._root && this._decimal
-                ? new Chord(this._root, this._decimal, this._pitches)
+                ? new Chord(this._root, this._decimal)
                 : undefined;
-
-        const allowedPitches = Object.entries(this._pitches).filter(([pitch]) =>
-            this._filters.every((scale) => scale.pitches[pitch as Pitch])
-        ) as [Pitch, boolean][];
-
-        this.state = {
-            root: this._root,
-            decimal: this._decimal,
-            pitches: allowedPitches,
-            filters: this._filters,
-            result: this._result,
-        };
     }
 }
 
@@ -233,57 +194,4 @@ function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
             return [pitch, isPresent];
         })
     ) as PitchMap;
-}
-
-export function chordItemInitFunc(item: Item<"ChordItem">) {
-    const timeline = getGreatGreatGrandparent(item);
-
-    if (
-        getParent(item) === timeline.scaleTrack ||
-        getParent(item) === timeline.totalTrack
-    ) {
-        return;
-    }
-
-    function updateFilter() {
-        const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
-            (scaleItem) => isOverlapping(item.state, scaleItem.state)
-        );
-
-        const scales = overlappingScaleItems
-            .map((scaleItem) => scaleItem.state.content.state.result as Chord)
-            .filter((value): value is Chord => value !== undefined); // Scale must be specified
-
-        item.state.content.setFilters(scales);
-    }
-
-    updateFilter();
-
-    item.subscribe(updateFilter); // For when the item gets moved
-
-    let unsubscribers: (() => void)[] = [];
-
-    // Catch when a new scale item is added
-    timeline.scaleTrack.subscribe(() => {
-        updateFilter();
-
-        unsubscribers.forEach((unsubscribe) => unsubscribe());
-        unsubscribers = [];
-
-        const overlappingScaleItems = getChildren(timeline.scaleTrack).filter(
-            (scaleItem) => isOverlapping(item.state, scaleItem.state)
-        );
-
-        overlappingScaleItems.forEach((scaleItem) => {
-            // Catch when the value of an overlapping scale item changes
-            const unsubscribe = scaleItem.subscribe(() => {
-                if (isOverlapping(item.state, scaleItem.state)) {
-                    updateFilter();
-                } else {
-                    unsubscribe();
-                }
-            });
-            unsubscribers.push(unsubscribe);
-        });
-    });
 }

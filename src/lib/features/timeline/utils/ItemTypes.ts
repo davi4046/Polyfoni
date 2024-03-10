@@ -4,11 +4,18 @@ import type Item from "../models/Item";
 import StringEditorWidget from "../visuals/editor_widgets/StringEditorWidget.svelte";
 import ChordEditorWidget from "../visuals/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 
-import { ChordBuilder, chordItemInitFunc } from "./chord/Chord";
+import { Chord } from "./chord/Chord";
 
 export type ItemTypes = {
     StringItem: string;
-    ChordItem: ChordBuilder;
+    ChordItem: {
+        chord?: Chord;
+        filters: {
+            chord: Chord;
+            isUserRemovable: boolean;
+            isDisabled: boolean;
+        }[];
+    };
 };
 
 export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
@@ -29,8 +36,8 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
 export const stringConversionFunctions: StringConversionFunctions = {
     StringItem: (value) => value,
     ChordItem: (value) => {
-        if (value.state.result) {
-            return value.state.result.name;
+        if (value.chord) {
+            return value.chord.getName();
         } else {
             return "Unfinished";
         }
@@ -44,12 +51,14 @@ type StringConversionFunctions = {
 export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     StringItem: () => "",
     ChordItem: () => {
-        return new ChordBuilder();
+        return { filters: [] }; // obj should be a proxy such that changes to filters are reflected in chord
     },
 };
 
 export const postInitFunctions: Partial<{
     [K in keyof ItemTypes]: (item: Item<K>) => void;
 }> = {
-    ChordItem: chordItemInitFunc,
+    ChordItem: (item) => {
+        // Update filters based on specified scales
+    },
 };

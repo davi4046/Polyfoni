@@ -5,35 +5,32 @@
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import type Item from "../../../models/Item";
-    import { cloneDeep } from "lodash";
     import { onDestroy } from "svelte";
+    import { ChordBuilder } from "../../../utils/chord/Chord";
 
     export let item: Item<"ChordItem">;
 
-    let builder = cloneDeep(item.state.content);
+    let builder = new ChordBuilder(item.state.content.chord);
 
-    builder.subscribe(() => (builder = builder));
+    item.subscribe(() => {
+        // Update filters, BUT NOT BUILDER
+    });
 
     let sortedPitchEntries: [string, boolean][];
 
     $: {
-        const rootIndex = builder.state.root
-            ? builder.state.pitches.findIndex(
-                  ([pitch]) => pitch === builder.state.root
-              )
-            : 0;
+        const rootIndex = builder.root ? pitchNames.indexOf(builder.root) : 0;
+        const pitchEntries = Object.entries(builder.pitches);
 
         sortedPitchEntries = [
-            ...builder.state.pitches.slice(rootIndex),
-            ...builder.state.pitches.slice(0, rootIndex),
+            ...pitchEntries.slice(rootIndex),
+            ...pitchEntries.slice(0, rootIndex),
         ];
     }
 
-    console.log("filters:", builder.state.filters);
-
     onDestroy(() => {
         item.state = {
-            content: builder,
+            // content: SOMETHING HERE,
         };
     });
 </script>
@@ -48,8 +45,9 @@
                 title="Rotate Left"
                 on:click={(_) => {
                     builder.rotate("L");
+                    builder = builder; // Reactivity hack
                 }}
-                disabled={builder.state.root === undefined}
+                disabled={builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateLeftIcon />
@@ -60,8 +58,9 @@
                 title="Rotate Right"
                 on:click={(_) => {
                     builder.rotate("R");
+                    builder = builder; // Reactivity hack
                 }}
-                disabled={builder.state.root === undefined}
+                disabled={builder.root === undefined}
             >
                 <div class="h-5">
                     <RotateRightIcon />
@@ -70,7 +69,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Chord"
-                disabled={builder.state.result === undefined}
+                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -79,7 +78,7 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Scale"
-                disabled={builder.state.result === undefined}
+                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -93,11 +92,7 @@
             <select
                 class="w-24 p-2 text-xl font-medium bg-gray-200"
                 title="Root"
-                value={builder.state.root}
-                on:change={(e) => {
-                    // @ts-ignore
-                    builder.setRoot(e.target.value);
-                }}
+                bind:value={builder.root}
             >
                 <option value={undefined}>---</option>
                 {#each pitchNames as pitch}
@@ -109,11 +104,7 @@
                 class="w-24 p-2 text-xl font-medium bg-gray-200"
                 type="number"
                 title="Decimal"
-                value={builder.state.decimal}
-                on:change={(e) => {
-                    // @ts-ignore
-                    builder.setDecimal(Number(e.target.value));
-                }}
+                bind:value={builder.decimal}
             />
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
@@ -125,6 +116,7 @@
                         on:click={(_) => {
                             // @ts-ignore
                             builder.togglePitch(pitch);
+                            builder = builder; // Reactivity hack
                         }}>{pitch}</button
                     >
                 {/each}
@@ -134,9 +126,9 @@
     <div
         class="flex flex-col items-center justify-center px-4 bg-green-400 border-l-2 border-black w-42 xl:w-72"
     >
-        {#if builder.state.result}
+        {#if builder.result}
             <div class="text-4xl">
-                {builder.state.result.name}
+                {builder.result.getName()}
             </div>
             <!-- test -->
             <div>★A-2741</div>
