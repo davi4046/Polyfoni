@@ -44,35 +44,7 @@ export class ChordBuilder {
     }
 
     get pitches() {
-        const builder = this;
-        return new Proxy(this._pitches, {
-            set(target, key, value) {
-                target[key as keyof PitchMap] = value;
-
-                if (!builder._root && value) {
-                    // There is no root and a new pitch has been checked
-                    // Use the new pitch as the root
-                    builder._root = key as Pitch;
-                } else if (key === builder._root && !value) {
-                    // Reflect that the root pitch has been unchecked
-                    builder._root = undefined;
-                }
-
-                if (builder._root) {
-                    builder._decimal = getDecimalFromRootAndPitches(
-                        builder._root,
-                        builder._pitches
-                    );
-                } else {
-                    // There is no root so the decimal cannot be told
-                    builder._decimal = undefined;
-                }
-
-                builder._updateResult();
-
-                return true;
-            },
-        });
+        return this._pitches;
     }
 
     get filters() {
@@ -144,6 +116,32 @@ export class ChordBuilder {
                 );
                 break;
             }
+        }
+
+        this._updateResult();
+    }
+
+    togglePitch(pitch: Pitch) {
+        const newValue = !this._pitches[pitch];
+        this._pitches[pitch] = newValue;
+
+        if (!this._root && newValue) {
+            // There is no root and a new pitch has been checked
+            // Use the new pitch as the root
+            this._root = pitch;
+        } else if (pitch === this._root && !newValue) {
+            // Reflect that the root pitch has been unchecked
+            this._root = undefined;
+        }
+
+        if (this._root) {
+            this._decimal = getDecimalFromRootAndPitches(
+                this._root,
+                this._pitches
+            );
+        } else {
+            // There is no root so the decimal cannot be told
+            this._decimal = undefined;
         }
 
         this._updateResult();

@@ -107,14 +107,15 @@
             />
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
-                {#each sortedPitchEntries as [pitch, isChecked]}
+                {#each sortedPitchEntries as [pitch, value]}
                     <button
-                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {isChecked
+                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {value
                             ? 'bg-gray-300'
                             : 'opacity-50'}"
                         on:click={(_) => {
                             // @ts-ignore
-                            builder.pitches[pitch] = !isChecked;
+                            builder.togglePitch(pitch);
+                            builder = builder; // Reactivity hack
                         }}>{pitch}</button
                     >
                 {/each}
