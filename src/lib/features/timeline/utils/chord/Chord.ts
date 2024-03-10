@@ -93,6 +93,32 @@ export class ChordBuilder {
 
     set filters(newFilters) {
         this._filters = newFilters;
+
+        Object.entries(this._pitches).forEach(([pitch, value]) => {
+            if (!value) return;
+
+            const isAllowedByAllFilters = this._filters.every(
+                (scale) => scale.pitches[pitch as Pitch]
+            );
+
+            this._pitches[pitch as Pitch] = isAllowedByAllFilters;
+
+            if (pitch === this._root && !isAllowedByAllFilters) {
+                this._root = undefined;
+            }
+        });
+
+        if (this._root) {
+            this._decimal = getDecimalFromRootAndPitches(
+                this._root,
+                this._pitches
+            );
+        } else {
+            // There is no root so the decimal cannot be told
+            this._decimal = undefined;
+        }
+
+        this._updateResult();
     }
 
     rotate(direction: "L" | "R") {
