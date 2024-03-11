@@ -3,21 +3,25 @@ import pitchNames from "../pitchNames";
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
-type Filter = { chord: Required<Chord>; isDisabled: boolean };
+type Filter = { chord: Chord; isDisabled: boolean };
 
 export type ChordItemContent = {
-    chord: Chord;
+    chordStatus: Chord | PitchMap;
     filters: Filter[];
 };
 
-export class Chord {
-    public pitches = Object.fromEntries(
+export function createEmptyPitchMap(): PitchMap {
+    return Object.fromEntries(
         pitchNames.map((pitch) => [pitch, false])
     ) as PitchMap;
+}
+
+export class Chord {
+    public pitches = createEmptyPitchMap();
 
     constructor(
-        public root?: Pitch,
-        public decimal?: number
+        public root: Pitch,
+        public decimal: number
     ) {
         if (root && decimal) {
             this.pitches = getPitchesFromRootAndDecimal(root, decimal);
@@ -25,22 +29,20 @@ export class Chord {
     }
 
     getName() {
-        return this.root && this.decimal
-            ? `${this.root}-${this.decimal}`
-            : "undefined";
+        return `${this.root}-${this.decimal}`;
     }
 }
 
 export class ChordBuilder {
-    constructor(chord?: Chord) {
-        this._root = chord?.root;
-        this._decimal = chord?.decimal;
-
-        if (this._root && this._decimal) {
-            this._pitches = getPitchesFromRootAndDecimal(
-                this._root,
-                this._decimal
-            );
+    constructor(chordStatus?: Chord | PitchMap) {
+        if (chordStatus) {
+            if (chordStatus instanceof Chord) {
+                this._root = chordStatus.root;
+                this._decimal = chordStatus.decimal;
+                this._pitches = chordStatus.pitches;
+            } else {
+                this._pitches = chordStatus;
+            }
         }
     }
 
@@ -48,11 +50,7 @@ export class ChordBuilder {
 
     private _decimal: number | undefined;
 
-    private _pitches = Object.fromEntries(
-        pitchNames.map((pitch) => [pitch, false])
-    ) as PitchMap;
-
-    private _result: Chord | undefined;
+    private _pitches = createEmptyPitchMap();
 
     get root() {
         return this._root;
@@ -64,10 +62,6 @@ export class ChordBuilder {
 
     get pitches() {
         return this._pitches;
-    }
-
-    get result() {
-        return this._result;
     }
 
     set root(newRoot) {
@@ -165,6 +159,14 @@ export class ChordBuilder {
                 this.togglePitch(pitch as Pitch);
             }
         });
+    }
+
+    build(): Chord | PitchMap {
+        if (this._root && this._decimal) {
+            return new Chord(this._root, this._decimal);
+        } else {
+            return this._pitches;
+        }
     }
 }
 

@@ -10,7 +10,7 @@
 
     export let item: Item<"ChordItem">;
 
-    let builder = new ChordBuilder(item.state.content.chord);
+    let builder = new ChordBuilder(item.state.content.chordStatus);
 
     let sortedPitchEntries: [string, boolean][];
 
@@ -45,12 +45,11 @@
 
     // TODO: Calculate allowed decimals from current root
 
+    $: chordStatus = builder.build();
+
     $: onDestroy(() => {
         item.state = {
-            content: {
-                chord: new Chord(builder.root, builder.decimal),
-                filters: item.state.content.filters,
-            },
+            content: { chordStatus, filters },
         };
     });
 </script>
@@ -89,7 +88,6 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Chord"
-                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -98,7 +96,6 @@
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Listen as Scale"
-                disabled={builder.result === undefined}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -148,9 +145,9 @@
     <div
         class="flex flex-col items-center justify-center px-4 bg-green-400 border-l-2 border-black w-42 xl:w-72"
     >
-        {#if builder.result}
+        {#if chordStatus instanceof Chord}
             <div class="text-4xl">
-                {builder.result.getName()}
+                {chordStatus.getName()}
             </div>
             <!-- test -->
             <div>★A-2741</div>

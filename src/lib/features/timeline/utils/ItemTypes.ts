@@ -10,7 +10,12 @@ import {
 import ChordEditorWidget from "../visuals/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
-import { Chord, ChordBuilder, type ChordItemContent } from "./chord/Chord";
+import {
+    Chord,
+    ChordBuilder,
+    createEmptyPitchMap,
+    type ChordItemContent,
+} from "./chord/Chord";
 
 export type ItemTypes = {
     StringItem: string;
@@ -34,7 +39,10 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
 
 export const stringConversionFunctions: StringConversionFunctions = {
     StringItem: (value) => value,
-    ChordItem: (value) => value.chord.getName(),
+    ChordItem: (value) =>
+        value.chordStatus instanceof Chord
+            ? value.chordStatus.getName()
+            : "undefined",
 };
 
 type StringConversionFunctions = {
@@ -44,7 +52,7 @@ type StringConversionFunctions = {
 export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     StringItem: () => "",
     ChordItem: () => {
-        return { chord: new Chord(), filters: [] };
+        return { chordStatus: createEmptyPitchMap(), filters: [] };
     },
 };
 
@@ -65,23 +73,23 @@ export const postInitFunctions: Partial<{
             ).filter((scaleItem) => isOverlapping(item.state, scaleItem.state));
 
             const scales = overlappingScaleItems
-                .map((scaleItem) => scaleItem.state.content.chord)
+                .map((scaleItem) => scaleItem.state.content.chordStatus)
                 .filter(
-                    (chord): chord is Required<Chord> =>
-                        chord.root !== undefined && chord.decimal !== undefined
-                ); // Scale must be specified
+                    (chordStatus): chordStatus is Chord =>
+                        chordStatus instanceof Chord
+                ); // The item must contain a finished chord
 
             const newFilters = scales.map((scale) => {
                 return { chord: scale, isDisabled: false };
             });
 
-            const builder = new ChordBuilder(item.state.content.chord);
+            const builder = new ChordBuilder(item.state.content.chordStatus);
 
             builder.applyFilters(newFilters);
 
             item.state = {
                 content: {
-                    chord: new Chord(builder.root, builder.decimal),
+                    chordStatus: builder.build(),
                     filters: newFilters,
                 },
             };
