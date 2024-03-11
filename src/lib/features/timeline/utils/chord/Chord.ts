@@ -9,7 +9,7 @@ export class ChordItemContent {
     constructor(builder = new ChordBuilder(), filters: Filter[] = []) {
         this._builder = builder;
         this._filters = filters;
-        this._applyFilters();
+        this._builder.applyFilters(this._filters);
     }
 
     private _builder: ChordBuilder;
@@ -25,30 +25,14 @@ export class ChordItemContent {
 
     addFilters(...filters: Filter[]) {
         this._filters.push(...filters);
-        this._applyFilters();
+        this._builder.applyFilters(this._filters);
     }
 
     removeFilters(...filters: Filter[]) {
         filters.forEach((filter) => {
             this._filters.splice(this._filters.indexOf(filter));
         });
-        this._applyFilters();
-    }
-
-    private _applyFilters() {
-        Object.entries(this._builder.pitches).forEach(([pitch, value]) => {
-            if (!value) return;
-
-            const filterChords = this._filters.map((filter) => filter.chord);
-
-            const isAllowedPitch = filterChords.every(
-                (chord) => chord.pitches[pitch as Pitch]
-            );
-
-            if (!isAllowedPitch) {
-                this.builder.togglePitch(pitch as Pitch);
-            }
-        });
+        this._builder.applyFilters(this._filters);
     }
 }
 
@@ -179,6 +163,22 @@ export class ChordBuilder {
         }
 
         this._updateResult();
+    }
+
+    applyFilters(filters: Filter[]) {
+        Object.entries(this._pitches).forEach(([pitch, value]) => {
+            if (!value) return;
+
+            const filterChords = filters.map((filter) => filter.chord);
+
+            const isPitchInEveryChord = filterChords.every(
+                (chord) => chord.pitches[pitch as Pitch]
+            );
+
+            if (!isPitchInEveryChord) {
+                this.togglePitch(pitch as Pitch);
+            }
+        });
     }
 
     private _updateResult() {
