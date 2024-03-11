@@ -7,6 +7,7 @@
     import type Item from "../../../models/Item";
     import { onDestroy } from "svelte";
     import { Chord, ChordBuilder } from "../../../utils/chord/Chord";
+    import { bindAll, initial } from "lodash";
 
     export let item: Item<"ChordItem">;
 
@@ -57,6 +58,34 @@
         return Object.entries(chord.pitches).every(([pitch, value]) => {
             return allowedPitches.includes(pitch) || !value;
         });
+    }
+
+    function isAllowedDecimal(decimal: number): boolean {
+        if (!builder.root) return false;
+        return isAllowedChord(new Chord(builder.root, decimal));
+    }
+
+    function updateDecimal(decimal: number) {
+        const startValue = builder.decimal ? builder.decimal : 0;
+
+        if (decimal === startValue) return;
+
+        const isIncrement = decimal > startValue;
+
+        if (decimal % 2 === 0) decimal += isIncrement ? 1 : -1; // Ensure that decimal is uneven
+
+        while (decimal >= 4096) decimal -= 4096;
+        while (decimal < 0) decimal += 4096;
+
+        while (!isAllowedDecimal(decimal)) {
+            decimal += isIncrement ? 2 : -2;
+            while (decimal >= 4096) decimal -= 4096;
+            while (decimal < 0) decimal += 4096;
+            if (decimal === startValue) return; // No new decimal was found
+        }
+
+        builder.decimal = decimal;
+        builder = builder; // Reactivity hack
     }
 
     $: chordStatus = builder.build();
@@ -135,7 +164,11 @@
                 class="w-24 p-2 text-xl font-medium bg-gray-200"
                 type="number"
                 title="Decimal"
-                bind:value={builder.decimal}
+                value={builder.decimal}
+                on:change={(e) => {
+                    // @ts-ignore
+                    updateDecimal(Number(e.target.value));
+                }}
             />
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
