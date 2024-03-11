@@ -34,20 +34,34 @@
     });
 
     let allowedPitches: string[];
+    let allowedRoots: string[];
 
-    $: allowedPitches = pitchNames.filter((pitch) =>
-        filters.every(
-            (filter) => filter.isDisabled || filter.chord.pitches[pitch]
-        )
-    );
+    $: allowedPitches = pitchNames.filter((pitch) => {
+        return filters.every((filter) => {
+            return filter.isDisabled || filter.chord.pitches[pitch];
+        });
+    });
 
-    // TODO: Calculate allowed roots from current decimal
+    $: {
+        if (builder.decimal) {
+            allowedRoots = pitchNames
+                .map((pitch) => new Chord(pitch, builder.decimal!)) // Create possible variations on decimal
+                .filter((chord) => isAllowedChord(chord)) // Remove variations not allowed by filters
+                .map((chord) => chord.root);
+        } else {
+            allowedRoots = allowedPitches;
+        }
+    }
 
-    // TODO: Calculate allowed decimals from current root
+    function isAllowedChord(chord: Chord): boolean {
+        return Object.entries(chord.pitches).every(([pitch, value]) => {
+            return allowedPitches.includes(pitch) || !value;
+        });
+    }
 
     $: chordStatus = builder.build();
 
-    $: onDestroy(() => {
+    onDestroy(() => {
         item.state = {
             content: { chordStatus, filters },
         };
@@ -112,7 +126,7 @@
                 bind:value={builder.root}
             >
                 <option value={undefined}>---</option>
-                {#each pitchNames as pitch}
+                {#each allowedRoots as pitch}
                     <option>{pitch}</option>
                 {/each}
             </select>
