@@ -6,16 +6,11 @@
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import type Item from "../../../models/Item";
     import { onDestroy } from "svelte";
-    import { ChordItemContent } from "../../../utils/chord/Chord";
-    import { cloneDeep } from "lodash";
+    import { Chord, ChordBuilder } from "../../../utils/chord/Chord";
 
     export let item: Item<"ChordItem">;
 
-    let builder = cloneDeep(item.state.content.builder);
-
-    item.subscribe(() => {
-        // Update filters, BUT NOT BUILDER
-    });
+    let builder = new ChordBuilder(item.state.content.chord);
 
     let sortedPitchEntries: [string, boolean][];
 
@@ -29,12 +24,33 @@
         ];
     }
 
-    onDestroy(() => {
+    let filters = item.state.content.filters;
+
+    item.subscribe(() => {
+        // Apply new filters from scale track
+        filters = item.state.content.filters;
+        builder.applyFilters(filters);
+        builder = builder; // Reactivity hack
+    });
+
+    let allowedPitches: string[];
+
+    $: allowedPitches = pitchNames.filter((pitch) =>
+        filters.every(
+            (filter) => filter.isDisabled || filter.chord.pitches[pitch]
+        )
+    );
+
+    // TODO: Calculate allowed roots from current decimal
+
+    // TODO: Calculate allowed decimals from current root
+
+    $: onDestroy(() => {
         item.state = {
-            content: new ChordItemContent(
-                builder,
-                item.state.content.filters as any
-            ),
+            content: {
+                chord: new Chord(builder.root, builder.decimal),
+                filters: item.state.content.filters,
+            },
         };
     });
 </script>
@@ -113,16 +129,18 @@
             <div class="text-sm font-medium">Pitches</div>
             <div class="flex gap-1 place-items-center">
                 {#each sortedPitchEntries as [pitch, value]}
-                    <button
-                        class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {value
-                            ? 'bg-gray-300'
-                            : 'opacity-50'}"
-                        on:click={(_) => {
-                            // @ts-ignore
-                            builder.togglePitch(pitch);
-                            builder = builder; // Reactivity hack
-                        }}>{pitch}</button
-                    >
+                    {#if allowedPitches.includes(pitch)}
+                        <button
+                            class="adjust-width-to-height h-full rounded-full text-xl font-medium hover:brightness-105 {value
+                                ? 'bg-gray-300'
+                                : 'opacity-50'}"
+                            on:click={(_) => {
+                                // @ts-ignore
+                                builder.togglePitch(pitch);
+                                builder = builder; // Reactivity hack
+                            }}>{pitch}</button
+                        >
+                    {/if}
                 {/each}
             </div>
         </div>

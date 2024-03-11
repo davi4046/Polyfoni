@@ -10,7 +10,7 @@ import {
 import ChordEditorWidget from "../visuals/editor_widgets/chord_editor_widget/ChordEditorWidget.svelte";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
-import { Chord, ChordItemContent } from "./chord/Chord";
+import { Chord, ChordBuilder, type ChordItemContent } from "./chord/Chord";
 
 export type ItemTypes = {
     StringItem: string;
@@ -34,13 +34,7 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
 
 export const stringConversionFunctions: StringConversionFunctions = {
     StringItem: (value) => value,
-    ChordItem: (value) => {
-        if (value.builder.result) {
-            return value.builder.result.getName();
-        } else {
-            return "Unfinished";
-        }
-    },
+    ChordItem: (value) => value.chord.getName(),
 };
 
 type StringConversionFunctions = {
@@ -50,7 +44,7 @@ type StringConversionFunctions = {
 export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     StringItem: () => "",
     ChordItem: () => {
-        return new ChordItemContent();
+        return { chord: new Chord(), filters: [] };
     },
 };
 
@@ -65,26 +59,32 @@ export const postInitFunctions: Partial<{
         // Update filters based on specified scales
         function updateFilters() {
             // CURRENTLY NOT HANDLING USER-SPECIFIED FILTERS CORRECTLY (THEY SHOULD NOT BE REMOVED)
-            item.state.content.removeFilters(...item.state.content.filters);
 
             const overlappingScaleItems = getChildren(
                 timeline.scaleTrack
             ).filter((scaleItem) => isOverlapping(item.state, scaleItem.state));
 
             const scales = overlappingScaleItems
-                .map(
-                    (scaleItem) =>
-                        scaleItem.state.content.builder.result as Chord
-                )
-                .filter((value): value is Chord => value !== undefined); // Scale must be specified
+                .map((scaleItem) => scaleItem.state.content.chord)
+                .filter(
+                    (chord): chord is Required<Chord> =>
+                        chord.root !== undefined && chord.decimal !== undefined
+                ); // Scale must be specified
 
             const newFilters = scales.map((scale) => {
                 return { chord: scale, isDisabled: false };
             });
 
-            item.state.content.addFilters(...newFilters);
+            const builder = new ChordBuilder(item.state.content.chord);
 
-            item.state = {}; // Notify subscribers
+            builder.applyFilters(newFilters);
+
+            item.state = {
+                content: {
+                    chord: new Chord(builder.root, builder.decimal),
+                    filters: newFilters,
+                },
+            };
         }
 
         updateFilters(); // Initial update
@@ -93,12 +93,14 @@ export const postInitFunctions: Partial<{
         let prevEnd = item.state.end;
 
         item.subscribe(() => {
+            // Update filters when the item has been moved
             if (item.state.start !== prevStart || item.state.end !== prevEnd) {
-                updateFilters();
+                // VERY IMPORTANT to set prevStart and prevEnd BEFORE calling updateFilters
                 prevStart = item.state.start;
                 prevEnd = item.state.end;
+                updateFilters();
             }
-        }); // Update filters when the item gets moved
+        });
 
         let unsubscribers: (() => void)[] = [];
 
@@ -109,7 +111,7 @@ export const postInitFunctions: Partial<{
             unsubscribers = [];
 
             getChildren(timeline.scaleTrack).forEach((scaleItem) => {
-                unsubscribers.push(scaleItem.subscribe(updateFilters)); // Update filters when state of scale item changes
+                unsubscribers.push(scaleItem.subscribe(updateFilters)); // Update filters when state of a scale item changes
             });
         });
     },

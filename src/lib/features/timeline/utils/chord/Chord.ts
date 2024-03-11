@@ -3,55 +3,47 @@ import pitchNames from "../pitchNames";
 type Pitch = (typeof pitchNames)[number];
 type PitchMap = { [K in Pitch]: boolean };
 
-type Filter = { chord: Chord; isDisabled: boolean };
+type Filter = { chord: Required<Chord>; isDisabled: boolean };
 
-export class ChordItemContent {
-    constructor(builder = new ChordBuilder(), filters: Filter[] = []) {
-        this._builder = builder;
-        this._filters = filters;
-        this._builder.applyFilters(this._filters);
-    }
-
-    private _builder: ChordBuilder;
-    private _filters: Filter[];
-
-    get builder() {
-        return this._builder;
-    }
-
-    get filters() {
-        return this._filters as Readonly<Filter[]>;
-    }
-
-    addFilters(...filters: Filter[]) {
-        this._filters.push(...filters);
-        this._builder.applyFilters(this._filters);
-    }
-
-    removeFilters(...filters: Filter[]) {
-        filters.forEach((filter) => {
-            this._filters.splice(this._filters.indexOf(filter));
-        });
-        this._builder.applyFilters(this._filters);
-    }
-}
+export type ChordItemContent = {
+    chord: Chord;
+    filters: Filter[];
+};
 
 export class Chord {
-    readonly pitches: PitchMap;
+    public pitches = Object.fromEntries(
+        pitchNames.map((pitch) => [pitch, false])
+    ) as PitchMap;
 
     constructor(
-        readonly root: Pitch,
-        readonly decimal: number
+        public root?: Pitch,
+        public decimal?: number
     ) {
-        this.pitches = getPitchesFromRootAndDecimal(root, decimal);
+        if (root && decimal) {
+            this.pitches = getPitchesFromRootAndDecimal(root, decimal);
+        }
     }
 
     getName() {
-        return `${this.root}-${this.decimal}`;
+        return this.root && this.decimal
+            ? `${this.root}-${this.decimal}`
+            : "undefined";
     }
 }
 
 export class ChordBuilder {
+    constructor(chord?: Chord) {
+        this._root = chord?.root;
+        this._decimal = chord?.decimal;
+
+        if (this._root && this._decimal) {
+            this._pitches = getPitchesFromRootAndDecimal(
+                this._root,
+                this._decimal
+            );
+        }
+    }
+
     private _root: Pitch | undefined;
 
     private _decimal: number | undefined;
@@ -95,8 +87,6 @@ export class ChordBuilder {
                 );
             }
         }
-
-        this._updateResult();
     }
 
     set decimal(newDecimal: number | undefined) {
@@ -108,8 +98,6 @@ export class ChordBuilder {
                 this._decimal
             );
         }
-
-        this._updateResult();
     }
 
     rotate(direction: "L" | "R") {
@@ -136,8 +124,6 @@ export class ChordBuilder {
                 break;
             }
         }
-
-        this._updateResult();
     }
 
     togglePitch(pitch: Pitch) {
@@ -161,8 +147,6 @@ export class ChordBuilder {
             // There is no root so the decimal cannot be told
             this._decimal = undefined;
         }
-
-        this._updateResult();
     }
 
     applyFilters(filters: Filter[]) {
@@ -181,13 +165,6 @@ export class ChordBuilder {
                 this.togglePitch(pitch as Pitch);
             }
         });
-    }
-
-    private _updateResult() {
-        this._result =
-            this._root && this._decimal
-                ? new Chord(this._root, this._decimal)
-                : undefined;
     }
 }
 
