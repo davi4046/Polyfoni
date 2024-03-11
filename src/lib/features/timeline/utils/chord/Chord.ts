@@ -169,7 +169,9 @@ export class ChordBuilder {
         Object.entries(this._pitches).forEach(([pitch, value]) => {
             if (!value) return;
 
-            const filterChords = filters.map((filter) => filter.chord);
+            const filterChords = filters
+                .filter((filter) => !filter.isDisabled)
+                .map((filter) => filter.chord);
 
             const isPitchInEveryChord = filterChords.every(
                 (chord) => chord.pitches[pitch as Pitch]
