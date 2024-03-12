@@ -1,7 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use eval::Evaluator;
 use tauri::{CustomMenuItem, Menu, Submenu, Manager};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
@@ -34,7 +33,7 @@ fn main() {
                 .expect("Failed to resolve resource")
             );
 
-            let pool = Pool::<Evaluator>::new(4);
+            let pool = Pool::<eval::Evaluator>::new(4);
 
             app.manage(Mutex::new(pool));
 
