@@ -25,11 +25,11 @@
         ];
     }
 
-    let filters = item.state.content.filters;
+    let filters = item.state.content.filters.slice();
 
     item.subscribe(() => {
         // Apply new filters from scale track
-        filters = item.state.content.filters;
+        filters = item.state.content.filters.slice();
         builder.applyFilters(filters);
         builder = builder; // Reactivity hack
     });
