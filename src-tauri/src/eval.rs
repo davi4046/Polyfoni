@@ -27,7 +27,6 @@ impl Default for Evaluator {
             stdin: child.stdin.expect("Failed to open stdin"),
             stdout: BufReader::new(child.stdout.expect("Failed to open stdout")),
         }
-        
     }
 }
 

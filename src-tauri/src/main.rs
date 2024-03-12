@@ -1,12 +1,12 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use evaluation::Evaluator;
+use eval::Evaluator;
 use tauri::{CustomMenuItem, Menu, Submenu, Manager};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
 
-mod evaluation;
+mod eval;
 
 fn create_menu() -> Menu {
     return Menu::new()
@@ -55,7 +55,7 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![evaluation::evaluate])
+        .invoke_handler(tauri::generate_handler![eval::evaluate])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
