@@ -18,46 +18,51 @@ pub fn main_js() -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub struct Handle(Stream, Sender<MidiEvent>);
+pub struct MidiPlayer(Stream, Sender<MidiEvent>);
 
-impl Handle {
-    fn note_on(&mut self, channel: u8, key: u8, vel: u8) {
+#[wasm_bindgen]
+impl MidiPlayer {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> MidiPlayer {
+        let host = cpal::default_host();
+        let device = host
+            .default_output_device()
+            .expect("failed to find a default output device");
+        let config = device.default_output_config().unwrap();
+
+        let (tx, rx) = std::sync::mpsc::channel::<MidiEvent>();
+
+        MidiPlayer(
+            match config.sample_format() {
+                cpal::SampleFormat::F32 => create_synth_stream::<f32>(&device, &config.into(), rx),
+                cpal::SampleFormat::I16 => create_synth_stream::<i16>(&device, &config.into(), rx),
+                cpal::SampleFormat::U16 => create_synth_stream::<u16>(&device, &config.into(), rx),
+                _ => panic!("Unsupported sample format")
+            },
+            tx,
+        )
+    }
+    pub fn noteOn(&mut self, channel: u8, key: u8, vel: u8) {
         self.1.send(MidiEvent::NoteOn { channel, key, vel }).ok();
     }
-    fn note_off(&mut self, channel: u8, key: u8) {
+    pub fn noteOff(&mut self, channel: u8, key: u8) {
         self.1.send(MidiEvent::NoteOff { channel, key }).ok();
+    }
+    pub fn setProgram(&mut self, channel: u8, program: u8) {
+        self.1.send(MidiEvent::ProgramChange { channel, program_id: program }).ok();
+    }
+    pub fn setVolume(&mut self, channel: u8, volume: u8) {
+        self.1.send(MidiEvent::ControlChange { channel, ctrl: 7, value: volume }).ok();
+    }
+    pub fn allNotesOff(&mut self, channel: u8) {
+        self.1.send(MidiEvent::AllNotesOff { channel }).ok();
+    }
+    pub fn allSoundOff(&mut self, channel: u8) {
+        self.1.send(MidiEvent::AllSoundOff { channel }).ok();
     }
 }
 
-#[wasm_bindgen]
-pub struct Synth(oxisynth::Synth);
-
-#[wasm_bindgen]
-pub fn noteOn(h: &mut Handle, note: i32) {
-    h.note_on(0, note as _, 100);
-}
-
-#[wasm_bindgen]
-pub fn beep() -> Handle {
-    let host = cpal::default_host();
-    let device = host
-        .default_output_device()
-        .expect("failed to find a default output device");
-    let config = device.default_output_config().unwrap();
-
-    let (tx, rx) = std::sync::mpsc::channel::<MidiEvent>();
-    Handle(
-        match config.sample_format() {
-            cpal::SampleFormat::F32 => run::<f32>(&device, &config.into(), rx),
-            cpal::SampleFormat::I16 => run::<i16>(&device, &config.into(), rx),
-            cpal::SampleFormat::U16 => run::<u16>(&device, &config.into(), rx),
-            _ => panic!("Unsupported sample format")
-        },
-        tx,
-    )
-}
-
-fn run<T>(device: &cpal::Device, config: &cpal::StreamConfig, rx: Receiver<MidiEvent>) -> Stream
+fn create_synth_stream<T>(device: &cpal::Device, config: &cpal::StreamConfig, rx: Receiver<MidiEvent>) -> Stream
 where
     T: cpal::SizedSample + cpal::FromSample<f32>,
 {
