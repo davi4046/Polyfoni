@@ -24,13 +24,21 @@ export default class Stateful<TState extends object>
      * @param callback Function that will be called when the state updates
      * @returns Function for unsubscribing
      */
-    subscribe(callback: () => void) {
+    subscribe(callback: () => void): SubscriptionHandle<TState> {
         this._callbacks.push(callback);
 
-        return () => {
-            this._callbacks = this._callbacks.filter(
-                (func) => func !== callback
-            );
+        return {
+            obj: this,
+            unsubscribe: () => {
+                this._callbacks = this._callbacks.filter(
+                    (func) => func !== callback
+                );
+            },
         };
     }
 }
+
+export type SubscriptionHandle<TState extends object> = {
+    obj: Stateful<TState>;
+    unsubscribe: () => void;
+};
