@@ -2,7 +2,7 @@ import type { ComponentType, SvelteComponent } from "svelte";
 
 import type Item from "../models/Item";
 import StringEditorWidget from "../visuals/editor_widgets/StringEditorWidget.svelte";
-import type { SubscriptionHandle } from "../../../architecture/Stateful";
+import type { Subscription } from "../../../architecture/Stateful";
 import {
     getChildren,
     getGreatGreatGrandparent,
@@ -111,7 +111,7 @@ export const postInitFunctions: Partial<{
             }
         });
 
-        const subscriptionHandles: SubscriptionHandle<any>[] = [];
+        const subscriptionHandles: Subscription<any>[] = [];
 
         timeline.scaleTrack.subscribe(() => {
             updateFilters(); // Update filters when a new item is added to the scale track
