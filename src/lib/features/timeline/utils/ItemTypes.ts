@@ -111,12 +111,13 @@ export const postInitFunctions: Partial<{
             }
         });
 
-        let subscriptionHandles: SubscriptionHandle<any>[] = [];
+        const subscriptionHandles: SubscriptionHandle<any>[] = [];
 
         timeline.scaleTrack.subscribe(() => {
             updateFilters(); // Update filters when a new item is added to the scale track
 
             subscriptionHandles.forEach((handle) => handle.unsubscribe());
+            subscriptionHandles.length = 0; // Clear old handles
 
             getChildren(timeline.scaleTrack).forEach((scaleItem) => {
                 subscriptionHandles.push(scaleItem.subscribe(updateFilters)); // Update filters when state of a scale item changes
