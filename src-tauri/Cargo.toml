@@ -13,9 +13,7 @@ edition = "2021"
 tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
-itertools = "0.12.0"
 tauri = { version = "1.5", features = [ "global-shortcut-all", "shell-open"] }
-workerpool = "1.2.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
