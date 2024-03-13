@@ -31,6 +31,20 @@ export class Chord {
     getName() {
         return `${this.root}-${this.decimal}`;
     }
+
+    getMidiValues(): number[] {
+        const rootIndex = pitchNames.indexOf(this.root);
+
+        const midiValues = Object.entries(this.pitches)
+            .filter(([_, value]) => value)
+            .map(([pitch]) => {
+                const index = pitchNames.indexOf(pitch as Pitch);
+                const midiValue = (index - 3) % 12;
+                return index < rootIndex ? midiValue + 12 : midiValue; // Raise an octave if below root
+            });
+
+        return midiValues;
+    }
 }
 
 export class ChordBuilder {
@@ -202,10 +216,7 @@ function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
     const rootIndex = pitchNames.indexOf(root);
 
     let binary = decimal.toString(2);
-
-    while (binary.length < 12) {
-        binary = "0" + binary;
-    }
+    while (binary.length < 12) binary = "0" + binary;
 
     binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Unshift binary according to root
 

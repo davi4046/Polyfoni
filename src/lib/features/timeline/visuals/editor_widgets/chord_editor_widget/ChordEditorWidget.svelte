@@ -7,7 +7,7 @@
     import type Item from "../../../models/Item";
     import { onDestroy } from "svelte";
     import { Chord, ChordBuilder } from "../../../utils/chord/Chord";
-    import { bindAll, initial } from "lodash";
+    import { midiPlayer } from "../../../utils/midiPlayer";
 
     export let item: Item<"ChordItem">;
 
@@ -37,11 +37,13 @@
     let allowedPitches: string[];
     let allowedRoots: string[];
 
-    $: allowedPitches = pitchNames.filter((pitch) => {
-        return filters.every((filter) => {
-            return filter.isDisabled || filter.chord.pitches[pitch];
+    $: {
+        allowedPitches = pitchNames.filter((pitch) => {
+            return filters.every((filter) => {
+                return filter.isDisabled || filter.chord.pitches[pitch];
+            });
         });
-    });
+    }
 
     $: {
         if (builder.decimal) {
@@ -95,6 +97,38 @@
             content: { chordStatus, filters },
         };
     });
+
+    let playbackTimeout: NodeJS.Timeout;
+
+    function playMidiValuesConcurrently(midiValues: number[]) {
+        clearTimeout(playbackTimeout);
+
+        midiPlayer.allSoundOff(0);
+
+        midiValues.forEach((midiValue) => {
+            midiPlayer.noteOn(0, midiValue + 60, 100);
+        });
+
+        playbackTimeout = setTimeout(() => {
+            midiPlayer.allNotesOff(0);
+        }, 2000);
+    }
+
+    function playMidiValuesSequentially(midiValues: number[]) {
+        clearTimeout(playbackTimeout);
+
+        midiPlayer.allSoundOff(0);
+
+        function playNextNote() {
+            midiPlayer.noteOn(0, midiValues.shift()! + 60, 100);
+            playbackTimeout = setTimeout(() => {
+                midiPlayer.allNotesOff(0);
+                if (midiValues.length > 0) playNextNote();
+            }, 500);
+        }
+
+        playNextNote();
+    }
 </script>
 
 <div class="grid grid-cols-[1fr,auto] border-t-2 border-black">
@@ -130,7 +164,12 @@
             </button>
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-                title="Listen as Chord"
+                title="Play as Chord"
+                on:click={(_) => {
+                    if (!(chordStatus instanceof Chord)) return;
+                    const midiValues = chordStatus.getMidiValues();
+                    playMidiValuesConcurrently(midiValues);
+                }}
             >
                 <div class="h-5">
                     <SpeakerIcon />
@@ -138,7 +177,13 @@
             </button>
             <button
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
-                title="Listen as Scale"
+                title="Play as Scale"
+                on:click={(_) => {
+                    if (!(chordStatus instanceof Chord)) return;
+                    const midiValues = chordStatus.getMidiValues();
+                    midiValues.sort((a, b) => a - b); // Put root first
+                    playMidiValuesSequentially(midiValues);
+                }}
             >
                 <div class="h-5">
                     <SpeakerIcon />
