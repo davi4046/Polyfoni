@@ -24,7 +24,7 @@ export default class Stateful<TState extends object>
      * @param callback Function that will be called when the state updates
      * @returns Function for unsubscribing
      */
-    subscribe(callback: () => void): Subscription<TState> {
+    subscribe(callback: () => void): Subscription<typeof this> {
         this._callbacks.push(callback);
 
         return {
@@ -38,7 +38,7 @@ export default class Stateful<TState extends object>
     }
 }
 
-export type Subscription<TState extends object> = {
-    obj: Stateful<TState>;
+export type Subscription<T extends Stateful<any>> = {
+    obj: T;
     unsubscribe: () => void;
 };
