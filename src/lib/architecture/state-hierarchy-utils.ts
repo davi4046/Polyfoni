@@ -2,11 +2,6 @@ export interface ChildState<TParent> {
     parent: TParent;
 }
 
-export interface ParentChildState<TParent, TChild> {
-    parent: TParent;
-    children: readonly TChild[];
-}
-
 export interface ParentState<TChild> {
     children: readonly TChild[];
 }
@@ -19,9 +14,9 @@ export interface SetState<TState> {
     set state(newState: Partial<TState>);
 }
 
-type HasParent<TParent> = ChildState<TParent> | ParentChildState<TParent, any>;
+type HasParent<TParent> = ChildState<TParent>;
 
-type HasChildren<TChild> = ParentState<TChild> | ParentChildState<any, TChild>;
+type HasChildren<TChild> = ParentState<TChild>;
 
 type HasGettableParent<TParent> = GetState<HasParent<TParent>>;
 

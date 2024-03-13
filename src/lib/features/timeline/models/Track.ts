@@ -7,7 +7,8 @@ import Item from "./Item";
 import type Voice from "./Voice";
 
 interface TrackState<T extends keyof ItemTypes>
-    extends stateHierarchyUtils.ParentChildState<Voice, Item<T>> {
+    extends stateHierarchyUtils.ChildState<Voice>,
+        stateHierarchyUtils.ParentState<Item<T>> {
     label: string;
 }
 

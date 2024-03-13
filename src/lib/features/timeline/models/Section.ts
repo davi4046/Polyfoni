@@ -1,10 +1,13 @@
 import Model from "../../../architecture/Model";
-import type { ParentChildState } from "../../../architecture/state-hierarchy-utils";
+import type {
+    ChildState,
+    ParentState,
+} from "../../../architecture/state-hierarchy-utils";
 
 import type Timeline from "./Timeline";
 import type Voice from "./Voice";
 
-interface SectionState extends ParentChildState<Timeline, Voice> {}
+interface SectionState extends ChildState<Timeline>, ParentState<Voice> {}
 
 class Section extends Model<SectionState> {}
 
