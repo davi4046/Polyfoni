@@ -18,8 +18,10 @@ class TimelineContext {
 
         const stateHierarchyWatcher = new StateHierarchyWatcher(
             timeline,
-            (obj) => {
-                console.log("state of obj:", obj);
+            (obj, oldState) => {
+                console.log("obj:", obj);
+                console.log("oldState:", oldState);
+                // Generate stuff
             }
         );
     }
