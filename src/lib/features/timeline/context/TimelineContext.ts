@@ -16,14 +16,13 @@ class TimelineContext {
     constructor(readonly timeline: Timeline) {
         this.editorWidgetManager = new EditorWidgetManager(this.timeline);
 
-        const stateHierarchyWatcher = new StateHierarchyWatcher(
-            timeline,
-            (obj, oldState) => {
-                console.log("obj:", obj);
-                console.log("oldState:", oldState);
-                // Generate stuff
-            }
-        );
+        const stateHierarchyWatcher = new StateHierarchyWatcher(timeline);
+
+        stateHierarchyWatcher.subscribe((obj, oldState) => {
+            console.log("obj:", obj);
+            console.log("oldState:", oldState);
+            console.log("newState:", obj.state);
+        });
     }
 }
 

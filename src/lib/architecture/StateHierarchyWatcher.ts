@@ -9,11 +9,7 @@ import {
 } from "./state-hierarchy-utils";
 
 export default class StateHierarchyWatcher {
-    private _reportStateChange;
-
-    constructor(root: Stateful<any>, callback: SubscriptionCallback<any>) {
-        this._reportStateChange = callback;
-
+    constructor(root: Stateful<any>) {
         if (root.state.children) {
             this._watchRecursively(root);
         } else {
@@ -21,11 +17,32 @@ export default class StateHierarchyWatcher {
         }
     }
 
+    private _callbacks: SubscriptionCallback<any>[] = [];
+
+    subscribe(callback: SubscriptionCallback<any>): Subscription<any> {
+        this._callbacks.push(callback);
+
+        return {
+            obj: this,
+            unsubscribe: () => {
+                this._callbacks = this._callbacks.filter(
+                    (func) => func !== callback
+                );
+            },
+        };
+    }
+
+    getWatchedObjects(): object[] {
+        return this._subscriptions.map((subscription) => subscription.obj);
+    }
+
     private _subscriptions: Subscription[] = [];
 
-    private _watchNonRecursively(obj: Stateful<any>) {
-        this._reportStateChange(obj, undefined); // Initial report
+    private _reportStateChange(obj: Stateful<any>, oldState: any) {
+        this._callbacks.forEach((callback) => callback(obj, oldState));
+    }
 
+    private _watchNonRecursively(obj: Stateful<any>) {
         const subscription = obj.subscribe((_, oldState) => {
             if (isEqual(oldState, obj.state)) return;
             this._reportStateChange(obj, oldState);
@@ -35,8 +52,6 @@ export default class StateHierarchyWatcher {
     }
 
     private _watchRecursively(obj: Stateful<ParentState<Stateful<any>>>) {
-        this._reportStateChange(obj, undefined); // Initial report
-
         getChildren(obj).forEach((child) => {
             if (child.state.children) {
                 this._watchRecursively(child);
