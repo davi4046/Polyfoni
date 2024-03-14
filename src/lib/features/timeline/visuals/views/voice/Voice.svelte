@@ -2,19 +2,19 @@
     import type VoiceVM from "../../../view_models/VoiceVM";
     import Track from "../track/Track.svelte";
 
-    export let voiceVM: VoiceVM;
+    export let vm: VoiceVM;
 
-    voiceVM.subscribe(() => (voiceVM = voiceVM));
+    vm.subscribe(() => (vm = vm));
 
-    $: tracksToDisplay = voiceVM.state.isCollapsed
-        ? voiceVM.state.tracks.slice(0, 1)
-        : voiceVM.state.tracks;
+    $: tracksToDisplay = vm.state.isCollapsed
+        ? vm.state.tracks.slice(0, 1)
+        : vm.state.tracks;
 </script>
 
 <div
     class="space-y-[var(--timeline-track-gap)] bg-[color:var(--timeline-voice-color)]"
 >
     {#each tracksToDisplay as trackVM (trackVM.id)}
-        <Track {trackVM}></Track>
+        <Track vm={trackVM}></Track>
     {/each}
 </div>

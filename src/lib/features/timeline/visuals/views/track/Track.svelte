@@ -2,17 +2,17 @@
     import Item from "../item/Item.svelte";
     import type TrackVM from "../../../view_models/TrackVM";
 
-    export let trackVM: TrackVM;
+    export let vm: TrackVM;
 
-    trackVM.subscribe(() => (trackVM = trackVM));
+    vm.subscribe(() => (vm = vm));
 </script>
 
 <div
     class="relative h-[var(--timeline-track-height)] bg-[var(--timeline-track-color)]"
     data-type="track"
-    data-model-id={trackVM.id}
+    data-model-id={vm.id}
 >
-    {#each trackVM.state.items as itemVM (itemVM.id)}
-        <Item {itemVM}></Item>
+    {#each vm.state.items as itemVM (itemVM.id)}
+        <Item vm={itemVM}></Item>
     {/each}
 </div>

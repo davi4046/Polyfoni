@@ -7,9 +7,9 @@
     import TimelineVM from "../../../view_models/TimelineVM";
     import { onMount } from "svelte";
 
-    export let timelineVM: TimelineVM;
+    export let vm: TimelineVM;
 
-    timelineVM.subscribe(() => (timelineVM = timelineVM));
+    vm.subscribe(() => (vm = vm));
 
     onMount(() => {
         for (let element of document.getElementsByClassName("h-scroll")) {
@@ -37,10 +37,10 @@
 
 <div
     class="grid h-full grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto,auto]"
-    on:mousemove={timelineVM.state.handleMouseMove_tracks}
+    on:mousemove={vm.state.handleMouseMove_tracks}
     role="none"
     data-type="timeline"
-    data-model-id={timelineVM.id}
+    data-model-id={vm.id}
 >
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
@@ -65,31 +65,31 @@
     <!-- TOP HEADERS -->
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
-        on:mousemove={timelineVM.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove_others}
         role="none"
     >
-        {#each timelineVM.state.top as voiceVM (voiceVM.id)}
-            <VoiceHeader {voiceVM}></VoiceHeader>
+        {#each vm.state.top as voiceVM (voiceVM.id)}
+            <VoiceHeader vm={voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- CENTER HEADERS -->
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
-        on:mousemove={timelineVM.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove_others}
         role="none"
     >
-        {#each timelineVM.state.center as voiceVM (voiceVM.id)}
-            <VoiceHeader {voiceVM}></VoiceHeader>
+        {#each vm.state.center as voiceVM (voiceVM.id)}
+            <VoiceHeader vm={voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- BOTTOM HEADERS -->
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
-        on:mousemove={timelineVM.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove_others}
         role="none"
     >
-        {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
-            <VoiceHeader {voiceVM}></VoiceHeader>
+        {#each vm.state.bottom as voiceVM (voiceVM.id)}
+            <VoiceHeader vm={voiceVM}></VoiceHeader>
         {/each}
     </div>
     <!-- TOP TRACKS -->
@@ -101,8 +101,8 @@
             class="flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.top as voiceVM (voiceVM.id)}
-                <Voice {voiceVM}></Voice>
+            {#each vm.state.top as voiceVM (voiceVM.id)}
+                <Voice vm={voiceVM}></Voice>
             {/each}
         </div>
     </div>
@@ -115,8 +115,8 @@
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.center as voiceVM (voiceVM.id)}
-                <Voice {voiceVM}></Voice>
+            {#each vm.state.center as voiceVM (voiceVM.id)}
+                <Voice vm={voiceVM}></Voice>
             {/each}
         </div>
     </div>
@@ -129,8 +129,8 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each timelineVM.state.bottom as voiceVM (voiceVM.id)}
-                <Voice {voiceVM}></Voice>
+            {#each vm.state.bottom as voiceVM (voiceVM.id)}
+                <Voice vm={voiceVM}></Voice>
             {/each}
         </div>
     </div>
@@ -157,7 +157,7 @@
     <div
         data-type="editor-widget-container"
         class="col-start-1 col-end-3 row-start-5 row-end-6"
-        on:mousemove={timelineVM.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove_others}
         role="none"
     />
     <!-- TOP HEADERS SHADOW -->

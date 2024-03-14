@@ -5,29 +5,29 @@
     import PipeEnd from "./assets/PipeEnd.svelte";
     import ArrowDown from "./assets/ArrowDown.svelte";
 
-    export let voiceVM: VoiceVM;
+    export let vm: VoiceVM;
 
-    voiceVM.subscribe(() => (voiceVM = voiceVM));
+    vm.subscribe(() => (vm = vm));
 
     function toggleCollapsed() {
-        voiceVM.state = { isCollapsed: !voiceVM.state.isCollapsed };
+        vm.state = { isCollapsed: !vm.state.isCollapsed };
     }
 
-    $: trackCount = voiceVM.state.tracks.length;
+    $: trackCount = vm.state.tracks.length;
 
-    $: tracksToDisplay = voiceVM.state.isCollapsed
-        ? voiceVM.state.tracks.slice(0, 1)
-        : voiceVM.state.tracks;
+    $: tracksToDisplay = vm.state.isCollapsed
+        ? vm.state.tracks.slice(0, 1)
+        : vm.state.tracks;
 </script>
 
 <div class="space-y-[var(--timeline-track-gap)]">
     {#each tracksToDisplay as trackVM, index (trackVM.id)}
-        <TrackHeader {trackVM}>
+        <TrackHeader vm={trackVM}>
             <span slot="icon">
                 {#if index === 0}
                     <button
-                        class="w-full h-full"
-                        class:-rotate-90={voiceVM.state.isCollapsed}
+                        class="h-full w-full"
+                        class:-rotate-90={vm.state.isCollapsed}
                         on:click={(_) => toggleCollapsed()}
                     >
                         <ArrowDown />

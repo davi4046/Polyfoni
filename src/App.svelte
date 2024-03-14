@@ -30,5 +30,5 @@
 </script>
 
 <main class="h-full">
-    <Timeline {timelineVM}></Timeline>
+    <Timeline vm={timelineVM}></Timeline>
 </main>
