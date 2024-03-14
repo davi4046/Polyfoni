@@ -34,7 +34,7 @@ export default class Stateful<TState extends object>
     }
 }
 
-export type Subscription<T extends Stateful<any>> = {
+export type Subscription<T extends Stateful<any> = any> = {
     obj: T;
     unsubscribe: () => void;
 };
