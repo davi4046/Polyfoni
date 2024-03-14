@@ -8,9 +8,7 @@ interface TrackVMState {
     label: string;
 }
 
-class TrackVM<
-    TState extends TrackVMState = TrackVMState,
-> extends Model<TState> {
+class TrackVM<TState extends TrackVMState> extends Model<TState> {
     constructor(
         readonly View: ViewModelView<TState>,
         state: TState,

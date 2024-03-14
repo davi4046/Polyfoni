@@ -3,7 +3,7 @@ import Model from "../../../architecture/Model";
 import type TrackVM from "./TrackVM";
 
 interface VoiceVMState {
-    tracks: TrackVM[];
+    tracks: TrackVM<any>[];
     isCollapsed: boolean;
 }
 
