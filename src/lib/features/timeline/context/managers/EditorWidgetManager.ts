@@ -1,7 +1,5 @@
 import type { SvelteComponent } from "svelte";
 
-import { cloneDeep } from "lodash";
-
 import type Item from "./../../models/Item";
 import Timeline from "./../../models/Timeline";
 import { editorWidgets } from "./../../utils/ItemTypes";
