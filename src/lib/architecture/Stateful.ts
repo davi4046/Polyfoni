@@ -10,7 +10,9 @@ export default class Stateful<TState extends object>
     }
 
     set state(newState: Partial<TState>) {
-        Object.assign(this._state, newState);
+        const stateClone = Object.assign({}, this._state); // Create a clone of the current state
+        Object.assign(stateClone, newState);
+        this._state = stateClone;
         this._callbacks.forEach((callback) => callback()); //notify subscribers
     }
 
