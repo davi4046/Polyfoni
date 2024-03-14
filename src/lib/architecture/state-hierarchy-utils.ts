@@ -116,3 +116,12 @@ function isGreaterPosRecursive<T extends Position<any>>(
         return result;
     }
 }
+
+export function isDescendant(obj: object, potentialAncestor: object): boolean {
+    let curr = obj;
+    while ((curr as any).state.parent) {
+        curr = (curr as any).state.parent;
+        if (curr === potentialAncestor) return true;
+    }
+    return false;
+}
