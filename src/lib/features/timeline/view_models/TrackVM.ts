@@ -1,6 +1,6 @@
 import Model from "../../../architecture/Model";
 import type { ViewModelView } from "../../../architecture/ViewModelView";
-import TrackView from "../visuals/views/track/Track.svelte";
+import ItemTrackView from "../visuals/views/item_track/ItemTrack.svelte";
 
 import type ItemVM from "./ItemVM";
 
