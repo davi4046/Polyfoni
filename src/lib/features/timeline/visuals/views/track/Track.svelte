@@ -1,8 +1,9 @@
 <script lang="ts">
     import Item from "../item/Item.svelte";
-    import type TrackVM from "../../../view_models/TrackVM";
+    import type { ItemTrackVMState } from "../../../view_models/TrackVM";
+    import type Model from "../../../../../architecture/Model";
 
-    export let vm: TrackVM;
+    export let vm: Model<ItemTrackVMState>;
 
     vm.subscribe(() => (vm = vm));
 </script>
