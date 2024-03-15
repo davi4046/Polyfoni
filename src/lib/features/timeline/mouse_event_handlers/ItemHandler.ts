@@ -80,10 +80,9 @@ class ItemHandler implements MouseEventHandler {
         }
 
         const tracks = (
-            getNestedArrayOfDescendants(
-                getLastAncestor(this.item),
-                countAncestors(getParent(this.item))
-            ).flat(Infinity) as Track<any>[]
+            getNestedArrayOfDescendants(getLastAncestor(this.item), 3).flat(
+                Infinity
+            ) as Track<any>[]
         ).filter((track) => track.state.allowUserEdit);
 
         const hoveredIndex = tracks.indexOf(hoveredTrack);

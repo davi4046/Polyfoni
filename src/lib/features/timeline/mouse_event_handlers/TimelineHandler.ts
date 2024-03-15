@@ -3,6 +3,12 @@ import Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
+import {
+    countAncestors,
+    getLastAncestor,
+    getNestedArrayOfDescendants,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
 
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
@@ -65,10 +71,20 @@ class TimelineHandler implements MouseEventHandler {
             return;
         }
 
-        const newHighlights = Track.getTracksInRange(
-            clickedTrack,
-            hoveredTrack
-        ).map((track) => {
+        const tracks = getNestedArrayOfDescendants(
+            this.context.timeline,
+            3
+        ).flat(Infinity) as Track<any>[];
+
+        const hoveredIndex = tracks.indexOf(hoveredTrack);
+        const clickedIndex = tracks.indexOf(clickedTrack);
+
+        const minIndex = Math.min(hoveredIndex, clickedIndex);
+        const maxIndex = Math.max(hoveredIndex, clickedIndex);
+
+        const tracksInRange = tracks.slice(minIndex, maxIndex + 1);
+
+        const newHighlights = tracksInRange.map((track) => {
             return { track: track, start: minBeat, end: maxBeat };
         });
 
