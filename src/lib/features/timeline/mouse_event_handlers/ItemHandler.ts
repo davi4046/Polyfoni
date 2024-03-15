@@ -47,11 +47,13 @@ class ItemHandler implements MouseEventHandler {
 
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
-            moveEvent.clientY
+            moveEvent.clientY,
+            (track) => track.state.allowUserEdit
         );
         const clickedTrack = findClosestTrack(
             this.context.timeline,
-            downEvent.clientY
+            downEvent.clientY,
+            (track) => track.state.allowUserEdit
         );
 
         if (
