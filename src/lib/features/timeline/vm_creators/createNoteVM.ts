@@ -10,6 +10,7 @@ export default function createNoteVM(
         {
             start: model.state.start,
             end: model.state.end,
+            pitch: model.state.content,
         },
         model.id
     );
@@ -18,6 +19,7 @@ export default function createNoteVM(
         vm.state = {
             start: model.state.start,
             end: model.state.end,
+            pitch: model.state.content,
         };
     });
 
