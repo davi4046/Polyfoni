@@ -4,7 +4,10 @@ import VoiceVM from "../view_models/VoiceVM";
 
 import createItemTrackVM from "./createItemTrackVM";
 
-function createVoiceVM(model: Voice, context: TimelineContext): VoiceVM {
+export default function createVoiceVM(
+    model: Voice,
+    context: TimelineContext
+): VoiceVM {
     const vm = new VoiceVM(
         {
             tracks: model.state.children.map((track) => {
@@ -25,5 +28,3 @@ function createVoiceVM(model: Voice, context: TimelineContext): VoiceVM {
 
     return vm;
 }
-
-export default createVoiceVM;
