@@ -10,6 +10,9 @@
 </script>
 
 <div
-    class="absolute z-10 h-full bg-black"
+    class="absolute z-10 h-full px-0.5"
     style="width:{width}px; left:{left}px"
-/>
+    title={String(vm.state.pitch)}
+>
+    <div class="h-full w-full bg-black" />
+</div>
