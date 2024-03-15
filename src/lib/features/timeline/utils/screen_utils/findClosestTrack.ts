@@ -1,8 +1,9 @@
 import type Timeline from "../../models/Timeline";
 import type Track from "../../models/Track";
 import Attribute from "../../../../architecture/AttributeEnum";
+import type Model from "../../../../architecture/Model";
+import { getDescendants } from "../../../../architecture/state-hierarchy-utils";
 import findClosestElement from "../../../../utils/dom_utils/findClosestElement";
-import findModelById from "../../../../utils/model_utils/findModelById";
 
 function findClosestTrack(
     timeline: Timeline,
@@ -19,7 +20,10 @@ function findClosestTrack(
 
     const trackElement = findClosestElement(0, clientY, trackElements);
     const modelId = trackElement.getAttribute(Attribute.ModelId)!;
-    const model = findModelById(timeline, modelId) as Track<any>;
+
+    const model = (getDescendants(timeline) as Model<any>[]).find(
+        (child) => child.id === modelId
+    ) as Track<any>;
 
     return model;
 }

@@ -100,7 +100,9 @@ export function countAncestors(obj: any): number {
     while (curr.state.parent) {
         curr = curr.state.parent;
         if (curr === obj) {
-            throw Error("Tried to get depth of object in cyclical hierarchy");
+            throw Error(
+                "Tried to count ancestors of object in cyclical hierarchy"
+            );
         }
         depth += 1;
     }
@@ -134,4 +136,21 @@ export function getNestedArrayOfDescendants(
             })
             .filter((value) => value !== undefined);
     }
+}
+
+export function getDescendants(obj: HasGettableChildren<any>) {
+    const checkedObjects: any[] = [];
+
+    function recursive(obj: HasGettableChildren<any>): any[] {
+        if (checkedObjects.includes(obj)) return [];
+        checkedObjects.push(obj);
+        return [
+            obj.state.children,
+            obj.state.children
+                .filter((child) => child.state.children)
+                .map(recursive),
+        ];
+    }
+
+    return recursive(obj).flat(Infinity);
 }
