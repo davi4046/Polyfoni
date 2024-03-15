@@ -1,3 +1,4 @@
+import type Item from "../models/Item";
 import Model from "../../../architecture/Model";
 
 import type VoiceVM from "./VoiceVM";

@@ -15,7 +15,8 @@ function createItemTrackVM<T extends keyof ItemTypes>(
             return createItemVM(item, context);
         });
 
-        const ghostItems = context.moveManager.ghostItems
+        const ghostItems = context.state.ghostPairs
+            .map((pair) => pair[1])
             .filter((item) => item.state.parent === model)
             .map((item) => createItemVM_ghost(item, context));
 
@@ -37,7 +38,7 @@ function createItemTrackVM<T extends keyof ItemTypes>(
         };
     });
 
-    context.moveManager.subscribe(() => {
+    context.subscribe(() => {
         vm.state = {
             items: createItems(),
         };

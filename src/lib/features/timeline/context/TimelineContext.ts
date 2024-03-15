@@ -1,29 +1,52 @@
+import type { SvelteComponent } from "svelte";
+
+import type Highlight from "../models/Highlight";
+import type Item from "../models/Item";
 import type Timeline from "../models/Timeline";
-import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
+import { editorWidgets, type ItemTypes } from "../utils/ItemTypes";
+import Attribute from "../../../architecture/AttributeEnum";
+import Stateful from "../../../architecture/Stateful";
 
-import EditorWidgetManager from "./managers/EditorWidgetManager";
-import HighlightManager from "./managers/HighlightManager";
-import MoveManager from "./managers/MoveManager";
-import SelectionManager from "./managers/SelectionManager";
+interface TimelineContextState {
+    editItem?: Item<any>;
+    highlights: Highlight[];
+    ghostPairs: [Item<any>, Item<any>][];
+    selectedItems: Item<any>[];
+}
 
-class TimelineContext {
-    readonly highlightManager = new HighlightManager();
-    readonly selectionManager = new SelectionManager();
-    readonly moveManager = new MoveManager();
-
-    readonly editorWidgetManager;
-
+export default class TimelineContext extends Stateful<TimelineContextState> {
     constructor(readonly timeline: Timeline) {
-        this.editorWidgetManager = new EditorWidgetManager(this.timeline);
+        super({
+            highlights: [],
+            ghostPairs: [],
+            selectedItems: [],
+        });
 
-        const stateHierarchyWatcher = new StateHierarchyWatcher(timeline);
+        let editorWidget: SvelteComponent | undefined;
 
-        stateHierarchyWatcher.subscribe((obj, oldState) => {
-            console.log("obj:", obj);
-            console.log("oldState:", oldState);
-            console.log("newState:", obj.state);
+        this.subscribe((_, oldState) => {
+            if (this.state.editItem === oldState.editItem) return;
+
+            editorWidget?.$destroy();
+
+            if (!this.state.editItem) return;
+
+            const EditorWidgetCtor =
+                editorWidgets[this.state.editItem.itemType as keyof ItemTypes];
+
+            if (!EditorWidgetCtor) return;
+
+            const editorWidgetContainer = document
+                .querySelector(`[${Attribute.ModelId}='${timeline.id}']`)!
+                .querySelector(
+                    `[${Attribute.Type}='editor-widget-container']`
+                )!;
+
+            editorWidget = new EditorWidgetCtor({
+                target: editorWidgetContainer,
+                // @ts-ignore
+                props: { item: this.state.editItem },
+            });
         });
     }
 }
-
-export default TimelineContext;

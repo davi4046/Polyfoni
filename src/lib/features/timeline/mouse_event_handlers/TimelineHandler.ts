@@ -1,4 +1,5 @@
 import type TimelineContext from "../context/TimelineContext";
+import Highlight from "../models/Highlight";
 import Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
@@ -14,9 +15,11 @@ class TimelineHandler implements MouseEventHandler {
     private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
-        this.context.selectionManager.deselectAll();
-        this.context.highlightManager.highlights = [];
-        this.context.editorWidgetManager.closeEditorWigdet();
+        this.context.state = {
+            highlights: [],
+            selectedItems: [],
+            editItem: undefined,
+        };
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
@@ -80,10 +83,16 @@ class TimelineHandler implements MouseEventHandler {
         const tracksInRange = tracks.slice(minIndex, maxIndex + 1);
 
         const newHighlights = tracksInRange.map((track) => {
-            return { track: track, start: minBeat, end: maxBeat };
+            return new Highlight({
+                start: minBeat,
+                end: maxBeat,
+                parent: track,
+            });
         });
 
-        this.context.highlightManager.highlights = newHighlights;
+        this.context.state = {
+            highlights: newHighlights,
+        };
     }
 }
 

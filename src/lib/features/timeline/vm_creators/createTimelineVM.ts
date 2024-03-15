@@ -3,6 +3,7 @@ import Timeline from "../models/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
+import { getChildren } from "../../../architecture/state-hierarchy-utils";
 
 import createVoiceVM from "./createVoiceVM";
 
@@ -13,15 +14,15 @@ function createTimelineVM(
     const mouseEventHandler = new TimelineHandler(context);
 
     const createSections = () => {
-        const top = model.state.children[0].state.children.map((voice) => {
+        const top = getChildren(getChildren(model)[0]).map((voice) => {
             return createVoiceVM(voice, context);
         });
 
-        const center = model.state.children[1].state.children.map((voice) => {
+        const center = getChildren(getChildren(model)[1]).map((voice) => {
             return createVoiceVM(voice, context);
         });
 
-        const bottom = model.state.children[2].state.children.map((voice) => {
+        const bottom = getChildren(getChildren(model)[2]).map((voice) => {
             return createVoiceVM(voice, context);
         });
 

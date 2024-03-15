@@ -2,6 +2,8 @@ import type TimelineContext from "../context/TimelineContext";
 import Item from "../models/Item";
 import type Track from "../models/Track";
 import { initialContent, type ItemTypes } from "../utils/ItemTypes";
+import placeGhostItems from "../context/operations/placeGhostItems";
+import toggleItemSelected from "../context/operations/toggleItemSelected";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
@@ -24,14 +26,15 @@ class ItemHandler implements MouseEventHandler {
 
     handleMouseDown(downEvent: MouseEvent) {
         if (downEvent.shiftKey) {
-            this.context.selectionManager.toggleSelected(this.item);
+            toggleItemSelected(this.context, this.item);
         } else {
-            this.context.selectionManager.deselectAll();
-            this.context.selectionManager.selectItem(this.item);
+            this.context.state = {
+                selectedItems: [this.item],
+            };
         }
-        if (this.context.selectionManager.isSelected(this.item)) {
-            this.context.editorWidgetManager.openItemEditorWidget(this.item);
-        }
+        this.context.state = {
+            editItem: this.item,
+        };
         downEvent.stopPropagation();
     }
 
@@ -75,7 +78,9 @@ class ItemHandler implements MouseEventHandler {
             !clickedTrack ||
             (hoveredBeat === clickedBeat && hoveredTrack === clickedTrack)
         ) {
-            this.context.moveManager.ghostPairs = [];
+            this.context.state = {
+                ghostPairs: [],
+            };
             return;
         }
 
@@ -91,7 +96,7 @@ class ItemHandler implements MouseEventHandler {
         const trackOffset = hoveredIndex - clickedIndex;
         const beatOffset = hoveredBeat - clickedBeat;
 
-        const selectedItems = this.context.selectionManager.state.selectedItems;
+        const selectedItems = this.context.state.selectedItems;
 
         // Will fail if there is no track at newIndex. In that case, no action is needed
         try {
@@ -118,12 +123,14 @@ class ItemHandler implements MouseEventHandler {
                 return [item, clone];
             }) as [Item<any>, Item<any>][];
 
-            this.context.moveManager.ghostPairs = ghostPairs;
+            this.context.state = {
+                ghostPairs: ghostPairs,
+            };
         } catch {}
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
-        this.context.moveManager.placeGhostItems();
+        placeGhostItems(this.context);
     }
 }
 

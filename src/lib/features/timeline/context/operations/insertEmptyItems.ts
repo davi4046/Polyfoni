@@ -1,28 +1,32 @@
 import type TimelineContext from "../TimelineContext";
 import Item from "../../models/Item";
 import { initialContent, type ItemTypes } from "../../utils/ItemTypes";
-import { addChildren } from "../../../../architecture/state-hierarchy-utils";
+import {
+    addChildren,
+    getParent,
+} from "../../../../architecture/state-hierarchy-utils";
 
 function insertEmptyItems(context: TimelineContext) {
-    context.highlightManager.highlights.forEach((highlight) => {
-        if (!highlight.track.state.allowUserEdit) return;
+    context.state.highlights.forEach((highlight) => {
+        const track = getParent(highlight);
 
-        highlight.track.cropItemsByInterval(highlight.start, highlight.end);
+        if (!track.state.allowUserEdit) return;
+
+        track.cropItemsByInterval(highlight.state.start, highlight.state.end);
 
         addChildren(
-            highlight.track,
-            new Item(highlight.track.itemType, {
-                parent: highlight.track,
-                start: highlight.start,
-                end: highlight.end,
-                content:
-                    initialContent[
-                        highlight.track.itemType as keyof ItemTypes
-                    ](),
+            track,
+            new Item(track.itemType, {
+                parent: track,
+                start: highlight.state.start,
+                end: highlight.state.end,
+                content: initialContent[track.itemType as keyof ItemTypes](),
             })
         );
     });
-    context.highlightManager.highlights = [];
+    context.state = {
+        highlights: [],
+    };
 }
 
 export default insertEmptyItems;

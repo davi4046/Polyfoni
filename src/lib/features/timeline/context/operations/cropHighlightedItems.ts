@@ -1,11 +1,17 @@
 import type TimelineContext from "../TimelineContext";
+import { getParent } from "../../../../architecture/state-hierarchy-utils";
 
 function cropHighlightedItems(context: TimelineContext) {
-    context.highlightManager.highlights.forEach((highlight) => {
-        if (!highlight.track.state.allowUserEdit) return;
-        highlight.track.cropItemsByInterval(highlight.start, highlight.end);
+    context.state.highlights.forEach((highlight) => {
+        const track = getParent(highlight);
+
+        if (!track.state.allowUserEdit) return;
+
+        track.cropItemsByInterval(highlight.state.start, highlight.state.end);
     });
-    context.highlightManager.highlights = [];
+    context.state = {
+        highlights: [],
+    };
 }
 
 export default cropHighlightedItems;

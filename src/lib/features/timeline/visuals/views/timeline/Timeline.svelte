@@ -6,6 +6,7 @@
     import VerticalLine from "./assets/VerticalLine.svelte";
     import TimelineVM from "../../../view_models/TimelineVM";
     import { onMount } from "svelte";
+    import { editorWidgets, type ItemTypes } from "../../../utils/ItemTypes";
 
     export let vm: TimelineVM;
 
@@ -155,8 +156,8 @@
     </div>
     <!-- EDITOR WIDGET CONTAINER -->
     <div
-        data-type="editor-widget-container"
         class="col-start-1 col-end-3 row-start-5 row-end-6"
+        data-type="editor-widget-container"
         on:mousemove={vm.state.handleMouseMove_others}
         role="none"
     />
