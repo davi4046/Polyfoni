@@ -9,4 +9,7 @@
     $: left = vm.state.start * 64;
 </script>
 
-<div class="absolute z-10 h-full bg-black w-[{width}px] left-[{left}px]" />
+<div
+    class="absolute z-10 h-full bg-black"
+    style="width:{width}px; left:{left}px"
+/>
