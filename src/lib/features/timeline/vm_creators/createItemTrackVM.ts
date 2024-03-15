@@ -6,7 +6,7 @@ import { ItemTrackVM } from "../view_models/TrackVM";
 import createItemVM from "./createItemVM";
 import createItemVM_ghost from "./createItemVM_ghost";
 
-function createTrackVM<T extends keyof ItemTypes>(
+function createItemTrackVM<T extends keyof ItemTypes>(
     model: Track<T>,
     context: TimelineContext
 ): ItemTrackVM {
@@ -46,4 +46,4 @@ function createTrackVM<T extends keyof ItemTypes>(
     return vm;
 }
 
-export default createTrackVM;
+export default createItemTrackVM;
