@@ -23,7 +23,7 @@ export type ItemTypes = {
     ChordItem: ChordItemContent;
 };
 
-export const editorWidgets: { [K in keyof ItemTypes]: EditorWidget<K> } = {
+export const editorWidgets: Partial<{ [K in keyof ItemTypes]: EditorWidget<K> }> = {
     StringItem: StringEditorWidget,
     ChordItem: ChordEditorWidget,
 };

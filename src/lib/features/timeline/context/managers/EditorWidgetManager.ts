@@ -5,7 +5,7 @@ import Timeline from "./../../models/Timeline";
 import { editorWidgets } from "./../../utils/ItemTypes";
 import type { ItemTypes } from "./../../utils/ItemTypes";
 import Attribute from "../../../../architecture/AttributeEnum";
-import { getGrandparent } from "../../../../architecture/state-hierarchy-utils";
+import { getGreatGreatGrandparent } from "../../../../architecture/state-hierarchy-utils";
 
 class EditorWidgetManager {
     constructor(timeline: Timeline) {
@@ -16,9 +16,13 @@ class EditorWidgetManager {
     private _editorWidget?: SvelteComponent;
 
     openItemEditorWidget<T extends keyof ItemTypes>(item: Item<T>) {
-        if (getGrandparent(getGrandparent(item)) !== this._timeline) {
+        if (getGreatGreatGrandparent(item) !== this._timeline) {
             throw new Error("Item must be on this timeline");
         }
+
+        const EditorWidgetCtor = editorWidgets[item.itemType];
+
+        if (!EditorWidgetCtor) return;
 
         this.closeEditorWigdet();
 
@@ -26,7 +30,7 @@ class EditorWidgetManager {
             .querySelector(`[${Attribute.ModelId}='${this._timeline.id}']`)!
             .querySelector(`[${Attribute.Type}='editor-widget-container']`)!;
 
-        this._editorWidget = new editorWidgets[item.itemType]({
+        this._editorWidget = new EditorWidgetCtor({
             target: editorWidgetContainer,
             props: {
                 item: item,
