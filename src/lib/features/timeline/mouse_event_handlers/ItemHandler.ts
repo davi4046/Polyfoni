@@ -93,28 +93,33 @@ class ItemHandler implements MouseEventHandler {
 
         const selectedItems = this.context.selectionManager.state.selectedItems;
 
-        const ghostPairs = selectedItems.map((item) => {
-            const newStart = item.state.start + beatOffset;
-            const newEnd = item.state.end + beatOffset;
-            const newIndex = tracks.indexOf(getParent(item)) + trackOffset;
-            const newTrack = tracks[newIndex];
+        // Will fail if there is no track at newIndex. In that case, no action is needed
+        try {
+            const ghostPairs = selectedItems.map((item) => {
+                const newStart = item.state.start + beatOffset;
+                const newEnd = item.state.end + beatOffset;
+                const newIndex = tracks.indexOf(getParent(item)) + trackOffset;
+                const newTrack = tracks[newIndex];
 
-            const content =
-                item.itemType === newTrack.itemType
-                    ? item.state.content
-                    : initialContent[newTrack.itemType as keyof ItemTypes]();
+                const content =
+                    item.itemType === newTrack.itemType
+                        ? item.state.content
+                        : initialContent[
+                              newTrack.itemType as keyof ItemTypes
+                          ]();
 
-            const clone = new Item(newTrack.itemType, {
-                start: newStart,
-                end: newEnd,
-                content: content,
-                parent: newTrack,
-            });
+                const clone = new Item(newTrack.itemType, {
+                    start: newStart,
+                    end: newEnd,
+                    content: content,
+                    parent: newTrack,
+                });
 
-            return [item, clone];
-        }) as [Item<any>, Item<any>][];
+                return [item, clone];
+            }) as [Item<any>, Item<any>][];
 
-        this.context.moveManager.ghostPairs = ghostPairs;
+            this.context.moveManager.ghostPairs = ghostPairs;
+        } catch {}
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
