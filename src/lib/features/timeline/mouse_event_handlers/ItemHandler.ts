@@ -1,11 +1,15 @@
 import type TimelineContext from "../context/TimelineContext";
 import Item from "../models/Item";
 import type Track from "../models/Track";
+import { initialContent, type ItemTypes } from "../utils/ItemTypes";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import {
+    getNestedArrayOfDescendants,
     getIndex,
+    getLastAncestor,
+    countAncestors,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 
@@ -75,26 +79,41 @@ class ItemHandler implements MouseEventHandler {
             return;
         }
 
+        const tracks = (
+            getNestedArrayOfDescendants(
+                getLastAncestor(this.item),
+                countAncestors(getParent(this.item))
+            ).flat(Infinity) as Track<any>[]
+        ).filter((track) => track.state.allowUserEdit);
+
+        const hoveredIndex = tracks.indexOf(hoveredTrack);
+        const clickedIndex = tracks.indexOf(clickedTrack);
+
+        const trackOffset = hoveredIndex - clickedIndex;
         const beatOffset = hoveredBeat - clickedBeat;
 
-        const trackOffset = getIndex(hoveredTrack) - getIndex(clickedTrack);
+        const selectedItems = this.context.selectionManager.state.selectedItems;
 
-        const voiceOffset =
-            getIndex(getParent(hoveredTrack)) -
-            getIndex(getParent(clickedTrack));
+        const ghostPairs = selectedItems.map((item) => {
+            const newStart = item.state.start + beatOffset;
+            const newEnd = item.state.end + beatOffset;
+            const newIndex = tracks.indexOf(getParent(item)) + trackOffset;
+            const newTrack = tracks[newIndex];
 
-        const items = this.context.selectionManager.state.selectedItems;
+            const content =
+                item.itemType === newTrack.itemType
+                    ? item.state.content
+                    : initialContent[newTrack.itemType as keyof ItemTypes]();
 
-        const movedItems = Item.offsetBunchOfItems(
-            items,
-            beatOffset,
-            trackOffset,
-            voiceOffset
-        );
+            const clone = new Item(newTrack.itemType, {
+                start: newStart,
+                end: newEnd,
+                content: content,
+                parent: newTrack,
+            });
 
-        const ghostPairs: [legit: Item<any>, ghost: Item<any>][] = [];
-
-        items.map((item, index) => ghostPairs.push([item, movedItems[index]]));
+            return [item, clone];
+        }) as [Item<any>, Item<any>][];
 
         this.context.moveManager.ghostPairs = ghostPairs;
     }

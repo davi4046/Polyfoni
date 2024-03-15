@@ -6,7 +6,7 @@ import {
     removeChildren,
 } from "../../../../architecture/state-hierarchy-utils";
 
-type ItemPair = [legit: Item<any>, ghost: Item<any>];
+type ItemPair = [Item<any>, Item<any>];
 
 interface MoveManagerState {
     ghostPairs: readonly ItemPair[];

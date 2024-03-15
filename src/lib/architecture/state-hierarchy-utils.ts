@@ -26,6 +26,12 @@ type HasSettableParent<TParent> = SetState<HasParent<TParent>>;
 
 type HasSettableChildren<TParent> = SetState<HasChildren<TParent>>;
 
+type LastAncestor<T> = T extends HasGettableParent<infer U>
+    ? U extends HasGettableParent<any>
+        ? LastAncestor<U>
+        : U
+    : T;
+
 export function getParent<T>(obj: HasGettableParent<T>) {
     return obj.state.parent;
 }
@@ -124,4 +130,47 @@ export function isDescendant(obj: object, potentialAncestor: object): boolean {
         if (curr === potentialAncestor) return true;
     }
     return false;
+}
+
+export function countAncestors(obj: any): number {
+    let curr = obj;
+    let depth = 0;
+
+    while (curr.state.parent) {
+        curr = curr.state.parent;
+        if (curr === obj) {
+            throw Error("Tried to get depth of object in cyclical hierarchy");
+        }
+        depth += 1;
+    }
+
+    return depth;
+}
+
+export function getLastAncestor<T extends HasGettableParent<any>>(
+    obj: T
+): LastAncestor<T> {
+    let curr = obj;
+    while (curr.state.parent) curr = curr.state.parent;
+    return curr as LastAncestor<T>;
+}
+
+export function getNestedArrayOfDescendants(
+    obj: HasGettableChildren<any>,
+    endDepth: number
+) {
+    return recursive(obj, endDepth);
+
+    function recursive(
+        obj: HasGettableChildren<any>,
+        remainingDepth: number
+    ): any[] {
+        return obj.state.children
+            .map((child) => {
+                return child.state.children && remainingDepth > 1
+                    ? recursive(child, remainingDepth - 1)
+                    : child;
+            })
+            .filter((value) => value !== undefined);
+    }
 }
