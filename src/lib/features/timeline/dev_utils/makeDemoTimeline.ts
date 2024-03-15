@@ -62,26 +62,31 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
             parent: voice,
             label: "Piano 1",
             children: [],
+            allowUserEdit: false,
         }),
         new Track("StringItem", {
             parent: voice,
             label: "Pitch",
             children: [],
+            allowUserEdit: true,
         }),
         new Track("StringItem", {
             parent: voice,
             label: "Duration",
             children: [],
+            allowUserEdit: true,
         }),
         new Track("StringItem", {
             parent: voice,
             label: "Rest",
             children: [],
+            allowUserEdit: true,
         }),
         new Track("ChordItem", {
             parent: voice,
             label: "Harmony",
             children: [],
+            allowUserEdit: true,
         })
     );
 

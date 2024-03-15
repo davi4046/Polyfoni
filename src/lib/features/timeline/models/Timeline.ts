@@ -39,6 +39,7 @@ class Timeline extends Model<TimelineState> {
             label: "Scale",
             parent: voice,
             children: [],
+            allowUserEdit: true,
         });
 
         addChildren(voice, track);
@@ -51,6 +52,7 @@ class Timeline extends Model<TimelineState> {
             label: "Total Harmony",
             parent: voice,
             children: [],
+            allowUserEdit: false,
         });
 
         addChildren(voice, track);

@@ -10,6 +10,7 @@ interface TrackState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Voice>,
         stateHierarchyUtils.ParentState<Item<T>> {
     label: string;
+    allowUserEdit: boolean;
 }
 
 export default class Track<T extends keyof ItemTypes> extends Model<
