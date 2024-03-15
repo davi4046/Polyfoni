@@ -21,9 +21,12 @@ import {
 export type ItemTypes = {
     StringItem: string;
     ChordItem: ChordItemContent;
+    NoteItem: number;
 };
 
-export const editorWidgets: Partial<{ [K in keyof ItemTypes]: EditorWidget<K> }> = {
+export const editorWidgets: Partial<{
+    [K in keyof ItemTypes]: EditorWidget<K>;
+}> = {
     StringItem: StringEditorWidget,
     ChordItem: ChordEditorWidget,
 };
@@ -44,6 +47,7 @@ export const stringConversionFunctions: StringConversionFunctions = {
         value.chordStatus instanceof Chord
             ? value.chordStatus.getName()
             : "undefined",
+    NoteItem: (value) => String(value),
 };
 
 type StringConversionFunctions = {
@@ -55,6 +59,7 @@ export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     ChordItem: () => {
         return { chordStatus: createEmptyPitchMap(), filters: [] };
     },
+    NoteItem: () => Math.round(Math.random() * 14), // TEST
 };
 
 export const postInitFunctions: Partial<{

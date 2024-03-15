@@ -58,7 +58,7 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
     const tracks: Track<any>[] = [];
 
     tracks.push(
-        new Track("StringItem", {
+        new Track("NoteItem", {
             parent: voice,
             label: "Piano 1",
             children: [],
