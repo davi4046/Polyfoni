@@ -3,12 +3,7 @@ import Track from "../models/Track";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
-import {
-    countAncestors,
-    getLastAncestor,
-    getNestedArrayOfDescendants,
-    getParent,
-} from "../../../architecture/state-hierarchy-utils";
+import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}

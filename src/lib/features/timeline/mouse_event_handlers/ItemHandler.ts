@@ -7,9 +7,7 @@ import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import {
     getNestedArrayOfDescendants,
-    getIndex,
     getLastAncestor,
-    countAncestors,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 
