@@ -5,12 +5,26 @@
     import VoiceHeader from "../voice_header/VoiceHeader.svelte";
     import VerticalLine from "./assets/VerticalLine.svelte";
     import TimelineVM from "../../../view_models/TimelineVM";
-    import { onMount } from "svelte";
-    import { editorWidgets, type ItemTypes } from "../../../utils/ItemTypes";
+    import { SvelteComponent, onMount } from "svelte";
 
     export let vm: TimelineVM;
 
-    vm.subscribe(() => (vm = vm));
+    let editorWidgetContainer: HTMLElement;
+    let editorWidgetComponent: SvelteComponent;
+
+    vm.subscribe((_, oldState) => {
+        vm = vm;
+
+        if (vm.state.editorWidget !== oldState.editorWidget) {
+            editorWidgetComponent?.$destroy();
+            if (vm.state.editorWidget) {
+                editorWidgetComponent = new vm.state.editorWidget.ctor({
+                    target: editorWidgetContainer,
+                    props: vm.state.editorWidget.props,
+                });
+            }
+        }
+    });
 
     onMount(() => {
         for (let element of document.getElementsByClassName("h-scroll")) {
@@ -46,7 +60,7 @@
     <!-- BUTTONS -->
     <div class="col-start-1 row-start-1"></div>
     <!-- MARKERS -->
-    <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
+    <div class="h-6 col-start-2 row-start-1 overflow-hidden h-scroll">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
@@ -95,7 +109,7 @@
     </div>
     <!-- TOP TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
         data-type="top"
     >
         <div
@@ -109,7 +123,7 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
         data-type="center"
     >
         <div
@@ -123,7 +137,7 @@
     </div>
     <!-- BOTTOM TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
         data-type="bottom"
     >
         <div
@@ -137,7 +151,7 @@
     </div>
     <!-- SEPARATORS -->
     <div
-        class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
+        class="col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
     >
         <div
             class="relative h-full overflow-clip"
@@ -157,24 +171,24 @@
     <!-- EDITOR WIDGET CONTAINER -->
     <div
         class="col-start-1 col-end-3 row-start-5 row-end-6"
-        data-type="editor-widget-container"
         on:mousemove={vm.state.handleMouseMove_others}
+        bind:this={editorWidgetContainer}
         role="none"
     />
     <!-- TOP HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 self-end h-1 col-start-1 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 h-1 col-start-1 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
     <!-- TOP TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 self-end h-1 col-start-2 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 h-1 col-start-2 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
 </div>

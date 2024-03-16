@@ -1,9 +1,12 @@
 import TimelineContext from "../context/TimelineContext";
+import type Item from "../models/Item";
 import Timeline from "../models/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
+import { editorWidgets, type ItemTypes } from "../utils/ItemTypes";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 
 import createVoiceVM from "./createVoiceVM";
 
@@ -57,6 +60,28 @@ function createTimelineVM(
             center: center,
             bottom: bottom,
         };
+    });
+
+    context.subscribe((_, oldState) => {
+        if (context.state.editItem === oldState.editItem) return;
+
+        const EditorWidgetCtor =
+            editorWidgets[context.state.editItem?.itemType as keyof ItemTypes];
+
+        if (EditorWidgetCtor && context.state.editItem) {
+            vm.state = {
+                editorWidget: new SvelteCtorMatchProps<{ item: Item<any> }>(
+                    EditorWidgetCtor,
+                    {
+                        item: context.state.editItem,
+                    }
+                ),
+            };
+        } else {
+            vm.state = {
+                editorWidget: undefined,
+            };
+        }
     });
 
     return vm;
