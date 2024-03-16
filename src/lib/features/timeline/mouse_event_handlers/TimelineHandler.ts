@@ -6,7 +6,7 @@ import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 
-class TimelineHandler implements MouseEventHandler {
+export default class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
 
     private _prevMinBeat?: number;
@@ -98,5 +98,3 @@ class TimelineHandler implements MouseEventHandler {
         this._prevClickedTrack = undefined;
     }
 }
-
-export default TimelineHandler;

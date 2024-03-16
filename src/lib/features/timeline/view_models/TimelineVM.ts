@@ -13,6 +13,4 @@ interface TimelineVMState {
     editorWidget?: SvelteCtorMatchProps<{ item: Item<any> }>;
 }
 
-class TimelineVM extends Model<TimelineVMState> {}
-
-export default TimelineVM;
+export default class TimelineVM extends Model<TimelineVMState> {}

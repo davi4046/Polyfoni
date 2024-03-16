@@ -11,7 +11,9 @@ interface ItemState<T extends keyof ItemTypes>
     content: ItemTypes[T];
 }
 
-class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
+export default class Item<T extends keyof ItemTypes> extends Model<
+    ItemState<T>
+> {
     constructor(
         readonly itemType: T,
         state: ItemState<T>
@@ -21,5 +23,3 @@ class Item<T extends keyof ItemTypes> extends Model<ItemState<T>> {
         if (postInitFunctions[itemType]) postInitFunctions[itemType]!(this);
     }
 }
-
-export default Item;

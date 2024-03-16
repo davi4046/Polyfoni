@@ -4,7 +4,7 @@ import Attribute from "../../../../architecture/AttributeEnum";
 import { getNestedArrayOfDescendants } from "../../../../architecture/state-hierarchy-utils";
 import findClosestElement from "../../../../utils/dom_utils/findClosestElement";
 
-function findClosestTrack(
+export default function findClosestTrack(
     timeline: Timeline,
     clientY: number,
     predicate?: (track: Track<any>) => boolean
@@ -23,5 +23,3 @@ function findClosestTrack(
 
     return tracks.find((track) => track.id === modelId);
 }
-
-export default findClosestTrack;

@@ -1,4 +1,4 @@
-function findClosestElement(
+export default function findClosestElement(
     x: number,
     y: number,
     elements: Element[]
@@ -23,5 +23,3 @@ function findClosestElement(
 
     return closestElement;
 }
-
-export default findClosestElement;

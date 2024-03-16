@@ -9,6 +9,4 @@ import type Voice from "./Voice";
 
 interface SectionState extends ChildState<Timeline>, ParentState<Voice> {}
 
-class Section extends Model<SectionState> {}
-
-export default Section;
+export default class Section extends Model<SectionState> {}

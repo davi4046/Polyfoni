@@ -6,7 +6,7 @@ import {
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
 
-function insertEmptyItems(context: TimelineContext) {
+export default function insertEmptyItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {
         const track = getParent(highlight);
 
@@ -28,5 +28,3 @@ function insertEmptyItems(context: TimelineContext) {
         highlights: [],
     };
 }
-
-export default insertEmptyItems;

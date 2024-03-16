@@ -13,7 +13,7 @@ import {
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 
-class ItemHandler implements MouseEventHandler {
+export default class ItemHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
@@ -135,5 +135,3 @@ class ItemHandler implements MouseEventHandler {
         placeGhostItems(this.context);
     }
 }
-
-export default ItemHandler;

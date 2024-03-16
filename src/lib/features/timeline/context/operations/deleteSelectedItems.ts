@@ -4,7 +4,7 @@ import {
     removeChildren,
 } from "../../../../architecture/state-hierarchy-utils";
 
-function deleteSelectedItems(context: TimelineContext) {
+export default function deleteSelectedItems(context: TimelineContext) {
     context.state.selectedItems.forEach((item) => {
         removeChildren(getParent(item), item);
     });
@@ -12,5 +12,3 @@ function deleteSelectedItems(context: TimelineContext) {
         selectedItems: [],
     };
 }
-
-export default deleteSelectedItems;

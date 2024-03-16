@@ -6,7 +6,7 @@ import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import { getParent } from "../../../architecture/state-hierarchy-utils";
 
-class StartHandleHandler implements MouseEventHandler {
+export default class StartHandleHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
@@ -38,5 +38,3 @@ class StartHandleHandler implements MouseEventHandler {
         );
     }
 }
-
-export default StartHandleHandler;

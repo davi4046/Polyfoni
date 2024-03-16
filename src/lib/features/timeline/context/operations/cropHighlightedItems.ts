@@ -1,7 +1,7 @@
 import type TimelineContext from "../TimelineContext";
 import { getParent } from "../../../../architecture/state-hierarchy-utils";
 
-function cropHighlightedItems(context: TimelineContext) {
+export default function cropHighlightedItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {
         const track = getParent(highlight);
 
@@ -13,5 +13,3 @@ function cropHighlightedItems(context: TimelineContext) {
         highlights: [],
     };
 }
-
-export default cropHighlightedItems;

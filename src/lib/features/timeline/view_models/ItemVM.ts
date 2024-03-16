@@ -15,6 +15,4 @@ interface ItemVMState {
     handleMouseMove_endHandle?: (event: MouseEvent) => void;
 }
 
-class ItemVM extends Model<ItemVMState> {}
-
-export default ItemVM;
+export default class ItemVM extends Model<ItemVMState> {}

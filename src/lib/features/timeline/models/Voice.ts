@@ -9,6 +9,4 @@ import type Track from "./Track";
 
 interface VoiceState extends ChildState<Section>, ParentState<Track<any>> {}
 
-class Voice extends Model<VoiceState> {}
-
-export default Voice;
+export default class Voice extends Model<VoiceState> {}

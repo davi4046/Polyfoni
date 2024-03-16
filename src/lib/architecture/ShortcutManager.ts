@@ -10,7 +10,7 @@ function processShortcut(shortcut: string): string[] {
     return shortcut.replaceAll(" ", "").split("+").sort();
 }
 
-class ShortcutManager {
+export default class ShortcutManager {
     private _shortcuts: Shortcut[] = [];
     private _pressedKeys: string[] = [];
 
@@ -63,5 +63,3 @@ class ShortcutManager {
         }
     }
 }
-
-export default ShortcutManager;

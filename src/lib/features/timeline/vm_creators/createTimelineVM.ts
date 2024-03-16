@@ -10,7 +10,7 @@ import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 
 import createVoiceVM from "./createVoiceVM";
 
-function createTimelineVM(
+export default function createTimelineVM(
     model: Timeline,
     context: TimelineContext
 ): TimelineVM {
@@ -86,5 +86,3 @@ function createTimelineVM(
 
     return vm;
 }
-
-export default createTimelineVM;

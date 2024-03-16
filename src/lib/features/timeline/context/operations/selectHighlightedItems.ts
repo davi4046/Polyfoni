@@ -5,7 +5,7 @@ import {
 } from "../../../../architecture/state-hierarchy-utils";
 import isWithin from "../../../../utils/interval/is_within/isWithin";
 
-function selectHighlightedItems(context: TimelineContext) {
+export default function selectHighlightedItems(context: TimelineContext) {
     const items = context.state.highlights
         .filter((highlight) => getParent(highlight).state.allowUserEdit)
         .flatMap((highlight) => {
@@ -25,5 +25,3 @@ function selectHighlightedItems(context: TimelineContext) {
         selectedItems: items,
     };
 }
-
-export default selectHighlightedItems;

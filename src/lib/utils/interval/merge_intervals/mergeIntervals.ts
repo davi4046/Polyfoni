@@ -1,6 +1,6 @@
 import type Interval from "../Interval";
 
-function mergeIntervals(intervals: Interval[]): Interval[] {
+export default function mergeIntervals(intervals: Interval[]): Interval[] {
     if (intervals.length <= 1) {
         return intervals.slice(); // Return a copy of the input array
     }
@@ -28,5 +28,3 @@ function mergeIntervals(intervals: Interval[]): Interval[] {
 
     return mergedIntervals;
 }
-
-export default mergeIntervals;

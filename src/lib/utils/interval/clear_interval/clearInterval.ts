@@ -4,7 +4,10 @@ import type Interval from "../Interval";
  * Adjusts intervals in the provided list so that none overlap the specified interval.
  * Removes intervals that are completely overlapped by the specified interval.
  */
-function clearInterval(list: Interval[], interval: Interval): void {
+export default function clearInterval(
+    list: Interval[],
+    interval: Interval
+): void {
     if (list.length === 0) return;
 
     list.sort((a, b) => a.start - b.start);
@@ -43,5 +46,3 @@ function clearInterval(list: Interval[], interval: Interval): void {
         }
     }
 }
-
-export default clearInterval;

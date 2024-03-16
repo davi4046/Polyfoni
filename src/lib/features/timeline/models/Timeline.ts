@@ -1,7 +1,6 @@
 import Model from "../../../architecture/Model";
 import {
     addChildren,
-    getChildren,
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
@@ -11,7 +10,7 @@ import Voice from "./Voice";
 
 interface TimelineState extends ParentState<Section> {}
 
-class Timeline extends Model<TimelineState> {
+export default class Timeline extends Model<TimelineState> {
     readonly scaleTrack;
     readonly totalTrack;
 
@@ -75,5 +74,3 @@ class Timeline extends Model<TimelineState> {
         return super.state;
     }
 }
-
-export default Timeline;
