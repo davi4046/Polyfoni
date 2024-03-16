@@ -1,5 +1,3 @@
-import chroma from "chroma-js";
-
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
 import ItemVM from "../view_models/ItemVM";
