@@ -2,8 +2,8 @@ import type TimelineContext from "../context/TimelineContext";
 import type Voice from "../models/Voice";
 import VoiceVM from "../view_models/VoiceVM";
 
+import createItemTrackVM from "./createItemTrackVM";
 import createNoteTrackVM from "./createNoteTrackVM";
-import createTrackVM from "./createTrackVM";
 
 export default function createVoiceVM(
     model: Voice,
@@ -14,7 +14,7 @@ export default function createVoiceVM(
             tracks: model.state.children.map((track) => {
                 return track.itemType === "NoteItem"
                     ? createNoteTrackVM(track, context)
-                    : createTrackVM(track, context);
+                    : createItemTrackVM(track, context);
             }),
             isCollapsed: false,
         },
@@ -26,7 +26,7 @@ export default function createVoiceVM(
             tracks: model.state.children.map((track) => {
                 return track.itemType === "NoteItem"
                     ? createNoteTrackVM(track, context)
-                    : createTrackVM(track, context);
+                    : createItemTrackVM(track, context);
             }),
         };
     });

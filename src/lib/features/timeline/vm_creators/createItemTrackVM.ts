@@ -5,7 +5,7 @@ import TrackVM from "../view_models/TrackVM";
 import createItemVM from "./createItemVM";
 import createItemVM_ghost from "./createItemVM_ghost";
 
-export default function createTrackVM(
+export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,
     context: TimelineContext
 ): TrackVM {
