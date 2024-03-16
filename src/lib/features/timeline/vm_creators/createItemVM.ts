@@ -22,6 +22,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
             "background-color": chroma.hcl(0, 0, 80).css(),
             "border-width": "2px",
             "border-color": "black",
+            inset: "4px 0 4px 0",
         };
 
         if (context.state.selectedItems.includes(model)) {

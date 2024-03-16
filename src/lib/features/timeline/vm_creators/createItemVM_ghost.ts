@@ -22,6 +22,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
                 opacity: "0.75",
                 "border-width": "2px",
                 "border-color": "black",
+                inset: "4px 0 4px 0",
             },
         },
         model.id

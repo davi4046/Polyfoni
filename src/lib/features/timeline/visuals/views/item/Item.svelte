@@ -17,13 +17,13 @@
 </script>
 
 <div
-    class="absolute z-10 h-full py-1"
+    class="absolute z-10 h-full"
     style="width: {width}px; left: {left}px;"
     data-type="item"
     data-model-id={vm.id}
 >
     <div
-        class="relative flex items-center h-full p-2 font-semibold text-black"
+        class="absolute inset-0 flex items-center p-2 font-semibold text-black"
         {style}
         on:mousemove={(event) => {
             if (vm.state.handleMouseMove) vm.state.handleMouseMove(event);
