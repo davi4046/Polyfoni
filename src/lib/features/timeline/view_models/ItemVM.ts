@@ -4,7 +4,7 @@ interface ItemVMState {
     start: number;
     end: number;
     text: string;
-    backgroundColor: chroma.Color;
+    bgColor: chroma.Color;
     outlineColor: chroma.Color;
     opacity: number;
     handleMouseMove: (event: MouseEvent) => void;

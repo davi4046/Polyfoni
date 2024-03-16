@@ -16,9 +16,9 @@
     data-model-id={vm.id}
 >
     <div
-        class="relative flex items-center h-full p-2 font-semibold text-black border-2 border-black outline outline-4"
+        class="relative flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
         style="
-        background-color: {vm.state.backgroundColor.css()}; 
+        background-color: {vm.state.bgColor.css()}; 
         outline-color: {vm.state.outlineColor.css()}; 
         opacity: {vm.state.opacity};
         "
@@ -38,8 +38,7 @@
         <!-- end handle -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
-            on:mousemove={(event) =>
-                vm.state.handleMouseMove_endHandle(event)}
+            on:mousemove={(event) => vm.state.handleMouseMove_endHandle(event)}
             role="none"
         />
     </div>
