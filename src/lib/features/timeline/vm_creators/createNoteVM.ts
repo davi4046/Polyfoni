@@ -12,15 +12,7 @@ export default function createNoteVM(
         {
             start: model.state.start,
             end: model.state.end,
-
-            text: "",
-            opacity: 1,
-            bgColor: chroma.hcl(0, 0, 80),
-            olColor: chroma.hcl(0, 0, 0, 0),
-
-            handleMouseMove: () => {},
-            handleMouseMove_endHandle: () => {},
-            handleMouseMove_startHandle: () => {},
+            styles: { "background-color": "black" },
         },
         model.id
     );

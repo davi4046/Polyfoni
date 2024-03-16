@@ -17,13 +17,12 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
                 model.state.content
             ),
 
-            opacity: 0.75,
-            bgColor: chroma.hcl(0, 0, 80),
-            olColor: chroma.hcl(0, 0, 0, 0),
-
-            handleMouseMove: () => {},
-            handleMouseMove_endHandle: () => {},
-            handleMouseMove_startHandle: () => {},
+            styles: {
+                "background-color": chroma.hcl(0, 0, 80).css(),
+                opacity: "0.75",
+                "border-width": "2px",
+                "border-color": "black",
+            },
         },
         model.id
     );

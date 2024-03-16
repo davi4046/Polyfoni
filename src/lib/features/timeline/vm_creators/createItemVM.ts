@@ -17,6 +17,21 @@ export default function createItemVM<T extends keyof ItemTypes>(
     const startHandleHandler = new StartHandleHandler(context, model);
     const endHandleHandler = new EndHandleHandler(context, model);
 
+    function createStyles() {
+        const styles: Record<string, string> = {
+            "background-color": chroma.hcl(0, 0, 80).css(),
+            "border-width": "2px",
+            "border-color": "black",
+        };
+
+        if (context.state.selectedItems.includes(model)) {
+            styles["outline-style"] = "solid";
+            styles["outline-color"] = chroma.hcl(240, 80, 80).css();
+        }
+
+        return styles;
+    }
+
     const vm = new ItemVM(
         {
             start: model.state.start,
@@ -25,11 +40,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
                 model.state.content
             ),
 
-            opacity: 1,
-            bgColor: chroma.hcl(0, 0, 80),
-            olColor: context.state.selectedItems.includes(model)
-                ? chroma.hcl(240, 80, 80)
-                : chroma.hcl(0, 0, 0, 0),
+            styles: createStyles(),
 
             handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = itemHandler;
@@ -59,9 +70,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
 
     context.subscribe(() => {
         vm.state = {
-            olColor: context.state.selectedItems.includes(model)
-                ? chroma.hcl(240, 80, 80)
-                : chroma.hcl(0, 0, 0, 0),
+            styles: createStyles(),
         };
     });
 
