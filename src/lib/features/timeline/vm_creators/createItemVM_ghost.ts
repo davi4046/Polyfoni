@@ -19,7 +19,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
 
             opacity: 0.75,
             bgColor: chroma.hcl(0, 0, 80),
-            outlineColor: chroma.hcl(0, 0, 0, 0),
+            olColor: chroma.hcl(0, 0, 0, 0),
 
             handleMouseMove: () => {},
             handleMouseMove_endHandle: () => {},

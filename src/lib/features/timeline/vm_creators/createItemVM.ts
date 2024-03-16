@@ -27,7 +27,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
 
             opacity: 1,
             bgColor: chroma.hcl(0, 0, 80),
-            outlineColor: context.state.selectedItems.includes(model)
+            olColor: context.state.selectedItems.includes(model)
                 ? chroma.hcl(240, 80, 80)
                 : chroma.hcl(0, 0, 0, 0),
 
@@ -59,7 +59,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
 
     context.subscribe(() => {
         vm.state = {
-            outlineColor: context.state.selectedItems.includes(model)
+            olColor: context.state.selectedItems.includes(model)
                 ? chroma.hcl(240, 80, 80)
                 : chroma.hcl(0, 0, 0, 0),
         };

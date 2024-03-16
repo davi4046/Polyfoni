@@ -16,7 +16,7 @@ export default function createNoteVM(
             text: "",
             opacity: 1,
             bgColor: chroma.hcl(0, 0, 80),
-            outlineColor: chroma.hcl(0, 0, 0, 0),
+            olColor: chroma.hcl(0, 0, 0, 0),
 
             handleMouseMove: () => {},
             handleMouseMove_endHandle: () => {},

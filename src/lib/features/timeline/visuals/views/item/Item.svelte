@@ -19,7 +19,7 @@
         class="relative flex h-full items-center border-2 border-black p-2 font-semibold text-black outline outline-4"
         style="
         background-color: {vm.state.bgColor.css()}; 
-        outline-color: {vm.state.outlineColor.css()}; 
+        outline-color: {vm.state.olColor.css()}; 
         opacity: {vm.state.opacity};
         "
         on:mousemove={(event) => {
