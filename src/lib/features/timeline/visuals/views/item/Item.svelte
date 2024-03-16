@@ -35,7 +35,7 @@
         {/if}
         <!-- start handle-->
         <div
-            class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-purple-400"
+            class="absolute bottom-0 left-0 top-0 z-50 w-1.5 bg-black opacity-25"
             on:mousemove={(event) => {
                 if (vm.state.handleMouseMove_startHandle)
                     vm.state.handleMouseMove_startHandle(event);
@@ -44,7 +44,7 @@
         />
         <!-- end handle -->
         <div
-            class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-purple-400"
+            class="absolute bottom-0 right-0 top-0 z-50 w-1.5 bg-black opacity-25"
             on:mousemove={(event) => {
                 if (vm.state.handleMouseMove_endHandle)
                     vm.state.handleMouseMove_endHandle(event);
