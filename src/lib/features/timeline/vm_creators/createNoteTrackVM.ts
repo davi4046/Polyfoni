@@ -32,13 +32,13 @@ export default function createNoteTrackVM(
             const pitchIndex = pitches.indexOf(item.state.content);
             const top = (pitches.length - pitchIndex - 1) * height;
 
-            const newStyles = Object.assign({}, noteVM.state.styles);
+            const newStyles = Object.assign({}, noteVM.state.innerDivStyles);
 
             newStyles["height"] = `${height}%`;
             newStyles["top"] = `${top}%`;
 
             noteVM.state = {
-                styles: newStyles,
+                innerDivStyles: newStyles,
             };
 
             return noteVM;

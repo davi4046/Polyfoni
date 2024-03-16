@@ -10,7 +10,7 @@ export default function createNoteVM(
         {
             start: model.state.start,
             end: model.state.end,
-            styles: { "background-color": "black" },
+            innerDivStyles: { "background-color": "black" },
         },
         model.id
     );

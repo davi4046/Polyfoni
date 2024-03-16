@@ -17,12 +17,16 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
                 model.state.content
             ),
 
-            styles: {
+            innerDivStyles: {
                 "background-color": chroma.hcl(0, 0, 80).css(),
                 opacity: "0.75",
                 "border-width": "2px",
                 "border-color": "black",
                 inset: "4px 0 4px 0",
+            },
+            handleStyles: {
+                "background-color": "black",
+                opacity: "0.25",
             },
         },
         model.id

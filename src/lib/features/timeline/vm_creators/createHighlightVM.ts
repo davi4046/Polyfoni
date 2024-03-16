@@ -11,9 +11,13 @@ export default function createHighlightVM(
             start: model.state.start,
             end: model.state.end,
 
-            styles: {
+            innerDivStyles: {
                 "background-color": "blue",
+                opacity: "0.5",
                 "pointer-events": "none",
+            },
+            outerDivStyles: {
+                "z-index": "10",
             },
         },
         model.id

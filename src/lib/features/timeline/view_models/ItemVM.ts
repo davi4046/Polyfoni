@@ -5,7 +5,10 @@ interface ItemVMState {
     end: number;
 
     text?: string;
-    styles?: Record<string, string>;
+
+    innerDivStyles?: Record<string, string>;
+    outerDivStyles?: Record<string, string>;
+    handleStyles?: Record<string, string>;
 
     handleMouseMove?: (event: MouseEvent) => void;
     handleMouseMove_startHandle?: (event: MouseEvent) => void;

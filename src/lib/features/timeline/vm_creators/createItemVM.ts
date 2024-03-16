@@ -41,7 +41,11 @@ export default function createItemVM<T extends keyof ItemTypes>(
                 model.state.content
             ),
 
-            styles: createStyles(),
+            innerDivStyles: createStyles(),
+            handleStyles: {
+                "background-color": "black",
+                opacity: "0.25",
+            },
 
             handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = itemHandler;
@@ -71,7 +75,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
 
     context.subscribe(() => {
         vm.state = {
-            styles: createStyles(),
+            innerDivStyles: createStyles(),
         };
     });
 
