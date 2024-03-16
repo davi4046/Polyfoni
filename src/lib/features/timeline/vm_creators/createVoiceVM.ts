@@ -3,7 +3,6 @@ import type Voice from "../models/Voice";
 import VoiceVM from "../view_models/VoiceVM";
 
 import createItemTrackVM from "./createItemTrackVM";
-import createNoteTrackVM from "./createNoteTrackVM";
 
 export default function createVoiceVM(
     model: Voice,
@@ -12,11 +11,7 @@ export default function createVoiceVM(
     const vm = new VoiceVM(
         {
             tracks: model.state.children.map((track) => {
-                if (track.itemType === "NoteItem") {
-                    return createNoteTrackVM(track, context);
-                } else {
-                    return createItemTrackVM(track, context);
-                }
+                return createItemTrackVM(track, context);
             }),
             isCollapsed: false,
         },
@@ -26,11 +21,7 @@ export default function createVoiceVM(
     model.subscribe(() => {
         vm.state = {
             tracks: model.state.children.map((track) => {
-                if (track.itemType === "NoteItem") {
-                    return createNoteTrackVM(track, context);
-                } else {
-                    return createItemTrackVM(track, context);
-                }
+                return createItemTrackVM(track, context);
             }),
         };
     });
