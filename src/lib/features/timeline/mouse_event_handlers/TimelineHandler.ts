@@ -9,8 +9,8 @@ import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarc
 class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
 
-    private _prevClickedBeat?: number;
-    private _prevHoveredBeat?: number;
+    private _prevMinBeat?: number;
+    private _prevMaxBeat?: number;
     private _prevClickedTrack?: Track<any>;
     private _prevHoveredTrack?: Track<any>;
 
@@ -48,24 +48,20 @@ class TimelineHandler implements MouseEventHandler {
         );
 
         if (
-            clickedBeat === this._prevClickedBeat &&
-            hoveredBeat === this._prevHoveredBeat &&
+            minBeat === this._prevMinBeat &&
+            maxBeat === this._prevMaxBeat &&
             clickedTrack === this._prevClickedTrack &&
             hoveredTrack === this._prevHoveredTrack
         ) {
             return;
         }
 
-        this._prevClickedBeat = clickedBeat;
-        this._prevHoveredBeat = hoveredBeat;
+        this._prevMinBeat = minBeat;
+        this._prevMaxBeat = maxBeat;
         this._prevClickedTrack = clickedTrack;
         this._prevHoveredTrack = hoveredTrack;
 
-        if (
-            !hoveredTrack ||
-            !clickedTrack ||
-            (hoveredBeat === clickedBeat && hoveredTrack === clickedTrack)
-        ) {
+        if (!hoveredTrack || !clickedTrack) {
             return;
         }
 
@@ -93,6 +89,13 @@ class TimelineHandler implements MouseEventHandler {
         this.context.state = {
             highlights: newHighlights,
         };
+    }
+
+    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
+        this._prevMinBeat = undefined;
+        this._prevMaxBeat = undefined;
+        this._prevHoveredTrack = undefined;
+        this._prevClickedTrack = undefined;
     }
 }
 
