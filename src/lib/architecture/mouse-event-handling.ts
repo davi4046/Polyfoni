@@ -4,6 +4,11 @@ class MouseEventListener {
 
     set handler(newHandler: MouseEventHandler | undefined) {
         if (this._downEvent) return; //avoid handler updating when dragging
+
+        if (newHandler !== this._handler) {
+            document.body.style.cursor = "default";
+        }
+
         this._handler = newHandler;
     }
 

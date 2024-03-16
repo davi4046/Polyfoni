@@ -39,6 +39,8 @@ class ItemHandler implements MouseEventHandler {
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+        document.body.style.cursor = downEvent ? "grabbing" : "pointer";
+
         if (!downEvent) return;
 
         const hoveredBeat = Math.round(

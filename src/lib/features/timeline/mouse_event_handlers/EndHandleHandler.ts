@@ -11,6 +11,8 @@ class EndHandleHandler implements MouseEventHandler {
     ) {}
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+        document.body.style.cursor = "e-resize";
+
         if (!downEvent) return;
 
         const hoveredBeat = Math.round(
