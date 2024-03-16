@@ -2,7 +2,7 @@ import type TimelineContext from "../context/TimelineContext";
 import type Voice from "../models/Voice";
 import VoiceVM from "../view_models/VoiceVM";
 
-import createItemTrackVM from "./createItemTrackVM";
+import createTrackVM from "./createTrackVM";
 
 export default function createVoiceVM(
     model: Voice,
@@ -11,7 +11,7 @@ export default function createVoiceVM(
     const vm = new VoiceVM(
         {
             tracks: model.state.children.map((track) => {
-                return createItemTrackVM(track, context);
+                return createTrackVM(track, context);
             }),
             isCollapsed: false,
         },
@@ -21,7 +21,7 @@ export default function createVoiceVM(
     model.subscribe(() => {
         vm.state = {
             tracks: model.state.children.map((track) => {
-                return createItemTrackVM(track, context);
+                return createTrackVM(track, context);
             }),
         };
     });
