@@ -1,15 +1,23 @@
 import type TimelineContext from "../context/TimelineContext";
 import type Track from "../models/Track";
+import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
-import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import {
+    getChildren,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
 
+import createHighlightVM from "./createHighlightVM";
 import createNoteVM from "./createNoteVM";
 
 export default function createNoteTrackVM(
     model: Track<"NoteItem">,
     context: TimelineContext
 ): TrackVM {
-    const createItems = () => {
+    let items: ItemVM[] = [];
+    let highlights: ItemVM[] = [];
+
+    function remakeItems() {
         const pitches = Array.from(
             new Set(
                 getChildren(model).map((noteItem) => noteItem.state.content)
@@ -18,7 +26,7 @@ export default function createNoteTrackVM(
 
         const height = 100 / pitches.length;
 
-        const items = model.state.children.map((item) => {
+        items = model.state.children.map((item) => {
             const noteVM = createNoteVM(item, context);
 
             const pitchIndex = pitches.indexOf(item.state.content);
@@ -35,28 +43,40 @@ export default function createNoteTrackVM(
 
             return noteVM;
         });
+    }
 
-        return items;
-    };
+    function remakeHighlights() {
+        highlights = context.state.highlights
+            .filter((highlight) => getParent(highlight) === model)
+            .map((highlight) => createHighlightVM(highlight, context));
+    }
+
+    remakeItems();
+    remakeHighlights();
 
     const vm = new TrackVM(
         {
             label: model.state.label,
-            items: createItems(),
+            items: [...items, ...highlights],
         },
         model.id
     );
 
-    model.subscribe(() => {
+    model.subscribe((_, oldState) => {
+        if (model.state.children !== oldState.children) remakeItems();
+
         vm.state = {
             label: model.state.label,
-            items: createItems(),
+            items: [...items, ...highlights],
         };
     });
 
-    context.subscribe(() => {
+    context.subscribe((_, oldState) => {
+        if (context.state.highlights !== oldState.highlights)
+            remakeHighlights();
+
         vm.state = {
-            items: createItems(),
+            items: [...items, ...highlights],
         };
     });
 
