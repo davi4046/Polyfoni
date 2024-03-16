@@ -59,6 +59,10 @@ export default function createItemVM<T extends keyof ItemTypes>(
                 mouseEventListener.handler = endHandleHandler;
                 event.stopPropagation();
             },
+
+            onDestroy: () => {
+                mouseEventListener.handler = undefined;
+            },
         },
         model.id
     );

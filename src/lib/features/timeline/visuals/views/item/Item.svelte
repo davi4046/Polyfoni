@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onDestroy } from "svelte";
     import convertToInlineStyles from "../../../../../utils/convertToInlineStyles";
     import type ItemVM from "../../../view_models/ItemVM";
 
@@ -8,6 +9,10 @@
 
     $: width = (vm.state.end - vm.state.start) * 64 + 2;
     $: left = vm.state.start * 64;
+
+    onDestroy(() => {
+        if (vm.state.onDestroy) vm.state.onDestroy();
+    });
 </script>
 
 <div

@@ -13,6 +13,8 @@ interface ItemVMState {
     handleMouseMove?: (event: MouseEvent) => void;
     handleMouseMove_startHandle?: (event: MouseEvent) => void;
     handleMouseMove_endHandle?: (event: MouseEvent) => void;
+
+    onDestroy?: () => void;
 }
 
 export default class ItemVM extends Model<ItemVMState> {}
