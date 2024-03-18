@@ -8,8 +8,8 @@ import {
     type ParentState,
 } from "./state-hierarchy-utils";
 
-export default class StateHierarchyWatcher {
-    constructor(root: Stateful<any>) {
+export default class StateHierarchyWatcher<T extends Stateful<any>> {
+    constructor(root: T) {
         if (root.state.children) {
             this._watchRecursively(root);
         } else {
