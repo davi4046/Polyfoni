@@ -1,8 +1,9 @@
-import { invoke } from "@tauri-apps/api";
+import type { OptionalKeys } from "ts-essentials";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
     getChildren,
+    getGrandparent,
     getIndex,
     getParent,
 } from "../../architecture/state-hierarchy-utils";
@@ -12,16 +13,21 @@ import Track, { type TrackState } from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
 import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import type Interval from "../../utils/interval/Interval";
-import { Chord } from "../timeline/utils/chord/Chord";
 
 export default class Generator {
     private _voiceMap = new Map<Voice, NoteBuilder[]>();
 
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
-            if (obj instanceof Track) {
-                this._handleTrackChanges(obj, oldState);
-            }
+            if (!(obj instanceof Track)) return;
+
+            const { addedItems, removedItems } = compareTrackStates(
+                oldState,
+                obj.state
+            );
+
+            removedItems.forEach((item) => this._handleItemRemoved(item));
+            addedItems.forEach((item) => this._handleItemAdded(item));
         });
     }
 
@@ -36,169 +42,76 @@ export default class Generator {
         return voiceArray;
     }
 
-    private _handleTrackChanges(track: Track<any>, oldState: TrackState<any>) {
-        const removedItems = oldState.children.filter((child) => {
-            return !getChildren(track).includes(child);
-        });
-
-        const addedItems = getChildren(track).filter((child) => {
-            return !oldState.children.includes(child);
-        });
-
-        let voice = this._voiceMap.get(getParent(track));
-
-        if (!voice) {
-            voice = [];
-            this._voiceMap.set(getParent(track), voice);
+    private _handleItemAdded(item: Item<any>) {
+        switch (getIndex(getParent(item))) {
+            // Pitch
+            case 1: {
+            }
+            // Duration
+            case 2: {
+            }
+            // Rest
+            case 3: {
+            }
+            // Harmony
+            case 4: {
+            }
         }
+    }
 
-        switch (getIndex(track)) {
+    private _handleItemRemoved(item: Item<any>) {
+        const notes = this._getVoiceNoteBuilders(getGrandparent(item));
+
+        switch (getIndex(getParent(item))) {
             // Pitch
             case 1:
-                this._handlePitchTrackChanges(voice, removedItems, addedItems);
+                clearPropertyWithinInterval(notes, "scaleDegree", item.state);
             // Duration
-            case 2:
-                this._handleDurationTrackChanges(track, oldState);
+            case 2: {
+                // Remove notes starting within the removed item's interval
+                for (const note of getNotesStartingWithinInterval(
+                    notes,
+                    item.state
+                )) {
+                    const index = notes.indexOf(note);
+                    notes.splice(index, 1);
+                }
+
+                const durationItems = getChildren(getParent(item));
+
+                function adjustNote(note: NoteBuilder) {
+                    const durationItem = durationItems.find((item) =>
+                        isNoteStartWithinInterval(note, item.state)
+                    )!; // Note must have a duration item, otherwise it would have been removed
+
+                    const index = notes.indexOf(note);
+
+                    if (index > 0) {
+                        const prevNote = notes[index - 1];
+
+                        note.start = Math.max(
+                            durationItem.state.start,
+                            prevNote.end
+                        );
+                    } else {
+                        note.start = durationItem.state.start;
+                    }
+                }
+
+                const startIndex = notes.findIndex(
+                    (note) => note.start > item.state.end
+                );
+
+                for (let i = startIndex; i < notes.length; i++) {
+                    adjustNote(notes[i]);
+                }
+            }
             // Rest
             case 3:
-                this._handleRestTrackChanges(voice, removedItems, addedItems);
+                clearPropertyWithinInterval(notes, "isRest", item.state);
             // Harmony
             case 4:
-                this._handleHarmonyTrackChanges(
-                    voice,
-                    removedItems,
-                    addedItems
-                );
-        }
-    }
-
-    private _handlePitchTrackChanges(
-        voice: NoteBuilder[],
-        removedItems: Item<"StringItem">[],
-        addedItems: Item<"StringItem">[]
-    ) {
-        for (const item of removedItems) {
-            getNotesStartingWithinInterval(voice, item.state).forEach(
-                (note) => (note.pitch = undefined)
-            );
-        }
-
-        let promises = [];
-
-        for (const item of addedItems) {
-            let index = 0;
-            for (const note of getNotesStartingWithinInterval(
-                voice,
-                item.state
-            )) {
-                const promise = (async () => {
-                    const response = await invoke("evaluate", {
-                        task: `${item.state.content} ||| {"x": ${index}}`,
-                    });
-
-                    const parsedValue = Number(response);
-
-                    if (isNaN(parsedValue)) {
-                        throw Error("TODO: Handle pitch error gracefully");
-                    } else {
-                        note.scaleDegree = Math.round(parsedValue);
-                    }
-                })();
-
-                promises.push(promise);
-            }
-        }
-
-        // await Promise.all(promises)
-    }
-
-    private _handleDurationTrackChanges(
-        track: Track<"StringItem">,
-        oldState: TrackState<"StringItem">
-    ) {
-        const { addedItems, removedItems } = compareTrackStates(
-            oldState,
-            track.state
-        );
-
-        const voice = this._getVoiceNoteBuilders(getParent(track));
-
-        for (const item of removedItems) {
-            for (const note of getNotesStartingWithinInterval(
-                voice,
-                item.state
-            )) {
-                const noteIndex = voice.indexOf(note);
-                voice.splice(noteIndex, 1);
-            }
-        }
-
-        addedItems.sort((a, b) => a.state.start - b.state.start);
-
-        for (const item of addedItems) {
-        }
-    }
-
-    private _handleRestTrackChanges(
-        voice: NoteBuilder[],
-        removedItems: Item<"StringItem">[],
-        addedItems: Item<"StringItem">[]
-    ) {
-        for (const item of removedItems) {
-            getNotesStartingWithinInterval(voice, item.state).forEach(
-                (note) => (note.isRest = undefined)
-            );
-        }
-
-        let promises = [];
-
-        for (const item of addedItems) {
-            let index = 0;
-
-            for (const note of getNotesStartingWithinInterval(
-                voice,
-                item.state
-            )) {
-                const promise = (async () => {
-                    const response = await invoke("evaluate", {
-                        task: `${item.state.content} ||| {"x": ${index}}`,
-                    });
-
-                    if (response === "True" || response === "False") {
-                        note.isRest = response === "True";
-                    } else {
-                        throw Error("TODO: Handle isRest error gracefully");
-                    }
-                })();
-
-                promises.push(promise);
-            }
-        }
-    }
-
-    private _handleHarmonyTrackChanges(
-        voice: NoteBuilder[],
-        removedItems: Item<"ChordItem">[],
-        addedItems: Item<"ChordItem">[]
-    ) {
-        for (const item of removedItems) {
-            getNotesStartingWithinInterval(voice, item.state).forEach(
-                (note) => (note.pitch = undefined)
-            );
-        }
-
-        for (const item of addedItems) {
-            const chord = item.state.content.chordStatus;
-
-            if (!(chord instanceof Chord)) return;
-
-            for (const note of getNotesStartingWithinInterval(
-                voice,
-                item.state
-            )) {
-                if (!note.scaleDegree) continue;
-                note.pitch = chord.convertDegreeToMidiValue(note.scaleDegree);
-            }
+                clearPropertyWithinInterval(notes, "pitch", item.state);
         }
     }
 }
@@ -225,16 +138,16 @@ function isNoteStartWithinInterval(
 }
 
 function getNotesStartingWithinInterval(
-    voice: NoteBuilder[],
+    notes: NoteBuilder[],
     interval: Interval
 ) {
-    const firstIndex = voice.findIndex((note) =>
+    const firstIndex = notes.findIndex((note) =>
         isNoteStartWithinInterval(note, interval)
     );
-    const lastIndex = voice.findLastIndex((note) =>
+    const lastIndex = notes.findLastIndex((note) =>
         isNoteStartWithinInterval(note, interval)
     );
-    return voice.slice(firstIndex, lastIndex + 1);
+    return notes.slice(firstIndex, lastIndex + 1);
 }
 
 function compareTrackStates<T extends keyof ItemTypes>(
@@ -248,4 +161,14 @@ function compareTrackStates<T extends keyof ItemTypes>(
         return !newState.children.includes(child);
     });
     return { addedItems, removedItems };
+}
+
+function clearPropertyWithinInterval(
+    notes: NoteBuilder[],
+    property: OptionalKeys<NoteBuilder>,
+    interval: Interval
+) {
+    getNotesStartingWithinInterval(notes, interval).forEach((note) => {
+        note[property] = undefined;
+    });
 }
