@@ -32,18 +32,18 @@ export default class Generator {
     }
 
     private _getVoiceNoteBuilders(voice: Voice): NoteBuilder[] {
-        let voiceArray = this._voiceMap.get(voice);
-
-        if (!voiceArray) {
-            voiceArray = [];
-            this._voiceMap.set(voice, voiceArray);
+        let noteBuilders = this._voiceMap.get(voice);
+        if (!noteBuilders) {
+            noteBuilders = [];
+            this._voiceMap.set(voice, noteBuilders);
         }
-
-        return voiceArray;
+        return noteBuilders;
     }
 
     private _handleItemAdded(item: Item<any>) {
-        switch (getItemTrackType(item)) {
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        switch (trackType) {
             case "pitch":
             case "duration":
             case "rest":
@@ -52,57 +52,45 @@ export default class Generator {
     }
 
     private _handleItemRemoved(item: Item<any>) {
-        const notes = this._getVoiceNoteBuilders(getGrandparent(item));
+        const voice = getGrandparent(item);
 
-        switch (getItemTrackType(item)) {
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        switch (trackType) {
             case "pitch":
-                clearPropertyWithinInterval(notes, "scaleDegree", item.state);
-            case "duration": {
-                // Remove notes starting within the removed item's interval
-                for (const note of getNotesStartingWithinInterval(
-                    notes,
-                    item.state
-                )) {
-                    const index = notes.indexOf(note);
-                    notes.splice(index, 1);
-                }
-
-                const durationItems = getChildren(getParent(item));
-
-                function adjustNote(note: NoteBuilder) {
-                    const durationItem = durationItems.find((item) =>
-                        isNoteStartWithinInterval(note, item.state)
-                    );
-
-                    if (!durationItem) return;
-
-                    const index = notes.indexOf(note);
-
-                    if (index > 0) {
-                        const prevNote = notes[index - 1];
-
-                        note.start = Math.max(
-                            durationItem.state.start,
-                            prevNote.end
-                        );
-                    } else {
-                        note.start = durationItem.state.start;
-                    }
-                }
-
-                const startIndex = notes.findIndex(
-                    (note) => note.start > item.state.end
-                );
-
-                for (let i = startIndex; i < notes.length; i++) {
-                    adjustNote(notes[i]);
-                }
-            }
+                this._clearPropertyWithinInterval(voice, "degree", item.state);
+            case "duration":
+                this._removeNotesWithinInterval(voice, item.state);
             case "rest":
-                clearPropertyWithinInterval(notes, "isRest", item.state);
+                this._clearPropertyWithinInterval(voice, "isRest", item.state);
             case "harmony":
-                clearPropertyWithinInterval(notes, "pitch", item.state);
+                this._clearPropertyWithinInterval(voice, "pitch", item.state);
         }
+    }
+
+    private _clearPropertyWithinInterval(
+        voice: Voice,
+        property: OptionalKeys<NoteBuilder>,
+        interval: Interval
+    ) {
+        const notes = this._getVoiceNoteBuilders(voice);
+
+        getNotesStartingWithinInterval(notes, interval).forEach((note) => {
+            note[property] = undefined;
+        });
+    }
+
+    private _removeNotesWithinInterval(voice: Voice, interval: Interval) {
+        const notes = this._getVoiceNoteBuilders(voice);
+
+        for (const note of getNotesStartingWithinInterval(notes, interval)) {
+            const index = notes.indexOf(note);
+            notes.splice(index, 1);
+        }
+    }
+
+    private _adjustNote(note: NoteBuilder) {
+        findItemAtNoteStart(note, "duration");
     }
 }
 
@@ -110,13 +98,16 @@ class NoteBuilder {
     start: number;
     end: number;
 
-    scaleDegree?: number;
+    degree?: number;
     pitch?: number;
     isRest?: boolean;
 
-    constructor(start: number, end: number) {
+    voice: Voice;
+
+    constructor(start: number, end: number, voice: Voice) {
         this.start = start;
         this.end = end;
+        this.voice = voice;
     }
 }
 
@@ -153,18 +144,46 @@ function compareTrackStates<T extends keyof ItemTypes>(
     return { addedItems, removedItems };
 }
 
-function clearPropertyWithinInterval(
-    notes: NoteBuilder[],
-    property: OptionalKeys<NoteBuilder>,
-    interval: Interval
-) {
-    getNotesStartingWithinInterval(notes, interval).forEach((note) => {
-        note[property] = undefined;
-    });
+function getTrackOfType<T extends keyof TrackTypes>(
+    voice: Voice,
+    trackType: T
+): Track<TrackTypes[T]> {
+    const trackIndex = trackTypeToIndex(trackType);
+    return getChildren(voice)[trackIndex] as Track<TrackTypes[T]>;
 }
 
-function getItemTrackType(item: Item<any>) {
-    switch (getIndex(getParent(item))) {
+function findItemAtNoteStart<T extends keyof TrackTypes>(
+    note: NoteBuilder,
+    trackType: T
+): Item<TrackTypes[T]> | undefined {
+    const track = getTrackOfType(note.voice, trackType);
+    return getChildren(track).find((item) =>
+        isNoteStartWithinInterval(note, item.state)
+    );
+}
+
+type TrackTypes = {
+    pitch: "StringItem";
+    duration: "StringItem";
+    rest: "StringItem";
+    harmony: "ChordItem";
+};
+
+function trackTypeToIndex(trackType: keyof TrackTypes): number {
+    switch (trackType) {
+        case "pitch":
+            return 1;
+        case "duration":
+            return 2;
+        case "rest":
+            return 3;
+        case "harmony":
+            return 4;
+    }
+}
+
+function trackIndexToType(index: number): keyof TrackTypes | undefined {
+    switch (index) {
         case 1:
             return "pitch";
         case 2:
