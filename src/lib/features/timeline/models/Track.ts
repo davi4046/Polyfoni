@@ -6,7 +6,7 @@ import clearInterval from "../../../utils/interval/clear_interval/clearInterval"
 import Item from "./Item";
 import type Voice from "./Voice";
 
-interface TrackState<T extends keyof ItemTypes>
+export interface TrackState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Voice>,
         stateHierarchyUtils.ParentState<Item<T>> {
     label: string;

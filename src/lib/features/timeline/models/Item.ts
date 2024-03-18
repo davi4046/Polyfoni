@@ -4,7 +4,7 @@ import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-util
 
 import type Track from "./Track";
 
-interface ItemState<T extends keyof ItemTypes>
+export interface ItemState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Track<T>> {
     start: number;
     end: number;

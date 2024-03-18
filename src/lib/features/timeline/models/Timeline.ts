@@ -8,7 +8,7 @@ import Section from "./Section";
 import Track from "./Track";
 import Voice from "./Voice";
 
-interface TimelineState extends ParentState<Section> {}
+export interface TimelineState extends ParentState<Section> {}
 
 export default class Timeline extends Model<TimelineState> {
     readonly scaleTrack;

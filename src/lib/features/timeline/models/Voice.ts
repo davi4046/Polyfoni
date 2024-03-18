@@ -7,6 +7,8 @@ import type {
 import type Section from "./Section";
 import type Track from "./Track";
 
-interface VoiceState extends ChildState<Section>, ParentState<Track<any>> {}
+export interface VoiceState
+    extends ChildState<Section>,
+        ParentState<Track<any>> {}
 
 export default class Voice extends Model<VoiceState> {}

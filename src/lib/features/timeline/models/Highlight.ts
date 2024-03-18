@@ -3,7 +3,7 @@ import type { ChildState } from "../../../architecture/state-hierarchy-utils";
 
 import type Track from "./Track";
 
-interface HighlightState extends ChildState<Track<any>> {
+export interface HighlightState extends ChildState<Track<any>> {
     start: number;
     end: number;
 }
