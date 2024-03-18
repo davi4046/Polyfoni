@@ -43,31 +43,21 @@ export default class Generator {
     }
 
     private _handleItemAdded(item: Item<any>) {
-        switch (getIndex(getParent(item))) {
-            // Pitch
-            case 1: {
-            }
-            // Duration
-            case 2: {
-            }
-            // Rest
-            case 3: {
-            }
-            // Harmony
-            case 4: {
-            }
+        switch (getItemTrackType(item)) {
+            case "pitch":
+            case "duration":
+            case "rest":
+            case "harmony":
         }
     }
 
     private _handleItemRemoved(item: Item<any>) {
         const notes = this._getVoiceNoteBuilders(getGrandparent(item));
 
-        switch (getIndex(getParent(item))) {
-            // Pitch
-            case 1:
+        switch (getItemTrackType(item)) {
+            case "pitch":
                 clearPropertyWithinInterval(notes, "scaleDegree", item.state);
-            // Duration
-            case 2: {
+            case "duration": {
                 // Remove notes starting within the removed item's interval
                 for (const note of getNotesStartingWithinInterval(
                     notes,
@@ -106,11 +96,9 @@ export default class Generator {
                     adjustNote(notes[i]);
                 }
             }
-            // Rest
-            case 3:
+            case "rest":
                 clearPropertyWithinInterval(notes, "isRest", item.state);
-            // Harmony
-            case 4:
+            case "harmony":
                 clearPropertyWithinInterval(notes, "pitch", item.state);
         }
     }
@@ -171,4 +159,17 @@ function clearPropertyWithinInterval(
     getNotesStartingWithinInterval(notes, interval).forEach((note) => {
         note[property] = undefined;
     });
+}
+
+function getItemTrackType(item: Item<any>) {
+    switch (getIndex(getParent(item))) {
+        case 1:
+            return "pitch";
+        case 2:
+            return "duration";
+        case 3:
+            return "rest";
+        case 4:
+            return "harmony";
+    }
 }
