@@ -46,18 +46,13 @@ impl Worker for Evaluator {
 }
 
 #[tauri::command(async)]
-pub fn evaluate(pool: tauri::State<Mutex<Pool<Evaluator>>>, tasks: Vec<&str>) -> Vec<String> {
+pub fn evaluate(pool: tauri::State<Mutex<Pool<Evaluator>>>, task: String) -> String {
     let (tx, rx) = channel();
 
     let pool_clone = pool.lock().unwrap();
+    pool_clone.execute_to(tx.clone(), task.to_owned());
 
-    for task in tasks.clone() {
-        pool_clone.execute_to(tx.clone(), task.to_owned());
-    }
+    let output = rx.recv().unwrap_or_else(|error| error.to_string());
 
-    let output = rx.iter()
-        .take(tasks.len() as usize)
-        .collect();
-
-    return output;
+    output
 }

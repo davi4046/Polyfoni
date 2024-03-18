@@ -14,7 +14,7 @@ def evaluate(expr, vars):
 if __name__ == "__main__":
     for line in sys.stdin:
         try:
-            expr, vars = line.split(", ", 1)
+            expr, vars = line.split("|||", 1)
             vars = json.loads(vars)
             result = evaluate(expr, vars)
             
