@@ -72,7 +72,9 @@ export default class Generator {
                 function adjustNote(note: NoteBuilder) {
                     const durationItem = durationItems.find((item) =>
                         isNoteStartWithinInterval(note, item.state)
-                    )!; // Note must have a duration item, otherwise it would have been removed
+                    );
+
+                    if (!durationItem) return;
 
                     const index = notes.indexOf(note);
 
