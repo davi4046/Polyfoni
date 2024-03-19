@@ -24,7 +24,7 @@
     data-model-id={vm.id}
 >
     <div
-        class="absolute inset-0 flex items-center p-2 font-semibold text-black"
+        class="absolute inset-0 flex items-center px-2 font-semibold text-black"
         style={vm.state.innerDivStyles
             ? convertToInlineStyles(vm.state.innerDivStyles)
             : ""}
