@@ -1,4 +1,8 @@
+import { invoke } from "@tauri-apps/api";
+
 import type { OptionalKeys } from "ts-essentials";
+
+import { range } from "lodash";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
@@ -13,6 +17,7 @@ import Track, { type TrackState } from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
 import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import type Interval from "../../utils/interval/Interval";
+import { Chord } from "../timeline/utils/chord/Chord";
 
 export default class Generator {
     private _voiceMap = new Map<Voice, NoteBuilder[]>();
@@ -42,54 +47,134 @@ export default class Generator {
 
     private _handleItemAdded(item: Item<any>) {
         const trackType = trackIndexToType(getIndex(getParent(item)));
+        const voiceNotes = this._getVoiceNoteBuilders(getGrandparent(item));
+        const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
 
         switch (trackType) {
-            case "pitch":
-            case "duration":
-            case "rest":
-            case "harmony":
+            case "pitch": {
+                for (const index of range(notes.length)) {
+                    invoke("evaluate", {
+                        task: `${item.state.content} ||| {"x": ${index}}`,
+                    }).then((value) => {
+                        notes[index].degree = processResultAsDegree(value);
+
+                        const harmonyItem = findItemAtNoteStart(
+                            notes[index],
+                            "harmony"
+                        );
+
+                        if (harmonyItem) {
+                            setNotePitchFromChordItem(
+                                notes[index],
+                                harmonyItem
+                            );
+                        }
+                    });
+                }
+            }
+            case "duration": {
+                // TODO: Remove existing notes???
+
+                const prevNote = voiceNotes.find(
+                    (note) => note.end < item.state.start
+                );
+
+                let beat = prevNote
+                    ? Math.max(prevNote.end, item.state.start)
+                    : item.state.start;
+
+                let index = 0;
+
+                const newNotes: NoteBuilder[] = [];
+
+                (async () => {
+                    while (beat < item.state.end) {
+                        const result = await invoke("evaluate", {
+                            task: `${item.state.content} ||| {"x": ${index}}`,
+                        });
+
+                        const duration = processResultAsDuration(result);
+
+                        newNotes.push(
+                            new NoteBuilder(
+                                beat,
+                                beat + duration,
+                                getGrandparent(item)
+                            )
+                        );
+
+                        index++;
+                        beat += duration;
+                    }
+                })().then(() => {
+                    voiceNotes.push(...newNotes);
+                    voiceNotes.sort((a, b) => a.start - b.start);
+
+                    const nextNote = voiceNotes.find(
+                        (note) => note.start >= item.state.end
+                    );
+                    if (nextNote) {
+                        this._adjustNoteStartRecursively(
+                            nextNote,
+                            newNotes[newNotes.length - 1].end
+                        );
+                    }
+                });
+            }
+            case "rest": {
+                for (const index of range(notes.length)) {
+                    invoke("evaluate", {
+                        task: `${item.state.content} ||| {"x": ${index}}`,
+                    }).then((value) => {
+                        notes[index].isRest = processResultAsRest(value);
+                    });
+                }
+            }
+            case "harmony": {
+                notes.forEach((note) => {
+                    setNotePitchFromChordItem(note, item);
+                });
+            }
         }
     }
 
     private _handleItemRemoved(item: Item<any>) {
-        const voice = getGrandparent(item);
-
         const trackType = trackIndexToType(getIndex(getParent(item)));
+        const voiceNotes = this._getVoiceNoteBuilders(getGrandparent(item));
+        const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
 
         switch (trackType) {
             case "pitch":
-                this._clearPropertyWithinInterval(voice, "degree", item.state);
-            case "duration":
-                this._removeNotesWithinInterval(voice, item.state);
+                notes.forEach((note) => {
+                    note.degree = undefined;
+                    note.pitch = undefined;
+                });
+            case "duration": {
+                notes.forEach((note) => {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                });
+
+                const lastNote = notes[notes.length - 1];
+                const nextNote = voiceNotes.find(
+                    (note) => note.start >= lastNote.end
+                );
+
+                if (nextNote) {
+                    this._adjustNoteStartRecursively(nextNote, lastNote.end);
+                }
+            }
             case "rest":
-                this._clearPropertyWithinInterval(voice, "isRest", item.state);
+                notes.forEach((note) => {
+                    note.isRest = undefined;
+                });
             case "harmony":
-                this._clearPropertyWithinInterval(voice, "pitch", item.state);
+                notes.forEach((note) => {
+                    note.pitch = undefined;
+                });
         }
     }
 
-    private _clearPropertyWithinInterval(
-        voice: Voice,
-        property: OptionalKeys<NoteBuilder>,
-        interval: Interval
-    ) {
-        const notes = this._getVoiceNoteBuilders(voice);
-
-        getNotesStartingWithinInterval(notes, interval).forEach((note) => {
-            note[property] = undefined;
-        });
-    }
-
-    private _removeNotesWithinInterval(voice: Voice, interval: Interval) {
-        const notes = this._getVoiceNoteBuilders(voice);
-
-        for (const note of getNotesStartingWithinInterval(notes, interval)) {
-            const noteIndex = notes.indexOf(note);
-            notes.splice(noteIndex, 1);
-        }
-    }
-
-    private _adjustNote(note: NoteBuilder) {
+    private _adjustNoteStartRecursively(note: NoteBuilder, minStart: number) {
         const pitchItem = findItemAtNoteStart(note, "pitch");
         const durationItem = findItemAtNoteStart(note, "duration");
         const restItem = findItemAtNoteStart(note, "rest");
@@ -97,32 +182,84 @@ export default class Generator {
 
         if (!durationItem) return; // If this is true, the note will be removed in a later iteration
 
-        const notes = this._getVoiceNoteBuilders(note.voice);
-        const noteIndex = notes.indexOf(note);
+        const oldNoteStart = note.start;
+        const newNoteStart = Math.max(minStart, durationItem.state.start);
 
-        if (noteIndex > 0) {
-            const prevNote = notes[noteIndex - 1];
-            note.start = Math.max(durationItem.state.start, prevNote.end);
-        } else {
-            note.start = durationItem.state.start;
-        }
+        note.start = newNoteStart;
 
-        const newPitchItem = findItemAtNoteStart(note, "pitch");
-        const newDurationItem = findItemAtNoteStart(note, "duration");
-        const newRestItem = findItemAtNoteStart(note, "rest");
-        const newHarmonyItem = findItemAtNoteStart(note, "harmony");
+        if (newNoteStart !== oldNoteStart) {
+            const newPitchItem = findItemAtNoteStart(note, "pitch");
+            const newDurationItem = findItemAtNoteStart(note, "duration");
+            const newRestItem = findItemAtNoteStart(note, "rest");
+            const newHarmonyItem = findItemAtNoteStart(note, "harmony");
 
-        if (newPitchItem !== pitchItem) {
-            // Re-evaluate pitch
-        }
-        if (newDurationItem !== durationItem) {
-            // Re-evaluate duration (and adjust following notes)
-        }
-        if (newRestItem !== restItem) {
-            // Re-evaluate rest
-        }
-        if (newHarmonyItem !== harmonyItem) {
-            // Re-evaluate harmony
+            const voiceNotes = this._getVoiceNoteBuilders(note.voice);
+
+            if (newPitchItem !== pitchItem) {
+                if (newPitchItem) {
+                    const notes = getNotesStartingWithinInterval(
+                        voiceNotes,
+                        newPitchItem.state
+                    );
+                    const index = notes.indexOf(note);
+
+                    invoke("evaluate", {
+                        task: `${newPitchItem.state.content} ||| {"x": ${index}}`,
+                    }).then((value) => {
+                        note.degree = processResultAsDegree(value);
+                        // We're updating the pitch later in this flow
+                    });
+                } else {
+                    note.degree = undefined;
+                    note.pitch = undefined;
+                }
+            }
+            if (newDurationItem !== durationItem) {
+                if (newDurationItem) {
+                    const notes = getNotesStartingWithinInterval(
+                        voiceNotes,
+                        newDurationItem.state
+                    );
+                    const index = notes.indexOf(note);
+
+                    invoke("evaluate", {
+                        task: `${newDurationItem.state.content} ||| {"x": ${index}}`,
+                    }).then((value) => {
+                        note.end = note.start + processResultAsDuration(value);
+                    });
+                } else {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                }
+            }
+            if (newRestItem !== restItem) {
+                if (newRestItem) {
+                    const notes = getNotesStartingWithinInterval(
+                        voiceNotes,
+                        newRestItem.state
+                    );
+                    const index = notes.indexOf(note);
+
+                    invoke("evaluate", {
+                        task: `${newRestItem.state.content} ||| {"x": ${index}}`,
+                    }).then((value) => {
+                        note.isRest = processResultAsRest(value);
+                    });
+                } else {
+                    note.isRest = undefined;
+                }
+            }
+            if (newHarmonyItem !== harmonyItem || newPitchItem !== pitchItem) {
+                if (newHarmonyItem) {
+                    setNotePitchFromChordItem(note, newHarmonyItem);
+                } else {
+                    note.pitch = undefined;
+                }
+            }
+
+            const nextNote = voiceNotes.find(
+                (otherNote) => otherNote.start >= note.end
+            );
+            if (nextNote) this._adjustNoteStartRecursively(nextNote, note.end);
         }
     }
 }
@@ -141,6 +278,44 @@ class NoteBuilder {
         this.start = start;
         this.end = end;
         this.voice = voice;
+    }
+}
+
+function processResultAsDegree(value: unknown): number {
+    const parsedValue = Number(value);
+
+    if (isNaN(parsedValue)) {
+        throw Error("TODO: Handle pitch error gracefully");
+    } else {
+        return Math.round(parsedValue);
+    }
+}
+
+function processResultAsDuration(value: unknown): number {
+    const parsedValue = Number(value);
+
+    if (isNaN(parsedValue)) {
+        throw Error("TODO: Handle duration error gracefully");
+    } else {
+        return parsedValue;
+    }
+}
+
+function processResultAsRest(value: unknown): boolean {
+    if (value === "True" || value === "False") {
+        return value === "True";
+    } else {
+        throw Error("TODO: Handle isRest error gracefully");
+    }
+}
+
+function setNotePitchFromChordItem(note: NoteBuilder, item: Item<"ChordItem">) {
+    const chord = item.state.content.chordStatus;
+
+    if (note.degree && chord instanceof Chord) {
+        note.pitch = chord.convertDegreeToMidiValue(note.degree);
+    } else {
+        note.pitch = undefined;
     }
 }
 
