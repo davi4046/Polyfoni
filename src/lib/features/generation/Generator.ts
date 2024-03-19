@@ -49,11 +49,15 @@ export default class Generator {
     }
 
     private _handleItemAdded(item: Item<any>) {
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        if (!trackType || trackType === "output") {
+            return;
+        }
+
         const voice = getGrandparent(item);
         const voiceNotes = this._getVoiceNoteBuilders(voice);
         const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
-
-        const trackType = trackIndexToType(getIndex(getParent(item)));
 
         console.log("handling item added:", item);
         console.log("trackType:", trackType);
@@ -178,11 +182,15 @@ export default class Generator {
     }
 
     private _handleItemRemoved(item: Item<any>) {
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        if (!trackType || trackType === "output") {
+            return;
+        }
+
         const voice = getGrandparent(item);
         const voiceNotes = this._getVoiceNoteBuilders(voice);
         const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
-
-        const trackType = trackIndexToType(getIndex(getParent(item)));
 
         console.log("handling item removed:", item);
         console.log("trackType:", trackType);
@@ -395,7 +403,7 @@ function processValueAsRest(value: unknown): boolean {
 function setNotePitchFromChordItem(note: NoteBuilder, item: Item<"ChordItem">) {
     const chord = item.state.content.chordStatus;
 
-    if (note.degree && chord instanceof Chord) {
+    if (note.degree !== undefined && chord instanceof Chord) {
         note.pitch = chord.convertDegreeToMidiValue(note.degree);
     } else {
         note.pitch = undefined;
