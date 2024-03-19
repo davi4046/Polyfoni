@@ -8,10 +8,15 @@
     import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";
     import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
+    import StateHierarchyWatcher from "./lib/architecture/StateHierarchyWatcher";
+    import Generator from "./lib/features/generation/Generator";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
     const timelineVM = createTimelineVM(timeline, timelineContext);
+
+    const stateHierarchyWatcher = new StateHierarchyWatcher(timeline);
+    const generator = new Generator(stateHierarchyWatcher);
 
     const shortcutManager = new ShortcutManager();
 

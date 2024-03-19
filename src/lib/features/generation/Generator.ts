@@ -24,16 +24,18 @@ export default class Generator {
 
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
-            if (!(obj instanceof Track)) return;
-            if (getIndex(getGrandparent(obj)) !== 1) return;
+            if (obj instanceof Track && getIndex(getGrandparent(obj)) === 1) {
+                const { addedItems, removedItems } = compareTrackStates(
+                    oldState,
+                    obj.state
+                );
+                removedItems.forEach((item) => this._handleItemRemoved(item));
+                addedItems.forEach((item) => this._handleItemAdded(item));
+            }
 
-            const { addedItems, removedItems } = compareTrackStates(
-                oldState,
-                obj.state
-            );
-
-            removedItems.forEach((item) => this._handleItemRemoved(item));
-            addedItems.forEach((item) => this._handleItemAdded(item));
+            if (obj instanceof Item) {
+                this._handleItemAdded(obj);
+            }
         });
     }
 
@@ -47,14 +49,21 @@ export default class Generator {
     }
 
     private _handleItemAdded(item: Item<any>) {
-        const trackType = trackIndexToType(getIndex(getParent(item)));
-        const voiceNotes = this._getVoiceNoteBuilders(getGrandparent(item));
+        const voice = getGrandparent(item);
+        const voiceNotes = this._getVoiceNoteBuilders(voice);
         const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
+
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        console.log("handling item added:", item);
+        console.log("trackType:", trackType);
 
         switch (trackType) {
             case "pitch": {
+                const promises = [];
+
                 for (const index of range(notes.length)) {
-                    invoke("evaluate", {
+                    const promise = invoke("evaluate", {
                         task: `${item.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
                         notes[index].degree = processValueAsDegree(value);
@@ -71,10 +80,21 @@ export default class Generator {
                             );
                         }
                     });
+
+                    promises.push(promise);
                 }
+
+                Promise.all(promises).then(() => {
+                    this._updateOutput(voice);
+                });
+
+                break;
             }
             case "duration": {
-                // TODO: Remove existing notes???
+                // Remove existing notes
+                notes.forEach((note) => {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                });
 
                 const prevNote = voiceNotes.find(
                     (note) => note.end < item.state.start
@@ -121,38 +141,60 @@ export default class Generator {
                             lastNote.end
                         );
                     }
+
+                    this._updateOutput(voice);
                 });
+
+                break;
             }
             case "rest": {
+                const promises = [];
+
                 for (const index of range(notes.length)) {
-                    invoke("evaluate", {
+                    const promise = invoke("evaluate", {
                         task: `${item.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
                         notes[index].isRest = processValueAsRest(value);
                     });
+
+                    promises.push(promise);
                 }
+
+                Promise.all(promises).then(() => {
+                    this._updateOutput(voice);
+                });
+
+                break;
             }
             case "harmony": {
                 notes.forEach((note) => {
                     setNotePitchFromChordItem(note, item);
                 });
+                this._updateOutput(voice);
+
+                break;
             }
         }
-
-        this._updateOutput(getGrandparent(item));
     }
 
     private _handleItemRemoved(item: Item<any>) {
-        const trackType = trackIndexToType(getIndex(getParent(item)));
-        const voiceNotes = this._getVoiceNoteBuilders(getGrandparent(item));
+        const voice = getGrandparent(item);
+        const voiceNotes = this._getVoiceNoteBuilders(voice);
         const notes = getNotesStartingWithinInterval(voiceNotes, item.state);
 
+        const trackType = trackIndexToType(getIndex(getParent(item)));
+
+        console.log("handling item removed:", item);
+        console.log("trackType:", trackType);
+
         switch (trackType) {
-            case "pitch":
+            case "pitch": {
                 notes.forEach((note) => {
                     note.degree = undefined;
                     note.pitch = undefined;
                 });
+                break;
+            }
             case "duration": {
                 notes.forEach((note) => {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
@@ -165,18 +207,23 @@ export default class Generator {
                     const nextNote = voiceNotes[nextNoteIndex];
                     this._adjustNoteStartRecursively(nextNote, lastNote.end);
                 }
+                break;
             }
-            case "rest":
+            case "rest": {
                 notes.forEach((note) => {
                     note.isRest = undefined;
                 });
-            case "harmony":
+                break;
+            }
+            case "harmony": {
                 notes.forEach((note) => {
                     note.pitch = undefined;
                 });
+                break;
+            }
         }
 
-        this._updateOutput(getGrandparent(item));
+        this._updateOutput(voice);
     }
 
     private _adjustNoteStartRecursively(note: NoteBuilder, minStart: number) {
@@ -276,7 +323,9 @@ export default class Generator {
 
         const noteItems = voiceNotes
             .map((note) => {
-                if ((note.degree, note.pitch, note.isRest)) {
+                if (
+                    ![note.degree, note.pitch, note.isRest].includes(undefined)
+                ) {
                     return new Item("NoteItem", {
                         parent: outputTrack,
                         start: note.start,
@@ -286,6 +335,10 @@ export default class Generator {
                 }
             })
             .filter((value): value is Item<"NoteItem"> => value !== undefined);
+
+        console.log("voiceNotes (slice):", voiceNotes.slice());
+        console.log("noteItems:", noteItems);
+        console.log("outputTrack:", outputTrack);
 
         outputTrack.state = {
             children: noteItems,
@@ -331,8 +384,9 @@ function processValueAsDuration(value: unknown): number {
 }
 
 function processValueAsRest(value: unknown): boolean {
-    if (value === "True" || value === "False") {
-        return value === "True";
+    const parsedValue = String(value).trim();
+    if (parsedValue === "True" || parsedValue === "False") {
+        return parsedValue === "True";
     } else {
         throw Error("TODO: Handle isRest error gracefully");
     }
