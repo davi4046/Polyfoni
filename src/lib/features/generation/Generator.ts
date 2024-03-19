@@ -84,13 +84,46 @@ export default class Generator {
         const notes = this._getVoiceNoteBuilders(voice);
 
         for (const note of getNotesStartingWithinInterval(notes, interval)) {
-            const index = notes.indexOf(note);
-            notes.splice(index, 1);
+            const noteIndex = notes.indexOf(note);
+            notes.splice(noteIndex, 1);
         }
     }
 
     private _adjustNote(note: NoteBuilder) {
-        findItemAtNoteStart(note, "duration");
+        const pitchItem = findItemAtNoteStart(note, "pitch");
+        const durationItem = findItemAtNoteStart(note, "duration");
+        const restItem = findItemAtNoteStart(note, "rest");
+        const harmonyItem = findItemAtNoteStart(note, "harmony");
+
+        if (!durationItem) return; // If this is true, the note will be removed in a later iteration
+
+        const notes = this._getVoiceNoteBuilders(note.voice);
+        const noteIndex = notes.indexOf(note);
+
+        if (noteIndex > 0) {
+            const prevNote = notes[noteIndex - 1];
+            note.start = Math.max(durationItem.state.start, prevNote.end);
+        } else {
+            note.start = durationItem.state.start;
+        }
+
+        const newPitchItem = findItemAtNoteStart(note, "pitch");
+        const newDurationItem = findItemAtNoteStart(note, "duration");
+        const newRestItem = findItemAtNoteStart(note, "rest");
+        const newHarmonyItem = findItemAtNoteStart(note, "harmony");
+
+        if (newPitchItem !== pitchItem) {
+            // Re-evaluate pitch
+        }
+        if (newDurationItem !== durationItem) {
+            // Re-evaluate duration (and adjust following notes)
+        }
+        if (newRestItem !== restItem) {
+            // Re-evaluate rest
+        }
+        if (newHarmonyItem !== harmonyItem) {
+            // Re-evaluate harmony
+        }
     }
 }
 
