@@ -57,7 +57,7 @@ export default class Generator {
                     invoke("evaluate", {
                         task: `${item.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
-                        notes[index].degree = processResultAsDegree(value);
+                        notes[index].degree = processValueAsDegree(value);
 
                         const harmonyItem = findItemAtNoteStart(
                             notes[index],
@@ -94,7 +94,7 @@ export default class Generator {
                             task: `${item.state.content} ||| {"x": ${index}}`,
                         });
 
-                        const duration = processResultAsDuration(result);
+                        const duration = processValueAsDuration(result);
 
                         newNotes.push(
                             new NoteBuilder(
@@ -128,7 +128,7 @@ export default class Generator {
                     invoke("evaluate", {
                         task: `${item.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
-                        notes[index].isRest = processResultAsRest(value);
+                        notes[index].isRest = processValueAsRest(value);
                     });
                 }
             }
@@ -207,7 +207,7 @@ export default class Generator {
                     invoke("evaluate", {
                         task: `${newPitchItem.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
-                        note.degree = processResultAsDegree(value);
+                        note.degree = processValueAsDegree(value);
                         // We're updating the pitch later in this flow
                     });
                 } else {
@@ -226,7 +226,7 @@ export default class Generator {
                     invoke("evaluate", {
                         task: `${newDurationItem.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
-                        note.end = note.start + processResultAsDuration(value);
+                        note.end = note.start + processValueAsDuration(value);
                     });
                 } else {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
@@ -243,7 +243,7 @@ export default class Generator {
                     invoke("evaluate", {
                         task: `${newRestItem.state.content} ||| {"x": ${index}}`,
                     }).then((value) => {
-                        note.isRest = processResultAsRest(value);
+                        note.isRest = processValueAsRest(value);
                     });
                 } else {
                     note.isRest = undefined;
@@ -284,7 +284,7 @@ class NoteBuilder {
     }
 }
 
-function processResultAsDegree(value: unknown): number {
+function processValueAsDegree(value: unknown): number {
     const parsedValue = Number(value);
 
     if (isNaN(parsedValue)) {
@@ -294,7 +294,7 @@ function processResultAsDegree(value: unknown): number {
     }
 }
 
-function processResultAsDuration(value: unknown): number {
+function processValueAsDuration(value: unknown): number {
     const parsedValue = Number(value);
 
     if (isNaN(parsedValue)) {
@@ -304,7 +304,7 @@ function processResultAsDuration(value: unknown): number {
     }
 }
 
-function processResultAsRest(value: unknown): boolean {
+function processValueAsRest(value: unknown): boolean {
     if (value === "True" || value === "False") {
         return value === "True";
     } else {
