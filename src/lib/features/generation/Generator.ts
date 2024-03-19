@@ -25,6 +25,7 @@ export default class Generator {
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
             if (!(obj instanceof Track)) return;
+            if (getIndex(getGrandparent(obj)) !== 1) return;
 
             const { addedItems, removedItems } = compareTrackStates(
                 oldState,
