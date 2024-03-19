@@ -110,13 +110,14 @@ export default class Generator {
                     voiceNotes.push(...newNotes);
                     voiceNotes.sort((a, b) => a.start - b.start);
 
-                    const nextNote = voiceNotes.find(
-                        (note) => note.start >= item.state.end
-                    );
-                    if (nextNote) {
+                    const lastNote = newNotes[newNotes.length - 1];
+                    const nextNoteIndex = voiceNotes.indexOf(lastNote) + 1;
+
+                    if (voiceNotes.length > nextNoteIndex) {
+                        const nextNote = voiceNotes[nextNoteIndex];
                         this._adjustNoteStartRecursively(
                             nextNote,
-                            newNotes[newNotes.length - 1].end
+                            lastNote.end
                         );
                     }
                 });
@@ -155,11 +156,10 @@ export default class Generator {
                 });
 
                 const lastNote = notes[notes.length - 1];
-                const nextNote = voiceNotes.find(
-                    (note) => note.start >= lastNote.end
-                );
+                const nextNoteIndex = voiceNotes.indexOf(lastNote) + 1;
 
-                if (nextNote) {
+                if (voiceNotes.length > nextNoteIndex) {
+                    const nextNote = voiceNotes[nextNoteIndex];
                     this._adjustNoteStartRecursively(nextNote, lastNote.end);
                 }
             }
@@ -256,10 +256,12 @@ export default class Generator {
                 }
             }
 
-            const nextNote = voiceNotes.find(
-                (otherNote) => otherNote.start >= note.end
-            );
-            if (nextNote) this._adjustNoteStartRecursively(nextNote, note.end);
+            const nextNoteIndex = voiceNotes.indexOf(note) + 1;
+
+            if (voiceNotes.length > nextNoteIndex) {
+                const nextNote = voiceNotes[nextNoteIndex];
+                this._adjustNoteStartRecursively(nextNote, note.end);
+            }
         }
     }
 }
