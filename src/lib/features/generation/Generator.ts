@@ -135,6 +135,17 @@ export default class Generator {
                     voiceNotes.push(...newNotes);
                     voiceNotes.sort((a, b) => a.start - b.start);
 
+                    const promises: Promise<void>[] = [];
+
+                    newNotes.forEach((note) => {
+                        promises.push(
+                            this._updateNoteDegree(note).then(() =>
+                                this._updateNotePitch(note)
+                            ),
+                            this._updateNoteIsRest(note)
+                        );
+                    });
+
                     const lastNote = newNotes[newNotes.length - 1];
                     const nextNoteIndex = voiceNotes.indexOf(lastNote) + 1;
 
@@ -146,7 +157,7 @@ export default class Generator {
                         );
                     }
 
-                    this._updateOutput(voice);
+                    Promise.all(promises).then(() => this._updateOutput(voice));
                 });
 
                 break;
@@ -322,6 +333,82 @@ export default class Generator {
                 const nextNote = voiceNotes[nextNoteIndex];
                 this._adjustNoteStartRecursively(nextNote, note.end);
             }
+        }
+    }
+
+    private async _updateNoteDegree(note: NoteBuilder) {
+        const pitchItem = findItemAtNoteStart(note, "pitch");
+
+        if (pitchItem) {
+            const voiceNotes = this._getVoiceNoteBuilders(note.voice);
+
+            const notes = getNotesStartingWithinInterval(
+                voiceNotes,
+                pitchItem.state
+            );
+            const index = notes.indexOf(note);
+
+            const result = await invoke("evaluate", {
+                task: `${pitchItem.state.content} ||| {"x": ${index}}`,
+            });
+
+            note.degree = processValueAsDegree(result);
+        } else {
+            note.degree = undefined;
+            note.pitch = undefined;
+        }
+    }
+
+    private async _updateNoteDuration(note: NoteBuilder) {
+        const durationItem = findItemAtNoteStart(note, "pitch");
+        const voiceNotes = this._getVoiceNoteBuilders(note.voice);
+
+        if (durationItem) {
+            const notes = getNotesStartingWithinInterval(
+                voiceNotes,
+                durationItem.state
+            );
+            const index = notes.indexOf(note);
+
+            const result = await invoke("evaluate", {
+                task: `${durationItem.state.content} ||| {"x": ${index}}`,
+            });
+
+            note.end = note.start + processValueAsDuration(result);
+        } else {
+            voiceNotes.splice(voiceNotes.indexOf(note), 1);
+        }
+    }
+
+    private async _updateNoteIsRest(note: NoteBuilder) {
+        const restItem = findItemAtNoteStart(note, "rest");
+
+        if (restItem) {
+            const voiceNotes = this._getVoiceNoteBuilders(note.voice);
+
+            const notes = getNotesStartingWithinInterval(
+                voiceNotes,
+                restItem.state
+            );
+            const index = notes.indexOf(note);
+
+            const result = await invoke("evaluate", {
+                task: `${restItem.state.content} ||| {"x": ${index}}`,
+            });
+
+            note.isRest = processValueAsRest(result);
+        } else {
+            note.isRest = undefined;
+        }
+    }
+
+    private async _updateNotePitch(note: NoteBuilder) {
+        const harmonyItem = findItemAtNoteStart(note, "harmony");
+
+        if (harmonyItem) {
+            setNotePitchFromChordItem(note, harmonyItem);
+        } else {
+            note.pitch = undefined;
         }
     }
 
