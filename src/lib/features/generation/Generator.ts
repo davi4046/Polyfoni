@@ -11,7 +11,7 @@ import {
     getIndex,
     getParent,
 } from "../../architecture/state-hierarchy-utils";
-import type Item from "../timeline/models/Item";
+import Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import Track, { type TrackState } from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
@@ -138,6 +138,8 @@ export default class Generator {
                 });
             }
         }
+
+        this._updateOutput(getGrandparent(item));
     }
 
     private _handleItemRemoved(item: Item<any>) {
@@ -173,6 +175,8 @@ export default class Generator {
                     note.pitch = undefined;
                 });
         }
+
+        this._updateOutput(getGrandparent(item));
     }
 
     private _adjustNoteStartRecursively(note: NoteBuilder, minStart: number) {
@@ -264,6 +268,28 @@ export default class Generator {
                 this._adjustNoteStartRecursively(nextNote, note.end);
             }
         }
+    }
+
+    private _updateOutput(voice: Voice) {
+        const outputTrack = getTrackOfType(voice, "output");
+        const voiceNotes = this._getVoiceNoteBuilders(voice);
+
+        const noteItems = voiceNotes
+            .map((note) => {
+                if ((note.degree, note.pitch, note.isRest)) {
+                    return new Item("NoteItem", {
+                        parent: outputTrack,
+                        start: note.start,
+                        end: note.end,
+                        content: note.pitch!,
+                    });
+                }
+            })
+            .filter((value): value is Item<"NoteItem"> => value !== undefined);
+
+        outputTrack.state = {
+            children: noteItems,
+        };
     }
 }
 
@@ -374,6 +400,7 @@ function findItemAtNoteStart<T extends keyof TrackTypes>(
 }
 
 type TrackTypes = {
+    output: "NoteItem";
     pitch: "StringItem";
     duration: "StringItem";
     rest: "StringItem";
@@ -382,6 +409,8 @@ type TrackTypes = {
 
 function trackTypeToIndex(trackType: keyof TrackTypes): number {
     switch (trackType) {
+        case "output":
+            return 0;
         case "pitch":
             return 1;
         case "duration":
@@ -395,6 +424,8 @@ function trackTypeToIndex(trackType: keyof TrackTypes): number {
 
 function trackIndexToType(index: number): keyof TrackTypes | undefined {
     switch (index) {
+        case 0:
+            return "output";
         case 1:
             return "pitch";
         case 2:
