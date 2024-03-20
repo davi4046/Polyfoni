@@ -1,3 +1,7 @@
+import { invoke } from "@tauri-apps/api";
+
+import { range } from "lodash";
+
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
@@ -10,6 +14,7 @@ import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
 import type Interval from "../../utils/interval/Interval";
+import { Chord } from "../timeline/utils/chord/Chord";
 
 export default class Generator {
     private _itemChanges: ItemChange[] = [];
@@ -67,11 +72,11 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
-        if (change.oldState) this._clearItemStateEffect(change.oldState);
-        if (change.newState) this._applyItemStateEffect(change.newState);
+        if (change.oldState) await this._clearItemStateEffect(change.oldState);
+        if (change.newState) await this._applyItemStateEffect(change.newState);
     }
 
-    private _clearItemStateEffect(itemState: ItemState<any>) {
+    private async _clearItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
 
         if (!trackType || trackType === "output") return;
@@ -132,26 +137,26 @@ export default class Generator {
         }
     }
 
-    private _applyItemStateEffect(itemState: ItemState<any>) {
+    private async _applyItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
 
         if (!trackType || trackType === "output") return;
 
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
-        const ownedNotes = getNotesStartingWithinInterval(
-            voiceNotes,
-            itemState
-        );
 
         switch (trackType) {
             case "pitch": {
+                await applyItemStateAsDegree(itemState, voiceNotes);
+                // TODO: Recalculate pitch based on harmony for ownedNotes
                 break;
             }
             case "rest": {
+                await applyItemStateAsIsRest(itemState, voiceNotes);
                 break;
             }
             case "harmony": {
+                applyItemStateAsHarmony(itemState, voiceNotes);
                 break;
             }
             case "duration": {
@@ -260,3 +265,79 @@ function getNotesStartingWithinInterval(
     );
     return notes.slice(firstIndex, lastIndex + 1);
 }
+
+async function applyItemStateAsDegree(
+    itemState: ItemState<"StringItem">,
+    notes: NoteBuilder[]
+) {
+    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
+
+    const promises = [];
+
+    for (const index of range(ownedNotes.length)) {
+        const promise = invoke("evaluate", {
+            task: `${itemState.content} ||| {"x": ${index}}`,
+        }).then((value) => {
+            const parsedValue = Number(value);
+
+            if (isNaN(parsedValue)) {
+                throw Error("TODO: Handle pitch error gracefully");
+            }
+
+            ownedNotes[index].degree = Math.round(parsedValue);
+        });
+        promises.push(promise);
+    }
+
+    await Promise.all(promises);
+}
+
+async function applyItemStateAsIsRest(
+    itemState: ItemState<"StringItem">,
+    notes: NoteBuilder[]
+) {
+    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
+
+    const promises = [];
+
+    for (const index of range(ownedNotes.length)) {
+        const promise = invoke("evaluate", {
+            task: `${itemState.content} ||| {"x": ${index}}`,
+        }).then((value) => {
+            const parsedValue = String(value).trim();
+
+            if (parsedValue === "True" || parsedValue === "False") {
+                ownedNotes[index].isRest = parsedValue === "True";
+            } else {
+                throw Error("TODO: Handle isRest error gracefully");
+            }
+        });
+        promises.push(promise);
+    }
+
+    await Promise.all(promises);
+}
+
+function applyItemStateAsHarmony(
+    itemState: ItemState<"ChordItem">,
+    notes: NoteBuilder[]
+) {
+    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
+
+    const chord = itemState.content.chordStatus;
+
+    if (!(chord instanceof Chord)) return;
+
+    for (const note of ownedNotes) {
+        if (note.degree !== undefined) {
+            note.pitch = chord.convertDegreeToMidiValue(note.degree);
+        } else {
+            note.pitch = undefined;
+        }
+    }
+}
+
+async function applyItemStateAsDuration(
+    itemState: ItemState<"StringItem">,
+    notes: NoteBuilder[]
+) {}
