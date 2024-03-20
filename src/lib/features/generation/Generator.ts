@@ -1,6 +1,7 @@
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
+    getChildren,
     getIndex,
     getParent,
 } from "../../architecture/state-hierarchy-utils";
@@ -109,15 +110,16 @@ export default class Generator {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
 
-                const movedNotes = adjustNotesToPreventOverlaps(
-                    voiceNotes,
-                    (note) => {
-                        //return start of the duration item owning this note
-                    }
-                );
+                const movedNotes = packNotesByIndex(voiceNotes, (note) => {
+                    const durationItem = getChildren(itemState.parent).find(
+                        (item) => isNoteStartWithinInterval(note, item.state)
+                    );
+                    return durationItem ? durationItem.state.start : undefined;
+                });
 
                 //update properties of moved notes
                 //if note duration changes, we adjust positions of the following notes
+                movedNotes.forEach((note) => {});
 
                 break;
             }
@@ -227,32 +229,26 @@ function getNotesStartingWithinInterval(
     return notes.slice(firstIndex, lastIndex + 1);
 }
 
-/**
- * Adjusts the positions of notes to prevent overlaps between adjacent notes.
- *
- * @param notes An array of notes to adjust.
- * @param calcMinStart An optional function that calculates the minimum start time for a note.
- * @returns An array containing the notes that were moved.
- */
-function adjustNotesToPreventOverlaps(
+function packNotesByIndex(
     notes: NoteBuilder[],
-    calcMinStart?: (note: NoteBuilder) => number
+    calcMinStart: (note: NoteBuilder) => number | undefined
 ): NoteBuilder[] {
-    const modifiedNotes: NoteBuilder[] = [];
+    const movedNotes: NoteBuilder[] = [];
 
     for (let i = 0; i < notes.length; i++) {
         const prevNoteEnd = i > 0 ? notes[i - 1].end : notes[i].start;
-        const newStart = calcMinStart
-            ? Math.max(prevNoteEnd, calcMinStart(notes[i]))
+        const minStart = calcMinStart(notes[i]);
+        const newStart = minStart
+            ? Math.max(prevNoteEnd, minStart)
             : prevNoteEnd;
         const duration = notes[i].end - notes[i].start;
 
         if (notes[i].start !== newStart) {
             notes[i].start = newStart;
             notes[i].end = newStart + duration;
-            modifiedNotes.push(notes[i]);
+            movedNotes.push(notes[i]);
         }
     }
 
-    return modifiedNotes;
+    return movedNotes;
 }
