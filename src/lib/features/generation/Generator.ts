@@ -371,6 +371,7 @@ function applyItemStateAsHarmony(
     }
 }
 
+/** @returns added notes */
 async function applyItemStateAsDuration(
     itemState: ItemState<"StringItem">,
     notes: NoteBuilder[]
@@ -385,25 +386,23 @@ async function applyItemStateAsDuration(
 
     const newNotes: NoteBuilder[] = [];
 
-    (async () => {
-        while (beat < itemState.end) {
-            const result = await invoke("evaluate", {
-                task: `${itemState.content} ||| {"x": ${index}}`,
-            });
+    while (beat < itemState.end) {
+        const result = await invoke("evaluate", {
+            task: `${itemState.content} ||| {"x": ${index}}`,
+        });
 
-            const parsedResult = Number(result);
+        const parsedResult = Number(result);
 
-            if (isNaN(parsedResult)) {
-                throw Error("TODO: Handle duration error gracefully");
-            }
-
-            newNotes.push(new NoteBuilder(beat, beat + parsedResult));
-
-            index++;
-            beat += parsedResult;
+        if (isNaN(parsedResult)) {
+            throw Error("TODO: Handle duration error gracefully");
         }
-    })().then(() => {
-        notes.push(...newNotes);
-        notes.sort((a, b) => a.start - b.start);
-    });
+
+        newNotes.push(new NoteBuilder(beat, beat + parsedResult));
+
+        index++;
+        beat += parsedResult;
+    }
+    notes.push(...newNotes);
+    notes.sort((a, b) => a.start - b.start);
+    return newNotes;
 }
