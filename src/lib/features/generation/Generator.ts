@@ -110,18 +110,21 @@ export default class Generator {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
 
-                // Recalculate notes of all following duration items (recursively)
+                // Remove and remake notes for all following duration items
 
                 const durationsItems = getChildren(itemState.parent).slice();
                 durationsItems.sort((a, b) => a.state.start - b.state.start);
 
-                const nextDurationItem = durationsItems.find(
+                const nextItemIndex = durationsItems.findIndex(
                     (item) => item.state.start >= itemState.end
                 );
 
-                if (nextDurationItem) {
-                    this._clearItemStateEffect(nextDurationItem.state); // Resursive
-                    this._applyItemStateEffect(nextDurationItem.state);
+                if (nextItemIndex !== -1) {
+                    const followingItems = durationsItems.slice(nextItemIndex);
+
+                    followingItems.forEach((item) => {
+                        // TODO
+                    });
                 }
 
                 break;
