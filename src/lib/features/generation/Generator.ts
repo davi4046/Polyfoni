@@ -29,7 +29,7 @@ export default class Generator {
                 }
             }
 
-            if (!this._isHandlingChanges) {
+            if (this._itemChanges.length > 0 && !this._isHandlingChanges) {
                 const handleNextChangeLoop = () => {
                     const nextChange = this._itemChanges.shift();
 
