@@ -148,7 +148,6 @@ export default class Generator {
         switch (trackType) {
             case "pitch": {
                 await applyItemStateAsDegree(itemState, voiceNotes);
-                // TODO: Recalculate pitch based on harmony for ownedNotes
                 break;
             }
             case "rest": {
@@ -275,21 +274,24 @@ async function applyItemStateAsDegree(
     const promises = [];
 
     for (const index of range(ownedNotes.length)) {
-        const promise = invoke("evaluate", {
-            task: `${itemState.content} ||| {"x": ${index}}`,
-        }).then((value) => {
-            const parsedValue = Number(value);
+        const promise = (async () => {
+            const result = await invoke("evaluate", {
+                task: `${itemState.content} ||| {"x": ${index}}`,
+            });
+
+            const parsedValue = Number(result);
 
             if (isNaN(parsedValue)) {
                 throw Error("TODO: Handle pitch error gracefully");
             }
 
             ownedNotes[index].degree = Math.round(parsedValue);
-        });
+        })();
         promises.push(promise);
     }
-
     await Promise.all(promises);
+
+    // TODO: Recalculate pitch based on harmony for ownedNotes
 }
 
 async function applyItemStateAsIsRest(
@@ -301,20 +303,21 @@ async function applyItemStateAsIsRest(
     const promises = [];
 
     for (const index of range(ownedNotes.length)) {
-        const promise = invoke("evaluate", {
-            task: `${itemState.content} ||| {"x": ${index}}`,
-        }).then((value) => {
-            const parsedValue = String(value).trim();
+        const promise = (async () => {
+            const result = await invoke("evaluate", {
+                task: `${itemState.content} ||| {"x": ${index}}`,
+            });
+
+            const parsedValue = String(result).trim();
 
             if (parsedValue === "True" || parsedValue === "False") {
                 ownedNotes[index].isRest = parsedValue === "True";
             } else {
                 throw Error("TODO: Handle isRest error gracefully");
             }
-        });
+        })();
         promises.push(promise);
     }
-
     await Promise.all(promises);
 }
 
