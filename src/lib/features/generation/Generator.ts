@@ -346,4 +346,36 @@ function applyItemStateAsHarmony(
 async function applyItemStateAsDuration(
     itemState: ItemState<"StringItem">,
     notes: NoteBuilder[]
-) {}
+) {
+    const prevNote = notes.find((note) => note.end < itemState.start);
+
+    let beat = prevNote
+        ? Math.max(itemState.start, prevNote.end)
+        : itemState.start;
+
+    let index = 0;
+
+    const newNotes: NoteBuilder[] = [];
+
+    (async () => {
+        while (beat < itemState.end) {
+            const result = await invoke("evaluate", {
+                task: `${itemState.content} ||| {"x": ${index}}`,
+            });
+
+            const parsedResult = Number(result);
+
+            if (isNaN(parsedResult)) {
+                throw Error("TODO: Handle duration error gracefully");
+            }
+
+            newNotes.push(new NoteBuilder(beat, beat + parsedResult));
+
+            index++;
+            beat += parsedResult;
+        }
+    })().then(() => {
+        notes.push(...newNotes);
+        notes.sort((a, b) => a.start - b.start);
+    });
+}
