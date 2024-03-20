@@ -1,12 +1,29 @@
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
-import { countAncestors } from "../../architecture/state-hierarchy-utils";
+import {
+    countAncestors,
+    getIndex,
+    getParent,
+} from "../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
+import type Voice from "../timeline/models/Voice";
+import type Interval from "../../utils/interval/Interval";
 
 export default class Generator {
     private _itemChanges: ItemChange[] = [];
     private _isHandlingChanges = false;
+
+    private _voiceMap = new Map<Voice, NoteBuilder[]>();
+
+    private _getVoiceNotes(voice: Voice): NoteBuilder[] {
+        let noteBuilders = this._voiceMap.get(voice);
+        if (!noteBuilders) {
+            noteBuilders = [];
+            this._voiceMap.set(voice, noteBuilders);
+        }
+        return noteBuilders;
+    }
 
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
@@ -53,7 +70,59 @@ export default class Generator {
         if (change.newState) this._applyItemStateEffect(change.newState);
     }
 
-    private _clearItemStateEffect(itemState: ItemState<any>) {}
+    private _clearItemStateEffect(itemState: ItemState<any>) {
+        const trackType = trackIndexToType(getIndex(itemState.parent));
+
+        if (!trackType || trackType === "output") return;
+
+        const voice = getParent(itemState.parent);
+        const voiceNotes = this._getVoiceNotes(voice);
+        const ownedNotes = getNotesStartingWithinInterval(
+            voiceNotes,
+            itemState
+        );
+
+        switch (trackType) {
+            case "pitch": {
+                ownedNotes.forEach((note) => {
+                    note.degree = undefined;
+                    note.pitch = undefined;
+                });
+                break;
+            }
+            case "rest": {
+                ownedNotes.forEach((note) => {
+                    note.isRest = undefined;
+                });
+                break;
+            }
+            case "harmony": {
+                ownedNotes.forEach((note) => {
+                    note.pitch = undefined;
+                });
+                break;
+            }
+            case "duration": {
+                if (ownedNotes.length === 0) break;
+
+                ownedNotes.forEach((note) => {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                });
+
+                const movedNotes = adjustNotesToPreventOverlaps(
+                    voiceNotes,
+                    (note) => {
+                        //return start of the duration item owning this note
+                    }
+                );
+
+                //update properties of moved notes
+                //if note duration changes, we adjust positions of the following notes
+
+                break;
+            }
+        }
+    }
 
     private _applyItemStateEffect(itemState: ItemState<any>) {}
 }
@@ -136,4 +205,54 @@ function trackIndexToType(index: number): keyof TrackTypes | undefined {
         case 4:
             return "harmony";
     }
+}
+
+function isNoteStartWithinInterval(
+    note: NoteBuilder,
+    interval: Interval
+): boolean {
+    return note.start >= interval.start && note.start < interval.end;
+}
+
+function getNotesStartingWithinInterval(
+    notes: NoteBuilder[],
+    interval: Interval
+) {
+    const firstIndex = notes.findIndex((note) =>
+        isNoteStartWithinInterval(note, interval)
+    );
+    const lastIndex = notes.findLastIndex((note) =>
+        isNoteStartWithinInterval(note, interval)
+    );
+    return notes.slice(firstIndex, lastIndex + 1);
+}
+
+/**
+ * Adjusts the positions of notes to prevent overlaps between adjacent notes.
+ *
+ * @param notes An array of notes to adjust.
+ * @param calcMinStart An optional function that calculates the minimum start time for a note.
+ * @returns An array containing the notes that were moved.
+ */
+function adjustNotesToPreventOverlaps(
+    notes: NoteBuilder[],
+    calcMinStart?: (note: NoteBuilder) => number
+): NoteBuilder[] {
+    const modifiedNotes: NoteBuilder[] = [];
+
+    for (let i = 0; i < notes.length; i++) {
+        const prevNoteEnd = i > 0 ? notes[i - 1].end : notes[i].start;
+        const newStart = calcMinStart
+            ? Math.max(prevNoteEnd, calcMinStart(notes[i]))
+            : prevNoteEnd;
+        const duration = notes[i].end - notes[i].start;
+
+        if (notes[i].start !== newStart) {
+            notes[i].start = newStart;
+            notes[i].end = newStart + duration;
+            modifiedNotes.push(notes[i]);
+        }
+    }
+
+    return modifiedNotes;
 }
