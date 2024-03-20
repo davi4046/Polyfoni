@@ -159,6 +159,9 @@ export default class Generator {
                 break;
             }
             case "duration": {
+                await applyItemStateAsDuration(itemState, voiceNotes);
+                // TODO: Remove and remake notes for all following duration items
+                // TODO: Apply items in pitch, rest, and harmony tracks (that own one or more new notes)
                 break;
             }
         }
@@ -279,13 +282,13 @@ async function applyItemStateAsDegree(
                 task: `${itemState.content} ||| {"x": ${index}}`,
             });
 
-            const parsedValue = Number(result);
+            const parsedResult = Number(result);
 
-            if (isNaN(parsedValue)) {
+            if (isNaN(parsedResult)) {
                 throw Error("TODO: Handle pitch error gracefully");
             }
 
-            ownedNotes[index].degree = Math.round(parsedValue);
+            ownedNotes[index].degree = Math.round(parsedResult);
         })();
         promises.push(promise);
     }
@@ -308,10 +311,10 @@ async function applyItemStateAsIsRest(
                 task: `${itemState.content} ||| {"x": ${index}}`,
             });
 
-            const parsedValue = String(result).trim();
+            const parsedResult = String(result).trim();
 
-            if (parsedValue === "True" || parsedValue === "False") {
-                ownedNotes[index].isRest = parsedValue === "True";
+            if (parsedResult === "True" || parsedResult === "False") {
+                ownedNotes[index].isRest = parsedResult === "True";
             } else {
                 throw Error("TODO: Handle isRest error gracefully");
             }
