@@ -40,6 +40,7 @@ export default class Generator {
             switch (objDepth) {
                 // Track
                 case 3: {
+                    console.log("track change detected");
                     this._itemChanges.push(
                         ...deriveItemChangesFromTrackChange(change)
                     );
@@ -47,6 +48,7 @@ export default class Generator {
                 }
                 // Item
                 case 4: {
+                    console.log("item change detected");
                     this._itemChanges.push(change);
                     break;
                 }
@@ -63,6 +65,8 @@ export default class Generator {
                     } else {
                         this._isHandlingChanges = false;
                         // TODO: render output
+                        console.log("finsihed generation");
+                        console.log(this._voiceMap);
                     }
                 };
                 this._isHandlingChanges = true;
@@ -72,8 +76,12 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
-        if (change.oldState) await this._clearItemStateEffect(change.oldState);
-        if (change.newState) await this._applyItemStateEffect(change.newState);
+        try {
+            if (change.oldState)
+                await this._clearItemStateEffect(change.oldState);
+            if (change.newState)
+                await this._applyItemStateEffect(change.newState);
+        } catch (error) {}
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
@@ -98,24 +106,17 @@ export default class Generator {
                 break;
             }
             case "duration": {
-                clearItemStateAsDuration(itemState, voiceNotes);
-
-                // Remove and remake notes for all following duration items
-
-                const durationsItems = getChildren(itemState.parent).slice();
-                durationsItems.sort((a, b) => a.state.start - b.state.start);
-
-                const nextItemIndex = durationsItems.findIndex(
-                    (item) => item.state.start >= itemState.end
+                const removedNotes = clearItemStateAsDuration(
+                    itemState,
+                    voiceNotes
                 );
 
-                if (nextItemIndex !== -1) {
-                    const followingItems = durationsItems.slice(nextItemIndex);
+                if (removedNotes.length === 0) break;
 
-                    followingItems.forEach((item) => {
-                        // TODO
-                    });
-                }
+                const newNotes =
+                    await this._remakeNotesForFollowingDurationItems(itemState);
+
+                await this._remakePropertiesForNotes(voice, newNotes);
 
                 break;
             }
@@ -144,12 +145,75 @@ export default class Generator {
                 break;
             }
             case "duration": {
-                await applyItemStateAsDuration(itemState, voiceNotes);
-                // TODO: Remove and remake notes for all following duration items
-                // TODO: Apply items in pitch, rest, and harmony tracks (that own one or more new notes)
+                const newNotes = [
+                    ...(await applyItemStateAsDuration(itemState, voiceNotes)),
+                    ...(await this._remakeNotesForFollowingDurationItems(
+                        itemState
+                    )),
+                ];
+
+                await this._remakePropertiesForNotes(voice, newNotes);
+
                 break;
             }
         }
+    }
+
+    private async _remakeNotesForFollowingDurationItems(
+        itemState: ItemState<"StringItem">
+    ) {
+        const voice = getParent(itemState.parent);
+        const voiceNotes = this._getVoiceNotes(voice);
+
+        const durationTrack = getChildren(voice)[trackTypeToIndex("duration")];
+        const durationItems = getChildren(durationTrack).slice();
+
+        durationItems.sort((a, b) => a.state.start - b.state.start);
+
+        const nextItemIndex = durationItems.findIndex(
+            (item) => item.state.start >= itemState.end
+        );
+
+        if (nextItemIndex === -1) return [];
+
+        const followingItems = durationItems.slice(nextItemIndex);
+
+        const newNotes: NoteBuilder[] = [];
+
+        for (const item of followingItems) {
+            clearItemStateAsDuration(item.state, voiceNotes);
+            newNotes.push(
+                ...(await applyItemStateAsDuration(item.state, voiceNotes))
+            );
+        }
+
+        return newNotes;
+    }
+
+    private async _remakePropertiesForNotes(
+        voice: Voice,
+        notes: NoteBuilder[]
+    ) {
+        const pitchTrack = getChildren(voice)[trackTypeToIndex("pitch")];
+        const restTrack = getChildren(voice)[trackTypeToIndex("rest")];
+        const harmonyTrack = getChildren(voice)[trackTypeToIndex("harmony")];
+
+        // Find all pitch, rest, and harmony items that "own" one or more of the notes
+        const items = [pitchTrack, restTrack, harmonyTrack].flatMap((track) => {
+            return getChildren(track).filter((item) =>
+                notes.find((note) =>
+                    isNoteStartWithinInterval(note, item.state)
+                )
+            );
+        });
+
+        const promises = [];
+
+        for (const item of items) {
+            promises.push(this._applyItemStateEffect(item.state));
+        }
+
+        await Promise.all(promises);
     }
 }
 
@@ -402,6 +466,7 @@ async function applyItemStateAsDuration(
         index++;
         beat += parsedResult;
     }
+
     notes.push(...newNotes);
     notes.sort((a, b) => a.start - b.start);
     return newNotes;
