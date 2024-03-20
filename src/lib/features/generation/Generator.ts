@@ -2,10 +2,37 @@ import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher
 import type Timeline from "../timeline/models/Timeline";
 
 export default class Generator {
+    private _stateChanges: StateChange<any>[] = [];
+
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
-        watcher.subscribe((obj, oldState) => {});
+        watcher.subscribe((obj, oldState) => {
+            const newState = obj.state;
+            this._stateChanges.push({ oldState, newState });
+
+            if (this._stateChanges.length === 1) {
+                const handleNextChangeLoop = () => {
+                    const nextChange = this._stateChanges.shift();
+
+                    if (nextChange) {
+                        this._handleChange(nextChange).then(
+                            handleNextChangeLoop
+                        );
+                    } else {
+                        //else render output
+                    }
+                };
+                handleNextChangeLoop();
+            }
+        });
     }
+
+    private async _handleChange(change: StateChange<any>) {}
 }
+
+type StateChange<TState extends object> = {
+    oldState: TState;
+    newState: TState;
+};
 
 class NoteBuilder {
     constructor(
