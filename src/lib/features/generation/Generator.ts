@@ -110,23 +110,52 @@ export default class Generator {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
 
-                const movedNotes = packNotesByIndex(voiceNotes, (note) => {
-                    const durationItem = getChildren(itemState.parent).find(
-                        (item) => isNoteStartWithinInterval(note, item.state)
-                    );
-                    return durationItem ? durationItem.state.start : undefined;
-                });
+                // Recalculate notes of all following duration items (recursively)
 
-                //update properties of moved notes
-                //if note duration changes, we adjust positions of the following notes
-                movedNotes.forEach((note) => {});
+                const durationsItems = getChildren(itemState.parent).slice();
+                durationsItems.sort((a, b) => a.state.start - b.state.start);
+
+                const nextDurationItem = durationsItems.find(
+                    (item) => item.state.start >= itemState.end
+                );
+
+                if (nextDurationItem) {
+                    this._clearItemStateEffect(nextDurationItem.state); // Resursive
+                    this._applyItemStateEffect(nextDurationItem.state);
+                }
 
                 break;
             }
         }
     }
 
-    private _applyItemStateEffect(itemState: ItemState<any>) {}
+    private _applyItemStateEffect(itemState: ItemState<any>) {
+        const trackType = trackIndexToType(getIndex(itemState.parent));
+
+        if (!trackType || trackType === "output") return;
+
+        const voice = getParent(itemState.parent);
+        const voiceNotes = this._getVoiceNotes(voice);
+        const ownedNotes = getNotesStartingWithinInterval(
+            voiceNotes,
+            itemState
+        );
+
+        switch (trackType) {
+            case "pitch": {
+                break;
+            }
+            case "rest": {
+                break;
+            }
+            case "harmony": {
+                break;
+            }
+            case "duration": {
+                break;
+            }
+        }
+    }
 }
 
 type StateChange<TState> = {
@@ -227,28 +256,4 @@ function getNotesStartingWithinInterval(
         isNoteStartWithinInterval(note, interval)
     );
     return notes.slice(firstIndex, lastIndex + 1);
-}
-
-function packNotesByIndex(
-    notes: NoteBuilder[],
-    calcMinStart: (note: NoteBuilder) => number | undefined
-): NoteBuilder[] {
-    const movedNotes: NoteBuilder[] = [];
-
-    for (let i = 0; i < notes.length; i++) {
-        const prevNoteEnd = i > 0 ? notes[i - 1].end : notes[i].start;
-        const minStart = calcMinStart(notes[i]);
-        const newStart = minStart
-            ? Math.max(prevNoteEnd, minStart)
-            : prevNoteEnd;
-        const duration = notes[i].end - notes[i].start;
-
-        if (notes[i].start !== newStart) {
-            notes[i].start = newStart;
-            notes[i].end = newStart + duration;
-            movedNotes.push(notes[i]);
-        }
-    }
-
-    return movedNotes;
 }
