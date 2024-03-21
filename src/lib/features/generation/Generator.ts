@@ -77,9 +77,10 @@ export default class Generator {
                         );
                     } else {
                         this._isHandlingChanges = false;
-                        // TODO: render output
-                        console.log("finsihed generation");
-                        console.log(this._voiceMap);
+                        //render output
+                        for (const voice of this._voiceMap.keys()) {
+                            this._renderOutput(voice);
+                        }
                     }
                 };
                 this._isHandlingChanges = true;
@@ -322,6 +323,33 @@ export default class Generator {
         }
 
         await Promise.all(promises);
+    }
+
+    private _renderOutput(voice: Voice) {
+        const voiceNotes = this._getVoiceNotes(voice);
+        const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
+
+        const notes = voiceNotes
+            .map((noteBuilder) => {
+                if (
+                    noteBuilder.pitch !== undefined &&
+                    noteBuilder.isRest !== undefined
+                ) {
+                    return new Item("NoteItem", {
+                        parent: outputTrack,
+                        start: noteBuilder.start,
+                        end: noteBuilder.end,
+                        content: noteBuilder.pitch,
+                    });
+                }
+            })
+            .filter((value): value is Item<"NoteItem"> => {
+                return value !== undefined;
+            });
+
+        outputTrack.state = {
+            children: notes,
+        };
     }
 }
 
