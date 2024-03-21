@@ -141,10 +141,50 @@ export default class Generator {
 
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
+        const ownedNotes = getNotesStartingWithinInterval(
+            voiceNotes,
+            itemState
+        );
 
         switch (trackType) {
             case "pitch": {
-                await applyItemStateAsDegree(itemState, voiceNotes);
+                const promises = [];
+
+                for (const index of range(ownedNotes.length)) {
+                    const promise = (async () => {
+                        const result = await invoke("evaluate", {
+                            task: `${itemState.content} ||| {"x": ${index}}`,
+                        });
+
+                        const parsedResult = Number(result);
+
+                        if (isNaN(parsedResult)) {
+                            throw Error("TODO: Handle pitch error gracefully");
+                        }
+
+                        ownedNotes[index].degree = Math.round(parsedResult);
+                    })();
+                    promises.push(promise);
+                }
+
+                await Promise.all(promises);
+
+                // Recalculate pitch based on harmony for ownedNotes
+                const voice = getParent(itemState.parent);
+                const harmonyTrack =
+                    getChildren(voice)[trackTypeToIndex("harmony")];
+
+                ownedNotes.forEach((note) => {
+                    const harmonyItem = getChildren(harmonyTrack).find((item) =>
+                        isNoteStartWithinInterval(note, item.state)
+                    );
+                    if (!harmonyItem) return;
+                    note.pitch = getPitchFromChordStatusAndDegree(
+                        harmonyItem.state.content.chordStatus,
+                        note.degree
+                    );
+                });
+
                 break;
             }
             case "rest": {
@@ -343,50 +383,6 @@ function getNotesStartingWithinInterval(
         isNoteStartWithinInterval(note, interval)
     );
     return notes.slice(firstIndex, lastIndex + 1);
-}
-
-async function applyItemStateAsDegree(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-
-    const promises = [];
-
-    for (const index of range(ownedNotes.length)) {
-        const promise = (async () => {
-            const result = await invoke("evaluate", {
-                task: `${itemState.content} ||| {"x": ${index}}`,
-            });
-
-            const parsedResult = Number(result);
-
-            if (isNaN(parsedResult)) {
-                throw Error("TODO: Handle pitch error gracefully");
-            }
-
-            ownedNotes[index].degree = Math.round(parsedResult);
-        })();
-        promises.push(promise);
-    }
-    await Promise.all(promises);
-
-    const voice = getParent(itemState.parent);
-    const harmonyTrack = getChildren(voice)[trackTypeToIndex("harmony")];
-    const harmonyItems = getChildren(harmonyTrack);
-
-    ownedNotes.forEach((note) => {
-        const harmonyItem = harmonyItems.find((item) =>
-            isNoteStartWithinInterval(note, item.state)
-        );
-        if (!harmonyItem) return;
-        note.pitch = getPitchFromChordStatusAndDegree(
-            harmonyItem.state.content.chordStatus,
-            note.degree
-        );
-    });
-
-    // TODO: Recalculate pitch based on harmony for ownedNotes
 }
 
 async function applyItemStateAsIsRest(
