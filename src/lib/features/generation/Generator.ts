@@ -82,7 +82,9 @@ export default class Generator {
                 await this._clearItemStateEffect(change.oldState);
             if (change.newState)
                 await this._applyItemStateEffect(change.newState);
-        } catch (error) {}
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
@@ -96,6 +98,8 @@ export default class Generator {
             voiceNotes,
             itemState
         );
+
+        if (ownedNotes.length === 0) return;
 
         switch (trackType) {
             case "pitch": {
@@ -122,13 +126,17 @@ export default class Generator {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
 
-                if (ownedNotes.length === 0) break;
+                const durationItems = getChildren(itemState.parent).slice();
+                durationItems.sort((a, b) => a.state.start - b.state.start);
 
-                const newNotes =
-                    await this._remakeNotesForFollowingDurationItems(itemState);
+                // TODO: Use binary search here instead
+                const nextDurationItem = durationItems.find(
+                    (item) => item.state.start >= itemState.end
+                );
 
-                await this._remakePropertiesForNotes(voice, newNotes);
-
+                if (nextDurationItem) {
+                    await this._applyItemStateEffect(nextDurationItem.state);
+                }
                 break;
             }
         }
@@ -159,7 +167,8 @@ export default class Generator {
                         const parsedResult = Number(result);
 
                         if (isNaN(parsedResult)) {
-                            throw Error("TODO: Handle pitch error gracefully");
+                            console.warn("pitch item result error");
+                            return;
                         }
 
                         ownedNotes[index].degree = Math.round(parsedResult);
@@ -202,7 +211,8 @@ export default class Generator {
                         ) {
                             ownedNotes[index].isRest = parsedResult === "True";
                         } else {
-                            throw Error("TODO: Handle isRest error gracefully");
+                            console.warn("rest item result error");
+                            return;
                         }
                     })();
                     promises.push(promise);
@@ -224,57 +234,62 @@ export default class Generator {
                 break;
             }
             case "duration": {
-                const newNotes = [
-                    ...(await applyItemStateAsDuration(itemState, voiceNotes)),
-                    ...(await this._remakeNotesForFollowingDurationItems(
-                        itemState
-                    )),
-                ];
+                ownedNotes.forEach((note) => {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                });
+
+                const firstOverlappingNote = voiceNotes.find((note) => {
+                    return (
+                        note.start < itemState.start &&
+                        note.end > itemState.start
+                    );
+                });
+
+                let beat = firstOverlappingNote
+                    ? Math.max(itemState.start, firstOverlappingNote.end)
+                    : itemState.start;
+
+                let index = 0;
+
+                const newNotes: NoteBuilder[] = [];
+
+                while (beat < itemState.end) {
+                    const result = await invoke("evaluate", {
+                        task: `${itemState.content} ||| {"x": ${index}}`,
+                    });
+
+                    const parsedResult = Number(result);
+
+                    if (isNaN(parsedResult)) {
+                        console.warn("duration item result error");
+                        return;
+                    }
+
+                    newNotes.push(new NoteBuilder(beat, beat + parsedResult));
+
+                    index++;
+                    beat += parsedResult;
+                }
+
+                voiceNotes.push(...newNotes);
+                voiceNotes.sort((a, b) => a.start - b.start);
+
+                const durationItems = getChildren(itemState.parent).slice();
+                durationItems.sort((a, b) => a.state.start - b.state.start);
+
+                // TODO: Use binary search here instead
+                const nextDurationItem = durationItems.find(
+                    (item) => item.state.start >= itemState.end
+                );
+
+                if (nextDurationItem) {
+                    await this._applyItemStateEffect(nextDurationItem.state);
+                }
 
                 await this._remakePropertiesForNotes(voice, newNotes);
-
                 break;
             }
         }
-    }
-
-    private async _remakeNotesForFollowingDurationItems(
-        itemState: ItemState<"StringItem">
-    ) {
-        const voice = getParent(itemState.parent);
-        const voiceNotes = this._getVoiceNotes(voice);
-
-        const durationTrack = getChildren(voice)[trackTypeToIndex("duration")];
-        const durationItems = getChildren(durationTrack).slice();
-
-        durationItems.sort((a, b) => a.state.start - b.state.start);
-
-        const nextItemIndex = durationItems.findIndex(
-            (item) => item.state.start >= itemState.end
-        );
-
-        if (nextItemIndex === -1) return [];
-
-        const followingItems = durationItems.slice(nextItemIndex);
-
-        const newNotes: NoteBuilder[] = [];
-
-        for (const item of followingItems) {
-            const ownedNotes = getNotesStartingWithinInterval(
-                voiceNotes,
-                item.state
-            );
-
-            ownedNotes.forEach((note) => {
-                voiceNotes.splice(voiceNotes.indexOf(note), 1);
-            });
-
-            newNotes.push(
-                ...(await applyItemStateAsDuration(item.state, voiceNotes))
-            );
-        }
-
-        return newNotes;
     }
 
     private async _remakePropertiesForNotes(
@@ -413,41 +428,4 @@ function getPitchFromChordStatusAndDegree(
     if (degree !== undefined) {
         return chordStatus.convertDegreeToMidiValue(degree);
     }
-}
-
-/** @returns added notes */
-async function applyItemStateAsDuration(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const prevNote = notes.find((note) => note.end < itemState.start);
-
-    let beat = prevNote
-        ? Math.max(itemState.start, prevNote.end)
-        : itemState.start;
-
-    let index = 0;
-
-    const newNotes: NoteBuilder[] = [];
-
-    while (beat < itemState.end) {
-        const result = await invoke("evaluate", {
-            task: `${itemState.content} ||| {"x": ${index}}`,
-        });
-
-        const parsedResult = Number(result);
-
-        if (isNaN(parsedResult)) {
-            throw Error("TODO: Handle duration error gracefully");
-        }
-
-        newNotes.push(new NoteBuilder(beat, beat + parsedResult));
-
-        index++;
-        beat += parsedResult;
-    }
-
-    notes.push(...newNotes);
-    notes.sort((a, b) => a.start - b.start);
-    return newNotes;
 }
