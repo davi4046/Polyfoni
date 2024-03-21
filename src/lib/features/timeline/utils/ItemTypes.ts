@@ -41,17 +41,15 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     >
 >;
 
-export const itemTextFunctions: StringConversionFunctions = {
+export const itemTextFunctions: {
+    [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
+} = {
     StringItem: (value) => value,
     ChordItem: (value) =>
         value.chordStatus instanceof Chord
             ? value.chordStatus.getName()
             : "undefined",
     NoteItem: (value) => String(value),
-};
-
-type StringConversionFunctions = {
-    [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
 };
 
 export const itemInitialContentFunctions: {
