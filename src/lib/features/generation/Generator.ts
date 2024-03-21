@@ -13,6 +13,7 @@ import type { ItemState } from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
+import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import type Interval from "../../utils/interval/Interval";
 import { Chord } from "../timeline/utils/chord/Chord";
 
@@ -146,8 +147,8 @@ export default class Generator {
                     itemState
                 );
                 ownedNotes.forEach((note) => {
-                    note.pitch = getPitchFromItemStateAndDegree(
-                        itemState,
+                    note.pitch = getPitchFromChordStatusAndDegree(
+                        itemState.content.chordStatus,
                         note.degree
                     );
                 });
@@ -404,8 +405,8 @@ async function applyItemStateAsDegree(
             isNoteStartWithinInterval(note, item.state)
         );
         if (!harmonyItem) return;
-        note.pitch = getPitchFromItemStateAndDegree(
-            harmonyItem.state,
+        note.pitch = getPitchFromChordStatusAndDegree(
+            harmonyItem.state.content.chordStatus,
             note.degree
         );
     });
@@ -440,16 +441,14 @@ async function applyItemStateAsIsRest(
     await Promise.all(promises);
 }
 
-function getPitchFromItemStateAndDegree(
-    itemState: ItemState<"ChordItem">,
+function getPitchFromChordStatusAndDegree(
+    chordStatus: ItemTypes["ChordItem"]["chordStatus"],
     degree: number | undefined
 ): number | undefined {
-    const chord = itemState.content.chordStatus;
-
-    if (!(chord instanceof Chord)) return;
+    if (!(chordStatus instanceof Chord)) return;
 
     if (degree !== undefined) {
-        return chord.convertDegreeToMidiValue(degree);
+        return chordStatus.convertDegreeToMidiValue(degree);
     }
 }
 
