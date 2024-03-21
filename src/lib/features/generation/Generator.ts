@@ -88,14 +88,8 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
-        try {
-            if (change.oldState)
-                await this._clearItemStateEffect(change.oldState);
-            if (change.newState)
-                await this._applyItemStateEffect(change.newState);
-        } catch (error) {
-            console.error(error);
-        }
+        if (change.oldState) await this._clearItemStateEffect(change.oldState);
+        if (change.newState) await this._applyItemStateEffect(change.newState);
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
@@ -270,10 +264,15 @@ export default class Generator {
                         return;
                     }
 
-                    newNotes.push(new NoteBuilder(beat, beat + parsedResult));
+                    const duration = roundToNearestMultiple(
+                        Math.abs(parsedResult),
+                        2
+                    );
+
+                    newNotes.push(new NoteBuilder(beat, beat + duration));
 
                     index++;
-                    beat += parsedResult;
+                    beat += duration;
                 }
 
                 voiceNotes.push(...newNotes);
@@ -460,4 +459,8 @@ function getPitchFromChordStatusAndDegree(
     if (degree !== undefined) {
         return chordStatus.convertDegreeToMidiValue(degree);
     }
+}
+
+function roundToNearestMultiple(value: number, factor: number) {
+    return Math.pow(factor, Math.round(Math.log(value) / Math.log(factor)));
 }
