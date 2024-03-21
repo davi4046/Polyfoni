@@ -1,6 +1,9 @@
 import type TimelineContext from "../TimelineContext";
 import Item from "../../models/Item";
-import { initialContent, type ItemTypes } from "../../utils/ItemTypes";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../../utils/ItemTypes";
 import {
     addChildren,
     getParent,
@@ -20,7 +23,10 @@ export default function insertEmptyItems(context: TimelineContext) {
                 parent: track,
                 start: highlight.state.start,
                 end: highlight.state.end,
-                content: initialContent[track.itemType as keyof ItemTypes](),
+                content:
+                    itemInitialContentFunctions[
+                        track.itemType as keyof ItemTypes
+                    ](),
             })
         );
     });

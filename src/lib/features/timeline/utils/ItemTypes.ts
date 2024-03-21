@@ -54,7 +54,9 @@ type StringConversionFunctions = {
     [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
 };
 
-export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
+export const itemInitialContentFunctions: {
+    [K in keyof ItemTypes]: () => ItemTypes[K];
+} = {
     StringItem: () => "",
     ChordItem: () => {
         return { chordStatus: createEmptyPitchMap(), filters: [] };

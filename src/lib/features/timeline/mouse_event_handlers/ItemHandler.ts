@@ -1,7 +1,10 @@
 import type TimelineContext from "../context/TimelineContext";
 import Item from "../models/Item";
 import type Track from "../models/Track";
-import { initialContent, type ItemTypes } from "../utils/ItemTypes";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../utils/ItemTypes";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
 import findClosestTrack from "../utils/screen_utils/findClosestTrack";
@@ -111,7 +114,7 @@ export default class ItemHandler implements MouseEventHandler {
                 const content =
                     item.itemType === newTrack.itemType
                         ? item.state.content
-                        : initialContent[
+                        : itemInitialContentFunctions[
                               newTrack.itemType as keyof ItemTypes
                           ]();
 

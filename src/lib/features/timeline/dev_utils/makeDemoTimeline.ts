@@ -2,7 +2,10 @@ import Item from "../models/Item";
 import Timeline from "../models/Timeline";
 import Track from "../models/Track";
 import Voice from "../models/Voice";
-import { initialContent, type ItemTypes } from "../utils/ItemTypes";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../utils/ItemTypes";
 import {
     addChildren,
     getChildren,
@@ -44,7 +47,7 @@ function makeRandomItems<T extends keyof ItemTypes>(
                     parent: track,
                     start: beat,
                     end: end,
-                    content: initialContent[itemType](),
+                    content: itemInitialContentFunctions[itemType](),
                 })
             );
         }
