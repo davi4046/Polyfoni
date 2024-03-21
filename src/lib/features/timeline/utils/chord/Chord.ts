@@ -65,6 +65,27 @@ export class Chord {
         const c = 100 - (100 / 11) * (pitchCount - 1);
         return chroma.hcl(h, c, 80);
     }
+
+    getPrimeForm(): Chord {
+        const builder = new ChordBuilder(this);
+        const decimals: number[] = [];
+
+        decimals.push(builder.decimal!);
+        builder.rotateOnce("L");
+
+        while (!decimals.includes(builder.decimal!)) {
+            decimals.push(builder.decimal!);
+            builder.rotateOnce("L");
+        }
+
+        const minDecimal = decimals.reduce(
+            (min, curr) => (curr < min ? curr : min),
+            Number.MAX_SAFE_INTEGER
+        );
+
+        builder.rotate("R", decimals.length - decimals.indexOf(minDecimal));
+        return builder.build() as Chord;
+    }
 }
 
 export class ChordBuilder {
@@ -128,7 +149,7 @@ export class ChordBuilder {
         }
     }
 
-    rotate(direction: "L" | "R") {
+    rotateOnce(direction: "L" | "R") {
         if (!this._root) return;
 
         const rootIndex = pitchNames.indexOf(this._root);
@@ -138,12 +159,56 @@ export class ChordBuilder {
         pitchEntries = [
             ...pitchEntries.slice(rootIndex),
             ...pitchEntries.slice(0, rootIndex),
-        ].slice(1); // Make root the first entry
+        ].slice(1); // Make root the first entry, then remove it
 
         if (direction === "L") pitchEntries.reverse();
 
         for (const [pitch, value] of pitchEntries) {
             if (value) {
+                this._root = pitch as Pitch;
+                this._decimal = getDecimalFromRootAndPitches(
+                    this._root,
+                    this._pitches
+                );
+                break;
+            }
+        }
+    }
+
+    rotate(direction: "L" | "R", rotations: number) {
+        if (!this._root) return;
+
+        if (rotations === 1) {
+            this.rotateOnce(direction);
+            return;
+        }
+
+        const rootIndex = pitchNames.indexOf(this._root);
+
+        let pitchEntries = Object.entries(this._pitches);
+
+        pitchEntries = [
+            ...pitchEntries.slice(rootIndex),
+            ...pitchEntries.slice(0, rootIndex),
+        ].slice(1); // Make root the first entry, then remove it
+
+        if (direction === "L") pitchEntries.reverse();
+
+        const pitchCount = Object.values(this.pitches).reduce(
+            (count, value) => (value ? count + 1 : count),
+            0
+        );
+
+        rotations = rotations % pitchCount;
+
+        let currRotations = 0;
+
+        for (const [pitch, value] of pitchEntries) {
+            if (!value) continue;
+
+            currRotations++;
+
+            if (currRotations === rotations) {
                 this._root = pitch as Pitch;
                 this._decimal = getDecimalFromRootAndPitches(
                     this._root,

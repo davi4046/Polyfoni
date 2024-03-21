@@ -140,7 +140,7 @@
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Rotate Left"
                 on:click={(_) => {
-                    builder.rotate("L");
+                    builder.rotateOnce("L");
                     builder = builder; // Reactivity hack
                 }}
                 disabled={builder.root === undefined}
@@ -153,7 +153,7 @@
                 class="btn-default flex place-items-center space-x-0.5 p-1 font-medium"
                 title="Rotate Right"
                 on:click={(_) => {
-                    builder.rotate("R");
+                    builder.rotateOnce("R");
                     builder = builder; // Reactivity hack
                 }}
                 disabled={builder.root === undefined}
@@ -243,7 +243,7 @@
                 {chordStatus.getName()}
             </div>
             <!-- test -->
-            <div>★A-2741</div>
+            <div>★{chordStatus.getPrimeForm().getName()}</div>
         </div>
     {/if}
 </div>
