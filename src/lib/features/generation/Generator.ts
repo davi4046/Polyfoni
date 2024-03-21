@@ -330,7 +330,8 @@ export default class Generator {
             .map((noteBuilder) => {
                 if (
                     noteBuilder.pitch !== undefined &&
-                    noteBuilder.isRest !== undefined
+                    noteBuilder.isRest !== undefined &&
+                    !noteBuilder.isRest
                 ) {
                     return new Item("NoteItem", {
                         parent: outputTrack,
