@@ -141,7 +141,16 @@ export default class Generator {
                 break;
             }
             case "harmony": {
-                applyItemStateAsHarmony(itemState, voiceNotes);
+                const ownedNotes = getNotesStartingWithinInterval(
+                    voiceNotes,
+                    itemState
+                );
+                ownedNotes.forEach((note) => {
+                    note.pitch = getPitchFromItemStateAndDegree(
+                        itemState,
+                        note.degree
+                    );
+                });
                 break;
             }
             case "duration": {
@@ -386,6 +395,21 @@ async function applyItemStateAsDegree(
     }
     await Promise.all(promises);
 
+    const voice = getParent(itemState.parent);
+    const harmonyTrack = getChildren(voice)[trackTypeToIndex("harmony")];
+    const harmonyItems = getChildren(harmonyTrack);
+
+    ownedNotes.forEach((note) => {
+        const harmonyItem = harmonyItems.find((item) =>
+            isNoteStartWithinInterval(note, item.state)
+        );
+        if (!harmonyItem) return;
+        note.pitch = getPitchFromItemStateAndDegree(
+            harmonyItem.state,
+            note.degree
+        );
+    });
+
     // TODO: Recalculate pitch based on harmony for ownedNotes
 }
 
@@ -416,22 +440,16 @@ async function applyItemStateAsIsRest(
     await Promise.all(promises);
 }
 
-function applyItemStateAsHarmony(
+function getPitchFromItemStateAndDegree(
     itemState: ItemState<"ChordItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-
+    degree: number | undefined
+): number | undefined {
     const chord = itemState.content.chordStatus;
 
     if (!(chord instanceof Chord)) return;
 
-    for (const note of ownedNotes) {
-        if (note.degree !== undefined) {
-            note.pitch = chord.convertDegreeToMidiValue(note.degree);
-        } else {
-            note.pitch = undefined;
-        }
+    if (degree !== undefined) {
+        return chord.convertDegreeToMidiValue(degree);
     }
 }
 
