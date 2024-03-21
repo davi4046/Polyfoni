@@ -92,27 +92,37 @@ export default class Generator {
 
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
+        const ownedNotes = getNotesStartingWithinInterval(
+            voiceNotes,
+            itemState
+        );
 
         switch (trackType) {
             case "pitch": {
-                clearItemStateAsDegree(itemState, voiceNotes);
+                ownedNotes.forEach((note) => {
+                    note.degree = undefined;
+                    note.pitch = undefined;
+                });
                 break;
             }
             case "rest": {
-                clearItemStateAsIsRest(itemState, voiceNotes);
+                ownedNotes.forEach((note) => {
+                    note.isRest = undefined;
+                });
                 break;
             }
             case "harmony": {
-                clearItemStateAsHarmony(itemState, voiceNotes);
+                ownedNotes.forEach((note) => {
+                    note.pitch = undefined;
+                });
                 break;
             }
             case "duration": {
-                const removedNotes = clearItemStateAsDuration(
-                    itemState,
-                    voiceNotes
-                );
+                ownedNotes.forEach((note) => {
+                    voiceNotes.splice(voiceNotes.indexOf(note), 1);
+                });
 
-                if (removedNotes.length === 0) break;
+                if (ownedNotes.length === 0) break;
 
                 const newNotes =
                     await this._remakeNotesForFollowingDurationItems(itemState);
@@ -191,7 +201,15 @@ export default class Generator {
         const newNotes: NoteBuilder[] = [];
 
         for (const item of followingItems) {
-            clearItemStateAsDuration(item.state, voiceNotes);
+            const ownedNotes = getNotesStartingWithinInterval(
+                voiceNotes,
+                item.state
+            );
+
+            ownedNotes.forEach((note) => {
+                voiceNotes.splice(voiceNotes.indexOf(note), 1);
+            });
+
             newNotes.push(
                 ...(await applyItemStateAsDuration(item.state, voiceNotes))
             );
@@ -325,49 +343,6 @@ function getNotesStartingWithinInterval(
         isNoteStartWithinInterval(note, interval)
     );
     return notes.slice(firstIndex, lastIndex + 1);
-}
-
-function clearItemStateAsDegree(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-    ownedNotes.forEach((note) => {
-        note.degree = undefined;
-        note.pitch = undefined;
-    });
-}
-
-function clearItemStateAsIsRest(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-    ownedNotes.forEach((note) => {
-        note.isRest = undefined;
-    });
-}
-
-function clearItemStateAsHarmony(
-    itemState: ItemState<"ChordItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-    ownedNotes.forEach((note) => {
-        note.pitch = undefined;
-    });
-}
-
-/** @returns removed notes */
-function clearItemStateAsDuration(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-    ownedNotes.forEach((note) => {
-        notes.splice(notes.indexOf(note), 1);
-    });
-    return ownedNotes;
 }
 
 async function applyItemStateAsDegree(
