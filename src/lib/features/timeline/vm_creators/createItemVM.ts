@@ -5,7 +5,7 @@ import type Item from "../models/Item";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
-import { stringConversionFunctions, type ItemTypes } from "../utils/ItemTypes";
+import { itemTextFunctions, type ItemTypes } from "../utils/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 
@@ -38,9 +38,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         {
             start: model.state.start,
             end: model.state.end,
-            text: stringConversionFunctions[model.itemType](
-                model.state.content
-            ),
+            text: itemTextFunctions[model.itemType](model.state.content),
 
             innerDivStyles: createStyles(),
             handleStyles: {
@@ -72,9 +70,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         vm.state = {
             start: model.state.start,
             end: model.state.end,
-            text: stringConversionFunctions[model.itemType](
-                model.state.content
-            ),
+            text: itemTextFunctions[model.itemType](model.state.content),
         };
     });
 

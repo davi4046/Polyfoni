@@ -41,7 +41,7 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     >
 >;
 
-export const stringConversionFunctions: StringConversionFunctions = {
+export const itemTextFunctions: StringConversionFunctions = {
     StringItem: (value) => value,
     ChordItem: (value) =>
         value.chordStatus instanceof Chord

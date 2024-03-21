@@ -2,7 +2,7 @@ import chroma from "chroma-js";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
-import { type ItemTypes, stringConversionFunctions } from "../utils/ItemTypes";
+import { type ItemTypes, itemTextFunctions } from "../utils/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
 
 export default function createItemVM_ghost<T extends keyof ItemTypes>(
@@ -13,9 +13,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
         {
             start: model.state.start,
             end: model.state.end,
-            text: stringConversionFunctions[model.itemType](
-                model.state.content
-            ),
+            text: itemTextFunctions[model.itemType](model.state.content),
 
             innerDivStyles: {
                 "background-color": chroma.hcl(0, 0, 80).css(),
@@ -37,9 +35,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
         vm.state = {
             start: model.state.start,
             end: model.state.end,
-            text: stringConversionFunctions[model.itemType](
-                model.state.content
-            ),
+            text: itemTextFunctions[model.itemType](model.state.content),
         };
     });
 
