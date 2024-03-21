@@ -64,6 +64,16 @@ export const itemInitialContentFunctions: {
     NoteItem: () => Math.round(Math.random() * 14), // TEST
 };
 
+export const itemColorFunctions: Partial<{
+    [K in keyof ItemTypes]: (content: ItemTypes[K]) => chroma.Color | undefined;
+}> = {
+    ChordItem: (content) => {
+        if (content.chordStatus instanceof Chord) {
+            return content.chordStatus.getColor();
+        }
+    },
+};
+
 export const itemInitFunctions: Partial<{
     [K in keyof ItemTypes]: (item: Item<K>) => void;
 }> = {
