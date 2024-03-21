@@ -4,14 +4,18 @@ import { range } from "lodash";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
+    addChildren,
     countAncestors,
     getChildren,
     getIndex,
     getParent,
+    removeChildren,
 } from "../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
+import Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
+import type Track from "../timeline/models/Track";
 import type Voice from "../timeline/models/Voice";
 import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import type Interval from "../../utils/interval/Interval";
@@ -41,7 +45,11 @@ export default class Generator {
             switch (objDepth) {
                 // Track
                 case 3: {
-                    console.log("track change detected");
+                    const trackType = trackIndexToType(
+                        getIndex(obj as Track<any>)
+                    );
+                    if (trackType === "output") break;
+
                     this._itemChanges.push(
                         ...deriveItemChangesFromTrackChange(change)
                     );
@@ -49,7 +57,11 @@ export default class Generator {
                 }
                 // Item
                 case 4: {
-                    console.log("item change detected");
+                    const trackType = trackIndexToType(
+                        getIndex(getParent(obj as Item<any>))
+                    );
+                    if (trackType === "output") break;
+
                     this._itemChanges.push(change);
                     break;
                 }
@@ -89,9 +101,6 @@ export default class Generator {
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
-
-        if (!trackType || trackType === "output") return;
-
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
         const ownedNotes = getNotesStartingWithinInterval(
@@ -144,9 +153,6 @@ export default class Generator {
 
     private async _applyItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
-
-        if (!trackType || trackType === "output") return;
-
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
         const ownedNotes = getNotesStartingWithinInterval(
