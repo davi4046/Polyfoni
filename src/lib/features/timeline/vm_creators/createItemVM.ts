@@ -23,6 +23,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
             "border-width": "2px",
             "border-color": "black",
             inset: "4px 0 4px 0",
+            padding: "0 8px 0 8px",
         };
 
         if (context.state.selectedItems.includes(model)) {
