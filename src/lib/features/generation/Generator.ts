@@ -166,7 +166,6 @@ export default class Generator {
                     })();
                     promises.push(promise);
                 }
-
                 await Promise.all(promises);
 
                 // Recalculate pitch based on harmony for ownedNotes
@@ -184,11 +183,31 @@ export default class Generator {
                         note.degree
                     );
                 });
-
                 break;
             }
             case "rest": {
-                await applyItemStateAsIsRest(itemState, voiceNotes);
+                const promises = [];
+
+                for (const index of range(ownedNotes.length)) {
+                    const promise = (async () => {
+                        const result = await invoke("evaluate", {
+                            task: `${itemState.content} ||| {"x": ${index}}`,
+                        });
+
+                        const parsedResult = String(result).trim();
+
+                        if (
+                            parsedResult === "True" ||
+                            parsedResult === "False"
+                        ) {
+                            ownedNotes[index].isRest = parsedResult === "True";
+                        } else {
+                            throw Error("TODO: Handle isRest error gracefully");
+                        }
+                    })();
+                    promises.push(promise);
+                }
+                await Promise.all(promises);
                 break;
             }
             case "harmony": {
@@ -383,33 +402,6 @@ function getNotesStartingWithinInterval(
         isNoteStartWithinInterval(note, interval)
     );
     return notes.slice(firstIndex, lastIndex + 1);
-}
-
-async function applyItemStateAsIsRest(
-    itemState: ItemState<"StringItem">,
-    notes: NoteBuilder[]
-) {
-    const ownedNotes = getNotesStartingWithinInterval(notes, itemState);
-
-    const promises = [];
-
-    for (const index of range(ownedNotes.length)) {
-        const promise = (async () => {
-            const result = await invoke("evaluate", {
-                task: `${itemState.content} ||| {"x": ${index}}`,
-            });
-
-            const parsedResult = String(result).trim();
-
-            if (parsedResult === "True" || parsedResult === "False") {
-                ownedNotes[index].isRest = parsedResult === "True";
-            } else {
-                throw Error("TODO: Handle isRest error gracefully");
-            }
-        })();
-        promises.push(promise);
-    }
-    await Promise.all(promises);
 }
 
 function getPitchFromChordStatusAndDegree(
