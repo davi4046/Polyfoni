@@ -2,7 +2,7 @@ import TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
 import Timeline from "../models/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
-import { editorWidgets, type ItemTypes } from "../utils/ItemTypes";
+import { itemEditorWidgets, type ItemTypes } from "../utils/ItemTypes";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
@@ -66,7 +66,9 @@ export default function createTimelineVM(
         if (context.state.editItem === oldState.editItem) return;
 
         const EditorWidgetCtor =
-            editorWidgets[context.state.editItem?.itemType as keyof ItemTypes];
+            itemEditorWidgets[
+                context.state.editItem?.itemType as keyof ItemTypes
+            ];
 
         if (EditorWidgetCtor && context.state.editItem) {
             vm.state = {

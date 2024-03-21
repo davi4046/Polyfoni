@@ -24,7 +24,7 @@ export type ItemTypes = {
     NoteItem: number;
 };
 
-export const editorWidgets: Partial<{
+export const itemEditorWidgets: Partial<{
     [K in keyof ItemTypes]: EditorWidget<K>;
 }> = {
     StringItem: StringEditorWidget,
