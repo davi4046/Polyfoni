@@ -4,12 +4,10 @@ import { range } from "lodash";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
-    addChildren,
     countAncestors,
     getChildren,
     getIndex,
     getParent,
-    removeChildren,
 } from "../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
 import Item from "../timeline/models/Item";
