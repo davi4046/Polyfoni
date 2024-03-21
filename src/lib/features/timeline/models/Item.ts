@@ -1,4 +1,4 @@
-import { postInitFunctions, type ItemTypes } from "./../utils/ItemTypes";
+import { itemInitFunctions, type ItemTypes } from "./../utils/ItemTypes";
 import Model from "../../../architecture/Model";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
@@ -20,6 +20,6 @@ export default class Item<T extends keyof ItemTypes> extends Model<
     ) {
         super(state);
 
-        if (postInitFunctions[itemType]) postInitFunctions[itemType]!(this);
+        if (itemInitFunctions[itemType]) itemInitFunctions[itemType]!(this);
     }
 }

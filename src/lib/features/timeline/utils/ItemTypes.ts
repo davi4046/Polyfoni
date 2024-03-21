@@ -62,7 +62,7 @@ export const initialContent: { [K in keyof ItemTypes]: () => ItemTypes[K] } = {
     NoteItem: () => Math.round(Math.random() * 14), // TEST
 };
 
-export const postInitFunctions: Partial<{
+export const itemInitFunctions: Partial<{
     [K in keyof ItemTypes]: (item: Item<K>) => void;
 }> = {
     ChordItem: (item) => {
