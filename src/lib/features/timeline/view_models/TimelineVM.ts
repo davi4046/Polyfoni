@@ -17,6 +17,8 @@ interface TimelineVMState {
     onPlayButtonClick: (event: MouseEvent) => void;
     onPauseButtonClick: (event: MouseEvent) => void;
     onStopButtonClick: (event: MouseEvent) => void;
+
+    playbackPosition: number;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}

@@ -25,7 +25,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     private _interval: NodeJS.Timeout | undefined;
 
     startPlayback() {
-        if (this.state.isPlaying) this.pausePlayback();
+        if (this.state.isPlaying) return;
 
         const voices = getChildren(getChildren(this._timeline)[1]);
 
@@ -39,7 +39,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             this.state = {
                 playbackPosition:
                     this.state.playbackPosition +
-                    this._bpm / 60000 / intervalDuration,
+                    (this._bpm / 60000) * intervalDuration,
             };
         }, intervalDuration);
 

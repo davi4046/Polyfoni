@@ -57,6 +57,8 @@ export default function createTimelineVM(
                     playbackPosition: 0,
                 };
             },
+
+            playbackPosition: context.player.state.playbackPosition,
         },
         model.id
     );
@@ -93,6 +95,12 @@ export default function createTimelineVM(
                 editorWidget: undefined,
             };
         }
+    });
+
+    context.player.subscribe(() => {
+        vm.state = {
+            playbackPosition: context.player.state.playbackPosition,
+        };
     });
 
     return vm;

@@ -61,6 +61,20 @@
     data-type="timeline"
     data-model-id={vm.id}
 >
+    <!-- PLAYBACK MARKER -->
+    <div
+        class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
+        data-type="top"
+    >
+        <div class="relative z-50 h-full overflow-clip" style="width: 4096px;">
+            <div
+                class="absolute h-full text-black"
+                style="left: {vm.state.playbackPosition * 64 + 1}px"
+            >
+                <VerticalLine />
+            </div>
+        </div>
+    </div>
     <!-- PLAYBACK BUTTONS -->
     <div class="pointer-events-none relative col-start-2 row-start-3">
         <div
