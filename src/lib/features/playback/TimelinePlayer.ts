@@ -30,7 +30,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         const voices = getChildren(getChildren(this._timeline)[1]);
 
         voices.forEach((voice) => {
-            midiPlayer.allSoundOff(getIndex(voice));
             this._schedulePlayback(voice);
         });
 
@@ -54,7 +53,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
-            midiPlayer.allSoundOff(getIndex(voice));
+            midiPlayer.allNotesOff(getIndex(voice));
         });
 
         this._voiceTimeouts.clear();
