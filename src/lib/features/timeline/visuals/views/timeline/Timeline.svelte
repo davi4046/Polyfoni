@@ -61,8 +61,20 @@
     data-type="timeline"
     data-model-id={vm.id}
 >
-    <!-- BUTTONS -->
-    <div class="col-start-1 row-start-1"></div>
+    <!-- PLAYBACK BUTTONS -->
+    <div class="relative col-start-2 row-start-3">
+        <div class="absolute bottom-0 right-0 z-30 m-2 flex gap-2">
+            <button class="btn-default h-9 p-1">
+                <PlayIcon />
+            </button>
+            <button class="btn-default h-9 p-1">
+                <PauseIcon />
+            </button>
+            <button class="btn-default h-9 p-1">
+                <StopIcon />
+            </button>
+        </div>
+    </div>
     <!-- MARKERS -->
     <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
