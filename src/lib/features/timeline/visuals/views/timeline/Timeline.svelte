@@ -15,15 +15,16 @@
     vm.subscribe((_, oldState) => {
         vm = vm;
 
-        if (vm.state.editorWidget !== oldState.editorWidget) {
-            editorWidgetComponent?.$destroy();
-            if (vm.state.editorWidget) {
-                editorWidgetComponent = new vm.state.editorWidget.ctor({
-                    target: editorWidgetContainer,
-                    props: vm.state.editorWidget.props,
-                });
-            }
-        }
+        if (vm.state.editorWidget === oldState.editorWidget) return;
+
+        editorWidgetComponent?.$destroy();
+
+        if (!vm.state.editorWidget) return;
+
+        editorWidgetComponent = new vm.state.editorWidget.ctor({
+            target: editorWidgetContainer,
+            props: vm.state.editorWidget.props,
+        });
     });
 
     onMount(() => {
