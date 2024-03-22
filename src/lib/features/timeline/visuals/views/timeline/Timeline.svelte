@@ -62,8 +62,10 @@
     data-model-id={vm.id}
 >
     <!-- PLAYBACK BUTTONS -->
-    <div class="relative col-start-2 row-start-3">
-        <div class="absolute bottom-0 right-0 z-30 m-2 flex gap-2">
+    <div class="pointer-events-none relative col-start-2 row-start-3">
+        <div
+            class="pointer-events-auto absolute bottom-0 right-0 z-30 m-2 flex gap-2"
+        >
             <button
                 class="btn-default h-9 p-1"
                 on:click={vm.state.onPlayButtonClick}
