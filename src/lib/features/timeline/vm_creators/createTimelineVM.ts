@@ -40,13 +40,22 @@ export default function createTimelineVM(
             center: center,
             bottom: bottom,
 
+            handleMouseMove: (event: MouseEvent) => {
+                mouseEventListener.handler = undefined;
+                event.stopPropagation();
+            },
             handleMouseMove_tracks: (event: MouseEvent) => {
                 mouseEventListener.handler = mouseEventHandler;
                 event.stopPropagation();
             },
-            handleMouseMove: (event: MouseEvent) => {
-                mouseEventListener.handler = undefined;
-                event.stopPropagation();
+
+            onPlayButtonClick: (_) => context.player.startPlayback(),
+            onPauseButtonClick: (_) => context.player.pausePlayback(),
+            onStopButtonClick: (_) => {
+                context.player.pausePlayback();
+                context.player.state = {
+                    playbackPosition: 0,
+                };
             },
         },
         model.id

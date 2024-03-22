@@ -8,9 +8,15 @@ interface TimelineVMState {
     top: VoiceVM[];
     center: VoiceVM[];
     bottom: VoiceVM[];
-    handleMouseMove_tracks: (event: MouseEvent) => void;
+
     handleMouseMove: (event: MouseEvent) => void;
+    handleMouseMove_tracks: (event: MouseEvent) => void;
+
     editorWidget?: SvelteCtorMatchProps<{ item: Item<any> }>;
+
+    onPlayButtonClick: (event: MouseEvent) => void;
+    onPauseButtonClick: (event: MouseEvent) => void;
+    onStopButtonClick: (event: MouseEvent) => void;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}
