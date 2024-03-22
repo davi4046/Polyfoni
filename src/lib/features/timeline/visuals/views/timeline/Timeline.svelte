@@ -1,11 +1,14 @@
 <script lang="ts">
-    import MarkerBig from "./assets/MarkerBig.svelte";
-    import MarkerSmall from "./assets/MarkerSmall.svelte";
     import Voice from "../voice/Voice.svelte";
     import VoiceHeader from "../voice_header/VoiceHeader.svelte";
-    import VerticalLine from "./assets/VerticalLine.svelte";
     import TimelineVM from "../../../view_models/TimelineVM";
     import { SvelteComponent, onMount } from "svelte";
+    import MarkerBig from "./assets/MarkerBig.svelte";
+    import MarkerSmall from "./assets/MarkerSmall.svelte";
+    import VerticalLine from "./assets/VerticalLine.svelte";
+    import PlayIcon from "./assets/icons/PlayIcon.svelte";
+    import PauseIcon from "./assets/icons/PauseIcon.svelte";
+    import StopIcon from "./assets/icons/StopIcon.svelte";
 
     export let vm: TimelineVM;
 
