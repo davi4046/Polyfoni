@@ -44,7 +44,7 @@ export default function createTimelineVM(
                 mouseEventListener.handler = mouseEventHandler;
                 event.stopPropagation();
             },
-            handleMouseMove_others: (event: MouseEvent) => {
+            handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = undefined;
                 event.stopPropagation();
             },

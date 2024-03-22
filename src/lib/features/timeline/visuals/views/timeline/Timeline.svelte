@@ -96,7 +96,7 @@
     <!-- TOP HEADERS -->
     <div
         class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
-        on:mousemove={vm.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
         {#each vm.state.top as voiceVM (voiceVM.id)}
@@ -106,7 +106,7 @@
     <!-- CENTER HEADERS -->
     <div
         class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
-        on:mousemove={vm.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
         {#each vm.state.center as voiceVM (voiceVM.id)}
@@ -116,7 +116,7 @@
     <!-- BOTTOM HEADERS -->
     <div
         class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
-        on:mousemove={vm.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
         {#each vm.state.bottom as voiceVM (voiceVM.id)}
@@ -187,7 +187,7 @@
     <!-- EDITOR WIDGET CONTAINER -->
     <div
         class="col-start-1 col-end-3 row-start-5 row-end-6"
-        on:mousemove={vm.state.handleMouseMove_others}
+        on:mousemove={vm.state.handleMouseMove}
         bind:this={editorWidgetContainer}
         role="none"
     />

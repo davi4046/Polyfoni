@@ -9,7 +9,7 @@ interface TimelineVMState {
     center: VoiceVM[];
     bottom: VoiceVM[];
     handleMouseMove_tracks: (event: MouseEvent) => void;
-    handleMouseMove_others: (event: MouseEvent) => void;
+    handleMouseMove: (event: MouseEvent) => void;
     editorWidget?: SvelteCtorMatchProps<{ item: Item<any> }>;
 }
 
