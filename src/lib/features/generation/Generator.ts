@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { range } from "lodash";
+import { range, round } from "lodash";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
@@ -251,8 +251,8 @@ export default class Generator {
                 let beat = firstOverlappingNote
                     ? Math.max(itemState.start, firstOverlappingNote.end)
                     : itemState.start;
-
                 let index = 0;
+                let skippedIndeces = 0;
 
                 const newNotes: NoteBuilder[] = [];
 
@@ -260,6 +260,8 @@ export default class Generator {
                     const result = await invoke("evaluate", {
                         task: `${itemState.content} ||| {"x": ${index}}`,
                     });
+
+                    index++;
 
                     const parsedResult = Number(result);
 
@@ -273,9 +275,20 @@ export default class Generator {
                         2
                     );
 
-                    newNotes.push(new NoteBuilder(beat, beat + duration));
+                    if (duration < 0.015625) {
+                        if (skippedIndeces === 3) {
+                            console.warn(
+                                "duration item failed to return a large enough value too many times"
+                            );
+                            return;
+                        } else {
+                            skippedIndeces++;
+                            continue;
+                        }
+                    }
+                    skippedIndeces = 0;
 
-                    index++;
+                    newNotes.push(new NoteBuilder(beat, beat + duration));
                     beat += duration;
                 }
 
