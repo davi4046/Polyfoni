@@ -10,6 +10,7 @@
     import PauseIcon from "./assets/icons/PauseIcon.svelte";
     import StopIcon from "./assets/icons/StopIcon.svelte";
     import { writable } from "svelte/store";
+    import ArrowDown from "./assets/ArrowDown.svelte";
 
     export let vm: TimelineVM;
 
@@ -90,7 +91,7 @@
     data-type="timeline"
     data-model-id={vm.id}
 >
-    <!-- PLAYBACK MARKER -->
+    <!-- PLAYBACK INDICATOR -->
     <div
         class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
     >
@@ -100,6 +101,16 @@
                 style="left: {$playbackPosition + 1}px"
             >
                 <VerticalLine />
+                <div
+                    class="absolute top-0 h-4 w-4 -translate-x-1/2 -translate-y-2"
+                >
+                    <ArrowDown />
+                </div>
+                <div
+                    class="absolute bottom-0 h-4 w-4 -translate-x-1/2 translate-y-2 rotate-180"
+                >
+                    <ArrowDown />
+                </div>
             </div>
         </div>
     </div>
