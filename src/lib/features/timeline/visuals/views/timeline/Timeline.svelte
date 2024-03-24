@@ -95,18 +95,21 @@
             <button
                 class="btn-default h-9 p-1"
                 on:click={vm.state.onPlayButtonClick}
+                on:mousemove={vm.state.handleMouseMove}
             >
                 <PlayIcon />
             </button>
             <button
                 class="btn-default h-9 p-1"
                 on:click={vm.state.onPauseButtonClick}
+                on:mousemove={vm.state.handleMouseMove}
             >
                 <PauseIcon />
             </button>
             <button
                 class="btn-default h-9 p-1"
                 on:click={vm.state.onStopButtonClick}
+                on:mousemove={vm.state.handleMouseMove}
             >
                 <StopIcon />
             </button>

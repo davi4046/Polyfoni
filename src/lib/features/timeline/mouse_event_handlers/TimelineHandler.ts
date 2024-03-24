@@ -96,5 +96,14 @@ export default class TimelineHandler implements MouseEventHandler {
         this._prevMaxBeat = undefined;
         this._prevHoveredTrack = undefined;
         this._prevClickedTrack = undefined;
+
+        const clickedBeat = getBeatAtClientX(
+            this.context.timeline,
+            upEvent.clientX
+        );
+
+        if (this.context.state.highlights.length === 0) {
+            this.context.player.setPlaybackPosition(Math.round(clickedBeat));
+        }
     }
 }

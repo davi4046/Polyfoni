@@ -25,17 +25,20 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     }
 
     private _timeline: Timeline;
+    private _isPlaying = false;
     private _bpm = 60;
 
     startPlayback() {
-        if (this.isPlaying()) return;
+        if (this._isPlaying) return;
 
-        const startBeat = this.state.motion.getBeatAtTime(new Date().getTime());
+        const currTime = new Date().getTime();
+
+        const startBeat = this.state.motion.getBeatAtTime(currTime);
         const endBeat = 64;
 
         const duration = ((endBeat - startBeat) / this._bpm) * 60000;
 
-        const startTime = new Date().getTime();
+        const startTime = currTime;
         const endTime = startTime + duration;
 
         this.state = {
@@ -47,10 +50,12 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         voices.forEach((voice) => {
             this._schedulePlayback(voice, startBeat, endBeat);
         });
+
+        this._isPlaying = true;
     }
 
     pausePlayback() {
-        if (!this.isPlaying()) return;
+        if (!this._isPlaying) return;
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
@@ -66,6 +71,8 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             motion: new PlaybackMotion(currTime, currTime, currBeat, currBeat),
             playingNotes: [],
         };
+
+        this._isPlaying = false;
     }
 
     resetPlayback() {
@@ -80,6 +87,21 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             motion: new PlaybackMotion(0, 0, 0, 0),
             playingNotes: [],
         };
+
+        this._isPlaying = false;
+    }
+
+    setPlaybackPosition(beat: number) {
+        const currTime = new Date().getTime();
+
+        this.state = {
+            motion: new PlaybackMotion(currTime, currTime, beat, beat),
+        };
+
+        if (this._isPlaying) {
+            this.pausePlayback();
+            this.startPlayback();
+        }
     }
 
     private _voiceTimeouts = new Map<Voice, NodeJS.Timeout[]>();
@@ -124,14 +146,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this._voiceTimeouts.set(voice, timeouts);
     }
-
-    isPlaying(): boolean {
-        const currentTime = new Date().getTime();
-        return (
-            currentTime >= this.state.motion.startTime &&
-            currentTime < this.state.motion.endTime
-        );
-    }
 }
 
 export class PlaybackMotion {
@@ -142,7 +156,7 @@ export class PlaybackMotion {
         public endBeat: number
     ) {}
 
-    getBeatAtTime(time: number) {
+    getBeatAtTime(time: number): number {
         const clampedTime = Math.min(
             Math.max(time, this.startTime),
             this.endTime
@@ -153,6 +167,20 @@ export class PlaybackMotion {
             this.endTime,
             this.startBeat,
             this.endBeat
+        );
+    }
+
+    getTimeAtBeat(beat: number): number {
+        const clampedBeat = Math.min(
+            Math.max(beat, this.startBeat),
+            this.endBeat
+        );
+        return mapRange(
+            clampedBeat,
+            this.startBeat,
+            this.endBeat,
+            this.startTime,
+            this.endTime
         );
     }
 }
