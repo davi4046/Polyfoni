@@ -12,12 +12,14 @@ import mapRange from "../../utils/math_utils/mapRange";
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;
+    playingNotes: Item<"NoteItem">[];
 }
 
 export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     constructor(timeline: Timeline) {
         super({
             motion: new PlaybackMotion(0, 0, 0, 0),
+            playingNotes: [],
         });
         this._timeline = timeline;
     }
@@ -62,6 +64,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this.state = {
             motion: new PlaybackMotion(currTime, currTime, currBeat, currBeat),
+            playingNotes: [],
         };
     }
 
@@ -75,6 +78,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this.state = {
             motion: new PlaybackMotion(0, 0, 0, 0),
+            playingNotes: [],
         };
     }
 
@@ -101,10 +105,18 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
             const startTimeout = setTimeout(() => {
                 midiPlayer.noteOn(getIndex(voice), note.state.content, 100);
+                this.state = {
+                    playingNotes: this.state.playingNotes.concat(note),
+                };
             }, relativeStartMS);
 
             const endTimeout = setTimeout(() => {
                 midiPlayer.noteOff(getIndex(voice), note.state.content);
+                this.state = {
+                    playingNotes: this.state.playingNotes.filter(
+                        (value) => value !== note
+                    ),
+                };
             }, relativeEndMS);
 
             timeouts.push(startTimeout, endTimeout);

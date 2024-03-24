@@ -26,5 +26,15 @@ export default function createNoteVM(
         };
     });
 
+    context.player.subscribe(() => {
+        const isPlaying = context.player.state.playingNotes.includes(model);
+        const alteredStyles = Object.assign({}, vm.state.innerDivStyles);
+        alteredStyles["background-color"] = isPlaying ? "blue" : "black";
+
+        vm.state = {
+            innerDivStyles: alteredStyles,
+        };
+    });
+
     return vm;
 }
