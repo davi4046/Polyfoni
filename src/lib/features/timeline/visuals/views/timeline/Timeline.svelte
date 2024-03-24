@@ -27,6 +27,12 @@
         const currTime = new Date().getTime();
         const currBeat = vm.state.playbackMotion.getBeatAtTime(currTime);
 
+        const newPosition = currBeat * 64;
+
+        requestAnimationFrame(updatePlaybackPosition);
+
+        if (newPosition === $playbackPosition) return;
+
         playbackPosition.set(currBeat * 64);
 
         const minVisiblePX = centerDiv.scrollLeft;
@@ -40,23 +46,21 @@
                 element.scrollLeft = $playbackPosition;
             }
         }
-
-        requestAnimationFrame(updatePlaybackPosition);
     }
 
     vm.subscribe((_, oldState) => {
         vm = vm;
 
-        if (vm.state.editorWidget === oldState.editorWidget) return;
+        if (vm.state.editorWidget !== oldState.editorWidget) {
+            editorWidgetComponent?.$destroy();
 
-        editorWidgetComponent?.$destroy();
-
-        if (!vm.state.editorWidget) return;
-
-        editorWidgetComponent = new vm.state.editorWidget.ctor({
-            target: editorWidgetContainer,
-            props: vm.state.editorWidget.props,
-        });
+            if (vm.state.editorWidget) {
+                editorWidgetComponent = new vm.state.editorWidget.ctor({
+                    target: editorWidgetContainer,
+                    props: vm.state.editorWidget.props,
+                });
+            }
+        }
     });
 
     onMount(() => {
