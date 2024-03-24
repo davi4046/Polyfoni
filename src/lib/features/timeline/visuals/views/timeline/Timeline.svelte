@@ -78,7 +78,7 @@
         class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
         data-type="top"
     >
-        <div class="relative z-50 h-full overflow-clip" style="width: 4096px;">
+        <div class="relative z-30 h-full overflow-clip" style="width: 4096px;">
             <div
                 class="absolute h-full text-black"
                 style="left: {$playbackPosition * 64 + 1}px"
@@ -90,7 +90,7 @@
     <!-- PLAYBACK BUTTONS -->
     <div class="pointer-events-none relative col-start-2 row-start-3">
         <div
-            class="pointer-events-auto absolute bottom-0 right-0 z-30 m-2 flex gap-2"
+            class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
         >
             <button
                 class="btn-default h-9 p-1"
