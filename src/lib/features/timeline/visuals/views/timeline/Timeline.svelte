@@ -126,20 +126,25 @@
         >
             <button
                 class="btn-default h-9 p-1"
-                on:click={vm.state.onPlayButtonClick}
+                title={vm.state.isPlaying ? "Pause Playback" : "Start Playback"}
+                on:click={(event) => {
+                    if (vm.state.isPlaying) {
+                        vm.state.onPauseButtonClick(event);
+                    } else {
+                        vm.state.onPlayButtonClick(event);
+                    }
+                }}
                 on:mousemove={vm.state.handleMouseMove}
             >
-                <PlayIcon />
+                {#if vm.state.isPlaying}
+                    <PauseIcon />
+                {:else}
+                    <PlayIcon />
+                {/if}
             </button>
             <button
                 class="btn-default h-9 p-1"
-                on:click={vm.state.onPauseButtonClick}
-                on:mousemove={vm.state.handleMouseMove}
-            >
-                <PauseIcon />
-            </button>
-            <button
-                class="btn-default h-9 p-1"
+                title="Reset Playback"
                 on:click={vm.state.onStopButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
