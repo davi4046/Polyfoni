@@ -29,23 +29,22 @@
 
         const newPosition = currBeat * 64;
 
-        requestAnimationFrame(updatePlaybackPosition);
+        if (newPosition !== $playbackPosition) {
+            const minVisiblePX = centerDiv.scrollLeft;
+            const maxVisiblePX = centerDiv.scrollLeft + centerDiv.clientWidth;
 
-        if (newPosition === $playbackPosition) return;
-
-        playbackPosition.set(currBeat * 64);
-
-        const minVisiblePX = centerDiv.scrollLeft;
-        const maxVisiblePX = centerDiv.scrollLeft + centerDiv.clientWidth;
-
-        if (
-            $playbackPosition < minVisiblePX ||
-            $playbackPosition > maxVisiblePX
-        ) {
-            for (const element of hScrollElements) {
-                element.scrollLeft = $playbackPosition;
+            if (newPosition < minVisiblePX || newPosition > maxVisiblePX) {
+                for (const element of hScrollElements) {
+                    element.scrollLeft = newPosition;
+                }
             }
         }
+
+        playbackPosition.set(newPosition);
+
+        if (!vm.state.isPlaying) return;
+
+        requestAnimationFrame(updatePlaybackPosition);
     }
 
     vm.subscribe((_, oldState) => {
@@ -61,6 +60,8 @@
                 });
             }
         }
+
+        updatePlaybackPosition();
     });
 
     onMount(() => {

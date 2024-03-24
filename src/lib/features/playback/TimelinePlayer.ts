@@ -13,6 +13,7 @@ import mapRange from "../../utils/math_utils/mapRange";
 interface TimelinePlayerState {
     motion: PlaybackMotion;
     playingNotes: Item<"NoteItem">[];
+    isPlaying: boolean;
 }
 
 export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
@@ -20,16 +21,16 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         super({
             motion: new PlaybackMotion(0, 0, 0, 0),
             playingNotes: [],
+            isPlaying: false,
         });
         this._timeline = timeline;
     }
 
     private _timeline: Timeline;
-    private _isPlaying = false;
     private _bpm = 60;
 
     startPlayback() {
-        if (this._isPlaying) return;
+        if (this.state.isPlaying) return;
 
         const currTime = new Date().getTime();
 
@@ -51,11 +52,13 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             this._schedulePlayback(voice, startBeat, endBeat);
         });
 
-        this._isPlaying = true;
+        this.state = {
+            isPlaying: true,
+        };
     }
 
     pausePlayback() {
-        if (!this._isPlaying) return;
+        if (!this.state.isPlaying) return;
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
@@ -72,7 +75,9 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             playingNotes: [],
         };
 
-        this._isPlaying = false;
+        this.state = {
+            isPlaying: false,
+        };
     }
 
     resetPlayback() {
@@ -88,7 +93,9 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             playingNotes: [],
         };
 
-        this._isPlaying = false;
+        this.state = {
+            isPlaying: false,
+        };
     }
 
     setPlaybackPosition(beat: number) {
@@ -98,7 +105,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             motion: new PlaybackMotion(currTime, currTime, beat, beat),
         };
 
-        if (this._isPlaying) {
+        if (this.state.isPlaying) {
             this.pausePlayback();
             this.startPlayback();
         }
