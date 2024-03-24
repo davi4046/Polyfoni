@@ -13,19 +13,35 @@
 
     export let vm: TimelineVM;
 
+    let hScrollElements: HTMLCollectionOf<Element>;
+    let vScrollElememts: HTMLCollectionOf<Element>;
+
     let editorWidgetContainer: HTMLElement;
     let editorWidgetComponent: SvelteComponent;
 
     let playbackPosition = writable(0);
+    let centerDiv: HTMLElement;
 
     function updatePlaybackPosition() {
         const currTime = new Date().getTime();
         const currBeat = vm.state.playbackMotion.getBeatAtTime(currTime);
-        playbackPosition.set(currBeat);
+
+        playbackPosition.set(currBeat * 64);
+
+        const minVisiblePX = centerDiv.scrollLeft;
+        const maxVisiblePX = centerDiv.scrollLeft + centerDiv.clientWidth;
+
+        if (
+            $playbackPosition < minVisiblePX ||
+            $playbackPosition > maxVisiblePX
+        ) {
+            for (const element of hScrollElements) {
+                element.scrollLeft = $playbackPosition;
+            }
+        }
+
         requestAnimationFrame(updatePlaybackPosition);
     }
-
-    updatePlaybackPosition();
 
     vm.subscribe((_, oldState) => {
         vm = vm;
@@ -43,26 +59,27 @@
     });
 
     onMount(() => {
-        for (let element of document.getElementsByClassName("h-scroll")) {
+        hScrollElements = document.getElementsByClassName("h-scroll");
+        vScrollElememts = document.getElementsByClassName("v-scroll");
+
+        for (const element of hScrollElements) {
             element.addEventListener("wheel", (event) => {
-                let wheelEvent = event as WheelEvent;
-                for (let element of document.getElementsByClassName(
-                    "h-scroll"
-                )) {
+                const wheelEvent = event as WheelEvent;
+                for (const element of hScrollElements) {
                     element.scrollLeft += wheelEvent.deltaX;
                 }
             });
         }
-        for (let element of document.getElementsByClassName("v-scroll")) {
+        for (const element of vScrollElememts) {
             element.addEventListener("wheel", (event) => {
-                let wheelEvent = event as WheelEvent;
-                for (let element of document.getElementsByClassName(
-                    "v-scroll"
-                )) {
+                const wheelEvent = event as WheelEvent;
+                for (const element of vScrollElememts) {
                     element.scrollTop += wheelEvent.deltaY;
                 }
             });
         }
+
+        updatePlaybackPosition();
     });
 </script>
 
@@ -75,38 +92,38 @@
 >
     <!-- PLAYBACK MARKER -->
     <div
-        class="h-full col-start-2 row-span-3 row-start-2 overflow-hidden pointer-events-none h-scroll"
+        class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
     >
         <div class="relative z-30 h-full overflow-clip" style="width: 4096px;">
             <div
                 class="absolute h-full text-black"
-                style="left: {$playbackPosition * 64 + 1}px"
+                style="left: {$playbackPosition + 1}px"
             >
                 <VerticalLine />
             </div>
         </div>
     </div>
     <!-- PLAYBACK BUTTONS -->
-    <div class="relative col-start-2 row-start-3 pointer-events-none">
+    <div class="pointer-events-none relative col-start-2 row-start-3">
         <div
-            class="absolute bottom-0 right-0 z-40 flex gap-2 m-2 pointer-events-auto"
+            class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
         >
             <button
-                class="p-1 btn-default h-9"
+                class="btn-default h-9 p-1"
                 on:click={vm.state.onPlayButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
                 <PlayIcon />
             </button>
             <button
-                class="p-1 btn-default h-9"
+                class="btn-default h-9 p-1"
                 on:click={vm.state.onPauseButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
                 <PauseIcon />
             </button>
             <button
-                class="p-1 btn-default h-9"
+                class="btn-default h-9 p-1"
                 on:click={vm.state.onStopButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
@@ -115,7 +132,7 @@
         </div>
     </div>
     <!-- MARKERS -->
-    <div class="h-6 col-start-2 row-start-1 overflow-hidden h-scroll">
+    <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
@@ -164,7 +181,7 @@
     </div>
     <!-- TOP TRACKS -->
     <div
-        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
         data-type="top"
     >
         <div
@@ -178,8 +195,9 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
         data-type="center"
+        bind:this={centerDiv}
     >
         <div
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
@@ -192,7 +210,7 @@
     </div>
     <!-- BOTTOM TRACKS -->
     <div
-        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
+        class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
         data-type="bottom"
     >
         <div
@@ -206,7 +224,7 @@
     </div>
     <!-- SEPARATORS -->
     <div
-        class="col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
+        class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
     >
         <div
             class="relative h-full overflow-clip"
@@ -232,18 +250,18 @@
     />
     <!-- TOP HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 self-end h-1 col-start-1 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 h-1 col-start-1 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 col-start-1 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
     <!-- TOP TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 self-end h-1 col-start-2 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 col-start-2 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 h-1 col-start-2 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 col-start-2 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
 </div>
