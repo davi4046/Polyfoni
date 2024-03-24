@@ -1,4 +1,5 @@
 import type Item from "../models/Item";
+import type { PlaybackMotion } from "../../playback/TimelinePlayer";
 import Model from "../../../architecture/Model";
 import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 
@@ -18,7 +19,7 @@ interface TimelineVMState {
     onPauseButtonClick: (event: MouseEvent) => void;
     onStopButtonClick: (event: MouseEvent) => void;
 
-    playbackPosition: number;
+    playbackMotion: PlaybackMotion;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}

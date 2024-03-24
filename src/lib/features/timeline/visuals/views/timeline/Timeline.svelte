@@ -9,25 +9,54 @@
     import PlayIcon from "./assets/icons/PlayIcon.svelte";
     import PauseIcon from "./assets/icons/PauseIcon.svelte";
     import StopIcon from "./assets/icons/StopIcon.svelte";
+    import { writable } from "svelte/store";
 
     export let vm: TimelineVM;
 
     let editorWidgetContainer: HTMLElement;
     let editorWidgetComponent: SvelteComponent;
 
+    let playbackPosition = writable(0);
+    let playbackTimeout: NodeJS.Timeout | undefined;
+    let playbackInterval: NodeJS.Timeout | undefined;
+
     vm.subscribe((_, oldState) => {
         vm = vm;
 
-        if (vm.state.editorWidget === oldState.editorWidget) return;
+        if (vm.state.editorWidget !== oldState.editorWidget) {
+            editorWidgetComponent?.$destroy();
 
-        editorWidgetComponent?.$destroy();
+            if (vm.state.editorWidget) {
+                editorWidgetComponent = new vm.state.editorWidget.ctor({
+                    target: editorWidgetContainer,
+                    props: vm.state.editorWidget.props,
+                });
+            }
+        }
 
-        if (!vm.state.editorWidget) return;
+        const currTime = new Date().getTime();
 
-        editorWidgetComponent = new vm.state.editorWidget.ctor({
-            target: editorWidgetContainer,
-            props: vm.state.editorWidget.props,
-        });
+        const playbackDuration = Math.max(
+            vm.state.playbackMotion.endTime - currTime,
+            0
+        );
+
+        playbackPosition.set(vm.state.playbackMotion.getBeatAtTime(currTime));
+
+        const intervalDuration = 10;
+        const intervalChange =
+            vm.state.playbackMotion.getBeatAtTime(currTime + intervalDuration) -
+            vm.state.playbackMotion.getBeatAtTime(currTime);
+
+        clearInterval(playbackInterval);
+        playbackInterval = setInterval(() => {
+            playbackPosition.set($playbackPosition + intervalChange);
+        }, intervalDuration);
+
+        clearTimeout(playbackTimeout);
+        playbackTimeout = setTimeout(() => {
+            clearInterval(playbackInterval);
+        }, playbackDuration);
     });
 
     onMount(() => {
@@ -69,7 +98,7 @@
         <div class="relative z-50 h-full overflow-clip" style="width: 4096px;">
             <div
                 class="absolute h-full text-black"
-                style="left: {vm.state.playbackPosition * 64 + 1}px"
+                style="left: {$playbackPosition * 64 + 1}px"
             >
                 <VerticalLine />
             </div>

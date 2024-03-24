@@ -51,14 +51,9 @@ export default function createTimelineVM(
 
             onPlayButtonClick: (_) => context.player.startPlayback(),
             onPauseButtonClick: (_) => context.player.pausePlayback(),
-            onStopButtonClick: (_) => {
-                context.player.pausePlayback();
-                context.player.state = {
-                    playbackPosition: 0,
-                };
-            },
+            onStopButtonClick: (_) => context.player.resetPlayback(),
 
-            playbackPosition: context.player.state.playbackPosition,
+            playbackMotion: context.player.state.motion,
         },
         model.id
     );
@@ -99,7 +94,7 @@ export default function createTimelineVM(
 
     context.player.subscribe(() => {
         vm.state = {
-            playbackPosition: context.player.state.playbackPosition,
+            playbackMotion: context.player.state.motion,
         };
     });
 

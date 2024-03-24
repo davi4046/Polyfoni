@@ -8,48 +8,47 @@ import type Timeline from "../timeline/models/Timeline";
 import type Voice from "../timeline/models/Voice";
 import { midiPlayer } from "../timeline/utils/midiPlayer";
 import { trackTypeToIndex } from "../timeline/utils/track-config";
+import mapRange from "../../utils/math_utils/mapRange";
 
 interface TimelinePlayerState {
-    playbackPosition: number;
-    isPlaying: boolean;
+    motion: PlaybackMotion;
 }
 
 export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     constructor(timeline: Timeline) {
-        super({ playbackPosition: 0, isPlaying: false });
+        super({
+            motion: new PlaybackMotion(0, 0, 0, 0),
+        });
         this._timeline = timeline;
     }
 
     private _timeline: Timeline;
     private _bpm = 60;
-    private _interval: NodeJS.Timeout | undefined;
 
     startPlayback() {
-        if (this.state.isPlaying) return;
+        if (this.isPlaying()) return;
+
+        const startBeat = this.state.motion.getBeatAtTime(new Date().getTime());
+        const endBeat = 64;
+
+        const duration = ((endBeat - startBeat) / this._bpm) * 60000;
+
+        const startTime = new Date().getTime();
+        const endTime = startTime + duration;
+
+        this.state = {
+            motion: new PlaybackMotion(startTime, endTime, startBeat, endBeat),
+        };
 
         const voices = getChildren(getChildren(this._timeline)[1]);
 
         voices.forEach((voice) => {
-            this._schedulePlayback(voice);
+            this._schedulePlayback(voice, startBeat, endBeat);
         });
-
-        const intervalDuration = 10;
-
-        this._interval = setInterval(() => {
-            this.state = {
-                playbackPosition:
-                    this.state.playbackPosition +
-                    (this._bpm / 60000) * intervalDuration,
-            };
-        }, intervalDuration);
-
-        this.state = {
-            isPlaying: true,
-        };
     }
 
     pausePlayback() {
-        clearInterval(this._interval);
+        if (!this.isPlaying()) return;
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
@@ -58,24 +57,44 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this._voiceTimeouts.clear();
 
+        const currTime = new Date().getTime();
+        const currBeat = this.state.motion.getBeatAtTime(currTime);
+
         this.state = {
-            isPlaying: false,
+            motion: new PlaybackMotion(currTime, currTime, currBeat, currBeat),
+        };
+    }
+
+    resetPlayback() {
+        this._voiceTimeouts.forEach((timeouts, voice) => {
+            timeouts.forEach(clearTimeout);
+            midiPlayer.allNotesOff(getIndex(voice));
+        });
+
+        this._voiceTimeouts.clear();
+
+        this.state = {
+            motion: new PlaybackMotion(0, 0, 0, 0),
         };
     }
 
     private _voiceTimeouts = new Map<Voice, NodeJS.Timeout[]>();
 
-    private _schedulePlayback(voice: Voice) {
+    private _schedulePlayback(
+        voice: Voice,
+        startBeat: number,
+        endBeat: number
+    ) {
         const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
-
         const timeouts: NodeJS.Timeout[] = [];
 
         getChildren(outputTrack).forEach((note: Item<"NoteItem">) => {
-            if (note.state.start < this.state.playbackPosition) return;
+            if (note.state.start < startBeat || note.state.start >= endBeat) {
+                return;
+            }
 
-            const relativeStart =
-                note.state.start - this.state.playbackPosition;
-            const relativeEnd = note.state.end - this.state.playbackPosition;
+            const relativeStart = note.state.start - startBeat;
+            const relativeEnd = note.state.end - startBeat;
 
             const relativeStartMS = (relativeStart / this._bpm) * 60000;
             const relativeEndMS = (relativeEnd / this._bpm) * 60000;
@@ -92,5 +111,36 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         });
 
         this._voiceTimeouts.set(voice, timeouts);
+    }
+
+    isPlaying(): boolean {
+        const currentTime = new Date().getTime();
+        return (
+            currentTime >= this.state.motion.startTime &&
+            currentTime < this.state.motion.endTime
+        );
+    }
+}
+
+export class PlaybackMotion {
+    constructor(
+        public startTime: number,
+        public endTime: number,
+        public startBeat: number,
+        public endBeat: number
+    ) {}
+
+    getBeatAtTime(time: number) {
+        const clampedTime = Math.min(
+            Math.max(time, this.startTime),
+            this.endTime
+        );
+        return mapRange(
+            clampedTime,
+            this.startTime,
+            this.endTime,
+            this.startBeat,
+            this.endBeat
+        );
     }
 }
