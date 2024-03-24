@@ -75,8 +75,7 @@
 >
     <!-- PLAYBACK MARKER -->
     <div
-        class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
-        data-type="top"
+        class="h-full col-start-2 row-span-3 row-start-2 overflow-hidden pointer-events-none h-scroll"
     >
         <div class="relative z-30 h-full overflow-clip" style="width: 4096px;">
             <div
@@ -88,26 +87,26 @@
         </div>
     </div>
     <!-- PLAYBACK BUTTONS -->
-    <div class="pointer-events-none relative col-start-2 row-start-3">
+    <div class="relative col-start-2 row-start-3 pointer-events-none">
         <div
-            class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
+            class="absolute bottom-0 right-0 z-40 flex gap-2 m-2 pointer-events-auto"
         >
             <button
-                class="btn-default h-9 p-1"
+                class="p-1 btn-default h-9"
                 on:click={vm.state.onPlayButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
                 <PlayIcon />
             </button>
             <button
-                class="btn-default h-9 p-1"
+                class="p-1 btn-default h-9"
                 on:click={vm.state.onPauseButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
                 <PauseIcon />
             </button>
             <button
-                class="btn-default h-9 p-1"
+                class="p-1 btn-default h-9"
                 on:click={vm.state.onStopButtonClick}
                 on:mousemove={vm.state.handleMouseMove}
             >
@@ -116,7 +115,7 @@
         </div>
     </div>
     <!-- MARKERS -->
-    <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
+    <div class="h-6 col-start-2 row-start-1 overflow-hidden h-scroll">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
@@ -165,7 +164,7 @@
     </div>
     <!-- TOP TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-2 overflow-hidden h-scroll"
         data-type="top"
     >
         <div
@@ -179,7 +178,7 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-3 overflow-hidden h-scroll"
         data-type="center"
     >
         <div
@@ -193,7 +192,7 @@
     </div>
     <!-- BOTTOM TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
+        class="h-full col-start-2 row-start-4 overflow-hidden h-scroll"
         data-type="bottom"
     >
         <div
@@ -207,7 +206,7 @@
     </div>
     <!-- SEPARATORS -->
     <div
-        class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
+        class="col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden pointer-events-none h-scroll"
     >
         <div
             class="relative h-full overflow-clip"
@@ -233,18 +232,18 @@
     />
     <!-- TOP HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 self-end h-1 col-start-1 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 h-1 col-start-1 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
     <!-- TOP TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="bottom-0 z-20 self-end h-1 col-start-2 row-start-2 translate-y-1 bg-gradient-to-b from-gray-800 to-transparent"
     />
     <!-- BOTTOM TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="bottom-0 z-20 h-1 col-start-2 row-start-4 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
     />
 </div>
