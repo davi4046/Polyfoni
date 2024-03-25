@@ -23,6 +23,8 @@ import {
 import type Interval from "../../utils/interval/Interval";
 import { Chord } from "../timeline/utils/chord/Chord";
 
+import compareArrays from "./compareArrays";
+
 export default class Generator {
     private _itemChanges: ItemChange[] = [];
     private _isHandlingChanges = false;
@@ -42,7 +44,6 @@ export default class Generator {
         watcher.subscribe((obj, oldState) => {
             const objDepth = countAncestors(obj);
             const newState = obj.state as any;
-            const change = { oldState, newState };
 
             switch (objDepth) {
                 // Track
@@ -52,9 +53,25 @@ export default class Generator {
                     );
                     if (trackType === "output") break;
 
+                    const { removedItems, addedItems } = compareArrays<
+                        Item<any>
+                    >(oldState.children, newState.children);
+
                     this._itemChanges.push(
-                        ...deriveItemChangesFromTrackChange(change)
+                        ...removedItems.map((item) => {
+                            return {
+                                oldState: item.state,
+                                newState: undefined,
+                            };
+                        }),
+                        ...addedItems.map((item) => {
+                            return {
+                                oldState: undefined,
+                                newState: item.state,
+                            };
+                        })
                     );
+
                     break;
                 }
                 // Item
@@ -64,7 +81,7 @@ export default class Generator {
                     );
                     if (trackType === "output") break;
 
-                    this._itemChanges.push(change);
+                    this._itemChanges.push({ oldState, newState });
                     break;
                 }
             }
@@ -374,30 +391,6 @@ type StateChange<TState> = {
 };
 
 type ItemChange = StateChange<ItemState<any> | undefined>;
-
-function deriveItemChangesFromTrackChange(
-    change: StateChange<TrackState<any>>
-): ItemChange[] {
-    const removedItems = change.oldState.children.filter((child) => {
-        return !change.newState.children.includes(child);
-    });
-
-    const addedItems = change.newState.children.filter((child) => {
-        return !change.oldState.children.includes(child);
-    });
-
-    const itemChanges: ItemChange[] = [];
-
-    removedItems.forEach((item) => {
-        itemChanges.push({ oldState: item.state, newState: undefined });
-    });
-
-    addedItems.forEach((item) => {
-        itemChanges.push({ oldState: undefined, newState: item.state });
-    });
-
-    return itemChanges;
-}
 
 class NoteBuilder {
     constructor(
