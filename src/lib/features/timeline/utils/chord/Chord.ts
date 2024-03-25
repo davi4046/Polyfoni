@@ -19,16 +19,11 @@ export function createEmptyPitchMap(): PitchMap {
 }
 
 export class Chord {
-    public pitches = createEmptyPitchMap();
-
     constructor(
         public root: Pitch,
-        public decimal: number
-    ) {
-        if (root && decimal) {
-            this.pitches = getPitchesFromRootAndDecimal(root, decimal);
-        }
-    }
+        public decimal: number,
+        public pitches: PitchMap
+    ) {}
 
     getName() {
         return `${this.root}-${this.decimal}`;
@@ -85,6 +80,16 @@ export class Chord {
 
         builder.rotate("R", decimals.length - decimals.indexOf(minDecimal));
         return builder.build() as Chord;
+    }
+
+    static fromPitches(root: Pitch, pitches: PitchMap): Chord {
+        const decimal = getDecimalFromRootAndPitches(root, pitches);
+        return new Chord(root, decimal, pitches);
+    }
+
+    static fromDecimal(root: Pitch, decimal: number): Chord {
+        const pitches = getPitchesFromRootAndDecimal(root, decimal);
+        return new Chord(root, decimal, pitches);
     }
 }
 
@@ -262,7 +267,7 @@ export class ChordBuilder {
 
     build(): Chord | PitchMap {
         if (this._root && this._decimal) {
-            return new Chord(this._root, this._decimal);
+            return new Chord(this._root, this._decimal, this._pitches);
         } else {
             return this._pitches;
         }

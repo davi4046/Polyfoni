@@ -48,7 +48,7 @@
     $: {
         if (builder.decimal) {
             allowedRoots = pitchNames
-                .map((pitch) => new Chord(pitch, builder.decimal!)) // Create possible variations on decimal
+                .map((pitch) => Chord.fromDecimal(pitch, builder.decimal!)) // Create possible variations on decimal
                 .filter((chord) => isAllowedChord(chord)) // Remove variations not allowed by filters
                 .map((chord) => chord.root);
         } else {
@@ -64,7 +64,7 @@
 
     function isAllowedDecimal(decimal: number): boolean {
         if (!builder.root) return false;
-        return isAllowedChord(new Chord(builder.root, decimal));
+        return isAllowedChord(Chord.fromDecimal(builder.root, decimal));
     }
 
     function updateDecimal(decimal: number) {
