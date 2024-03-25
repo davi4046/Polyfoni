@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { range, round } from "lodash";
+import { range } from "lodash";
 
 import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
