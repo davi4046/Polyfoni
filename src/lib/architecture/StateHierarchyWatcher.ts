@@ -9,7 +9,7 @@ import {
 } from "./state-hierarchy-utils";
 
 export default class StateHierarchyWatcher<T extends Stateful<any>> {
-    constructor(root: T) {
+    constructor(readonly root: T) {
         if (root.state.children) {
             this._watchRecursively(root);
         } else {

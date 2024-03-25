@@ -2,10 +2,10 @@ import chroma from "chroma-js";
 
 import pitchNames from "../pitchNames";
 
-type Pitch = (typeof pitchNames)[number];
-type PitchMap = { [K in Pitch]: boolean };
+export type Pitch = (typeof pitchNames)[number];
+export type PitchMap = { [K in Pitch]: boolean };
 
-type Filter = { chord: Chord; isDisabled: boolean };
+export type Filter = { chord: Chord; isDisabled: boolean };
 
 export type ChordItemContent = {
     chordStatus: Chord | PitchMap;
