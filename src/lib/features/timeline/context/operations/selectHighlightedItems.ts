@@ -3,7 +3,7 @@ import {
     getChildren,
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
-import isWithin from "../../../../utils/interval/is_within/isWithin";
+import type Interval from "../../../../utils/interval/Interval";
 
 export default function selectHighlightedItems(context: TimelineContext) {
     const items = context.state.highlights
@@ -24,4 +24,8 @@ export default function selectHighlightedItems(context: TimelineContext) {
         highlights: [],
         selectedItems: items,
     };
+}
+
+function isWithin(value: number, interval: Interval): Boolean {
+    return value >= interval.start && value <= interval.end;
 }
