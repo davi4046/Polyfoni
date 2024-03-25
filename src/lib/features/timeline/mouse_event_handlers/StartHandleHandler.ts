@@ -2,6 +2,7 @@ import { clamp } from "lodash";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
+import cropItemsByInterval from "../utils/cropItemsByInterval";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import { getParent } from "../../../architecture/state-hierarchy-utils";
@@ -31,10 +32,14 @@ export default class StartHandleHandler implements MouseEventHandler {
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
-        getParent(this.item).cropItemsByInterval(
-            this.item.state.start,
-            this.item.state.end,
-            [this.item]
+        const track = getParent(this.item);
+        const otherItems = track.state.children.filter(
+            (item) => item !== this.item
         );
+        track.state = {
+            children: cropItemsByInterval(otherItems, this.item.state).concat(
+                this.item
+            ),
+        };
     }
 }

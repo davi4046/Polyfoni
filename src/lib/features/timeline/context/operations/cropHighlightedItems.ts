@@ -1,4 +1,6 @@
 import type TimelineContext from "../TimelineContext";
+import type Item from "../../models/Item";
+import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import { getParent } from "../../../../architecture/state-hierarchy-utils";
 
 export default function cropHighlightedItems(context: TimelineContext) {
@@ -7,7 +9,12 @@ export default function cropHighlightedItems(context: TimelineContext) {
 
         if (!track.state.allowUserEdit) return;
 
-        track.cropItemsByInterval(highlight.state.start, highlight.state.end);
+        track.state = {
+            children: cropItemsByInterval(
+                track.state.children as Item<any>[],
+                highlight.state
+            ),
+        };
     });
     context.state = {
         highlights: [],

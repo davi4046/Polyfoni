@@ -4,6 +4,7 @@ import {
     itemInitialContentFunctions,
     type ItemTypes,
 } from "../../utils/ItemTypes";
+import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
@@ -15,7 +16,12 @@ export default function insertEmptyItems(context: TimelineContext) {
 
         if (!track.state.allowUserEdit) return;
 
-        track.cropItemsByInterval(highlight.state.start, highlight.state.end);
+        track.state = {
+            children: cropItemsByInterval(
+                track.state.children as Item<any>[],
+                highlight.state
+            ),
+        };
 
         addChildren(
             track,

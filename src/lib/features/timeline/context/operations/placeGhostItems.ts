@@ -1,4 +1,6 @@
 import type TimelineContext from "../TimelineContext";
+import type Item from "../../models/Item";
+import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
@@ -12,7 +14,12 @@ export default function placeGhostItems(context: TimelineContext) {
         const oldTrack = getParent(pair[0]);
         const newTrack = getParent(pair[1]);
 
-        newTrack.cropItemsByInterval(pair[1].state.start, pair[1].state.end);
+        newTrack.state = {
+            children: cropItemsByInterval(
+                newTrack.state.children as Item<any>[],
+                pair[1].state
+            ),
+        };
 
         removeChildren(oldTrack, pair[0]);
         addChildren(newTrack, pair[1]);
