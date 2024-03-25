@@ -51,7 +51,7 @@ export default class Generator {
                     const trackType = trackIndexToType(
                         getIndex(obj as Track<any>)
                     );
-                    if (trackType === "output") break;
+                    if (trackType === "output") return;
 
                     const { removedItems, addedItems } = compareArrays<
                         Item<any>
@@ -71,7 +71,6 @@ export default class Generator {
                             };
                         })
                     );
-
                     break;
                 }
                 // Item
@@ -79,7 +78,7 @@ export default class Generator {
                     const trackType = trackIndexToType(
                         getIndex(getParent(obj as Item<any>))
                     );
-                    if (trackType === "output") break;
+                    if (trackType === "output") return;
 
                     this._itemChanges.push({ oldState, newState });
                     break;
