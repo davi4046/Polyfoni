@@ -42,10 +42,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         const startTime = currTime;
         const endTime = startTime + duration;
 
-        this.state = {
-            motion: new PlaybackMotion(startTime, endTime, startBeat, endBeat),
-        };
-
         const voices = getChildren(getChildren(this._timeline)[1]);
 
         voices.forEach((voice) => {
@@ -53,6 +49,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         });
 
         this.state = {
+            motion: new PlaybackMotion(startTime, endTime, startBeat, endBeat),
             isPlaying: true,
         };
     }
@@ -73,9 +70,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         this.state = {
             motion: new PlaybackMotion(currTime, currTime, currBeat, currBeat),
             playingNotes: [],
-        };
-
-        this.state = {
             isPlaying: false,
         };
     }
@@ -91,9 +85,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         this.state = {
             motion: new PlaybackMotion(0, 0, 0, 0),
             playingNotes: [],
-        };
-
-        this.state = {
             isPlaying: false,
         };
     }
