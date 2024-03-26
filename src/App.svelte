@@ -16,8 +16,7 @@
     const timelineContext = new TimelineContext(timeline);
     const timelineVM = createTimelineVM(timeline, timelineContext);
 
-    const stateHierarchyWatcher = new StateHierarchyWatcher(timeline);
-    const generator = new Generator(stateHierarchyWatcher);
+    const generator = new Generator(timeline);
     const thGenerator = new TotalHarmonyGenerator(timeline);
 
     const shortcutManager = new ShortcutManager();

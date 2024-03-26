@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api";
 
 import { range } from "lodash";
 
-import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
+import StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
     getChildren,
@@ -40,7 +40,9 @@ export default class Generator {
         return noteBuilders;
     }
 
-    constructor(watcher: StateHierarchyWatcher<Timeline>) {
+    constructor(timeline: Timeline) {
+        const watcher = new StateHierarchyWatcher(getChildren(timeline)[1]);
+
         watcher.subscribe((obj, oldState) => {
             const objDepth = countAncestors(obj);
             const newState = obj.state as any;
