@@ -57,6 +57,14 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
                     console.warn("tempo item result error");
                     return;
                 }
+                if (parsedResult < 15) {
+                    console.warn("tempo item result too small");
+                    return;
+                }
+                if (parsedResult > 360) {
+                    console.warn("tempo item result too big");
+                    return;
+                }
 
                 tempoChanges.set(item.state.start, parsedResult);
                 tempoChanges.set(item.state.end, 60);
