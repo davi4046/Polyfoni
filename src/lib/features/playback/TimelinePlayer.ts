@@ -10,7 +10,11 @@ import type Timeline from "../timeline/models/Timeline";
 import type Voice from "../timeline/models/Voice";
 import { midiPlayer } from "../timeline/utils/midiPlayer";
 import { trackTypeToIndex } from "../timeline/utils/track-config";
+import type Interval from "../../utils/interval/Interval";
 import mapRange from "../../utils/math_utils/mapRange";
+
+type Beat = number;
+type Tempo = number;
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;
@@ -35,9 +39,6 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
     async startPlayback() {
         if (this.state.isPlaying) return;
-
-        type Beat = number;
-        type Tempo = number;
 
         const tempoChanges = new Map<Beat, Tempo>();
         tempoChanges.set(0, 60);
@@ -76,8 +77,8 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         const motions: PlaybackMotion[] = [];
         const tempoChangesArray = Array.from(tempoChanges);
 
-        let currTime = new Date().getTime();
-        let currBeat = this.state.motion.getBeatAtTime(currTime);
+        const currTime = new Date().getTime();
+        const currBeat = this.state.motion.getBeatAtTime(currTime);
 
         const lastTempoChange = tempoChangesArray.findLast(
             (element) => element[0] < currBeat
@@ -91,6 +92,8 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             );
         }
 
+        let time = currTime;
+
         for (let i = 0; i < tempoChangesArray.length; i++) {
             const currItem = tempoChangesArray[i];
             const nextItem = tempoChangesArray[i + 1];
@@ -100,14 +103,14 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
             const duration = ((endBeat - startBeat) / currItem[1]) * 60000;
 
-            const startTime = currTime;
+            const startTime = time;
             const endTime = startTime + duration;
 
             motions.push(
                 new PlaybackMotion(startTime, endTime, startBeat, endBeat)
             );
 
-            currTime = endTime;
+            time = endTime;
         }
 
         let index = 0;
@@ -135,6 +138,17 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         };
 
         nextMotionLoop();
+
+        const voices = getChildren(getChildren(this._timeline)[1]);
+
+        voices.forEach((voice) =>
+            this._schedulePlayback(
+                voice,
+                currBeat,
+                64,
+                Array.from(tempoChanges)
+            )
+        );
 
         this.state = {
             isPlaying: true,
@@ -196,28 +210,33 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         voice: Voice,
         startBeat: number,
         endBeat: number,
-        bpm: number
+        tempoChanges: [number, number][]
     ) {
         const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
         const timeouts: NodeJS.Timeout[] = [];
+
+        const startTime = calculateTimeAtBeat(tempoChanges, startBeat);
 
         getChildren(outputTrack).forEach((note: Item<"NoteItem">) => {
             if (note.state.start < startBeat || note.state.start >= endBeat) {
                 return;
             }
 
-            const relativeStart = note.state.start - startBeat;
-            const relativeEnd = note.state.end - startBeat;
-
-            const relativeStartMS = (relativeStart / bpm) * 60000;
-            const relativeEndMS = (relativeEnd / bpm) * 60000;
+            const noteStartTime = calculateTimeAtBeat(
+                tempoChanges,
+                note.state.start
+            );
+            const noteEndTime = calculateTimeAtBeat(
+                tempoChanges,
+                note.state.end
+            );
 
             const startTimeout = setTimeout(() => {
                 midiPlayer.noteOn(getIndex(voice), note.state.content, 100);
                 this.state = {
                     playingNotes: this.state.playingNotes.concat(note),
                 };
-            }, relativeStartMS);
+            }, noteStartTime - startTime);
 
             const endTimeout = setTimeout(() => {
                 midiPlayer.noteOff(getIndex(voice), note.state.content);
@@ -226,7 +245,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
                         (value) => value !== note
                     ),
                 };
-            }, relativeEndMS);
+            }, noteEndTime - startTime);
 
             timeouts.push(startTimeout, endTimeout);
         });
@@ -270,4 +289,29 @@ export class PlaybackMotion {
             this.endTime
         );
     }
+}
+
+function calculateTimeAtBeat(
+    tempoChanges: [number, number][],
+    beat: number
+): number {
+    let end = tempoChanges.findIndex((tempoChange) => tempoChange[0] >= beat);
+    if (end === -1) end = tempoChanges.length;
+
+    let time = 0;
+
+    for (let i = 0; i < end; i++) {
+        const currTempoChange = tempoChanges[i];
+        const nextTempoChange = tempoChanges[i + 1];
+
+        const startBeat = currTempoChange[0];
+        const endBeat = nextTempoChange
+            ? Math.min(nextTempoChange[0], beat)
+            : beat;
+
+        const duration = ((endBeat - startBeat) / currTempoChange[1]) * 60000;
+        time += duration;
+    }
+
+    return time;
 }
