@@ -77,6 +77,19 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         const tempoChangesArray = Array.from(tempoChanges);
 
         let currTime = new Date().getTime();
+        let currBeat = this.state.motion.getBeatAtTime(currTime);
+
+        const lastTempoChange = tempoChangesArray.findLast(
+            (element) => element[0] < currBeat
+        );
+
+        if (lastTempoChange) {
+            lastTempoChange[0] = Math.max(lastTempoChange[0], currBeat);
+            tempoChangesArray.splice(
+                0,
+                tempoChangesArray.indexOf(lastTempoChange)
+            );
+        }
 
         for (let i = 0; i < tempoChangesArray.length; i++) {
             const currItem = tempoChangesArray[i];
