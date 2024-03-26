@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import type Item from "../../models/Item";
 
-    export let item: Item<"StringItem">;
+    export let item: Item<"StringItem" | "TempoItem">;
 
     let value = item.state.content;
 
@@ -22,7 +22,7 @@
     });
 </script>
 
-<div class="p-2 border-t-2 border-black">
+<div class="border-t-2 border-black p-2">
     <input
         on:keydown={handleKeyDown}
         bind:this={inputField}

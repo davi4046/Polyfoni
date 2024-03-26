@@ -11,6 +11,7 @@ import Voice from "./Voice";
 export interface TimelineState extends ParentState<Section> {}
 
 export default class Timeline extends Model<TimelineState> {
+    readonly tempoTrack;
     readonly scaleTrack;
     readonly totalTrack;
 
@@ -34,29 +35,36 @@ export default class Timeline extends Model<TimelineState> {
         let track;
 
         voice = new Voice({ parent: sections[0], children: [] });
+        addChildren(voice.state.parent, voice);
+
+        track = new Track("TempoItem", {
+            label: "Tempo",
+            parent: voice,
+            children: [],
+            allowUserEdit: true,
+        });
+        addChildren(track.state.parent, track);
+        this.tempoTrack = track;
+
         track = new Track("ChordItem", {
             label: "Scale",
             parent: voice,
             children: [],
             allowUserEdit: true,
         });
-
-        addChildren(voice, track);
-        addChildren(sections[0], voice);
-
+        addChildren(track.state.parent, track);
         this.scaleTrack = track;
 
         voice = new Voice({ parent: sections[2], children: [] });
+        addChildren(voice.state.parent, voice);
+
         track = new Track("ChordItem", {
             label: "Total Harmony",
             parent: voice,
             children: [],
             allowUserEdit: false,
         });
-
-        addChildren(voice, track);
-        addChildren(sections[2], voice);
-
+        addChildren(track.state.parent, track);
         this.totalTrack = track;
     }
 
