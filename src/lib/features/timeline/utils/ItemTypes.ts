@@ -20,7 +20,6 @@ import {
 
 export type ItemTypes = {
     StringItem: string;
-    TempoItem: string;
     ChordItem: ChordItemContent;
     NoteItem: number;
 };
@@ -28,10 +27,7 @@ export type ItemTypes = {
 export const itemEditorWidgets: Partial<{
     [K in keyof ItemTypes]: EditorWidget<K>;
 }> = {
-    // @ts-expect-error
     StringItem: StringEditorWidget,
-    // @ts-expect-error
-    TempoItem: StringEditorWidget,
     ChordItem: ChordEditorWidget,
 };
 
@@ -49,7 +45,6 @@ export const itemTextFunctions: {
     [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
 } = {
     StringItem: (value) => value,
-    TempoItem: (value) => value,
     ChordItem: (value) =>
         value.chordStatus instanceof Chord
             ? value.chordStatus.getName()
@@ -61,7 +56,6 @@ export const itemInitialContentFunctions: {
     [K in keyof ItemTypes]: () => ItemTypes[K];
 } = {
     StringItem: () => "",
-    TempoItem: () => "",
     ChordItem: () => {
         return { chordStatus: createEmptyPitchMap(), filters: [] };
     },

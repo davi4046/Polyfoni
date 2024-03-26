@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import type Item from "../../models/Item";
 
-    export let item: Item<"StringItem" | "TempoItem">;
+    export let item: Item<"StringItem">;
 
     let value = item.state.content;
 

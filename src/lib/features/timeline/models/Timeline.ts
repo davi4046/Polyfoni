@@ -37,7 +37,7 @@ export default class Timeline extends Model<TimelineState> {
         voice = new Voice({ parent: sections[0], children: [] });
         addChildren(voice.state.parent, voice);
 
-        track = new Track("TempoItem", {
+        track = new Track("StringItem", {
             label: "Tempo",
             parent: voice,
             children: [],
