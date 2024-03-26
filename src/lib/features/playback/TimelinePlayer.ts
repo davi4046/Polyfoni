@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api";
+
 import Stateful from "../../architecture/Stateful";
 import {
     getChildren,
@@ -27,35 +29,102 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     }
 
     private _timeline: Timeline;
-    private _bpm = 60;
 
-    startPlayback() {
+    private _nextMotionTimeout: NodeJS.Timeout | undefined;
+    private _voiceTimeouts = new Map<Voice, NodeJS.Timeout[]>();
+
+    async startPlayback() {
         if (this.state.isPlaying) return;
 
-        const currTime = new Date().getTime();
+        type Beat = number;
+        type Tempo = number;
 
-        const startBeat = this.state.motion.getBeatAtTime(currTime);
-        const endBeat = 64;
+        const tempoChanges = new Map<Beat, Tempo>();
+        tempoChanges.set(0, 60);
 
-        const duration = ((endBeat - startBeat) / this._bpm) * 60000;
+        const tempoItems = getChildren(this._timeline.tempoTrack).slice();
+        tempoItems.sort((a, b) => a.state.start - b.state.start);
 
-        const startTime = currTime;
-        const endTime = startTime + duration;
+        const promises: Promise<void>[] = [];
 
-        const voices = getChildren(getChildren(this._timeline)[1]);
+        tempoItems.forEach((item) => {
+            const promise = invoke("evaluate", {
+                task: `${item.state.content} ||| {}`,
+            }).then((result) => {
+                const parsedResult = Number(result);
 
-        voices.forEach((voice) => {
-            this._schedulePlayback(voice, startBeat, endBeat);
+                if (isNaN(parsedResult)) {
+                    console.warn("tempo item result error");
+                    return;
+                }
+
+                tempoChanges.set(item.state.start, parsedResult);
+                tempoChanges.set(item.state.end, 60);
+            });
+            promises.push(promise);
         });
+        await Promise.all(promises);
+
+        const motions: PlaybackMotion[] = [];
+        const tempoChangesArray = Array.from(tempoChanges);
+
+        let currTime = new Date().getTime();
+
+        for (let i = 0; i < tempoChangesArray.length; i++) {
+            const currItem = tempoChangesArray[i];
+            const nextItem = tempoChangesArray[i + 1];
+
+            const startBeat = currItem[0];
+            const endBeat = nextItem ? nextItem[0] : 64;
+
+            const duration = ((endBeat - startBeat) / currItem[1]) * 60000;
+
+            const startTime = currTime;
+            const endTime = startTime + duration;
+
+            motions.push(
+                new PlaybackMotion(startTime, endTime, startBeat, endBeat)
+            );
+
+            currTime = endTime;
+        }
+
+        let index = 0;
+
+        const nextMotionLoop = () => {
+            const motion = motions[index];
+
+            if (!motion) {
+                this.state = {
+                    isPlaying: false,
+                };
+                return;
+            }
+
+            this.state = {
+                motion: motion,
+            };
+
+            index++;
+
+            this._nextMotionTimeout = setTimeout(
+                nextMotionLoop,
+                motion.endTime - motion.startTime
+            );
+        };
+
+        nextMotionLoop();
 
         this.state = {
-            motion: new PlaybackMotion(startTime, endTime, startBeat, endBeat),
             isPlaying: true,
         };
     }
 
     pausePlayback() {
         if (!this.state.isPlaying) return;
+
+        clearTimeout(this._nextMotionTimeout);
+        this._nextMotionTimeout = undefined;
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
@@ -102,12 +171,11 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         }
     }
 
-    private _voiceTimeouts = new Map<Voice, NodeJS.Timeout[]>();
-
     private _schedulePlayback(
         voice: Voice,
         startBeat: number,
-        endBeat: number
+        endBeat: number,
+        bpm: number
     ) {
         const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
         const timeouts: NodeJS.Timeout[] = [];
@@ -120,8 +188,8 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             const relativeStart = note.state.start - startBeat;
             const relativeEnd = note.state.end - startBeat;
 
-            const relativeStartMS = (relativeStart / this._bpm) * 60000;
-            const relativeEndMS = (relativeEnd / this._bpm) * 60000;
+            const relativeStartMS = (relativeStart / bpm) * 60000;
+            const relativeEndMS = (relativeEnd / bpm) * 60000;
 
             const startTimeout = setTimeout(() => {
                 midiPlayer.noteOn(getIndex(voice), note.state.content, 100);
