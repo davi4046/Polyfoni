@@ -179,17 +179,9 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
     }
 
     resetPlayback() {
-        this._voiceTimeouts.forEach((timeouts, voice) => {
-            timeouts.forEach(clearTimeout);
-            midiPlayer.allNotesOff(getIndex(voice));
-        });
-
-        this._voiceTimeouts.clear();
-
+        this.pausePlayback();
         this.state = {
             motion: new PlaybackMotion(0, 0, 0, 0),
-            playingNotes: [],
-            isPlaying: false,
         };
     }
 
