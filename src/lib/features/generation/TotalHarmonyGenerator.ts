@@ -1,4 +1,6 @@
-import type StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
+import { isEqual } from "lodash";
+
+import StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
     getChildren,
@@ -11,15 +13,19 @@ import type { ItemState } from "../timeline/models/Item";
 import Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type Track from "../timeline/models/Track";
+import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import pitchNames from "../timeline/utils/pitchNames";
 import {
     trackIndexToType,
     trackTypeToIndex,
 } from "../timeline/utils/track-config";
 import type Interval from "../../utils/interval/Interval";
-import { Chord, type PitchMap } from "../timeline/utils/chord/Chord";
+import {
+    Chord,
+    createEmptyPitchMap,
+    type PitchMap,
+} from "../timeline/utils/chord/Chord";
 import { intersectIntervals } from "../../utils/interval/intersect_intervals/intersectIntervals";
-import isOverlapping from "../../utils/interval/is_overlapping/isOverlapping";
 
 import compareArrays from "./compareArrays";
 
@@ -29,7 +35,9 @@ export default class TotalHarmonyGenerator {
 
     private _totalHarmonyItems: Item<"ChordItem">[] = [];
 
-    constructor(watcher: StateHierarchyWatcher<Timeline>) {
+    constructor(timeline: Timeline) {
+        const watcher = new StateHierarchyWatcher(getChildren(timeline)[1]);
+
         watcher.subscribe((obj, oldState) => {
             const objDepth = countAncestors(obj);
             const newState = obj.state as any;
@@ -89,8 +97,16 @@ export default class TotalHarmonyGenerator {
                     } else {
                         this._isHandlingChanges = false;
                         // render output
-                        watcher.root.totalTrack.state = {
-                            children: this._totalHarmonyItems,
+                        const filteredItems = this._totalHarmonyItems.filter(
+                            (item) =>
+                                item.state.content.chordStatus instanceof Chord
+                        );
+                        const mergedItems = mergeAdjacentItemsByContent(
+                            "ChordItem",
+                            filteredItems
+                        );
+                        timeline.totalTrack.state = {
+                            children: mergedItems,
                         };
                     }
                 };
@@ -114,7 +130,9 @@ export default class TotalHarmonyGenerator {
             (voice) => getChildren(voice)[trackTypeToIndex("output")]
         );
 
-        function getTotalHarmonyForInterval(interval: Interval): Chord {
+        function getTotalHarmonyForInterval(
+            interval: Interval
+        ): Chord | undefined {
             const notes = outputTracks.flatMap((track) => {
                 return getChildren(track).filter((note) => {
                     return (
@@ -124,13 +142,15 @@ export default class TotalHarmonyGenerator {
                 });
             });
 
+            if (notes.length === 0) return;
+
             const rootMidiValue = notes.reduce((minPitch, note) => {
                 return note.state.content < minPitch
                     ? note.state.content
                     : minPitch;
             }, Number.MAX_SAFE_INTEGER);
 
-            const root = Object.values(pitchNames)[rootMidiValue % 12];
+            const root = Object.values(pitchNames)[(rootMidiValue + 3) % 12];
 
             const pitches = Object.fromEntries(
                 pitchNames.map((pitch) => {
@@ -147,7 +167,7 @@ export default class TotalHarmonyGenerator {
 
         switch (trackType) {
             case "output": {
-                // update harmony for item that contain note start
+                // update harmony for item that contains note start
                 const item = this._totalHarmonyItems.find(
                     (item) =>
                         itemState.start >= item.state.start &&
@@ -156,9 +176,16 @@ export default class TotalHarmonyGenerator {
 
                 if (!item) return;
 
-                item.state.content.chordStatus = getTotalHarmonyForInterval(
-                    item.state
-                );
+                const totalChord = getTotalHarmonyForInterval(item.state);
+
+                item.state = {
+                    content: {
+                        chordStatus: totalChord
+                            ? totalChord
+                            : createEmptyPitchMap(),
+                        filters: [],
+                    },
+                };
 
                 break;
             }
@@ -167,37 +194,38 @@ export default class TotalHarmonyGenerator {
                     (voice) => getChildren(voice)[trackTypeToIndex("harmony")]
                 );
 
-                const overlappedItems = harmonyTracks.flatMap((track) => {
-                    return getChildren(track).filter((item) => {
-                        return (
-                            isOverlapping(item.state, itemState) &&
-                            item.state.content.chordStatus instanceof Chord
-                        );
-                    });
-                });
+                const harmonyItems = harmonyTracks.flatMap((track) =>
+                    getChildren(track)
+                );
 
                 const intervals = intersectIntervals(
-                    overlappedItems.map((item) => item.state)
+                    harmonyItems.map((item) => item.state)
                 );
 
                 const newTotalHarmonyItems = intervals.map((interval) => {
+                    const item = this._totalHarmonyItems.find(
+                        (item) => item.state.start === interval.start
+                    );
+
+                    const totalChord =
+                        item?.state.end === interval.end
+                            ? item.state.content.chordStatus
+                            : getTotalHarmonyForInterval(interval);
+
                     return new Item("ChordItem", {
                         parent: timeline.totalTrack,
                         start: interval.start,
                         end: interval.end,
                         content: {
-                            chordStatus: getTotalHarmonyForInterval(interval),
+                            chordStatus: totalChord
+                                ? totalChord
+                                : createEmptyPitchMap(),
                             filters: [],
                         },
                     });
                 });
 
-                this._totalHarmonyItems = this._totalHarmonyItems.filter(
-                    (item) => !isOverlapping(item.state, itemState)
-                );
-
-                this._totalHarmonyItems.push(...newTotalHarmonyItems);
-
+                this._totalHarmonyItems = newTotalHarmonyItems;
                 break;
             }
         }
@@ -210,3 +238,31 @@ type StateChange<TState> = {
 };
 
 type ItemChange = StateChange<ItemState<any> | undefined>;
+
+function mergeAdjacentItemsByContent<T extends keyof ItemTypes>(
+    itemType: T,
+    items: Item<T>[]
+): Item<T>[] {
+    if (items.length <= 1) return items;
+
+    const mergedItems: Item<T>[] = [];
+    let currItem: Item<T> = new Item(itemType, {
+        ...items[0].state,
+    });
+
+    for (let i = 1; i < items.length; i++) {
+        const nextItem = new Item(itemType, {
+            ...items[i].state,
+        });
+        if (isEqual(currItem.state.content, nextItem.state.content)) {
+            currItem.state = {
+                end: nextItem.state.end,
+            };
+        } else {
+            mergedItems.push(currItem);
+            currItem = nextItem;
+        }
+    }
+    mergedItems.push(currItem);
+    return mergedItems;
+}

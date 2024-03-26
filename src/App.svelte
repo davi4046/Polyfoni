@@ -10,6 +10,7 @@
     import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
     import StateHierarchyWatcher from "./lib/architecture/StateHierarchyWatcher";
     import Generator from "./lib/features/generation/Generator";
+    import TotalHarmonyGenerator from "./lib/features/generation/TotalHarmonyGenerator";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -17,6 +18,7 @@
 
     const stateHierarchyWatcher = new StateHierarchyWatcher(timeline);
     const generator = new Generator(stateHierarchyWatcher);
+    const thGenerator = new TotalHarmonyGenerator(timeline);
 
     const shortcutManager = new ShortcutManager();
 
