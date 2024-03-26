@@ -8,7 +8,6 @@
     import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";
     import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
-    import StateHierarchyWatcher from "./lib/architecture/StateHierarchyWatcher";
     import Generator from "./lib/features/generation/Generator";
     import TotalHarmonyGenerator from "./lib/features/generation/TotalHarmonyGenerator";
 
@@ -16,8 +15,8 @@
     const timelineContext = new TimelineContext(timeline);
     const timelineVM = createTimelineVM(timeline, timelineContext);
 
-    const generator = new Generator(timeline);
-    const thGenerator = new TotalHarmonyGenerator(timeline);
+    new Generator(timeline);
+    new TotalHarmonyGenerator(timeline);
 
     const shortcutManager = new ShortcutManager();
 
