@@ -75,6 +75,10 @@ export default function createItemVM<T extends keyof ItemTypes>(
             onDestroy: () => {
                 mouseEventListener.handler = undefined;
             },
+
+            tooltip: {
+                content: "blah",
+            },
         },
         model.id
     );

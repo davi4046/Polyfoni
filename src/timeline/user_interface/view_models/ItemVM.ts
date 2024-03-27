@@ -1,3 +1,5 @@
+import type { Props } from "tippy.js";
+
 import Model from "../../../architecture/Model";
 
 interface ItemVMState {
@@ -15,6 +17,8 @@ interface ItemVMState {
     handleMouseMove_endHandle?: (event: MouseEvent) => void;
 
     onDestroy?: () => void;
+
+    tooltip?: Partial<Props>;
 }
 
 export default class ItemVM extends Model<ItemVMState> {}

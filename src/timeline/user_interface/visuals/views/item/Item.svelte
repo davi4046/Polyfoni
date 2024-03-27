@@ -2,29 +2,37 @@
     import { onDestroy, onMount } from "svelte";
     import convertToInlineStyles from "../../../../../utils/css-utils";
     import type ItemVM from "../../../view_models/ItemVM";
-    import tippy, { followCursor } from "tippy.js";
+    import tippy, { type Instance, type Props } from "tippy.js";
 
     export let vm: ItemVM;
 
-    vm.subscribe(() => (vm = vm));
+    let innerDiv: HTMLElement;
 
-    $: width = (vm.state.end - vm.state.start) * 64 + 2;
-    $: left = vm.state.start * 64;
+    let tooltip: Instance<Props> | undefined;
+
+    vm.subscribe((_, oldState) => {
+        vm = vm;
+
+        if (vm.state.tooltip !== oldState.tooltip) {
+            tooltip?.destroy();
+            if (vm.state.tooltip) {
+                tooltip = tippy(innerDiv, vm.state.tooltip);
+            }
+        }
+    });
+
+    onMount(() => {
+        if (vm.state.tooltip) {
+            tooltip = tippy(innerDiv, vm.state.tooltip);
+        }
+    });
 
     onDestroy(() => {
         if (vm.state.onDestroy) vm.state.onDestroy();
     });
 
-    let innerDiv: HTMLElement;
-
-    onMount(() => {
-        tippy(innerDiv, {
-            content: "hej",
-            hideOnClick: true,
-            theme: "material",
-            allowHTML: true,
-        });
-    });
+    $: width = (vm.state.end - vm.state.start) * 64 + 2;
+    $: left = vm.state.start * 64;
 </script>
 
 <div
