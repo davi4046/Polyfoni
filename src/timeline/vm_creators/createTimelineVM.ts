@@ -6,7 +6,7 @@ import { itemEditorWidgets, type ItemTypes } from "../utils/ItemTypes";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../architecture/mouse-event-handling";
 import { getChildren } from "../../architecture/state-hierarchy-utils";
-import { SvelteCtorMatchProps } from "../../lib/utils/svelte-utils";
+import { SvelteCtorMatchProps } from "../../utils/svelte-utils";
 
 import createVoiceVM from "./createVoiceVM";
 

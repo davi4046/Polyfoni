@@ -1,6 +1,6 @@
 import Item from "../models/Item";
 import type Interval from "../../../utils/interval/Interval";
-import clearInterval from "../../lib/utils/interval/clear_interval/clearInterval";
+import clearInterval from "../../utils/interval/clear_interval/clearInterval";
 
 import type { ItemTypes } from "./ItemTypes";
 

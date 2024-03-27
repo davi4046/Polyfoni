@@ -3,7 +3,7 @@ import {
     getChildren,
     getIndex,
 } from "../../../architecture/state-hierarchy-utils";
-import mapRange from "../../../lib/utils/math-utils";
+import mapRange from "../../../utils/math-utils";
 import type Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type Voice from "../timeline/models/Voice";

@@ -25,7 +25,7 @@ import {
     createEmptyPitchMap,
     type PitchMap,
 } from "../../utils/chord/Chord";
-import { intersectIntervals } from "../../../lib/utils/interval/intersect_intervals/intersectIntervals";
+import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
 
 import compareArrays from "./compareArrays";
 
