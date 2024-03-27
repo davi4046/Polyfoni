@@ -1,5 +1,3 @@
-import { invoke } from "@tauri-apps/api";
-
 import Stateful from "../../architecture/Stateful";
 import {
     getChildren,
@@ -15,10 +13,6 @@ import {
     type TempoChange,
 } from "../timeline/utils/tempo-utils";
 import { trackTypeToIndex } from "../timeline/utils/track-config";
-import type Interval from "../../utils/interval/Interval";
-
-type Beat = number;
-type Tempo = number;
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;
