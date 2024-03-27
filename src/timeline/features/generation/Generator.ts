@@ -2,15 +2,15 @@ import { invoke } from "@tauri-apps/api";
 
 import { range } from "lodash";
 
-import StateHierarchyWatcher from "../../architecture/StateHierarchyWatcher";
+import StateHierarchyWatcher from "../../../lib/architecture/StateHierarchyWatcher";
 import {
     countAncestors,
     getChildren,
     getIndex,
     getParent,
-} from "../../architecture/state-hierarchy-utils";
+} from "../../../lib/architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
-import Item from "../../../timeline/models/Item";
+import Item from "../../models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
 import type Track from "../timeline/models/Track";
@@ -19,9 +19,9 @@ import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import {
     trackIndexToType,
     trackTypeToIndex,
-} from "../../../timeline/utils/track-config";
+} from "../../utils/track-config";
 import type Interval from "../../utils/interval/Interval";
-import { Chord } from "../../../timeline/utils/chord/Chord";
+import { Chord } from "../../utils/chord/Chord";
 
 import compareArrays from "./compareArrays";
 

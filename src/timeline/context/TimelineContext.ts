@@ -1,7 +1,7 @@
 import type Highlight from "../models/Highlight";
 import type Item from "../models/Item";
 import type Timeline from "../models/Timeline";
-import TimelinePlayer from "../../lib/features/playback/TimelinePlayer";
+import TimelinePlayer from "../features/playback/TimelinePlayer";
 import Stateful from "../../lib/architecture/Stateful";
 
 interface TimelineContextState {

@@ -8,11 +8,11 @@
     import cropHighlightedItems from "./timeline/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./timeline/context/operations/insertEmptyItems";
     import selectHighlightedItems from "./timeline/context/operations/selectHighlightedItems";
-    import Generator from "./lib/features/generation/Generator";
-    import TotalHarmonyGenerator from "./lib/features/generation/TotalHarmonyGenerator";
+    import Generator from "./timeline/features/generation/Generator";
+    import TotalHarmonyGenerator from "./timeline/features/generation/TotalHarmonyGenerator";
     import { listen } from "@tauri-apps/api/event";
     import { save } from "@tauri-apps/api/dialog";
-    import createMidiFileFromTimeline from "./lib/features/export/createMidiFileFromTimeline";
+    import createMidiFileFromTimeline from "./timeline/features/export/createMidiFileFromTimeline";
     import { writeBinaryFile } from "@tauri-apps/api/fs";
     import { onDestroy } from "svelte";
 
