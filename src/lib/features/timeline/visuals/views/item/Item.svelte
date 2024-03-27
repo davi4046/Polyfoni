@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import convertToInlineStyles from "../../../../../utils/convertToInlineStyles";
+    import convertToInlineStyles from "../../../../../utils/css-utils";
     import type ItemVM from "../../../view_models/ItemVM";
 
     export let vm: ItemVM;
