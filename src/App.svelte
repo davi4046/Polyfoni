@@ -46,7 +46,7 @@
 
         if (!path) return;
 
-        const buffer = createMidiFileFromTimeline(timeline);
+        const buffer = await createMidiFileFromTimeline(timeline);
         writeBinaryFile(path, buffer);
     });
 
