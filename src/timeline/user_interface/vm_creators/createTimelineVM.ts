@@ -1,3 +1,4 @@
+import { itemEditors } from "../item-type-config";
 import TimelineContext from "../context/TimelineContext";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
@@ -5,7 +6,7 @@ import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
 import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 import type Item from "../../models/item/Item";
-import { itemEditors, type ItemTypes } from "../../models/item/ItemTypes";
+import { type ItemTypes } from "../../models/item/ItemTypes";
 import Timeline from "../../models/timeline/Timeline";
 
 import createVoiceVM from "./createVoiceVM";

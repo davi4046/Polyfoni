@@ -1,5 +1,3 @@
-import type { ComponentType, SvelteComponent } from "svelte";
-
 import type { Subscription } from "../../../architecture/Stateful";
 import {
     getChildren,
@@ -7,8 +5,6 @@ import {
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
-import ChordEditorWidget from "../../user_interface/visuals/item_editors/chord_item_editor/ChordItemEditor.svelte";
-import StringEditorWidget from "../../user_interface/visuals/item_editors/string_item_editor/StringItemEditor.svelte";
 
 import { Chord, ChordBuilder, createEmptyPitchMap } from "./Chord";
 import type { PitchMap, Filter } from "./Chord";
@@ -23,34 +19,6 @@ export type ItemTypes = {
     NoteItem: number;
 };
 
-export const itemEditors: Partial<{
-    [K in keyof ItemTypes]: EditorWidget<K>;
-}> = {
-    StringItem: StringEditorWidget,
-    ChordItem: ChordEditorWidget,
-};
-
-type EditorWidget<T extends keyof ItemTypes> = ComponentType<
-    SvelteComponent<
-        {
-            item: Item<T>;
-        },
-        {},
-        {}
-    >
->;
-
-export const itemTextFunctions: {
-    [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
-} = {
-    StringItem: (value) => value,
-    ChordItem: (value) =>
-        value.chordStatus instanceof Chord
-            ? value.chordStatus.getName()
-            : "undefined",
-    NoteItem: (value) => String(value),
-};
-
 export const itemInitialContentFunctions: {
     [K in keyof ItemTypes]: () => ItemTypes[K];
 } = {
@@ -59,16 +27,6 @@ export const itemInitialContentFunctions: {
         return { chordStatus: createEmptyPitchMap(), filters: [] };
     },
     NoteItem: () => Math.round(Math.random() * 12 + 36), // TEST
-};
-
-export const itemColorFunctions: Partial<{
-    [K in keyof ItemTypes]: (content: ItemTypes[K]) => chroma.Color | undefined;
-}> = {
-    ChordItem: (content) => {
-        if (content.chordStatus instanceof Chord) {
-            return content.chordStatus.getColor();
-        }
-    },
 };
 
 export const itemInitFunctions: Partial<{

@@ -2,7 +2,6 @@
     import Timeline from "./timeline/user_interface/visuals/views/timeline/Timeline.svelte";
     import makeDemoTimeline from "./timeline/dev_utils/makeDemoTimeline";
     import TimelineContext from "./timeline/user_interface/context/TimelineContext";
-    import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
     import ShortcutManager from "./architecture/ShortcutManager";
     import deleteSelectedItems from "./timeline/user_interface/context/operations/deleteSelectedItems";
     import cropHighlightedItems from "./timeline/user_interface/context/operations/cropHighlightedItems";
@@ -15,6 +14,7 @@
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { writeBinaryFile } from "@tauri-apps/api/fs";
     import { onDestroy } from "svelte";
+    import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
