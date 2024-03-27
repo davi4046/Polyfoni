@@ -5,6 +5,7 @@ import {
     getChildren,
     getIndex,
 } from "../../architecture/state-hierarchy-utils";
+import mapRange from "../../utils/math-utils";
 import type Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type Voice from "../timeline/models/Voice";
@@ -15,7 +16,6 @@ import {
 } from "../timeline/utils/tempo-utils";
 import { trackTypeToIndex } from "../timeline/utils/track-config";
 import type Interval from "../../utils/interval/Interval";
-import mapRange from "../../utils/math_utils/mapRange";
 
 type Beat = number;
 type Tempo = number;
