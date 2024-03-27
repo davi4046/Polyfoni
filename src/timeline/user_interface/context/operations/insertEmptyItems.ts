@@ -1,14 +1,14 @@
 import type TimelineContext from "../TimelineContext";
-import Item from "../../models/Item";
+import Item from "../../../models/Item";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
-} from "../../utils/ItemTypes";
-import cropItemsByInterval from "../../utils/cropItemsByInterval";
+} from "../../../utils/ItemTypes";
+import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
-} from "../../../architecture/state-hierarchy-utils";
+} from "../../../../architecture/state-hierarchy-utils";
 
 export default function insertEmptyItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {

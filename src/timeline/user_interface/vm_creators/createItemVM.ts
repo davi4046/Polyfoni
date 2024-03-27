@@ -9,9 +9,9 @@ import {
     itemColorFunctions,
     itemTextFunctions,
     type ItemTypes,
-} from "../utils/ItemTypes";
+} from "../../utils/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
-import { mouseEventListener } from "../../architecture/mouse-event-handling";
+import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 
 export default function createItemVM<T extends keyof ItemTypes>(
     model: Item<T>,

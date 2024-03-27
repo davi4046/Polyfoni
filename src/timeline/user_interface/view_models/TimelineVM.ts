@@ -1,6 +1,6 @@
 import type Item from "../models/Item";
 import type { PlaybackMotion } from "../../playback/TimelinePlayer";
-import Model from "../../architecture/Model";
+import Model from "../../../architecture/Model";
 import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 
 import type VoiceVM from "./VoiceVM";

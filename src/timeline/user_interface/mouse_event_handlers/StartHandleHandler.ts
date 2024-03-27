@@ -2,10 +2,10 @@ import { clamp } from "lodash";
 
 import type TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
-import cropItemsByInterval from "../utils/cropItemsByInterval";
-import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
+import cropItemsByInterval from "../../utils/cropItemsByInterval";
+import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
-import { getParent } from "../../architecture/state-hierarchy-utils";
+import { getParent } from "../../../architecture/state-hierarchy-utils";
 
 export default class StartHandleHandler implements MouseEventHandler {
     constructor(

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import pitchNames from "../../../utils/pitchNames";
+    import pitchNames from "../../../../utils/pitchNames";
 
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
-    import type Item from "../../../models/Item";
+    import type Item from "../../../../models/Item";
     import { onDestroy } from "svelte";
-    import { Chord, ChordBuilder } from "../../../utils/chord/Chord";
-    import { midiPlayer } from "../../../utils/midiPlayer";
+    import { Chord, ChordBuilder } from "../../../../utils/chord/Chord";
+    import { midiPlayer } from "../../../../utils/midiPlayer";
 
     export let item: Item<"ChordItem">;
 

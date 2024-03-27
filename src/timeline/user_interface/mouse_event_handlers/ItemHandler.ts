@@ -1,20 +1,20 @@
 import type TimelineContext from "../context/TimelineContext";
-import Item from "../models/Item";
+import Item from "../../models/Item";
 import type Track from "../models/Track";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
-} from "../utils/ItemTypes";
+} from "../../utils/ItemTypes";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
-import findClosestTrack from "../utils/screen_utils/findClosestTrack";
-import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
+import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
+import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
 import {
     getNestedArrayOfDescendants,
     getLastAncestor,
     getParent,
-} from "../../architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 
 export default class ItemHandler implements MouseEventHandler {
     constructor(

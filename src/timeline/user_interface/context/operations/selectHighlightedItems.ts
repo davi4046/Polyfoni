@@ -2,7 +2,7 @@ import type TimelineContext from "../TimelineContext";
 import {
     getChildren,
     getParent,
-} from "../../../architecture/state-hierarchy-utils";
+} from "../../../../architecture/state-hierarchy-utils";
 import type Interval from "../../../../utils/interval/Interval";
 
 export default function selectHighlightedItems(context: TimelineContext) {
