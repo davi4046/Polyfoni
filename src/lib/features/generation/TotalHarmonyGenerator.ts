@@ -10,21 +10,21 @@ import {
     getParent,
 } from "../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
-import Item from "../timeline/models/Item";
+import Item from "../../../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type Track from "../timeline/models/Track";
 import type { ItemTypes } from "../timeline/utils/ItemTypes";
-import pitchNames from "../timeline/utils/pitchNames";
+import pitchNames from "../../../timeline/utils/pitchNames";
 import {
     trackIndexToType,
     trackTypeToIndex,
-} from "../timeline/utils/track-config";
+} from "../../../timeline/utils/track-config";
 import type Interval from "../../utils/interval/Interval";
 import {
     Chord,
     createEmptyPitchMap,
     type PitchMap,
-} from "../timeline/utils/chord/Chord";
+} from "../../../timeline/utils/chord/Chord";
 import { intersectIntervals } from "../../utils/interval/intersect_intervals/intersectIntervals";
 
 import compareArrays from "./compareArrays";

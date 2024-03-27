@@ -1,13 +1,13 @@
 <script lang="ts">
-    import Timeline from "./lib/features/timeline/visuals/views/timeline/Timeline.svelte";
-    import makeDemoTimeline from "./lib/features/timeline/dev_utils/makeDemoTimeline";
-    import TimelineContext from "./lib/features/timeline/context/TimelineContext";
-    import createTimelineVM from "./lib/features/timeline/vm_creators/createTimelineVM";
+    import Timeline from "./timeline/visuals/views/timeline/Timeline.svelte";
+    import makeDemoTimeline from "./timeline/dev_utils/makeDemoTimeline";
+    import TimelineContext from "./timeline/context/TimelineContext";
+    import createTimelineVM from "./timeline/vm_creators/createTimelineVM";
     import ShortcutManager from "./lib/architecture/ShortcutManager";
-    import deleteSelectedItems from "./lib/features/timeline/context/operations/deleteSelectedItems";
-    import cropHighlightedItems from "./lib/features/timeline/context/operations/cropHighlightedItems";
-    import insertEmptyItems from "./lib/features/timeline/context/operations/insertEmptyItems";
-    import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
+    import deleteSelectedItems from "./timeline/context/operations/deleteSelectedItems";
+    import cropHighlightedItems from "./timeline/context/operations/cropHighlightedItems";
+    import insertEmptyItems from "./timeline/context/operations/insertEmptyItems";
+    import selectHighlightedItems from "./timeline/context/operations/selectHighlightedItems";
     import Generator from "./lib/features/generation/Generator";
     import TotalHarmonyGenerator from "./lib/features/generation/TotalHarmonyGenerator";
     import { listen } from "@tauri-apps/api/event";

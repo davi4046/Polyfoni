@@ -7,12 +7,12 @@ import mapRange from "../../utils/math-utils";
 import type Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type Voice from "../timeline/models/Voice";
-import { midiPlayer } from "../timeline/utils/midiPlayer";
+import { midiPlayer } from "../../../timeline/utils/midiPlayer";
 import {
     deriveTempoChangesFromItems,
     type TempoChange,
-} from "../timeline/utils/tempo-utils";
-import { trackTypeToIndex } from "../timeline/utils/track-config";
+} from "../../../timeline/utils/tempo-utils";
+import { trackTypeToIndex } from "../../../timeline/utils/track-config";
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;
