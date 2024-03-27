@@ -61,7 +61,9 @@
             }
         }
 
-        updatePlaybackPosition();
+        if (!oldState.isPlaying) {
+            requestAnimationFrame(updatePlaybackPosition);
+        }
     });
 
     onMount(() => {
