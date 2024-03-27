@@ -1,4 +1,4 @@
-import Model from "../../architecture/Model";
+import Model from "../../../architecture/Model";
 import type {
     ChildState,
     ParentState,

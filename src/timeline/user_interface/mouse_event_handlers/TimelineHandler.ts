@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
-import Highlight from "../../models/Highlight";
-import Track from "../../models/Track";
+import Highlight from "../../models/highlight/Highlight";
+import Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";

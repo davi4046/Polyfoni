@@ -10,7 +10,7 @@ import {
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
-import Item from "../../models/Item";
+import Item from "../../models/item/Item";
 import type Timeline from "../timeline/models/Timeline";
 import type { TrackState } from "../timeline/models/Track";
 import type Track from "../timeline/models/Track";

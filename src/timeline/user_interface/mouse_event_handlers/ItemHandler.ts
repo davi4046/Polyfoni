@@ -1,5 +1,5 @@
 import type TimelineContext from "../context/TimelineContext";
-import Item from "../../models/Item";
+import Item from "../../models/item/Item";
 import type Track from "../models/Track";
 import {
     itemInitialContentFunctions,

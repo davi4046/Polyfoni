@@ -1,10 +1,11 @@
 import * as midi from "@perry-rylance/midi";
 
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";
+import { trackTypeToIndex } from "../generation/track-config";
+
 import type Timeline from "../timeline/models/Timeline";
 import type Track from "../timeline/models/Track";
-import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";
-import { trackTypeToIndex } from "../../utils/track-config";
 
 export default async function createMidiFileFromTimeline(
     timeline: Timeline

@@ -1,12 +1,12 @@
-import Model from "../../architecture/Model";
+import Model from "../../../architecture/Model";
 import {
     addChildren,
     type ParentState,
-} from "../../architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 
-import Section from "./Section";
-import Track from "./Track";
-import Voice from "./Voice";
+import Section from "../section/Section";
+import Track from "../track/Track";
+import Voice from "../voice/Voice";
 
 export interface TimelineState extends ParentState<Section> {}
 

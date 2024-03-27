@@ -1,4 +1,4 @@
-import Item from "../models/Item";
+import Item from "../models/item/Item";
 import type Interval from "../../../utils/interval/Interval";
 import clearInterval from "../../utils/interval/clear_interval/clearInterval";
 

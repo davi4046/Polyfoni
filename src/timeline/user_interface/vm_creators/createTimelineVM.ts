@@ -1,6 +1,6 @@
 import TimelineContext from "../context/TimelineContext";
 import type Item from "../models/Item";
-import Timeline from "../../models/Timeline";
+import Timeline from "../../models/timeline/Timeline";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import { itemEditorWidgets, type ItemTypes } from "../../utils/ItemTypes";
 import TimelineVM from "../view_models/TimelineVM";

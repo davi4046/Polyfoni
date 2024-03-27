@@ -1,7 +1,7 @@
-import Item from "../models/Item";
-import Timeline from "../models/Timeline";
-import Track from "../models/Track";
-import Voice from "../models/Voice";
+import Item from "../models/item/Item";
+import Timeline from "../models/timeline/Timeline";
+import Track from "../models/track/Track";
+import Voice from "../models/voice/Voice";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
