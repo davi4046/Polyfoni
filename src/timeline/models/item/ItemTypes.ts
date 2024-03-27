@@ -9,18 +9,15 @@ import {
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 import ChordEditorWidget from "../../user_interface/visuals/item_editors/chord_item_editor/ChordItemEditor.svelte";
 import StringEditorWidget from "../../user_interface/visuals/item_editors/string_item_editor/StringItemEditor.svelte";
-import {
-    Chord,
-    ChordBuilder,
-    ChordItemContent,
-    createEmptyPitchMap,
-    type,
-} from "./Chord";
+import { Chord, ChordBuilder, createEmptyPitchMap } from "./Chord";
 
 import type { Subscription } from "../../../architecture/Stateful";
 export type ItemTypes = {
     StringItem: string;
-    ChordItem: ChordItemContent;
+    ChordItem: {
+        chordStatus: Chord | PitchMap;
+        filters: Filter[];
+    };
     NoteItem: number;
 };
 
