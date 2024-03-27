@@ -59,7 +59,7 @@ export const itemInitialContentFunctions: {
     ChordItem: () => {
         return { chordStatus: createEmptyPitchMap(), filters: [] };
     },
-    NoteItem: () => Math.round(Math.random() * 14), // TEST
+    NoteItem: () => Math.round(Math.random() * 12 + 36), // TEST
 };
 
 export const itemColorFunctions: Partial<{

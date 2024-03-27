@@ -10,6 +10,11 @@
     import selectHighlightedItems from "./lib/features/timeline/context/operations/selectHighlightedItems";
     import Generator from "./lib/features/generation/Generator";
     import TotalHarmonyGenerator from "./lib/features/generation/TotalHarmonyGenerator";
+    import { listen } from "@tauri-apps/api/event";
+    import { save } from "@tauri-apps/api/dialog";
+    import createMidiFileFromTimeline from "./lib/features/export/createMidiFileFromTimeline";
+    import { writeBinaryFile } from "@tauri-apps/api/fs";
+    import { onDestroy } from "svelte";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -31,6 +36,22 @@
 
     shortcutManager.register("Enter", () => {
         selectHighlightedItems(timelineContext);
+    });
+
+    const unlisten = listen("export_to_midi", async (_) => {
+        const path = await save({
+            title: "Export to MIDI",
+            filters: [{ name: "MIDI", extensions: ["midi"] }],
+        });
+
+        if (!path) return;
+
+        const buffer = createMidiFileFromTimeline(timeline);
+        writeBinaryFile(path, buffer);
+    });
+
+    onDestroy(async () => {
+        (await unlisten)();
     });
 </script>
 

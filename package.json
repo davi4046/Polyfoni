@@ -12,6 +12,7 @@
         "test": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js --verbose"
     },
     "dependencies": {
+        "@perry-rylance/midi": "^1.0.6",
         "@tauri-apps/api": "^1.5.0",
         "chroma-js": "^2.4.2",
         "lodash": "^4.17.21",

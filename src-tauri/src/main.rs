@@ -11,6 +11,7 @@ fn create_menu() -> Menu {
     return Menu::new()
         .add_submenu(Submenu::new("File",Menu::new()
             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
+            .add_item(CustomMenuItem::new("export_to_midi".to_string(), "Export to MIDI"))
             )
         )
         .add_submenu(Submenu::new("Selection", Menu::new()
@@ -39,7 +40,7 @@ fn main() {
 
             Ok(())
         })
-        //.menu(create_menu())
+        .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
                 "quit" => {
@@ -50,6 +51,9 @@ fn main() {
                 }
                 "delete" => {
                     event.window().emit("delete", {}).unwrap();
+                }
+                "export_to_midi" => {
+                    event.window().emit("export_to_midi", {}).unwrap();
                 }
                 _ => {}
             }
