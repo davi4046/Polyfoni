@@ -3,7 +3,7 @@ import Item from "../../../models/item/Item";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
-} from "../../../utils/ItemTypes";
+} from "../../../models/item/ItemTypes";
 import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import {
     addChildren,

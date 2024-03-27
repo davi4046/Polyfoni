@@ -4,7 +4,7 @@ import type Track from "../models/Track";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
-} from "../../utils/ItemTypes";
+} from "../../models/item/ItemTypes";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";

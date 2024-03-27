@@ -6,7 +6,7 @@ import {
     type ItemTypes,
     itemTextFunctions,
     itemColorFunctions,
-} from "../../utils/ItemTypes";
+} from "../../models/item/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
 
 export default function createItemVM_ghost<T extends keyof ItemTypes>(

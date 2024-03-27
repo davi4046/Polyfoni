@@ -1,4 +1,4 @@
-import { itemInitFunctions, type ItemTypes } from "../../utils/ItemTypes";
+import { itemInitFunctions, type ItemTypes } from "./ItemTypes";
 import Model from "../../../architecture/Model";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 

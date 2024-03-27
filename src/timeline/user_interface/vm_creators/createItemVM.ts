@@ -9,7 +9,7 @@ import {
     itemColorFunctions,
     itemTextFunctions,
     type ItemTypes,
-} from "../../utils/ItemTypes";
+} from "../../models/item/ItemTypes";
 import ItemVM from "../view_models/ItemVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 

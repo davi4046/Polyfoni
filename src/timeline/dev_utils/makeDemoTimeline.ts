@@ -5,7 +5,7 @@ import Voice from "../models/voice/Voice";
 import {
     itemInitialContentFunctions,
     type ItemTypes,
-} from "../utils/ItemTypes";
+} from "../models/item/ItemTypes";
 import {
     addChildren,
     getChildren,
