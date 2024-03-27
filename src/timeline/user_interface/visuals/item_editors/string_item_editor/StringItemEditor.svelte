@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type Item from "../../models/Item";
+    import type Item from "../../../../models/item/Item";
 
     export let item: Item<"StringItem">;
 
