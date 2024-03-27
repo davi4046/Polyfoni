@@ -21,6 +21,8 @@
         tippy(innerDiv, {
             content: "hej",
             hideOnClick: true,
+            theme: "material",
+            allowHTML: true,
         });
     });
 </script>
