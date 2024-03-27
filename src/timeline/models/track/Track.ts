@@ -1,9 +1,8 @@
-import type { ItemTypes } from "../utils/ItemTypes";
+import Item from "../item/Item";
+import type { ItemTypes } from "../item/ItemTypes";
+import type Voice from "../voice/Voice";
 import Model from "../../../architecture/Model";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
-
-import Item from "../item/Item";
-import type Voice from "./Voice";
 
 export interface TrackState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Voice>,

@@ -1,17 +1,17 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
-import type Item from "../models/Item";
-import {
-    getChildren,
-    getGreatGreatGrandparent,
-    getParent,
-} from "../../../architecture/state-hierarchy-utils";
-import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
-import ChordEditorWidget from "../../user_interface/visuals/item_editors/chord_item_editor/ChordItemEditor.svelte";
-import StringEditorWidget from "../../user_interface/visuals/item_editors/string_item_editor/StringItemEditor.svelte";
-import { Chord, ChordBuilder, createEmptyPitchMap } from "./Chord";
-
 import type { Subscription } from "../../../architecture/Stateful";
+import {
+    getChildren, getGreatGreatGrandparent, getParent
+} from '../../../architecture/state-hierarchy-utils';
+import isOverlapping from '../../../utils/interval/is_overlapping/isOverlapping';
+import ChordEditorWidget from '../../user_interface/visuals/item_editors/chord_item_editor/ChordItemEditor.svelte';
+import StringEditorWidget from '../../user_interface/visuals/item_editors/string_item_editor/StringItemEditor.svelte';
+
+import { Chord, ChordBuilder, createEmptyPitchMap } from './Chord';
+import type { PitchMap, Filter } from "./Chord";
+import type Item from "./Item";
+
 export type ItemTypes = {
     StringItem: string;
     ChordItem: {

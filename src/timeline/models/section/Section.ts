@@ -1,11 +1,10 @@
+import type Timeline from "../timeline/Timeline";
+import type Voice from "../voice/Voice";
 import Model from "../../../architecture/Model";
 import type {
     ChildState,
     ParentState,
 } from "../../../architecture/state-hierarchy-utils";
-
-import type Timeline from "./Timeline";
-import type Voice from "./Voice";
 
 export interface SectionState
     extends ChildState<Timeline>,

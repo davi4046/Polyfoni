@@ -1,8 +1,8 @@
-import { itemInitFunctions, type ItemTypes } from "./ItemTypes";
-import Model from "../../../architecture/Model";
-import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
+import type Track from "../track/Track";
+import Model from '../../../architecture/Model';
+import * as stateHierarchyUtils from '../../../architecture/state-hierarchy-utils';
 
-import type Track from "./Track";
+import { itemInitFunctions, type ItemTypes } from './ItemTypes';
 
 export interface ItemState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Track<T>> {
