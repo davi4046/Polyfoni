@@ -8,7 +8,7 @@ import {
     getGreatGreatGrandparent,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
-import ChordEditorWidget from "../../user_interface/visuals/item_editors/chord_editor_widget/ChordEditorWidget.svelte";
+import ChordEditorWidget from "../../user_interface/visuals/item_editors/chord_item_editor/ChordEditorWidget.svelte";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
 import {
