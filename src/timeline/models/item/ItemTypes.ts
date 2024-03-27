@@ -16,7 +16,7 @@ import {
     ChordBuilder,
     createEmptyPitchMap,
     type ChordItemContent,
-} from "../../utils/chord/Chord";
+} from "./Chord";
 
 export type ItemTypes = {
     StringItem: string;

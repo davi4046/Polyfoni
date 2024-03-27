@@ -24,7 +24,7 @@ import {
     Chord,
     createEmptyPitchMap,
     type PitchMap,
-} from "../../utils/chord/Chord";
+} from "../../models/item/Chord";
 import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
 
 import compareArrays from "./compareArrays";

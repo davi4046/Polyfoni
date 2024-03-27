@@ -6,7 +6,7 @@
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import type Item from "../../../../models/item/Item";
     import { onDestroy } from "svelte";
-    import { Chord, ChordBuilder } from "../../../../utils/chord/Chord";
+    import { Chord, ChordBuilder } from "../../../../models/item/Chord";
     import { midiPlayer } from "../../../../utils/midiPlayer";
 
     export let item: Item<"ChordItem">;

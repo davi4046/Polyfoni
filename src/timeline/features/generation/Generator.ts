@@ -21,7 +21,7 @@ import {
     trackTypeToIndex,
 } from "./track-config";
 import type Interval from "../../utils/interval/Interval";
-import { Chord } from "../../utils/chord/Chord";
+import { Chord } from "../../models/item/Chord";
 
 import compareArrays from "./compareArrays";
 
