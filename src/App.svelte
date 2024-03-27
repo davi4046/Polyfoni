@@ -12,7 +12,7 @@
     import TotalHarmonyGenerator from "./timeline/features/generation/TotalHarmonyGenerator";
     import { listen } from "@tauri-apps/api/event";
     import { save } from "@tauri-apps/api/dialog";
-    import createMidiFileFromTimeline from "./timeline/features/export/createMidiFileFromTimeline";
+    import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { writeBinaryFile } from "@tauri-apps/api/fs";
     import { onDestroy } from "svelte";
 
