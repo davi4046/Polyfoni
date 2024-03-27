@@ -9,7 +9,7 @@ import {
 import {
     addChildren,
     getChildren,
-} from "../../lib/architecture/state-hierarchy-utils";
+} from "../../architecture/state-hierarchy-utils";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline();

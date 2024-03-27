@@ -1,8 +1,8 @@
-import Stateful from "../../../lib/architecture/Stateful";
+import Stateful from "../../../architecture/Stateful";
 import {
     getChildren,
     getIndex,
-} from "../../../lib/architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 import mapRange from "../../../lib/utils/math-utils";
 import type Item from "../timeline/models/Item";
 import type Timeline from "../timeline/models/Timeline";

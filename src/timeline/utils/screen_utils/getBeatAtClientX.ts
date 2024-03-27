@@ -1,5 +1,5 @@
 import type Timeline from "../../models/Timeline";
-import Attribute from "../../../lib/architecture/AttributeEnum";
+import Attribute from "../../../architecture/AttributeEnum";
 
 export default function getBeatAtClientX(
     timeline: Timeline,

@@ -1,6 +1,6 @@
 import * as midi from "@perry-rylance/midi";
 
-import { getChildren } from "../../../lib/architecture/state-hierarchy-utils";
+import { getChildren } from "../../../architecture/state-hierarchy-utils";
 import type Timeline from "../timeline/models/Timeline";
 import type Track from "../timeline/models/Track";
 import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";

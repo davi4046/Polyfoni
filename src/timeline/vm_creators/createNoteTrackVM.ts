@@ -5,7 +5,7 @@ import TrackVM from "../view_models/TrackVM";
 import {
     getChildren,
     getParent,
-} from "../../lib/architecture/state-hierarchy-utils";
+} from "../../architecture/state-hierarchy-utils";
 
 import createHighlightVM from "./createHighlightVM";
 import createNoteVM from "./createNoteVM";

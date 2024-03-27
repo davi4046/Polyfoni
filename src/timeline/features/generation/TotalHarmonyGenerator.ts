@@ -1,6 +1,6 @@
 import { isEqual } from "lodash";
 
-import StateHierarchyWatcher from "../../../lib/architecture/StateHierarchyWatcher";
+import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
     getChildren,
@@ -8,7 +8,7 @@ import {
     getGreatGrandparent,
     getIndex,
     getParent,
-} from "../../../lib/architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 import type { ItemState } from "../timeline/models/Item";
 import Item from "../../models/Item";
 import type Timeline from "../timeline/models/Timeline";

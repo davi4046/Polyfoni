@@ -5,7 +5,7 @@ import {
     addChildren,
     getParent,
     removeChildren,
-} from "../../../lib/architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 
 export default function placeGhostItems(context: TimelineContext) {
     const selectedItems = Object.assign([], context.state.selectedItems);

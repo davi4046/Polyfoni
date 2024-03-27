@@ -1,8 +1,8 @@
-import Model from "../../lib/architecture/Model";
+import Model from "../../architecture/Model";
 import {
     addChildren,
     type ParentState,
-} from "../../lib/architecture/state-hierarchy-utils";
+} from "../../architecture/state-hierarchy-utils";
 
 import Section from "./Section";
 import Track from "./Track";

@@ -3,7 +3,7 @@ import type Item from "../models/Item";
 import cropItemsByInterval from "../utils/cropItemsByInterval";
 import getBeatAtClientX from "../utils/screen_utils/getBeatAtClientX";
 import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
-import { getParent } from "../../lib/architecture/state-hierarchy-utils";
+import { getParent } from "../../architecture/state-hierarchy-utils";
 
 export default class EndHandleHandler implements MouseEventHandler {
     constructor(

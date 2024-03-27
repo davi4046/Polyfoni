@@ -8,7 +8,7 @@ import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
-} from "../../../lib/architecture/state-hierarchy-utils";
+} from "../../../architecture/state-hierarchy-utils";
 
 export default function insertEmptyItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {

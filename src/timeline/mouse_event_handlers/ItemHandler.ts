@@ -14,7 +14,7 @@ import {
     getNestedArrayOfDescendants,
     getLastAncestor,
     getParent,
-} from "../../lib/architecture/state-hierarchy-utils";
+} from "../../architecture/state-hierarchy-utils";
 
 export default class ItemHandler implements MouseEventHandler {
     constructor(

@@ -1,4 +1,4 @@
-import Model from "../../lib/architecture/Model";
+import Model from "../../architecture/Model";
 
 interface ItemVMState {
     start: number;

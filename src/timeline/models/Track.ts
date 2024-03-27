@@ -1,6 +1,6 @@
 import type { ItemTypes } from "../utils/ItemTypes";
-import Model from "../../lib/architecture/Model";
-import * as stateHierarchyUtils from "../../lib/architecture/state-hierarchy-utils";
+import Model from "../../architecture/Model";
+import * as stateHierarchyUtils from "../../architecture/state-hierarchy-utils";
 
 import Item from "./Item";
 import type Voice from "./Voice";
