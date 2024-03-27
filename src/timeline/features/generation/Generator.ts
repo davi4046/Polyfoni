@@ -19,7 +19,7 @@ import type { ItemTypes } from "../timeline/utils/ItemTypes";
 import {
     trackIndexToType,
     trackTypeToIndex,
-} from "../../utils/track-config";
+} from "./track-config";
 import type Interval from "../../utils/interval/Interval";
 import { Chord } from "../../utils/chord/Chord";
 

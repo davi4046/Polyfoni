@@ -12,7 +12,7 @@ import {
     deriveTempoChangesFromItems,
     type TempoChange,
 } from "../../utils/tempo-utils";
-import { trackTypeToIndex } from "../../utils/track-config";
+import { trackTypeToIndex } from "../generation/track-config";
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;

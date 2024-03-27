@@ -18,7 +18,7 @@ import pitchNames from "../../utils/pitchNames";
 import {
     trackIndexToType,
     trackTypeToIndex,
-} from "../../utils/track-config";
+} from "./track-config";
 import type Interval from "../../utils/interval/Interval";
 import {
     Chord,
