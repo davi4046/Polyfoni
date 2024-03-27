@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import convertToInlineStyles from "../../../../../utils/css-utils";
     import type ItemVM from "../../../view_models/ItemVM";
+    import tippy, { followCursor } from "tippy.js";
 
     export let vm: ItemVM;
 
@@ -12,6 +13,15 @@
 
     onDestroy(() => {
         if (vm.state.onDestroy) vm.state.onDestroy();
+    });
+
+    let innerDiv: HTMLElement;
+
+    onMount(() => {
+        tippy(innerDiv, {
+            content: "hej",
+            hideOnClick: true,
+        });
     });
 </script>
 
@@ -31,6 +41,7 @@
         on:mousemove={(event) => {
             if (vm.state.handleMouseMove) vm.state.handleMouseMove(event);
         }}
+        bind:this={innerDiv}
         role="none"
     >
         {#if vm.state.text}

@@ -1,7 +1,8 @@
-import App from "./App.svelte";
-import "./styles.css";
+import './styles.css';
+import './utils/html_classes/adjust-width-to-height';
+import 'tippy.js/dist/tippy.css';
 
-import "./utils/html_classes/adjust-width-to-height";
+import App from './App.svelte';
 
 const app = new App({
     target: document.getElementById("app")!,
