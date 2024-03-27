@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
-import type Highlight from "../models/Highlight";
 import ItemVM from "../view_models/ItemVM";
+import type Highlight from "../../models/highlight/Highlight";
 
 export default function createHighlightVM(
     model: Highlight,

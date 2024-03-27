@@ -1,11 +1,11 @@
 import type TimelineContext from "../TimelineContext";
-import type Item from "../../models/Item";
 import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
     removeChildren,
 } from "../../../../architecture/state-hierarchy-utils";
+import type Item from "../../../models/item/Item";
 
 export default function placeGhostItems(context: TimelineContext) {
     const selectedItems = Object.assign([], context.state.selectedItems);

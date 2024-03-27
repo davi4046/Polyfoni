@@ -1,17 +1,17 @@
 import chroma from "chroma-js";
 
 import type TimelineContext from "../context/TimelineContext";
-import type Item from "../models/Item";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
+import ItemVM from "../view_models/ItemVM";
+import { mouseEventListener } from "../../../architecture/mouse-event-handling";
+import type Item from "../../models/item/Item";
 import {
     itemColorFunctions,
     itemTextFunctions,
     type ItemTypes,
 } from "../../models/item/ItemTypes";
-import ItemVM from "../view_models/ItemVM";
-import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 
 export default function createItemVM<T extends keyof ItemTypes>(
     model: Item<T>,

@@ -1,8 +1,8 @@
-import type Highlight from "../models/Highlight";
-import type Item from "../models/Item";
-import type Timeline from "../models/Timeline";
-import TimelinePlayer from "../../features/playback/TimelinePlayer";
 import Stateful from "../../../architecture/Stateful";
+import TimelinePlayer from "../../features/playback/TimelinePlayer";
+import type Highlight from "../../models/highlight/Highlight";
+import type Item from "../../models/item/Item";
+import type Timeline from "../../models/timeline/Timeline";
 
 interface TimelineContextState {
     editItem?: Item<any>;

@@ -1,7 +1,6 @@
+import type Track from "../track/Track";
 import Model from "../../../architecture/Model";
 import type { ChildState } from "../../../architecture/state-hierarchy-utils";
-
-import type Track from "./Track";
 
 export interface HighlightState extends ChildState<Track<any>> {
     start: number;

@@ -1,11 +1,11 @@
 import type TimelineContext from "../context/TimelineContext";
-import type Track from "../models/Track";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
 import {
     getChildren,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
+import type Track from "../../models/track/Track";
 
 import createHighlightVM from "./createHighlightVM";
 import createNoteVM from "./createNoteVM";

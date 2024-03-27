@@ -1,7 +1,7 @@
 import type TimelineContext from "../TimelineContext";
-import type Item from "../../models/Item";
 import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import { getParent } from "../../../../architecture/state-hierarchy-utils";
+import type Item from "../../../models/item/Item";
 
 export default function cropHighlightedItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {

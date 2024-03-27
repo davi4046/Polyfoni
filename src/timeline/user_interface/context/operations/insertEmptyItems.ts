@@ -1,17 +1,18 @@
 import type TimelineContext from "../TimelineContext";
-import Item from "../../../models/item/Item";
-import {
-    itemInitialContentFunctions,
-    type ItemTypes,
-} from "../../../models/item/ItemTypes";
 import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import {
     addChildren,
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
+import type Highlight from "../../../models/highlight/Highlight";
+import Item from "../../../models/item/Item";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../../../models/item/ItemTypes";
 
 export default function insertEmptyItems(context: TimelineContext) {
-    context.state.highlights.forEach((highlight) => {
+    context.state.highlights.forEach((highlight: Highlight) => {
         const track = getParent(highlight);
 
         if (!track.state.allowUserEdit) return;

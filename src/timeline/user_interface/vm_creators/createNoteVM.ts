@@ -1,6 +1,6 @@
 import type TimelineContext from "../context/TimelineContext";
-import type Item from "../models/Item";
 import ItemVM from "../view_models/ItemVM";
+import type Item from "../../models/item/Item";
 
 export default function createNoteVM(
     model: Item<"NoteItem">,

@@ -1,5 +1,5 @@
 import type TimelineContext from "../TimelineContext";
-import type Item from "../../models/Item";
+import type Item from "../../../models/item/Item";
 
 export default function toggleItemSelected(
     context: TimelineContext,

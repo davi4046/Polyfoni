@@ -1,13 +1,13 @@
 import chroma from "chroma-js";
 
 import type TimelineContext from "../context/TimelineContext";
-import type Item from "../models/Item";
+import ItemVM from "../view_models/ItemVM";
+import type Item from "../../models/item/Item";
 import {
     type ItemTypes,
     itemTextFunctions,
     itemColorFunctions,
 } from "../../models/item/ItemTypes";
-import ItemVM from "../view_models/ItemVM";
 
 export default function createItemVM_ghost<T extends keyof ItemTypes>(
     model: Item<T>,
