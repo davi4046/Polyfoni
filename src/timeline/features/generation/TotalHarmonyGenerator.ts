@@ -10,6 +10,7 @@ import {
     getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
+import compareArrays from "../../../utils/compareArrays";
 import {
     Chord,
     createEmptyPitchMap,
@@ -24,7 +25,7 @@ import type Interval from "../../../utils/interval/Interval";
 import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
-import compareArrays from "../../../utils/compareArrays";
+import getHarmonyOfNotes from "./getHarmonyOfNotes";
 import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class TotalHarmonyGenerator {
@@ -136,28 +137,7 @@ export default class TotalHarmonyGenerator {
                     return isOverlapping(note.state, interval);
                 });
             });
-
-            if (notes.length === 0) return;
-
-            const rootMidiValue = notes.reduce((minPitch, note) => {
-                return note.state.content < minPitch
-                    ? note.state.content
-                    : minPitch;
-            }, Number.MAX_SAFE_INTEGER);
-
-            const root = Object.values(pitchNames)[(rootMidiValue + 3) % 12];
-
-            const pitches = Object.fromEntries(
-                pitchNames.map((pitch) => {
-                    const midiValue = (pitchNames.indexOf(pitch) + 9) % 12;
-                    const isPresent = notes.some(
-                        (note) => note.state.content % 12 === midiValue
-                    );
-                    return [pitch, isPresent];
-                })
-            ) as PitchMap;
-
-            return Chord.fromPitches(root, pitches);
+            return getHarmonyOfNotes(notes);
         }
 
         switch (trackType) {
