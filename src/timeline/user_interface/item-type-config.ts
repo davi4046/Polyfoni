@@ -40,7 +40,6 @@ export const itemTooltipContentFunctions: Partial<{
             const primeName = chord.getPrimeForm().getName();
             const chordPitchNames = chord
                 .getMidiValues()
-                .sort((a, b) => a - b)
                 .map((midiValue) => pitchNames[(midiValue + 3) % 12]);
 
             return `
