@@ -1,6 +1,12 @@
 import chroma from "chroma-js";
 
-import { itemColorFunctions, itemTextFunctions } from "../item-type-config";
+import type { Props } from "tippy.js";
+
+import {
+    itemColorFunctions,
+    itemTextFunctions,
+    itemTooltipContentFunctions,
+} from "../item-type-config";
 import type TimelineContext from "../context/TimelineContext";
 import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
@@ -19,14 +25,15 @@ export default function createItemVM<T extends keyof ItemTypes>(
     const startHandleHandler = new StartHandleHandler(context, model);
     const endHandleHandler = new EndHandleHandler(context, model);
 
+    const colorFunction = itemColorFunctions[model.itemType];
+    const tooltipContentFunction = itemTooltipContentFunctions[model.itemType];
+
     const baseInnerDivStyles: Record<string, string> = {
         "border-width": "2px",
         "border-color": "black",
         inset: "4px 0 4px 0",
         padding: "0 8px 0 8px",
     };
-
-    const colorFunction = itemColorFunctions[model.itemType];
 
     function createInnerDivStyles() {
         const innerDivStyles = Object.assign({}, baseInnerDivStyles);
@@ -47,13 +54,28 @@ export default function createItemVM<T extends keyof ItemTypes>(
         return innerDivStyles;
     }
 
+    function createTooltip(): Partial<Props> | undefined {
+        if (!tooltipContentFunction) return;
+
+        const content = tooltipContentFunction(model.state.content);
+
+        if (content === "") return;
+
+        return {
+            content: content,
+            allowHTML: true,
+            theme: "material",
+        };
+    }
+
     const vm = new ItemVM(
         {
             start: model.state.start,
             end: model.state.end,
             text: itemTextFunctions[model.itemType](model.state.content),
-
             innerDivStyles: createInnerDivStyles(),
+            tooltip: createTooltip(),
+
             handleStyles: {
                 "background-color": "black",
                 opacity: "0.25",
@@ -75,10 +97,6 @@ export default function createItemVM<T extends keyof ItemTypes>(
             onDestroy: () => {
                 mouseEventListener.handler = undefined;
             },
-
-            tooltip: {
-                content: "blah",
-            },
         },
         model.id
     );
@@ -89,6 +107,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
             end: model.state.end,
             text: itemTextFunctions[model.itemType](model.state.content),
             innerDivStyles: createInnerDivStyles(),
+            tooltip: createTooltip(),
         };
     });
 

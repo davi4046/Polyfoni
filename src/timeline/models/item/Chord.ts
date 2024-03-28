@@ -1,6 +1,6 @@
-import chroma from 'chroma-js';
+import chroma from "chroma-js";
 
-import pitchNames from '../../utils/pitchNames';
+import pitchNames from "../../utils/pitchNames";
 
 export type Pitch = (typeof pitchNames)[number];
 export type PitchMap = { [K in Pitch]: boolean };

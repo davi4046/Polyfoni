@@ -1,5 +1,6 @@
 import type { ComponentType, SvelteComponent } from "svelte";
 
+import pitchNames from "../utils/pitchNames";
 import { Chord } from "../models/item/Chord";
 import type Item from "../models/item/Item";
 import type { ItemTypes } from "../models/item/ItemTypes";
@@ -8,14 +9,14 @@ import ChordItemEditor from "./visuals/item_editors/chord_item_editor/ChordItemE
 import StringItemEditor from "./visuals/item_editors/string_item_editor/StringItemEditor.svelte";
 
 export const itemTextFunctions: {
-    [K in keyof ItemTypes]: (value: ItemTypes[K]) => string;
+    [K in keyof ItemTypes]: (content: ItemTypes[K]) => string;
 } = {
-    StringItem: (value) => value,
-    ChordItem: (value) =>
-        value.chordStatus instanceof Chord
-            ? value.chordStatus.getName()
+    StringItem: (content) => content,
+    ChordItem: (content) =>
+        content.chordStatus instanceof Chord
+            ? content.chordStatus.getName()
             : "undefined",
-    NoteItem: (value) => String(value),
+    NoteItem: (content) => String(content),
 };
 
 export const itemColorFunctions: Partial<{
@@ -25,6 +26,33 @@ export const itemColorFunctions: Partial<{
         if (content.chordStatus instanceof Chord) {
             return content.chordStatus.getColor();
         }
+    },
+};
+
+export const itemTooltipContentFunctions: Partial<{
+    [K in keyof ItemTypes]: (content: ItemTypes[K]) => string;
+}> = {
+    StringItem: (content) => content,
+    ChordItem: (content) => {
+        const chord = content.chordStatus;
+        if (chord instanceof Chord) {
+            const chordName = chord.getName();
+            const primeName = chord.getPrimeForm().getName();
+            const chordPitchNames = chord
+                .getMidiValues()
+                .sort((a, b) => a - b)
+                .map((midiValue) => pitchNames[(midiValue + 3) % 12]);
+
+            return `
+                    <div>${
+                        chordName === primeName
+                            ? `★ ${chordName}`
+                            : `${chordName} (★ ${primeName})`
+                    }</div>
+                    <div>[${chordPitchNames.join(", ")}]</div>
+                `;
+        }
+        return "";
     },
 };
 
