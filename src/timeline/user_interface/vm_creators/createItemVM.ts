@@ -13,7 +13,6 @@ import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
 import ItemVM from "../view_models/ItemVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
-import { Chord } from "../../models/item/Chord";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 
@@ -38,12 +37,16 @@ export default function createItemVM<T extends keyof ItemTypes>(
     function createInnerDivStyles() {
         const innerDivStyles = Object.assign({}, baseInnerDivStyles);
 
-        const customColor = colorFunction
+        if (model.state.error) {
+            innerDivStyles["border-color"] = "#ef4444";
+        }
+
+        const bgColor = colorFunction
             ? colorFunction(model.state.content)
             : undefined;
 
-        innerDivStyles["background-color"] = customColor
-            ? customColor.css()
+        innerDivStyles["background-color"] = bgColor
+            ? bgColor.css()
             : chroma.hcl(0, 0, 80).css();
 
         if (context.state.selectedItems.includes(model)) {
