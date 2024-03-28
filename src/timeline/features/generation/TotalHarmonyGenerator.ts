@@ -22,6 +22,7 @@ import type Timeline from "../../models/timeline/Timeline";
 import type Track from "../../models/track/Track";
 import type Interval from "../../../utils/interval/Interval";
 import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
+import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
 import compareArrays from "./compareArrays";
 import { trackIndexToType, trackTypeToIndex } from "./track-config";
@@ -132,10 +133,7 @@ export default class TotalHarmonyGenerator {
         ): Chord | undefined {
             const notes = outputTracks.flatMap((track) => {
                 return getChildren(track).filter((note) => {
-                    return (
-                        note.state.start >= interval.start &&
-                        note.state.start < interval.end
-                    );
+                    return isOverlapping(note.state, interval);
                 });
             });
 
@@ -164,25 +162,22 @@ export default class TotalHarmonyGenerator {
 
         switch (trackType) {
             case "output": {
-                // update harmony for item that contains note start
-                const item = this._totalHarmonyItems.find(
-                    (item) =>
-                        itemState.start >= item.state.start &&
-                        itemState.start < item.state.end
+                // update harmony for items that overlap the note
+                const items = this._totalHarmonyItems.filter((item) =>
+                    isOverlapping(item.state, itemState)
                 );
 
-                if (!item) return;
-
-                const totalChord = getTotalHarmonyForInterval(item.state);
-
-                item.state = {
-                    content: {
-                        chordStatus: totalChord
-                            ? totalChord
-                            : createEmptyPitchMap(),
-                        filters: [],
-                    },
-                };
+                items.forEach((item) => {
+                    const totalChord = getTotalHarmonyForInterval(item.state);
+                    item.state = {
+                        content: {
+                            chordStatus: totalChord
+                                ? totalChord
+                                : createEmptyPitchMap(),
+                            filters: [],
+                        },
+                    };
+                });
 
                 break;
             }
