@@ -2,7 +2,10 @@ import type { Props } from "tippy.js";
 
 import type TimelineContext from "../context/TimelineContext";
 import ItemVM from "../view_models/ItemVM";
-import pitchNames from "../../utils/pitchNames";
+import pitchNames, {
+    getPitchName,
+    getPitchOctave,
+} from "../../utils/pitchNames";
 import type Item from "../../models/item/Item";
 
 export default function createNoteVM(
@@ -10,11 +13,11 @@ export default function createNoteVM(
     context: TimelineContext
 ) {
     function createTooltip(): Partial<Props> {
-        const pitchIndex = (model.state.content + 3) % 12;
-        const pitchName = Object.values(pitchNames)[pitchIndex];
-        const octave = Math.floor(model.state.content / 12) - 1;
         return {
-            content: `${pitchName + octave} (${model.state.content})`,
+            content: `${
+                getPitchName(model.state.content) +
+                getPitchOctave(model.state.content)
+            } (${model.state.content})`,
             theme: "material",
         };
     }

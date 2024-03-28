@@ -11,6 +11,7 @@
     import StopIcon from "./assets/icons/StopIcon.svelte";
     import { writable } from "svelte/store";
     import ArrowDown from "./assets/ArrowDown.svelte";
+    import ComposerVision from "./assets/ComposerVision.svelte";
 
     export let vm: TimelineVM;
 
@@ -156,14 +157,8 @@
     </div>
     <!-- ANALYSIS -->
     {#if vm.state.highlightAnalysis}
-        {@const analysis = vm.state.highlightAnalysis}
         <div class="pointer-events-none relative col-start-2 row-start-3">
-            <div
-                class="pointer-events-auto absolute right-0 top-0 z-40 m-2 bg-black bg-opacity-25"
-            >
-                <div>Composer Vision™</div>
-                <div>Notes: {analysis.noteCount}</div>
-            </div>
+            <ComposerVision bind:analysis={vm.state.highlightAnalysis} />
         </div>
     {/if}
     <!-- MARKERS -->
