@@ -12,7 +12,7 @@ import {
 } from "../../../models/item/ItemTypes";
 
 export default function insertEmptyItems(context: TimelineContext) {
-    context.state.highlights.forEach((highlight: Highlight) => {
+    context.state.highlights.forEach((highlight: Highlight<any>) => {
         const track = getParent(highlight);
 
         if (!track.state.allowUserEdit) return;

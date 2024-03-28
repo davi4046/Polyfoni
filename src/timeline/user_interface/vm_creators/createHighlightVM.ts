@@ -3,7 +3,7 @@ import ItemVM from "../view_models/ItemVM";
 import type Highlight from "../../models/highlight/Highlight";
 
 export default function createHighlightVM(
-    model: Highlight,
+    model: Highlight<any>,
     context: TimelineContext
 ): ItemVM {
     const vm = new ItemVM(

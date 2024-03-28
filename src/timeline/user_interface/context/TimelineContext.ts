@@ -6,7 +6,7 @@ import type Timeline from "../../models/timeline/Timeline";
 
 interface TimelineContextState {
     editItem?: Item<any>;
-    highlights: Highlight[];
+    highlights: Highlight<any>[];
     ghostPairs: [Item<any>, Item<any>][];
     selectedItems: Item<any>[];
 }
