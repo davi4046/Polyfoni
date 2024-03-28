@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api";
 import { range } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
+import type Stateful from "../../../architecture/Stateful";
 import {
     countAncestors,
     getChildren,
@@ -19,6 +20,7 @@ import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
 import compareArrays from "./compareArrays";
+import compareStates from "./compareStates";
 import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class Generator {
@@ -58,12 +60,14 @@ export default class Generator {
                     this._itemChanges.push(
                         ...removedItems.map((item) => {
                             return {
+                                obj: item,
                                 oldState: item.state,
                                 newState: undefined,
                             };
                         }),
                         ...addedItems.map((item) => {
                             return {
+                                obj: item,
                                 oldState: undefined,
                                 newState: item.state,
                             };
@@ -78,7 +82,19 @@ export default class Generator {
                     );
                     if (trackType === "output") return;
 
-                    this._itemChanges.push({ oldState, newState });
+                    const updatedProps = compareStates<ItemState<any>>(
+                        oldState,
+                        newState
+                    );
+
+                    const isValidChange = ["start", "end", "content"].some(
+                        (key) => updatedProps.has(key as keyof ItemState<any>)
+                    );
+
+                    if (isValidChange) {
+                        this._itemChanges.push({ obj, oldState, newState });
+                    }
+
                     break;
                 }
             }
@@ -106,8 +122,14 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
-        if (change.oldState) await this._clearItemStateEffect(change.oldState);
-        if (change.newState) await this._applyItemStateEffect(change.newState);
+        if (change.oldState) {
+            await this._clearItemStateEffect(change.oldState);
+        }
+        if (change.newState) {
+            change.obj.state = {
+                error: await this._applyItemStateEffect(change.newState),
+            };
+        }
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
@@ -155,14 +177,20 @@ export default class Generator {
                 );
 
                 if (nextDurationItem) {
-                    await this._applyItemStateEffect(nextDurationItem.state);
+                    nextDurationItem.state = {
+                        error: await this._applyItemStateEffect(
+                            nextDurationItem.state
+                        ),
+                    };
                 }
                 break;
             }
         }
     }
 
-    private async _applyItemStateEffect(itemState: ItemState<any>) {
+    private async _applyItemStateEffect(
+        itemState: ItemState<any>
+    ): Promise<Error | undefined> {
         const trackType = trackIndexToType(getIndex(itemState.parent));
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
@@ -184,8 +212,7 @@ export default class Generator {
                         const parsedResult = Number(result);
 
                         if (isNaN(parsedResult)) {
-                            console.warn("pitch item result error");
-                            return;
+                            return "Failed to evaluate to a number";
                         }
 
                         ownedNotes[index].degree = Math.round(parsedResult);
@@ -228,8 +255,7 @@ export default class Generator {
                         ) {
                             ownedNotes[index].isRest = parsedResult === "True";
                         } else {
-                            console.warn("rest item result error");
-                            return;
+                            return "Failed to evaluate to a boolean";
                         }
                     })();
                     promises.push(promise);
@@ -280,8 +306,7 @@ export default class Generator {
                     const parsedResult = Number(result);
 
                     if (isNaN(parsedResult)) {
-                        console.warn("duration item result error");
-                        return;
+                        return "Failed to evaluate to a number";
                     }
 
                     const duration = roundToNearestMultiple(
@@ -291,10 +316,7 @@ export default class Generator {
 
                     if (duration < 0.015625) {
                         if (skippedIndeces === 3) {
-                            console.warn(
-                                "duration item failed to return a large enough value too many times"
-                            );
-                            return;
+                            return "Failed to return a large enough value too many times";
                         } else {
                             skippedIndeces++;
                             continue;
@@ -318,7 +340,11 @@ export default class Generator {
                 );
 
                 if (nextDurationItem) {
-                    await this._applyItemStateEffect(nextDurationItem.state);
+                    nextDurationItem.state = {
+                        error: await this._applyItemStateEffect(
+                            nextDurationItem.state
+                        ),
+                    };
                 }
 
                 await this._remakePropertiesForNotes(voice, newNotes);
@@ -347,7 +373,15 @@ export default class Generator {
         const promises = [];
 
         for (const item of items) {
-            promises.push(this._applyItemStateEffect(item.state));
+            const promise = new Promise<void>((resolve) => {
+                this._applyItemStateEffect(item.state).then((error) => {
+                    item.state = {
+                        error: error,
+                    };
+                    resolve();
+                });
+            });
+            promises.push(promise);
         }
 
         await Promise.all(promises);
@@ -382,12 +416,15 @@ export default class Generator {
     }
 }
 
-type StateChange<TState> = {
-    oldState: TState;
-    newState: TState;
+type StateChange<TState extends object> = {
+    obj: Stateful<TState>;
+    oldState: TState | undefined;
+    newState: TState | undefined;
 };
 
-type ItemChange = StateChange<ItemState<any> | undefined>;
+type ItemChange = StateChange<ItemState<any>>;
+
+type Error = string;
 
 class NoteBuilder {
     constructor(

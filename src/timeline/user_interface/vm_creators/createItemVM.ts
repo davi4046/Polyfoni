@@ -55,9 +55,17 @@ export default function createItemVM<T extends keyof ItemTypes>(
     }
 
     function createTooltip(): Partial<Props> | undefined {
-        if (!tooltipContentFunction) return;
+        let content = "";
 
-        const content = tooltipContentFunction(model.state.content);
+        if (tooltipContentFunction) {
+            content += tooltipContentFunction(model.state.content);
+        }
+
+        if (model.state.error) {
+            content += `
+                <div style="color: pink">Error: ${model.state.error}</div>
+            `;
+        }
 
         if (content === "") return;
 

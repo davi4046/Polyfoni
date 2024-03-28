@@ -9,13 +9,14 @@
     let outerDiv: HTMLElement;
     let innerDiv: HTMLElement;
 
-    let tooltip: Instance<Props> | undefined;
+    let tooltip: Instance<Props> | undefined = undefined;
 
     vm.subscribe((_, oldState) => {
         vm = vm;
 
         if (vm.state.tooltip !== oldState.tooltip) {
             tooltip?.destroy();
+            tooltip = undefined;
             if (vm.state.tooltip) {
                 vm.state.tooltip.triggerTarget = outerDiv;
                 tooltip = tippy(innerDiv, vm.state.tooltip);
