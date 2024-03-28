@@ -154,6 +154,18 @@
             </button>
         </div>
     </div>
+    <!-- ANALYSIS -->
+    {#if vm.state.highlightAnalysis}
+        {@const analysis = vm.state.highlightAnalysis}
+        <div class="pointer-events-none relative col-start-2 row-start-3">
+            <div
+                class="pointer-events-auto absolute right-0 top-0 z-40 m-2 bg-black bg-opacity-25"
+            >
+                <div>Composer Vision™</div>
+                <div>Notes: {analysis.noteCount}</div>
+            </div>
+        </div>
+    {/if}
     <!-- MARKERS -->
     <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
         <div class="relative h-full overflow-clip" style="width: 4096px;">

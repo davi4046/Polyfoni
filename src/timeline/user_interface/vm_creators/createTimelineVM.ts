@@ -4,7 +4,9 @@ import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import compareStates from "../../../utils/compareStates";
 import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
+import analyzeHighlights from "../../features/generation/analyzeHighlights";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 import Timeline from "../../models/timeline/Timeline";
@@ -33,13 +35,9 @@ export default function createTimelineVM(
         return { top, center, bottom };
     };
 
-    const { top, center, bottom } = createSections();
-
     const vm = new TimelineVM(
         {
-            top: top,
-            center: center,
-            bottom: bottom,
+            ...createSections(),
 
             handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = undefined;
@@ -61,34 +59,38 @@ export default function createTimelineVM(
     );
 
     model.subscribe(() => {
-        const { top, center, bottom } = createSections();
-
-        vm.state = {
-            top: top,
-            center: center,
-            bottom: bottom,
-        };
+        vm.state = { ...createSections() };
     });
 
     context.subscribe((_, oldState) => {
-        if (context.state.editItem === oldState.editItem) return;
+        const updatedProps = compareStates(context.state, oldState);
 
-        const EditorWidgetCtor =
-            itemEditors[context.state.editItem?.itemType as keyof ItemTypes];
+        if (updatedProps.has("highlights")) {
+            vm.state = {
+                highlightAnalysis: analyzeHighlights(context.state.highlights),
+            };
+        }
 
-        if (EditorWidgetCtor && context.state.editItem) {
-            vm.state = {
-                editorWidget: new SvelteCtorMatchProps<{ item: Item<any> }>(
-                    EditorWidgetCtor,
-                    {
-                        item: context.state.editItem,
-                    }
-                ),
-            };
-        } else {
-            vm.state = {
-                editorWidget: undefined,
-            };
+        if (updatedProps.has("editItem")) {
+            const EditorWidgetCtor =
+                itemEditors[
+                    context.state.editItem?.itemType as keyof ItemTypes
+                ];
+
+            if (EditorWidgetCtor && context.state.editItem) {
+                vm.state = {
+                    editorWidget: new SvelteCtorMatchProps<{ item: Item<any> }>(
+                        EditorWidgetCtor,
+                        {
+                            item: context.state.editItem,
+                        }
+                    ),
+                };
+            } else {
+                vm.state = {
+                    editorWidget: undefined,
+                };
+            }
         }
     });
 
