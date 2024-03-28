@@ -16,7 +16,6 @@
 
         if (vm.state.tooltip !== oldState.tooltip) {
             tooltip?.destroy();
-            tooltip = undefined;
             if (vm.state.tooltip) {
                 vm.state.tooltip.triggerTarget = outerDiv;
                 tooltip = tippy(innerDiv, vm.state.tooltip);

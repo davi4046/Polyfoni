@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { range } from "lodash";
+import { isBoolean, range } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
@@ -190,7 +190,7 @@ export default class Generator {
 
     private async _applyItemStateEffect(
         itemState: ItemState<any>
-    ): Promise<Error | undefined> {
+    ): Promise<string | undefined> {
         const trackType = trackIndexToType(getIndex(itemState.parent));
         const voice = getParent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
@@ -199,27 +199,33 @@ export default class Generator {
             itemState
         );
 
+        if (itemState.content === "") return;
+
         switch (trackType) {
             case "pitch": {
                 const promises = [];
 
-                for (const index of range(ownedNotes.length)) {
+                for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
                         const result = await invoke("evaluate", {
-                            task: `${itemState.content} ||| {"x": ${index}}`,
+                            task: `${itemState.content} ||| {"x": ${i}}`,
                         });
-
-                        const parsedResult = Number(result);
-
-                        if (isNaN(parsedResult)) {
-                            return "Failed to evaluate to a number";
-                        }
-
-                        ownedNotes[index].degree = Math.round(parsedResult);
+                        return Math.round(Number(result));
                     })();
                     promises.push(promise);
                 }
-                await Promise.all(promises);
+
+                const values = await Promise.all(promises);
+
+                for (const value of values) {
+                    if (isNaN(value)) {
+                        return "Failed to evaluate to a number";
+                    }
+                }
+
+                for (let i = 0; i < ownedNotes.length; i++) {
+                    ownedNotes[i].degree = values[i];
+                }
 
                 // Recalculate pitch based on harmony for ownedNotes
                 const voice = getParent(itemState.parent);
@@ -241,26 +247,28 @@ export default class Generator {
             case "rest": {
                 const promises = [];
 
-                for (const index of range(ownedNotes.length)) {
+                for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
-                        const result = await invoke("evaluate", {
-                            task: `${itemState.content} ||| {"x": ${index}}`,
+                        const result: string = await invoke("evaluate", {
+                            task: `${itemState.content} ||| {"x": ${i}}`,
                         });
-
-                        const parsedResult = String(result).trim();
-
-                        if (
-                            parsedResult === "True" ||
-                            parsedResult === "False"
-                        ) {
-                            ownedNotes[index].isRest = parsedResult === "True";
-                        } else {
-                            return "Failed to evaluate to a boolean";
-                        }
+                        return result.trim();
                     })();
                     promises.push(promise);
                 }
-                await Promise.all(promises);
+
+                const results = await Promise.all(promises);
+
+                for (const result of results) {
+                    if (result !== "True" && result !== "False") {
+                        return "Failed to evaluate to a boolean";
+                    }
+                }
+
+                for (let i = 0; i < ownedNotes.length; i++) {
+                    ownedNotes[i].isRest = results[i] === "True";
+                }
+
                 break;
             }
             case "harmony": {
@@ -373,17 +381,13 @@ export default class Generator {
         const promises = [];
 
         for (const item of items) {
-            const promise = new Promise<void>((resolve) => {
-                this._applyItemStateEffect(item.state).then((error) => {
-                    item.state = {
-                        error: error,
-                    };
-                    resolve();
-                });
-            });
+            const promise = (async () => {
+                item.state = {
+                    error: await this._applyItemStateEffect(item.state),
+                };
+            })();
             promises.push(promise);
         }
-
         await Promise.all(promises);
     }
 
@@ -423,8 +427,6 @@ type StateChange<TState extends object> = {
 };
 
 type ItemChange = StateChange<ItemState<any>>;
-
-type Error = string;
 
 class NoteBuilder {
     constructor(
