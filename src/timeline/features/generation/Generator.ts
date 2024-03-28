@@ -9,21 +9,17 @@ import {
     getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
-import type { ItemState } from "../timeline/models/Item";
-import Item from "../../models/item/Item";
-import type Timeline from "../timeline/models/Timeline";
-import type { TrackState } from "../timeline/models/Track";
-import type Track from "../timeline/models/Track";
-import type Voice from "../timeline/models/Voice";
-import type { ItemTypes } from "../timeline/utils/ItemTypes";
-import {
-    trackIndexToType,
-    trackTypeToIndex,
-} from "./track-config";
-import type Interval from "../../utils/interval/Interval";
 import { Chord } from "../../models/item/Chord";
+import type { ItemState } from "../../models/item/Item";
+import Item from "../../models/item/Item";
+import type { ItemTypes } from "../../models/item/ItemTypes";
+import type Timeline from "../../models/timeline/Timeline";
+import type Track from "../../models/track/Track";
+import type Voice from "../../models/voice/Voice";
+import type Interval from "../../../utils/interval/Interval";
 
 import compareArrays from "./compareArrays";
+import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class Generator {
     private _itemChanges: ItemChange[] = [];

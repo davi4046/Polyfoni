@@ -1,5 +1,6 @@
 import { isEqual } from "lodash";
 
+import pitchNames from "../../utils/pitchNames";
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
@@ -9,25 +10,21 @@ import {
     getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
-import type { ItemState } from "../timeline/models/Item";
-import Item from "../../models/item/Item";
-import type Timeline from "../timeline/models/Timeline";
-import type Track from "../timeline/models/Track";
-import type { ItemTypes } from "../timeline/utils/ItemTypes";
-import pitchNames from "../../utils/pitchNames";
-import {
-    trackIndexToType,
-    trackTypeToIndex,
-} from "./track-config";
-import type Interval from "../../utils/interval/Interval";
 import {
     Chord,
     createEmptyPitchMap,
     type PitchMap,
 } from "../../models/item/Chord";
+import type { ItemState } from "../../models/item/Item";
+import Item from "../../models/item/Item";
+import type { ItemTypes } from "../../models/item/ItemTypes";
+import type Timeline from "../../models/timeline/Timeline";
+import type Track from "../../models/track/Track";
+import type Interval from "../../../utils/interval/Interval";
 import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
 
 import compareArrays from "./compareArrays";
+import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class TotalHarmonyGenerator {
     private _itemChanges: ItemChange[] = [];
