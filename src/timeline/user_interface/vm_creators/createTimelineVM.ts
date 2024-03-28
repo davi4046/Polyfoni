@@ -67,7 +67,7 @@ export default function createTimelineVM(
 
         if (updatedProps.has("highlights")) {
             vm.state = {
-                highlightAnalysis: analyzeHighlights(context.state.highlights),
+                analysis: analyzeHighlights(context.state.highlights),
             };
         }
 

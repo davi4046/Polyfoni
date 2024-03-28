@@ -23,7 +23,7 @@ interface TimelineVMState {
     playbackMotion: PlaybackMotion;
     isPlaying: boolean;
 
-    highlightAnalysis?: NotesAnalysis;
+    analysis?: NotesAnalysis;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}

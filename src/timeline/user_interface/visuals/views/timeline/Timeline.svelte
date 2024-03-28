@@ -156,9 +156,15 @@
         </div>
     </div>
     <!-- ANALYSIS -->
-    {#if vm.state.highlightAnalysis}
+    {#if vm.state.analysis}
         <div class="pointer-events-none relative col-start-2 row-start-3">
-            <ComposerVision bind:analysis={vm.state.highlightAnalysis} />
+            <div
+                class="pointer-events-auto"
+                on:mousemove={vm.state.handleMouseMove}
+                role="none"
+            >
+                <ComposerVision bind:analysis={vm.state.analysis} />
+            </div>
         </div>
     {/if}
     <!-- MARKERS -->
