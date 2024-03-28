@@ -156,17 +156,15 @@
         </div>
     </div>
     <!-- ANALYSIS -->
-    {#if vm.state.analysis}
-        <div class="pointer-events-none relative col-start-2 row-start-3">
-            <div
-                class="pointer-events-auto"
-                on:mousemove={vm.state.handleMouseMove}
-                role="none"
-            >
-                <ComposerVision bind:analysis={vm.state.analysis} />
-            </div>
+    <div class="pointer-events-none relative col-start-2 row-start-3">
+        <div
+            class="pointer-events-auto"
+            on:mousemove={vm.state.handleMouseMove}
+            role="none"
+        >
+            <ComposerVision bind:analysis={vm.state.analysis} />
         </div>
-    {/if}
+    </div>
     <!-- MARKERS -->
     <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
         <div class="relative h-full overflow-clip" style="width: 4096px;">
