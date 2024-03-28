@@ -24,7 +24,7 @@ import type Interval from "../../../utils/interval/Interval";
 import { intersectIntervals } from "../../../utils/interval/intersect_intervals/intersectIntervals";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
-import compareArrays from "./compareArrays";
+import compareArrays from "../../../utils/compareArrays";
 import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class TotalHarmonyGenerator {

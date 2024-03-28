@@ -10,6 +10,8 @@ import {
     getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
+import compareArrays from "../../../utils/compareArrays";
+import compareStates from "../../../utils/compareStates";
 import { Chord } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
@@ -19,8 +21,6 @@ import type Track from "../../models/track/Track";
 import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
-import compareArrays from "./compareArrays";
-import compareStates from "./compareStates";
 import { trackIndexToType, trackTypeToIndex } from "./track-config";
 
 export default class Generator {
