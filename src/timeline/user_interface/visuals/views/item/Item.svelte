@@ -6,6 +6,7 @@
 
     export let vm: ItemVM;
 
+    let outerDiv: HTMLElement;
     let innerDiv: HTMLElement;
 
     let tooltip: Instance<Props> | undefined;
@@ -16,6 +17,7 @@
         if (vm.state.tooltip !== oldState.tooltip) {
             tooltip?.destroy();
             if (vm.state.tooltip) {
+                vm.state.tooltip.triggerTarget = outerDiv;
                 tooltip = tippy(innerDiv, vm.state.tooltip);
             }
         }
@@ -23,6 +25,7 @@
 
     onMount(() => {
         if (vm.state.tooltip) {
+            vm.state.tooltip.triggerTarget = outerDiv;
             tooltip = tippy(innerDiv, vm.state.tooltip);
         }
     });
@@ -42,6 +45,7 @@
         : ''}"
     data-type="item"
     data-model-id={vm.id}
+    bind:this={outerDiv}
 >
     <div
         class="absolute inset-0 flex items-center font-semibold text-black"
