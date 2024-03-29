@@ -3,13 +3,17 @@ import TimelineContext from "../context/TimelineContext";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
-import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import {
+    getChildren,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
 import compareStates from "../../../utils/compareStates";
 import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
-import analyzeHighlights from "../../features/generation/analyzeHighlights";
+import analyzeNotes from "../../features/generation/analyzeHighlights";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 import Timeline from "../../models/timeline/Timeline";
+import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
 import createVoiceVM from "./createVoiceVM";
 
@@ -66,8 +70,18 @@ export default function createTimelineVM(
         const updatedProps = compareStates(context.state, oldState);
 
         if (updatedProps.has("highlights")) {
+            const highlights = context.state.highlights.filter((highlight) => {
+                return getParent(highlight).itemType === "NoteItem";
+            });
+
+            const notes = highlights.flatMap((highlight) => {
+                return getChildren(getParent(highlight)).filter((noteItem) => {
+                    return isOverlapping(noteItem.state, highlight.state);
+                });
+            });
+
             vm.state = {
-                analysis: analyzeHighlights(context.state.highlights),
+                analysis: analyzeNotes(notes),
             };
         }
 

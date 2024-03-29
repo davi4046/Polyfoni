@@ -1,12 +1,7 @@
 import { max, mean, min } from "lodash";
 
-import {
-    getChildren,
-    getParent,
-} from "../../../architecture/state-hierarchy-utils";
-import type Highlight from "../../models/highlight/Highlight";
 import type { Chord } from "../../models/item/Chord";
-import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
+import type Item from "../../models/item/Item";
 
 import getHarmonyOfNotes from "./getHarmonyOfNotes";
 
@@ -16,36 +11,16 @@ export type NotesAnalysis = {
     minPitch: number;
     maxPitch: number;
     meanPitch: number;
-    medianPitch: number;
+    uniquePitches: number;
 
-    minDuration: number;
-    maxDuration: number;
     meanDuration: number;
-    medianDuration: number;
-
-    /* 
-    minStart: number,
-    maxStart: number,
-    minEnd: number,
-    maxEnd: number, 
-    */
 
     harmony: Chord;
 };
 
-export default function analyzeHighlights(
-    highlights: Highlight<any>[]
+export default function analyzeNotes(
+    notes: Item<"NoteItem">[]
 ): NotesAnalysis | undefined {
-    const noteHighlights = highlights.filter((highlight) => {
-        return getParent(highlight).itemType === "NoteItem";
-    }) as Highlight<"NoteItem">[];
-
-    const notes = noteHighlights.flatMap((highlight) => {
-        return getChildren(getParent(highlight)).filter((noteItem) => {
-            return isOverlapping(noteItem.state, highlight.state);
-        });
-    });
-
     if (notes.length === 0) return;
 
     const pitches = notes.map((note) => note.state.content);
@@ -53,18 +28,14 @@ export default function analyzeHighlights(
 
     return {
         noteCount: notes.length,
+        harmony: getHarmonyOfNotes(notes)!,
 
         minPitch: min(pitches)!,
         maxPitch: max(pitches)!,
-        meanPitch: mean(pitches),
-        medianPitch: findMedian(pitches)!,
+        meanPitch: mean(pitches)!,
+        uniquePitches: countUniqueValues(pitches)!,
 
-        minDuration: min(durations)!,
-        maxDuration: max(durations)!,
-        meanDuration: mean(durations),
-        medianDuration: findMedian(durations)!,
-
-        harmony: getHarmonyOfNotes(notes)!,
+        meanDuration: mean(durations)!,
     };
 }
 
@@ -80,4 +51,12 @@ function findMedian(array: number[]): number | undefined {
     } else {
         return array[middleIndex];
     }
+}
+
+function countUniqueValues(numbers: number[]): number {
+    return numbers.reduce(
+        (count, num, index) =>
+            numbers.indexOf(num) === index ? count + 1 : count,
+        0
+    );
 }
