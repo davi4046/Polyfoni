@@ -11,7 +11,7 @@
     import StopIcon from "./assets/icons/StopIcon.svelte";
     import { writable } from "svelte/store";
     import ArrowDown from "./assets/ArrowDown.svelte";
-    import ComposerVision from "./assets/ComposerVision.svelte";
+    import Analysis from "./assets/Analysis.svelte";
 
     export let vm: TimelineVM;
 
@@ -162,7 +162,7 @@
             on:mousemove={vm.state.handleMouseMove}
             role="none"
         >
-            <ComposerVision bind:analysis={vm.state.analysis} />
+            <Analysis bind:analysis={vm.state.analysis} />
         </div>
     </div>
     <!-- MARKERS -->
