@@ -1,6 +1,6 @@
 <script lang="ts">
     import { round } from "lodash";
-    import type { NotesAnalysis } from "../../../../../features/generation/analyzeHighlights";
+    import type { NotesAnalysis } from "../../../../../features/generation/analyzeNotes";
     import {
         getPitchName,
         getPitchOctave,

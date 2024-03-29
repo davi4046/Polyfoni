@@ -1,6 +1,6 @@
 import Model from "../../../architecture/Model";
 import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
-import type { NotesAnalysis } from "../../features/generation/analyzeHighlights";
+import type { NotesAnalysis } from "../../features/generation/analyzeNotes";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
 import type Item from "../../models/item/Item";
 
