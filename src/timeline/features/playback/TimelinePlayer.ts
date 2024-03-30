@@ -1,18 +1,18 @@
+import { trackTypeToIndex } from "../generation/track-config";
+import { midiPlayer } from "../../utils/midiPlayer";
+import {
+    deriveTempoChangesFromItems,
+    type TempoChange,
+} from "../../utils/tempo-utils";
 import Stateful from "../../../architecture/Stateful";
 import {
     getChildren,
     getIndex,
 } from "../../../architecture/state-hierarchy-utils";
 import mapRange from "../../../utils/math-utils";
-import type Item from "../timeline/models/Item";
-import type Timeline from "../timeline/models/Timeline";
-import type Voice from "../timeline/models/Voice";
-import { midiPlayer } from "../../utils/midiPlayer";
-import {
-    deriveTempoChangesFromItems,
-    type TempoChange,
-} from "../../utils/tempo-utils";
-import { trackTypeToIndex } from "../generation/track-config";
+import type Item from "../../models/item/Item";
+import type Timeline from "../../models/timeline/Timeline";
+import type Voice from "../../models/voice/Voice";
 
 interface TimelinePlayerState {
     motion: PlaybackMotion;
