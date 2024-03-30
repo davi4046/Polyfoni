@@ -24,6 +24,16 @@ export class Chord {
         return `${this.root}-${this.decimal}`;
     }
 
+    getColor(): chroma.Color {
+        const h = (360 / 12) * pitchNames.indexOf(this.root);
+        const pitchCount = Object.values(this.pitches).reduce(
+            (count, value) => (value ? count + 1 : count),
+            0
+        );
+        const c = 100 - (100 / 11) * (pitchCount - 1);
+        return chroma.hcl(h, c, 80);
+    }
+
     getMidiValues(): number[] {
         const rootIndex = pitchNames.indexOf(this.root);
 
@@ -44,16 +54,6 @@ export class Chord {
         let index = degree % midiValues.length;
         while (index < 0) index += midiValues.length;
         return midiValues[index] + octave * 12;
-    }
-
-    getColor(): chroma.Color {
-        const h = (360 / 12) * pitchNames.indexOf(this.root);
-        const pitchCount = Object.values(this.pitches).reduce(
-            (count, value) => (value ? count + 1 : count),
-            0
-        );
-        const c = 100 - (100 / 11) * (pitchCount - 1);
-        return chroma.hcl(h, c, 80);
     }
 
     getPrimeForm(): Chord {
