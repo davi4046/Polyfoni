@@ -1,7 +1,7 @@
 import Model from "../../../architecture/Model";
 import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
-import type { NotesAnalysis } from "../../features/generation/analyzeNotes";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
+import type { Chord } from "../../models/item/Chord";
 import type Item from "../../models/item/Item";
 
 import type VoiceVM from "./VoiceVM";
@@ -23,7 +23,7 @@ interface TimelineVMState {
     playbackMotion: PlaybackMotion;
     isPlaying: boolean;
 
-    analysis?: NotesAnalysis;
+    displayHarmony?: Chord;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}

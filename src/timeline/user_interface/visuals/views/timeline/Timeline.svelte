@@ -11,7 +11,6 @@
     import StopIcon from "./assets/icons/StopIcon.svelte";
     import { writable } from "svelte/store";
     import ArrowDown from "./assets/ArrowDown.svelte";
-    import Analysis from "./assets/Analysis.svelte";
 
     export let vm: TimelineVM;
 
@@ -122,8 +121,9 @@
             </div>
         </div>
     </div>
-    <!-- PLAYBACK BUTTONS -->
+    <!-- CENTER TRACKS OVERLAY -->
     <div class="pointer-events-none relative col-start-2 row-start-3">
+        <!-- PLAYBACK BUTTONS -->
         <div
             class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
         >
@@ -154,16 +154,17 @@
                 <StopIcon />
             </button>
         </div>
-    </div>
-    <!-- ANALYSIS -->
-    <div class="pointer-events-none relative col-start-2 row-start-3">
-        <div
-            class="pointer-events-auto"
-            on:mousemove={vm.state.handleMouseMove}
-            role="none"
-        >
-            <Analysis bind:analysis={vm.state.analysis} />
-        </div>
+        <!-- DISPLAY HARMONY -->
+        {#if vm.state.displayHarmony}
+            <div class="pointer-events-auto absolute right-0 top-0 z-40 m-2">
+                <div
+                    class="border-2 border-black px-2 py-1 text-2xl font-medium"
+                    style="background-color:{vm.state.displayHarmony.getColor()};"
+                >
+                    {vm.state.displayHarmony.getName()}
+                </div>
+            </div>
+        {/if}
     </div>
     <!-- MARKERS -->
     <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">

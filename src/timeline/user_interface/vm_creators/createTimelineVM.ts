@@ -9,7 +9,7 @@ import {
 } from "../../../architecture/state-hierarchy-utils";
 import compareStates from "../../../utils/compareStates";
 import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
-import analyzeNotes from "../../features/generation/analyzeNotes";
+import getHarmonyOfNotes from "../../features/generation/getHarmonyOfNotes";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 import Timeline from "../../models/timeline/Timeline";
@@ -81,7 +81,7 @@ export default function createTimelineVM(
             });
 
             vm.state = {
-                analysis: analyzeNotes(notes),
+                displayHarmony: getHarmonyOfNotes(notes),
             };
         }
 
