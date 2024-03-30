@@ -1,7 +1,5 @@
 import { invoke } from "@tauri-apps/api";
 
-import { isBoolean, range } from "lodash";
-
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
 import {
