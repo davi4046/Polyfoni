@@ -49,14 +49,6 @@ export class Chord {
         return midiValues;
     }
 
-    convertDegreeToMidiValue(degree: number): number {
-        const midiValues = this.getMidiValues().sort((a, b) => a - b);
-        const octave = Math.floor(degree / midiValues.length) + 4;
-        let index = degree % midiValues.length;
-        while (index < 0) index += midiValues.length;
-        return midiValues[index] + octave * 12;
-    }
-
     getPrimeForm(): Chord {
         const builder = new ChordBuilder(this);
         const decimals: number[] = [];
@@ -76,6 +68,14 @@ export class Chord {
 
         builder.rotate("R", decimals.length - decimals.indexOf(minDecimal));
         return builder.build() as Chord;
+    }
+
+    convertDegreeToMidiValue(degree: number): number {
+        const midiValues = this.getMidiValues().sort((a, b) => a - b);
+        const octave = Math.floor(degree / midiValues.length) + 4;
+        let index = degree % midiValues.length;
+        while (index < 0) index += midiValues.length;
+        return midiValues[index] + octave * 12;
     }
 
     static fromPitches(root: Pitch, pitches: PitchMap): Chord {
