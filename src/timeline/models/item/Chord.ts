@@ -25,8 +25,9 @@ export class Chord {
     }
 
     getColor(): chroma.Color {
-        const h = (360 / 12) * pitchNames.indexOf(this.root);
-        const pitchCount = Object.values(this.pitches).reduce(
+        const primeForm = this.getPrimeForm();
+        const h = (360 / 12) * pitchNames.indexOf(primeForm.root);
+        const pitchCount = Object.values(primeForm.pitches).reduce(
             (count, value) => (value ? count + 1 : count),
             0
         );
