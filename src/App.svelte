@@ -2,7 +2,6 @@
     import Timeline from "./timeline/user_interface/visuals/views/timeline/Timeline.svelte";
     import makeDemoTimeline from "./timeline/dev_utils/makeDemoTimeline";
     import TimelineContext from "./timeline/user_interface/context/TimelineContext";
-    import ShortcutManager from "./architecture/ShortcutManager";
     import deleteSelectedItems from "./timeline/user_interface/context/operations/deleteSelectedItems";
     import cropHighlightedItems from "./timeline/user_interface/context/operations/cropHighlightedItems";
     import insertEmptyItems from "./timeline/user_interface/context/operations/insertEmptyItems";
@@ -15,6 +14,7 @@
     import { writeBinaryFile } from "@tauri-apps/api/fs";
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
+    import hotkeys from "hotkeys-js";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -23,18 +23,20 @@
     new Generator(timeline);
     new TotalHarmonyGenerator(timeline);
 
-    const shortcutManager = new ShortcutManager();
+    hotkeys.unbind("delete");
+    hotkeys.unbind("insert");
+    hotkeys.unbind("enter");
 
-    shortcutManager.register("Delete", () => {
+    hotkeys("delete", () => {
         deleteSelectedItems(timelineContext);
         cropHighlightedItems(timelineContext);
     });
 
-    shortcutManager.register("Insert", () => {
+    hotkeys("insert", () => {
         insertEmptyItems(timelineContext);
     });
 
-    shortcutManager.register("Enter", () => {
+    hotkeys("enter", () => {
         selectHighlightedItems(timelineContext);
     });
 
