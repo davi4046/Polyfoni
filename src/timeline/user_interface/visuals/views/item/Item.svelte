@@ -15,8 +15,10 @@
         vm = vm;
 
         if (vm.state.tooltip !== oldState.tooltip) {
-            tooltip?.destroy();
-            if (vm.state.tooltip) {
+            if (tooltip && !tooltip.state.isDestroyed) {
+                tooltip.destroy()
+            }
+            if (vm.state.tooltip && innerDiv && outerDiv) {
                 vm.state.tooltip.triggerTarget = outerDiv;
                 tooltip = tippy(innerDiv, vm.state.tooltip);
             }
@@ -24,7 +26,7 @@
     });
 
     onMount(() => {
-        if (vm.state.tooltip) {
+        if (vm.state.tooltip && innerDiv && outerDiv) {
             vm.state.tooltip.triggerTarget = outerDiv;
             tooltip = tippy(innerDiv, vm.state.tooltip);
         }
