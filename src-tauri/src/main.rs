@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use midi_player::MidiPlayer;
+use oxisynth::MidiEvent;
 use tauri::{CustomMenuItem, Menu, Submenu, Manager};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
@@ -64,8 +65,32 @@ fn main() {
                 _ => {}
             }
         })
-        .invoke_handler(tauri::generate_handler![eval::evaluate])
-        .invoke_handler(tauri::generate_handler![midi_player::note_on])
+        .invoke_handler(tauri::generate_handler![
+            eval::evaluate, 
+            midi_note_on, 
+            midi_note_off, 
+            midi_control_change
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+// Commands
+
+#[tauri::command]
+fn midi_note_on(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8, vel: u8) {
+    let midi_player_locked = midi_player.lock().unwrap();
+    midi_player_locked.sender.send(MidiEvent::NoteOn { channel, key, vel }).ok();
+}
+
+#[tauri::command]
+fn midi_note_off(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8) {
+    let midi_player_locked = midi_player.lock().unwrap();
+    midi_player_locked.sender.send(MidiEvent::NoteOff { channel, key }).ok();
+}
+
+#[tauri::command]
+fn midi_control_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, control: u8, value: u8) {
+    let midi_player_locked = midi_player.lock().unwrap();
+    midi_player_locked.sender.send(MidiEvent::ControlChange { channel, ctrl: control, value }).ok();
 }

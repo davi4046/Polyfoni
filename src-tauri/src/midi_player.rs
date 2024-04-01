@@ -39,6 +39,12 @@ impl MidiPlayer {
     }
 }
 
+impl Drop for MidiPlayer {
+    fn drop(&mut self) {
+        *self.keep_synth_alive.lock().unwrap() = false;
+    }
+}
+
 fn create_synth_stream<T>(device: &cpal::Device, config: &cpal::StreamConfig, rx: Receiver<MidiEvent>) -> Stream
 where
     T: cpal::SizedSample + cpal::FromSample<f32>,
@@ -107,10 +113,4 @@ where
             *sample = channels[id % 2];
         }
     }
-}
-
-#[tauri::command]
-pub fn note_on(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8, vel: u8) {
-    let midi_player_locked = midi_player.lock().unwrap();
-    midi_player_locked.sender.send(MidiEvent::NoteOn { channel, key, vel }).ok();
 }
