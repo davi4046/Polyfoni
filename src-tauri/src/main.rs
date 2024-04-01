@@ -1,11 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use midi_player::MidiPlayer;
 use tauri::{CustomMenuItem, Menu, Submenu, Manager};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
 
 mod eval;
+mod midi_player;
 
 fn create_menu() -> Menu {
     return Menu::new()
@@ -38,6 +40,10 @@ fn main() {
 
             app.manage(Mutex::new(pool));
 
+            let midi_player = MidiPlayer::new();
+
+            app.manage(Mutex::new(midi_player));
+
             Ok(())
         })
         .menu(create_menu())
@@ -59,6 +65,7 @@ fn main() {
             }
         })
         .invoke_handler(tauri::generate_handler![eval::evaluate])
+        .invoke_handler(tauri::generate_handler![midi_player::note_on])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
