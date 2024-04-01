@@ -1,5 +1,6 @@
+import { invoke } from "@tauri-apps/api";
+
 import { trackTypeToIndex } from "../generation/track-config";
-import { midiPlayer } from "../../utils/midiPlayer";
 import {
     deriveTempoChangesFromItems,
     type TempoChange,
@@ -120,7 +121,11 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         this._voiceTimeouts.forEach((timeouts, voice) => {
             timeouts.forEach(clearTimeout);
-            midiPlayer.allNotesOff(getIndex(voice));
+            invoke("midi_control_change", {
+                channel: getIndex(voice),
+                control: 123,
+                value: 0,
+            }); // All notes off
         });
 
         this._voiceTimeouts.clear();
@@ -181,14 +186,21 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             );
 
             const startTimeout = setTimeout(() => {
-                midiPlayer.noteOn(getIndex(voice), note.state.content, 100);
+                invoke("midi_note_on", {
+                    channel: getIndex(voice),
+                    key: note.state.content,
+                    vel: 100,
+                });
                 this.state = {
                     playingNotes: this.state.playingNotes.concat(note),
                 };
             }, noteStartTime - startTime);
 
             const endTimeout = setTimeout(() => {
-                midiPlayer.noteOff(getIndex(voice), note.state.content);
+                invoke("midi_note_off", {
+                    channel: getIndex(voice),
+                    key: note.state.content,
+                });
                 this.state = {
                     playingNotes: this.state.playingNotes.filter(
                         (value) => value !== note

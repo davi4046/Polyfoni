@@ -7,7 +7,7 @@
     import type Item from "../../../../models/item/Item";
     import { onDestroy } from "svelte";
     import { Chord, ChordBuilder } from "../../../../models/item/Chord";
-    import { midiPlayer } from "../../../../utils/midiPlayer";
+    import { invoke } from "@tauri-apps/api";
 
     export let item: Item<"ChordItem">;
 
@@ -103,26 +103,42 @@
     function playMidiValuesConcurrently(midiValues: number[]) {
         clearTimeout(playbackTimeout);
 
-        midiPlayer.allSoundOff(0);
+        invoke("midi_control_change", { channel: 0, control: 120, value: 0 }); // All sound off
 
         midiValues.forEach((midiValue) => {
-            midiPlayer.noteOn(0, midiValue + 60, 100);
+            invoke("midi_note_on", {
+                channel: 0,
+                key: midiValue + 60,
+                vel: 100,
+            });
         });
 
         playbackTimeout = setTimeout(() => {
-            midiPlayer.allNotesOff(0);
+            invoke("midi_control_change", {
+                channel: 0,
+                control: 123,
+                value: 0,
+            }); // All notes off
         }, 2000);
     }
 
     function playMidiValuesSequentially(midiValues: number[]) {
         clearTimeout(playbackTimeout);
 
-        midiPlayer.allSoundOff(0);
+        invoke("midi_control_change", { channel: 0, control: 120, value: 0 }); // All sound off
 
         function playNextNote() {
-            midiPlayer.noteOn(0, midiValues.shift()! + 60, 100);
+            invoke("midi_note_on", {
+                channel: 0,
+                key: midiValues.shift()! + 60,
+                vel: 100,
+            });
             playbackTimeout = setTimeout(() => {
-                midiPlayer.allNotesOff(0);
+                invoke("midi_control_change", {
+                    channel: 0,
+                    control: 123,
+                    value: 0,
+                }); // All notes off
                 if (midiValues.length > 0) playNextNote();
             }, 500);
         }
