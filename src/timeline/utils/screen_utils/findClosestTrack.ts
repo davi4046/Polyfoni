@@ -1,8 +1,8 @@
-import type Timeline from "../../models/Timeline";
-import type Track from "../../models/Track";
 import Attribute from "../../../architecture/AttributeEnum";
 import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 import findClosestElement from "../../../utils/dom-utils";
+import type Timeline from "../../../timeline/models/timeline/Timeline";
+import type Track from "../../../timeline/models/track/Track";
 
 export default function findClosestTrack(
     timeline: Timeline,
