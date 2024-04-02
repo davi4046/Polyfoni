@@ -21,8 +21,8 @@ export default function createItemVM<T extends keyof ItemTypes>(
     context: TimelineContext
 ): ItemVM {
     const itemHandler = new ItemHandler(context, model);
-    const startHandleHandler = new StartHandleHandler(context, model);
-    const endHandleHandler = new EndHandleHandler(context, model);
+    const startGripHandler = new StartHandleHandler(context, model);
+    const endGripHandler = new EndHandleHandler(context, model);
 
     const colorFunction = itemColorFunctions[model.itemType];
     const tooltipContentFunction = itemTooltipContentFunctions[model.itemType];
@@ -96,12 +96,12 @@ export default function createItemVM<T extends keyof ItemTypes>(
                 mouseEventListener.handler = itemHandler;
                 event.stopPropagation();
             },
-            handleMouseMove_startHandle: (event: MouseEvent) => {
-                mouseEventListener.handler = startHandleHandler;
+            handleMouseMove_startGrip: (event: MouseEvent) => {
+                mouseEventListener.handler = startGripHandler;
                 event.stopPropagation();
             },
-            handleMouseMove_endHandle: (event: MouseEvent) => {
-                mouseEventListener.handler = endHandleHandler;
+            handleMouseMove_endGrip: (event: MouseEvent) => {
+                mouseEventListener.handler = endGripHandler;
                 event.stopPropagation();
             },
 

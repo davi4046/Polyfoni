@@ -16,7 +16,7 @@
 
         if (vm.state.tooltip !== oldState.tooltip) {
             if (tooltip && !tooltip.state.isDestroyed) {
-                tooltip.destroy()
+                tooltip.destroy();
             }
             if (vm.state.tooltip && innerDiv && outerDiv) {
                 vm.state.tooltip.triggerTarget = outerDiv;
@@ -63,27 +63,27 @@
         {#if vm.state.text}
             <div class="truncate">{vm.state.text}</div>
         {/if}
-        <!-- start handle-->
+        <!-- start grip-->
         <div
             class="absolute bottom-0 left-0 top-0 z-50 w-1.5"
             style={vm.state.handleStyles
                 ? convertToInlineStyles(vm.state.handleStyles)
                 : ""}
             on:mousemove={(event) => {
-                if (vm.state.handleMouseMove_startHandle)
-                    vm.state.handleMouseMove_startHandle(event);
+                if (vm.state.handleMouseMove_startGrip)
+                    vm.state.handleMouseMove_startGrip(event);
             }}
             role="none"
         />
-        <!-- end handle -->
+        <!-- end grip -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5"
             style={vm.state.handleStyles
                 ? convertToInlineStyles(vm.state.handleStyles)
                 : ""}
             on:mousemove={(event) => {
-                if (vm.state.handleMouseMove_endHandle)
-                    vm.state.handleMouseMove_endHandle(event);
+                if (vm.state.handleMouseMove_endGrip)
+                    vm.state.handleMouseMove_endGrip(event);
             }}
             role="none"
         />

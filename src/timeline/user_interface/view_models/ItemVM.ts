@@ -13,8 +13,8 @@ interface ItemVMState {
     handleStyles?: Record<string, string>;
 
     handleMouseMove?: (event: MouseEvent) => void;
-    handleMouseMove_startHandle?: (event: MouseEvent) => void;
-    handleMouseMove_endHandle?: (event: MouseEvent) => void;
+    handleMouseMove_startGrip?: (event: MouseEvent) => void;
+    handleMouseMove_endGrip?: (event: MouseEvent) => void;
 
     onDestroy?: () => void;
 
