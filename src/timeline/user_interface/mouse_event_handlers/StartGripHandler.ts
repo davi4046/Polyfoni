@@ -7,7 +7,7 @@ import { getParent } from "../../../architecture/state-hierarchy-utils";
 import type Item from "../../models/item/Item";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 
-export default class StartHandleHandler implements MouseEventHandler {
+export default class StartGripHandler implements MouseEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>

@@ -10,7 +10,7 @@ import {
 import type TimelineContext from "../context/TimelineContext";
 import EndGripHandler from "../mouse_event_handlers/EndGripHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
-import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
+import StartGripHandler from "../mouse_event_handlers/StartGripHandler";
 import ItemVM from "../view_models/ItemVM";
 import { mouseEventListener } from "../../../architecture/mouse-event-handling";
 import type Item from "../../models/item/Item";
@@ -21,7 +21,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
     context: TimelineContext
 ): ItemVM {
     const itemHandler = new ItemHandler(context, model);
-    const startGripHandler = new StartHandleHandler(context, model);
+    const startGripHandler = new StartGripHandler(context, model);
     const endGripHandler = new EndGripHandler(context, model);
 
     const colorFunction = itemColorFunctions[model.itemType];
