@@ -12,7 +12,9 @@ export default class TimelineHandler implements MouseEventHandler {
     private _clickedBeat?: number;
     private _clickedTrack?: Track<any>;
 
-    private _prevHoveredBeat?: number;
+    private _prevMinBeat?: number;
+    private _prevMaxBeat?: number;
+
     private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
@@ -46,14 +48,19 @@ export default class TimelineHandler implements MouseEventHandler {
             moveEvent.clientY
         );
 
+        const minBeat = Math.floor(Math.min(hoveredBeat, this._clickedBeat));
+        const maxBeat = Math.ceil(Math.max(hoveredBeat, this._clickedBeat));
+
         if (
-            hoveredBeat === this._prevHoveredBeat &&
+            minBeat === this._prevMinBeat &&
+            maxBeat === this._prevMaxBeat &&
             hoveredTrack === this._prevHoveredTrack
         ) {
             return;
         }
 
-        this._prevHoveredBeat = hoveredBeat;
+        this._prevMinBeat = minBeat;
+        this._prevMaxBeat = maxBeat;
         this._prevHoveredTrack = hoveredTrack;
 
         if (!hoveredTrack) return;
@@ -71,9 +78,6 @@ export default class TimelineHandler implements MouseEventHandler {
 
         const tracksInRange = tracks.slice(minIndex, maxIndex + 1);
 
-        const minBeat = Math.floor(Math.min(hoveredBeat, this._clickedBeat));
-        const maxBeat = Math.ceil(Math.max(hoveredBeat, this._clickedBeat));
-
         const newHighlights = tracksInRange.map((track) => {
             return new Highlight({
                 start: minBeat,
@@ -90,7 +94,8 @@ export default class TimelineHandler implements MouseEventHandler {
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
         this._clickedBeat = undefined;
         this._clickedTrack = undefined;
-        this._prevHoveredBeat = undefined;
+        this._prevMinBeat = undefined;
+        this._prevMaxBeat = undefined;
         this._prevHoveredTrack = undefined;
 
         const currBeat = getBeatAtClientX(
