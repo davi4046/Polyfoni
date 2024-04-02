@@ -89,6 +89,64 @@
 
         updatePlaybackPosition();
     });
+
+    let hScroll = 0;
+    let vScroll = 0;
+
+    setInterval(() => {
+        for (const element of hScrollElements) {
+            element.scrollLeft += hScroll;
+        }
+        for (const element of vScrollElememts) {
+            element.scrollTop += vScroll;
+        }
+    }, 10);
+
+    function updateHScroll(
+        event: MouseEvent & {
+            currentTarget: EventTarget & HTMLElement;
+        }
+    ) {
+        const hPercent =
+            (event.clientX - event.currentTarget.offsetLeft) /
+            event.currentTarget.offsetWidth;
+
+        hScroll = calculateScrollSpeed(
+            hPercent,
+            64 / event.currentTarget.offsetWidth
+        );
+    }
+
+    function updateVScroll(
+        event: MouseEvent & {
+            currentTarget: EventTarget & HTMLElement;
+        }
+    ) {
+        const vPercent =
+            (event.clientY - event.currentTarget.offsetTop) /
+            event.currentTarget.offsetHeight;
+
+        vScroll = calculateScrollSpeed(
+            vPercent,
+            64 / event.currentTarget.offsetHeight
+        );
+    }
+
+    function calculateScrollSpeed(percent: number, tolerance: number) {
+        const maxSpeed = 10;
+
+        if (percent <= tolerance) {
+            const factor = (tolerance - percent) * (1 / tolerance);
+
+            return -maxSpeed * factor;
+        }
+        if (percent >= 1 - tolerance) {
+            const factor = (tolerance - 1 + percent) * (1 / tolerance);
+
+            return maxSpeed * factor;
+        }
+        return 0;
+    }
 </script>
 
 <div
@@ -122,7 +180,7 @@
         </div>
     </div>
     <!-- CENTER TRACKS OVERLAY -->
-    <div class="pointer-events-none relative col-start-2 row-start-3">
+    <div class="pointer-events-auto relative col-start-2 row-start-3">
         <!-- PLAYBACK BUTTONS -->
         <div
             class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
@@ -218,6 +276,16 @@
     <div
         class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
         data-type="top"
+        role="none"
+        on:mousemove|capture={(event) => {
+            if (event.buttons === 1) {
+                updateHScroll(event);
+            } else {
+                hScroll = 0;
+            }
+        }}
+        on:mouseleave={(_) => (hScroll = 0)}
+        on:mouseup={(_) => (hScroll = 0)}
     >
         <div
             class="flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-clip"
@@ -232,7 +300,25 @@
     <div
         class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
         data-type="center"
+        role="none"
         bind:this={centerDiv}
+        on:mousemove|capture={(event) => {
+            console.log("moved");
+            if (event.buttons === 1) {
+                updateHScroll(event);
+                updateVScroll(event);
+            } else {
+                hScroll = 0;
+                vScroll = 0;
+            }
+        }}
+        on:mouseleave|capture={(_) => {
+            console.log("left");
+        }}
+        on:mouseup={(_) => {
+            hScroll = 0;
+            vScroll = 0;
+        }}
     >
         <div
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
@@ -247,6 +333,16 @@
     <div
         class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
         data-type="bottom"
+        role="none"
+        on:mousemove|capture={(event) => {
+            if (event.buttons === 1) {
+                updateHScroll(event);
+            } else {
+                hScroll = 0;
+            }
+        }}
+        on:mouseleave={(_) => (hScroll = 0)}
+        on:mouseup={(_) => (hScroll = 0)}
     >
         <div
             class="flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
