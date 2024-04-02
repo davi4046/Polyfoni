@@ -79,6 +79,11 @@ export default function createItemVM<T extends keyof ItemTypes>(
         };
     }
 
+    const defaultGripStyles = {
+        "background-color": "black",
+        opacity: "0.25",
+    };
+
     const vm = new ItemVM(
         {
             start: model.state.start,
@@ -87,10 +92,8 @@ export default function createItemVM<T extends keyof ItemTypes>(
             innerDivStyles: createInnerDivStyles(),
             tooltip: createTooltip(),
 
-            handleStyles: {
-                "background-color": "black",
-                opacity: "0.25",
-            },
+            startGripStyles: defaultGripStyles,
+            endGripStyles: defaultGripStyles,
 
             handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = itemHandler;

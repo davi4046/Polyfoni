@@ -10,7 +10,8 @@ interface ItemVMState {
 
     innerDivStyles?: Record<string, string>;
     outerDivStyles?: Record<string, string>;
-    handleStyles?: Record<string, string>;
+    startGripStyles?: Record<string, string>;
+    endGripStyles?: Record<string, string>;
 
     handleMouseMove?: (event: MouseEvent) => void;
     handleMouseMove_startGrip?: (event: MouseEvent) => void;

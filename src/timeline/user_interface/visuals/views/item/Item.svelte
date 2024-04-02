@@ -66,8 +66,8 @@
         <!-- start grip-->
         <div
             class="absolute bottom-0 left-0 top-0 z-50 w-1.5"
-            style={vm.state.handleStyles
-                ? convertToInlineStyles(vm.state.handleStyles)
+            style={vm.state.startGripStyles
+                ? convertToInlineStyles(vm.state.startGripStyles)
                 : ""}
             on:mousemove={(event) => {
                 if (vm.state.handleMouseMove_startGrip)
@@ -78,8 +78,8 @@
         <!-- end grip -->
         <div
             class="absolute bottom-0 right-0 top-0 z-50 w-1.5"
-            style={vm.state.handleStyles
-                ? convertToInlineStyles(vm.state.handleStyles)
+            style={vm.state.endGripStyles
+                ? convertToInlineStyles(vm.state.endGripStyles)
                 : ""}
             on:mousemove={(event) => {
                 if (vm.state.handleMouseMove_endGrip)
