@@ -8,7 +8,7 @@ import {
     itemTooltipContentFunctions,
 } from "../item-type-config";
 import type TimelineContext from "../context/TimelineContext";
-import EndHandleHandler from "../mouse_event_handlers/EndHandleHandler";
+import EndGripHandler from "../mouse_event_handlers/EndGripHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartHandleHandler from "../mouse_event_handlers/StartHandleHandler";
 import ItemVM from "../view_models/ItemVM";
@@ -22,7 +22,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
 ): ItemVM {
     const itemHandler = new ItemHandler(context, model);
     const startGripHandler = new StartHandleHandler(context, model);
-    const endGripHandler = new EndHandleHandler(context, model);
+    const endGripHandler = new EndGripHandler(context, model);
 
     const colorFunction = itemColorFunctions[model.itemType];
     const tooltipContentFunction = itemTooltipContentFunctions[model.itemType];
