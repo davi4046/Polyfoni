@@ -22,9 +22,10 @@ export default class ItemHandler implements MouseEventHandler {
         readonly item: Item<any>
     ) {}
 
-    private _prevClickedBeat?: number;
+    private _clickedBeat?: number;
+    private _clickedTrack?: Track<any>;
+
     private _prevHoveredBeat?: number;
-    private _prevClickedTrack?: Track<any>;
     private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
@@ -38,19 +39,27 @@ export default class ItemHandler implements MouseEventHandler {
         this.context.state = {
             editItem: this.item,
         };
+        this._clickedBeat = Math.round(
+            getBeatAtClientX(this.context.timeline, downEvent.clientX)
+        );
+        this._clickedTrack = findClosestTrack(
+            this.context.timeline,
+            downEvent.clientY,
+            (track) => track.state.allowUserEdit
+        );
         downEvent.stopPropagation();
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
-        document.body.style.cursor = downEvent ? "grabbing" : "pointer";
+        if (!this._clickedBeat || !this._clickedTrack) {
+            document.body.style.cursor = "pointer";
+            return;
+        }
 
-        if (!downEvent) return;
+        document.body.style.cursor = "grabbing";
 
         const hoveredBeat = Math.round(
             getBeatAtClientX(this.context.timeline, moveEvent.clientX)
-        );
-        const clickedBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, downEvent.clientX)
         );
 
         const hoveredTrack = findClosestTrack(
@@ -58,30 +67,20 @@ export default class ItemHandler implements MouseEventHandler {
             moveEvent.clientY,
             (track) => track.state.allowUserEdit
         );
-        const clickedTrack = findClosestTrack(
-            this.context.timeline,
-            downEvent.clientY,
-            (track) => track.state.allowUserEdit
-        );
 
         if (
-            clickedBeat === this._prevClickedBeat &&
             hoveredBeat === this._prevHoveredBeat &&
-            clickedTrack === this._prevClickedTrack &&
             hoveredTrack === this._prevHoveredTrack
         ) {
             return;
         }
-
-        this._prevClickedBeat = clickedBeat;
         this._prevHoveredBeat = hoveredBeat;
-        this._prevClickedTrack = clickedTrack;
         this._prevHoveredTrack = hoveredTrack;
 
         if (
-            !hoveredTrack ||
-            !clickedTrack ||
-            (hoveredBeat === clickedBeat && hoveredTrack === clickedTrack)
+            !hoveredBeat ||
+            (hoveredBeat === this._clickedBeat &&
+                hoveredTrack === this._clickedTrack)
         ) {
             this.context.state = {
                 ghostPairs: [],
@@ -96,10 +95,10 @@ export default class ItemHandler implements MouseEventHandler {
         ).filter((track) => track.state.allowUserEdit);
 
         const hoveredIndex = tracks.indexOf(hoveredTrack);
-        const clickedIndex = tracks.indexOf(clickedTrack);
+        const clickedIndex = tracks.indexOf(this._clickedTrack);
 
         const trackOffset = hoveredIndex - clickedIndex;
-        const beatOffset = hoveredBeat - clickedBeat;
+        const beatOffset = hoveredBeat - this._clickedBeat;
 
         const selectedItems = this.context.state.selectedItems;
 
@@ -135,6 +134,10 @@ export default class ItemHandler implements MouseEventHandler {
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
+        this._clickedBeat = undefined;
+        this._clickedTrack = undefined;
+        this._prevHoveredBeat = undefined;
+        this._prevHoveredTrack = undefined;
         placeGhostItems(this.context);
     }
 }

@@ -1,20 +1,31 @@
 import type TimelineContext from "../context/TimelineContext";
+import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
+import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 import Highlight from "../../models/highlight/Highlight";
 import Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
-import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
-import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 
 export default class TimelineHandler implements MouseEventHandler {
     constructor(readonly context: TimelineContext) {}
 
-    private _prevMinBeat?: number;
-    private _prevMaxBeat?: number;
-    private _prevClickedTrack?: Track<any>;
+    private _clickedBeat?: number;
+    private _clickedTrack?: Track<any>;
+
+    private _prevHoveredBeat?: number;
     private _prevHoveredTrack?: Track<any>;
 
     handleMouseDown(downEvent: MouseEvent) {
+        this._clickedBeat = getBeatAtClientX(
+            this.context.timeline,
+            downEvent.clientX
+        );
+
+        this._clickedTrack = findClosestTrack(
+            this.context.timeline,
+            downEvent.clientY
+        );
+
         this.context.state = {
             highlights: [],
             selectedItems: [],
@@ -23,47 +34,29 @@ export default class TimelineHandler implements MouseEventHandler {
     }
 
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
-        if (!downEvent) return;
+        if (!this._clickedBeat || !this._clickedTrack) return;
 
         const hoveredBeat = getBeatAtClientX(
             this.context.timeline,
             moveEvent.clientX
         );
 
-        const clickedBeat = getBeatAtClientX(
-            this.context.timeline,
-            downEvent.clientX
-        );
-
-        const minBeat = Math.floor(Math.min(hoveredBeat, clickedBeat));
-        const maxBeat = Math.ceil(Math.max(hoveredBeat, clickedBeat));
-
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
             moveEvent.clientY
         );
-        const clickedTrack = findClosestTrack(
-            this.context.timeline,
-            downEvent.clientY
-        );
 
         if (
-            minBeat === this._prevMinBeat &&
-            maxBeat === this._prevMaxBeat &&
-            clickedTrack === this._prevClickedTrack &&
+            hoveredBeat === this._prevHoveredBeat &&
             hoveredTrack === this._prevHoveredTrack
         ) {
             return;
         }
 
-        this._prevMinBeat = minBeat;
-        this._prevMaxBeat = maxBeat;
-        this._prevClickedTrack = clickedTrack;
+        this._prevHoveredBeat = hoveredBeat;
         this._prevHoveredTrack = hoveredTrack;
 
-        if (!hoveredTrack || !clickedTrack) {
-            return;
-        }
+        if (!hoveredTrack) return;
 
         const tracks = getNestedArrayOfDescendants(
             this.context.timeline,
@@ -71,12 +64,15 @@ export default class TimelineHandler implements MouseEventHandler {
         ).flat(Infinity) as Track<any>[];
 
         const hoveredIndex = tracks.indexOf(hoveredTrack);
-        const clickedIndex = tracks.indexOf(clickedTrack);
+        const clickedIndex = tracks.indexOf(this._clickedTrack);
 
         const minIndex = Math.min(hoveredIndex, clickedIndex);
         const maxIndex = Math.max(hoveredIndex, clickedIndex);
 
         const tracksInRange = tracks.slice(minIndex, maxIndex + 1);
+
+        const minBeat = Math.floor(Math.min(hoveredBeat, this._clickedBeat));
+        const maxBeat = Math.ceil(Math.max(hoveredBeat, this._clickedBeat));
 
         const newHighlights = tracksInRange.map((track) => {
             return new Highlight({
@@ -92,18 +88,18 @@ export default class TimelineHandler implements MouseEventHandler {
     }
 
     handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
-        this._prevMinBeat = undefined;
-        this._prevMaxBeat = undefined;
+        this._clickedBeat = undefined;
+        this._clickedTrack = undefined;
+        this._prevHoveredBeat = undefined;
         this._prevHoveredTrack = undefined;
-        this._prevClickedTrack = undefined;
 
-        const clickedBeat = getBeatAtClientX(
+        const currBeat = getBeatAtClientX(
             this.context.timeline,
             upEvent.clientX
         );
 
         if (this.context.state.highlights.length === 0) {
-            this.context.player.setPlaybackPosition(Math.round(clickedBeat));
+            this.context.player.setPlaybackPosition(Math.round(currBeat));
         }
     }
 }
