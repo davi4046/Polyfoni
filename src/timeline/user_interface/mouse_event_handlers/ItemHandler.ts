@@ -78,7 +78,7 @@ export default class ItemHandler implements MouseEventHandler {
         this._prevHoveredTrack = hoveredTrack;
 
         if (
-            !hoveredBeat ||
+            !hoveredTrack ||
             (hoveredBeat === this._clickedBeat &&
                 hoveredTrack === this._clickedTrack)
         ) {
