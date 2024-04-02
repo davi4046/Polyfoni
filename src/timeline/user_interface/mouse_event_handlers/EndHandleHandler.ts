@@ -11,6 +11,13 @@ export default class EndHandleHandler implements MouseEventHandler {
         readonly item: Item<any>
     ) {}
 
+    handleMouseDown() {
+        this.context.state = {
+            selectedGrips: [this.item],
+            gripMode: "end",
+        };
+    }
+
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
         document.body.style.cursor = "e-resize";
 
@@ -38,6 +45,9 @@ export default class EndHandleHandler implements MouseEventHandler {
             children: cropItemsByInterval(otherItems, this.item.state).concat(
                 this.item
             ),
+        };
+        this.context.state = {
+            selectedGrips: [],
         };
     }
 }

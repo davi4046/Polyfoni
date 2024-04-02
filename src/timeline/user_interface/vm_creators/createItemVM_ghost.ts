@@ -39,13 +39,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
             start: model.state.start,
             end: model.state.end,
             text: itemTextFunctions[model.itemType](model.state.content),
-
             innerDivStyles: createInnerDivStyles(),
-
-            handleStyles: {
-                "background-color": "black",
-                opacity: "0.25",
-            },
         },
         model.id
     );

@@ -5,10 +5,13 @@ import type Item from "../../models/item/Item";
 import type Timeline from "../../models/timeline/Timeline";
 
 interface TimelineContextState {
-    editItem?: Item<any>;
     highlights: Highlight<any>[];
     ghostPairs: [Item<any>, Item<any>][];
     selectedItems: Item<any>[];
+    selectedGrips: Item<any>[];
+    gripMode: "start" | "end";
+
+    editItem?: Item<any>;
 }
 
 export default class TimelineContext extends Stateful<TimelineContextState> {
@@ -17,6 +20,8 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
             highlights: [],
             ghostPairs: [],
             selectedItems: [],
+            selectedGrips: [],
+            gripMode: "start",
         });
 
         this.player = new TimelinePlayer(timeline);

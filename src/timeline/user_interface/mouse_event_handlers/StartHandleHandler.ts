@@ -13,6 +13,13 @@ export default class StartHandleHandler implements MouseEventHandler {
         readonly item: Item<any>
     ) {}
 
+    handleMouseDown() {
+        this.context.state = {
+            selectedGrips: [this.item],
+            gripMode: "start",
+        };
+    }
+
     handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
         document.body.style.cursor = "e-resize";
 
@@ -40,6 +47,9 @@ export default class StartHandleHandler implements MouseEventHandler {
             children: cropItemsByInterval(otherItems, this.item.state).concat(
                 this.item
             ),
+        };
+        this.context.state = {
+            selectedGrips: [],
         };
     }
 }

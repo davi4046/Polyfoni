@@ -79,9 +79,14 @@ export default function createItemVM<T extends keyof ItemTypes>(
         };
     }
 
-    const defaultGripStyles = {
+    const gripStylesUnselected = {
         "background-color": "black",
         opacity: "0.25",
+    };
+
+    const gripStylesSelected = {
+        "background-color": "blue",
+        opacity: "0.5",
     };
 
     const vm = new ItemVM(
@@ -92,8 +97,8 @@ export default function createItemVM<T extends keyof ItemTypes>(
             innerDivStyles: createInnerDivStyles(),
             tooltip: createTooltip(),
 
-            startGripStyles: defaultGripStyles,
-            endGripStyles: defaultGripStyles,
+            startGripStyles: gripStylesUnselected,
+            endGripStyles: gripStylesUnselected,
 
             handleMouseMove: (event: MouseEvent) => {
                 mouseEventListener.handler = itemHandler;
@@ -126,8 +131,18 @@ export default function createItemVM<T extends keyof ItemTypes>(
     });
 
     context.subscribe(() => {
+        const isGripSelected = context.state.selectedGrips.includes(model);
+
         vm.state = {
             innerDivStyles: createInnerDivStyles(),
+            startGripStyles:
+                isGripSelected && context.state.gripMode === "start"
+                    ? gripStylesSelected
+                    : gripStylesUnselected,
+            endGripStyles:
+                isGripSelected && context.state.gripMode === "end"
+                    ? gripStylesSelected
+                    : gripStylesUnselected,
         };
     });
 
