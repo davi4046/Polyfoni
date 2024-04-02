@@ -89,6 +89,18 @@
 
         updatePlaybackPosition();
     });
+
+    let hAutoScroll = 0;
+    let vAutoScroll = 0;
+
+    setInterval(() => {
+        for (const element of hScrollElements) {
+            element.scrollLeft += hAutoScroll;
+        }
+        for (const element of vScrollElememts) {
+            element.scrollTop += vAutoScroll;
+        }
+    }, 10);
 </script>
 
 <div
@@ -121,8 +133,83 @@
             </div>
         </div>
     </div>
+    <!-- TRACKS OVERLAY -->
+    <div class="pointer-events-none relative col-start-2 row-start-2 row-end-5">
+        <!-- LEFT AUTO-SCROLL ZONE -->
+        <div
+            class="pointer-events-auto absolute left-0 z-40 h-full w-16"
+            on:mousemove={(event) => {
+                if (event.buttons !== 1) return; // Left mouse button must be pressed
+                // @ts-ignore
+                const percentage = 1 - event.offsetX / event.target.clientWidth;
+                hAutoScroll = percentage * -10;
+                vm.state.handleMouseMove_tracks(event);
+            }}
+            on:mouseleave={(_) => {
+                hAutoScroll = 0;
+            }}
+            on:mouseup={(event) => {
+                if (event.button === 0) hAutoScroll = 0;
+            }}
+            role="none"
+        />
+        <!-- RIGHT AUTO-SCROLL ZONE -->
+        <div
+            class="pointer-events-auto absolute right-0 z-40 h-full w-16"
+            on:mousemove={(event) => {
+                if (event.buttons !== 1) return; // Left mouse button must be pressed
+                // @ts-ignore
+                const percentage = event.offsetX / event.target.clientWidth;
+                hAutoScroll = percentage * 10;
+                vm.state.handleMouseMove_tracks(event);
+            }}
+            on:mouseleave={(_) => {
+                hAutoScroll = 0;
+            }}
+            on:mouseup={(event) => {
+                if (event.button === 0) hAutoScroll = 0;
+            }}
+            role="none"
+        />
+    </div>
     <!-- CENTER TRACKS OVERLAY -->
     <div class="pointer-events-none relative col-start-2 row-start-3">
+        <!-- TOP AUTO-SCROLL ZONE -->
+        <div
+            class="pointer-events-auto absolute top-0 z-40 h-16 w-full"
+            on:mousemove={(event) => {
+                if (event.buttons !== 1) return; // Left mouse button must be pressed
+                const percentage = // @ts-ignore
+                    1 - event.offsetY / event.target.clientHeight;
+                vAutoScroll = percentage * -10;
+                vm.state.handleMouseMove_tracks(event);
+            }}
+            on:mouseleave={(_) => {
+                vAutoScroll = 0;
+            }}
+            on:mouseup={(event) => {
+                if (event.button === 0) vAutoScroll = 0;
+            }}
+            role="none"
+        />
+        <!-- BOTTOM AUTO-SCROLL ZONE -->
+        <div
+            class="pointer-events-auto absolute bottom-0 z-40 h-16 w-full"
+            on:mousemove={(event) => {
+                if (event.buttons !== 1) return; // Left mouse button must be pressed
+                // @ts-ignore
+                const percentage = event.offsetY / event.target.clientHeight;
+                vAutoScroll = percentage * 10;
+                vm.state.handleMouseMove_tracks(event);
+            }}
+            on:mouseleave={(_) => {
+                vAutoScroll = 0;
+            }}
+            on:mouseup={(event) => {
+                if (event.button === 0) vAutoScroll = 0;
+            }}
+            role="none"
+        />
         <!-- PLAYBACK BUTTONS -->
         <div
             class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
