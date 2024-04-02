@@ -180,7 +180,7 @@
         </div>
     </div>
     <!-- CENTER TRACKS OVERLAY -->
-    <div class="pointer-events-auto relative col-start-2 row-start-3">
+    <div class="pointer-events-none relative col-start-2 row-start-3">
         <!-- PLAYBACK BUTTONS -->
         <div
             class="pointer-events-auto absolute bottom-0 right-0 z-40 m-2 flex gap-2"
@@ -312,8 +312,9 @@
                 vScroll = 0;
             }
         }}
-        on:mouseleave|capture={(_) => {
-            console.log("left");
+        on:mouseleave={(_) => {
+            hScroll = 0;
+            vScroll = 0;
         }}
         on:mouseup={(_) => {
             hScroll = 0;
