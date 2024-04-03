@@ -15,7 +15,6 @@
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
     import hotkeys from "hotkeys-js";
-    import TimelineHistory from "./timeline/features/undo-redo/TimelineHistory";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -23,10 +22,6 @@
 
     new Generator(timeline);
     new TotalHarmonyGenerator(timeline);
-
-    hotkeys.unbind("delete");
-    hotkeys.unbind("insert");
-    hotkeys.unbind("enter");
 
     hotkeys("delete", () => {
         timelineContext.history.startAction("Delete");
