@@ -1,4 +1,4 @@
-import { clamp, clone } from "lodash";
+import { clamp } from "lodash";
 
 import type TimelineContext from "../context/TimelineContext";
 import cropItemsByInterval from "../../utils/cropItemsByInterval";
@@ -15,10 +15,13 @@ export default class StartGripHandler implements GlobalEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
-    ) {}
+    ) {
+        this._grippedPoint = item.state.start;
+    }
 
     private _isMouseDown = false;
-    private _prevBeat?: number;
+    private _grippedItems: Item<any>[] = [];
+    private _grippedPoint: number = 0;
 
     getIsOverwritable(): boolean {
         return !this._isMouseDown;
@@ -27,14 +30,8 @@ export default class StartGripHandler implements GlobalEventHandler {
     handleMouseDown(event: MouseEvent) {
         this._isMouseDown = true;
 
-        this.context.state = {
-            grips: new Map([
-                [
-                    this.item,
-                    { property: "start", value: this.item.state.start },
-                ],
-            ]),
-        };
+        this._grippedItems = [this.item];
+        this._updateGrips();
     }
 
     handleMouseMove(event: MouseEvent) {
@@ -56,68 +53,55 @@ export default class StartGripHandler implements GlobalEventHandler {
 
         const clampedBeat = clamp(hoveredBeat, 0, minEnd - 1);
 
-        if (clampedBeat === this._prevBeat) return;
+        if (clampedBeat === this._grippedPoint) return;
 
-        this._prevBeat = clampedBeat;
-
-        this.context.state = {
-            grips: new Map(
-                grippedItems.map((item) => [
-                    item,
-                    { property: "start", value: clampedBeat },
-                ])
-            ),
-        };
+        this._grippedPoint = clampedBeat;
+        this._updateGrips();
     }
 
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
-        Array.from(this.context.state.grips.entries()).forEach(
-            ([item, grip]) => {
-                item.state = {
-                    start: grip.value,
-                };
-                cropItemInterval(item);
-            }
-        );
+        this._grippedItems.forEach((item) => {
+            item.state = {
+                start: this._grippedPoint,
+            };
+            cropItemInterval(item);
+        });
 
-        this.context.state = {
-            grips: new Map(),
-        };
+        this._grippedItems = [];
+        this._updateGrips();
     }
 
     handleKeyDown(event: KeyboardEvent) {
         if (event.key !== "Shift") return;
 
-        const grippedItems = Array.from(this.context.state.grips.keys());
-        const grippedPoint = this._prevBeat
-            ? this._prevBeat
-            : this.item.state.start;
-
         const tracks = getChildren(getGrandparent(this.item))
             .filter((track) => track.itemType !== "NoteItem")
             .filter((track) => {
-                return !grippedItems.some((item) => getParent(item) === track);
+                return !this._grippedItems.some(
+                    (item) => getParent(item) === track
+                );
             }); // Only search tracks where there is no gripped item
 
         const matchStartItems = tracks
             .flatMap((track) => getChildren(track))
             .filter((item) => {
-                return item.state.start === grippedPoint;
+                return item.state.start === this._grippedPoint;
             });
 
-        const newGrips = clone(this.context.state.grips);
+        this._grippedItems = this._grippedItems.concat(matchStartItems);
+        this._updateGrips();
+    }
 
-        matchStartItems.forEach((item) => {
-            newGrips.set(item, {
-                property: "start",
-                value: item.state.start,
-            });
-        });
-
+    private _updateGrips() {
         this.context.state = {
-            grips: newGrips,
+            grips: new Map(
+                this._grippedItems.map((item) => [
+                    item,
+                    { property: "start", value: this._grippedPoint },
+                ])
+            ),
         };
     }
 }
