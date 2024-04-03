@@ -130,17 +130,27 @@ export default function createItemVM<T extends keyof ItemTypes>(
     });
 
     context.subscribe(() => {
-        const isGripSelected = context.state.selectedGrips.includes(model);
+        const grip = context.state.selectedGrips.get(model);
+
+        const start =
+            grip && grip.property === "start" ? grip.value : model.state.start;
+
+        const end =
+            grip && grip.property === "end" ? grip.value : model.state.end;
 
         vm.state = {
+            start: start,
+            end: end,
+
             innerDivStyles: createInnerDivStyles(),
-            outerDivStyles: isGripSelected ? { "z-index": "30" } : {},
+            outerDivStyles: grip ? { "z-index": "30" } : {},
+
             startGripStyles:
-                isGripSelected && context.state.gripMode === "start"
+                grip && grip.property === "start"
                     ? gripStylesSelected
                     : gripStylesUnselected,
             endGripStyles:
-                isGripSelected && context.state.gripMode === "end"
+                grip && grip.property === "end"
                     ? gripStylesSelected
                     : gripStylesUnselected,
         };
