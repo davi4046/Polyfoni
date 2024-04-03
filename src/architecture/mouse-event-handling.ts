@@ -47,7 +47,7 @@ class GlobalEventListener {
 export const globalEventListener = new GlobalEventListener();
 
 export interface GlobalEventHandler {
-    handleMouseDown?: (downEvent: MouseEvent) => void;
-    handleMouseMove?: (moveEvent: MouseEvent, downEvent?: MouseEvent) => void;
+    handleMouseDown?: (event: MouseEvent) => void;
+    handleMouseMove?: (event: MouseEvent, downEvent?: MouseEvent) => void;
     handleMouseUp?: (upEvent: MouseEvent, downEvent: MouseEvent) => void;
 }

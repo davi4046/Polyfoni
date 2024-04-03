@@ -11,20 +11,23 @@ export default class EndGripHandler implements GlobalEventHandler {
         readonly item: Item<any>
     ) {}
 
-    handleMouseDown() {
+    private _isMouseDown = false;
+
+    handleMouseDown(event: MouseEvent) {
         this.context.state = {
             selectedGrips: [this.item],
             gripMode: "end",
         };
+        this._isMouseDown = true;
     }
 
-    handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+    handleMouseMove(event: MouseEvent) {
         document.body.style.cursor = "e-resize";
 
-        if (!downEvent) return;
+        if (!this._isMouseDown) return;
 
         const hoveredBeat = Math.round(
-            getBeatAtClientX(this.context.timeline, moveEvent.clientX)
+            getBeatAtClientX(this.context.timeline, event.clientX)
         );
 
         const newEnd = Math.max(hoveredBeat, this.item.state.start + 1);
@@ -36,7 +39,7 @@ export default class EndGripHandler implements GlobalEventHandler {
         }
     }
 
-    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
+    handleMouseUp(event: MouseEvent) {
         const track = getParent(this.item);
         const otherItems = track.state.children.filter(
             (item) => item !== this.item
@@ -49,5 +52,6 @@ export default class EndGripHandler implements GlobalEventHandler {
         this.context.state = {
             selectedGrips: [],
         };
+        this._isMouseDown = false;
     }
 }

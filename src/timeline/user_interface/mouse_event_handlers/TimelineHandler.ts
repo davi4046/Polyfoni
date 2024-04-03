@@ -17,15 +17,15 @@ export default class TimelineHandler implements GlobalEventHandler {
 
     private _prevHoveredTrack?: Track<any>;
 
-    handleMouseDown(downEvent: MouseEvent) {
+    handleMouseDown(event: MouseEvent) {
         this._clickedBeat = getBeatAtClientX(
             this.context.timeline,
-            downEvent.clientX
+            event.clientX
         );
 
         this._clickedTrack = findClosestTrack(
             this.context.timeline,
-            downEvent.clientY
+            event.clientY
         );
 
         this.context.state = {
@@ -35,17 +35,17 @@ export default class TimelineHandler implements GlobalEventHandler {
         };
     }
 
-    handleMouseMove(moveEvent: MouseEvent, downEvent?: MouseEvent) {
+    handleMouseMove(event: MouseEvent) {
         if (!this._clickedBeat || !this._clickedTrack) return;
 
         const hoveredBeat = getBeatAtClientX(
             this.context.timeline,
-            moveEvent.clientX
+            event.clientX
         );
 
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
-            moveEvent.clientY
+            event.clientY
         );
 
         const minBeat = Math.floor(Math.min(hoveredBeat, this._clickedBeat));
@@ -91,17 +91,14 @@ export default class TimelineHandler implements GlobalEventHandler {
         };
     }
 
-    handleMouseUp(upEvent: MouseEvent, downEvent: MouseEvent) {
+    handleMouseUp(event: MouseEvent) {
         this._clickedBeat = undefined;
         this._clickedTrack = undefined;
         this._prevMinBeat = undefined;
         this._prevMaxBeat = undefined;
         this._prevHoveredTrack = undefined;
 
-        const currBeat = getBeatAtClientX(
-            this.context.timeline,
-            upEvent.clientX
-        );
+        const currBeat = getBeatAtClientX(this.context.timeline, event.clientX);
 
         if (this.context.state.highlights.length === 0) {
             this.context.player.setPlaybackPosition(Math.round(currBeat));
