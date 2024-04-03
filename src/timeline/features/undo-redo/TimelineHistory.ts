@@ -59,7 +59,7 @@ export default class TimelineHistory {
 
         if (!lastAction) return;
 
-        lastAction.changes.forEach(({ obj, oldState, newState }) => {
+        lastAction.changes.reverse().forEach(({ obj, oldState, newState }) => {
             obj.state = newState;
         });
 
