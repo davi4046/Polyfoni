@@ -85,8 +85,8 @@ export default function createItemVM<T extends keyof ItemTypes>(
     };
 
     const gripStylesSelected = {
-        "background-color": "blue",
-        opacity: "0.5",
+        "background-color": "white",
+        opacity: "0.75",
     };
 
     const vm = new ItemVM(
