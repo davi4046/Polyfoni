@@ -61,6 +61,15 @@ export default class StartGripHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
+        Array.from(this.context.state.grips.entries()).forEach(
+            ([item, grip]) => {
+                item.state = {
+                    start: grip.value,
+                };
+                cropItemInterval(item);
+            }
+        );
+
         this.context.state = {
             grips: new Map(),
         };
