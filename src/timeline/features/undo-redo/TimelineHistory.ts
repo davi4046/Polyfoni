@@ -65,8 +65,6 @@ export default class TimelineHistory {
 
         this._undoableActions.push(lastAction);
     }
-
-    private _revertActionChanges(action: Action) {}
 }
 
 class Action {
