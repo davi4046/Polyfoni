@@ -303,7 +303,6 @@
         role="none"
         bind:this={centerDiv}
         on:mousemove|capture={(event) => {
-            console.log("moved");
             if (event.buttons === 1) {
                 updateHScroll(event);
                 updateVScroll(event);
