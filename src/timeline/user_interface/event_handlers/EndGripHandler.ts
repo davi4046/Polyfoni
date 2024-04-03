@@ -1,5 +1,3 @@
-import { clamp } from "lodash";
-
 import type TimelineContext from "../context/TimelineContext";
 import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
@@ -27,7 +25,7 @@ export default class EndGripHandler implements GlobalEventHandler {
         this._isMouseDown = true;
 
         this.context.state = {
-            selectedGrips: new Map([
+            grips: new Map([
                 [this.item, { property: "end", value: this.item.state.end }],
             ]),
         };
@@ -49,7 +47,7 @@ export default class EndGripHandler implements GlobalEventHandler {
         this._prevBeat = clampedBeat;
 
         this.context.state = {
-            selectedGrips: new Map([
+            grips: new Map([
                 [this.item, { property: "end", value: clampedBeat }],
             ]),
         };
@@ -59,7 +57,7 @@ export default class EndGripHandler implements GlobalEventHandler {
         this._isMouseDown = false;
 
         this.context.state = {
-            selectedGrips: new Map(),
+            grips: new Map(),
         };
     }
 

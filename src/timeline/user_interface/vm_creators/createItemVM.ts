@@ -130,7 +130,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
     });
 
     context.subscribe(() => {
-        const grip = context.state.selectedGrips.get(model);
+        const grip = context.state.grips.get(model);
 
         const start =
             grip && grip.property === "start" ? grip.value : model.state.start;

@@ -27,7 +27,7 @@ export default class StartGripHandler implements GlobalEventHandler {
         this._isMouseDown = true;
 
         this.context.state = {
-            selectedGrips: new Map([
+            grips: new Map([
                 [
                     this.item,
                     { property: "start", value: this.item.state.start },
@@ -52,7 +52,7 @@ export default class StartGripHandler implements GlobalEventHandler {
         this._prevBeat = clampedBeat;
 
         this.context.state = {
-            selectedGrips: new Map([
+            grips: new Map([
                 [this.item, { property: "start", value: clampedBeat }],
             ]),
         };
@@ -62,7 +62,7 @@ export default class StartGripHandler implements GlobalEventHandler {
         this._isMouseDown = false;
 
         this.context.state = {
-            selectedGrips: new Map(),
+            grips: new Map(),
         };
     }
 

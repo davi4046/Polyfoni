@@ -10,8 +10,7 @@ interface TimelineContextState {
     highlights: Highlight<any>[];
     ghostPairs: [Item<any>, Item<any>][];
     selectedItems: Item<any>[];
-    selectedGrips: Map<Item<any>, ItemKeyValuePair<any, "start" | "end">>;
-    gripMode: "start" | "end";
+    grips: Map<Item<any>, ItemKeyValuePair<any, "start" | "end">>;
 
     editItem?: Item<any>;
 }
@@ -30,8 +29,7 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
             highlights: [],
             ghostPairs: [],
             selectedItems: [],
-            selectedGrips: new Map(),
-            gripMode: "start",
+            grips: new Map(),
         });
 
         this.player = new TimelinePlayer(timeline);
