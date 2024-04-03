@@ -62,12 +62,16 @@ export default class StartGripHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
+        this.context.history.startAction("Edit item start");
+
         this._grippedItems.forEach((item) => {
             item.state = {
                 start: this._grippedPoint,
             };
             cropItemInterval(item);
         });
+
+        this.context.history.endAction();
 
         this._grippedItems = [];
         this._updateGrips();
