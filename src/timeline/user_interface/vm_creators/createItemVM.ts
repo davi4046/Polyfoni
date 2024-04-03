@@ -12,7 +12,7 @@ import EndGripHandler from "../mouse_event_handlers/EndGripHandler";
 import ItemHandler from "../mouse_event_handlers/ItemHandler";
 import StartGripHandler from "../mouse_event_handlers/StartGripHandler";
 import ItemVM from "../view_models/ItemVM";
-import { mouseEventListener } from "../../../architecture/mouse-event-handling";
+import { globalEventListener } from "../../../architecture/mouse-event-handling";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 
@@ -101,20 +101,20 @@ export default function createItemVM<T extends keyof ItemTypes>(
             endGripStyles: gripStylesUnselected,
 
             handleMouseMove: (event: MouseEvent) => {
-                mouseEventListener.handler = itemHandler;
+                globalEventListener.handler = itemHandler;
                 event.stopPropagation();
             },
             handleMouseMove_startGrip: (event: MouseEvent) => {
-                mouseEventListener.handler = startGripHandler;
+                globalEventListener.handler = startGripHandler;
                 event.stopPropagation();
             },
             handleMouseMove_endGrip: (event: MouseEvent) => {
-                mouseEventListener.handler = endGripHandler;
+                globalEventListener.handler = endGripHandler;
                 event.stopPropagation();
             },
 
             onDestroy: () => {
-                mouseEventListener.handler = undefined;
+                globalEventListener.handler = undefined;
             },
         },
         model.id

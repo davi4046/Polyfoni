@@ -2,7 +2,7 @@ import { itemEditors } from "../item-type-config";
 import TimelineContext from "../context/TimelineContext";
 import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
-import { mouseEventListener } from "../../../architecture/mouse-event-handling";
+import { globalEventListener } from "../../../architecture/mouse-event-handling";
 import {
     getChildren,
     getParent,
@@ -44,11 +44,11 @@ export default function createTimelineVM(
             ...createSections(),
 
             handleMouseMove: (event: MouseEvent) => {
-                mouseEventListener.handler = undefined;
+                globalEventListener.handler = undefined;
                 event.stopPropagation();
             },
             handleMouseMove_tracks: (event: MouseEvent) => {
-                mouseEventListener.handler = mouseEventHandler;
+                globalEventListener.handler = mouseEventHandler;
                 event.stopPropagation();
             },
 

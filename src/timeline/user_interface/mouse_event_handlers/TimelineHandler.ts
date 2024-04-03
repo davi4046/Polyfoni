@@ -1,12 +1,12 @@
 import type TimelineContext from "../context/TimelineContext";
-import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
+import type { GlobalEventHandler } from "../../../architecture/mouse-event-handling";
 import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 import Highlight from "../../models/highlight/Highlight";
 import Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 
-export default class TimelineHandler implements MouseEventHandler {
+export default class TimelineHandler implements GlobalEventHandler {
     constructor(readonly context: TimelineContext) {}
 
     private _clickedBeat?: number;

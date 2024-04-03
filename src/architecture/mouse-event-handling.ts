@@ -1,8 +1,8 @@
-class MouseEventListener {
-    private _handler?: MouseEventHandler;
+class GlobalEventListener {
+    private _handler?: GlobalEventHandler;
     private _downEvent?: MouseEvent;
 
-    set handler(newHandler: MouseEventHandler | undefined) {
+    set handler(newHandler: GlobalEventHandler | undefined) {
         if (this._downEvent) return; //avoid handler updating when dragging
 
         if (newHandler !== this._handler) {
@@ -44,9 +44,9 @@ class MouseEventListener {
     }
 }
 
-export const mouseEventListener = new MouseEventListener();
+export const globalEventListener = new GlobalEventListener();
 
-export interface MouseEventHandler {
+export interface GlobalEventHandler {
     handleMouseDown?: (downEvent: MouseEvent) => void;
     handleMouseMove?: (moveEvent: MouseEvent, downEvent?: MouseEvent) => void;
     handleMouseUp?: (upEvent: MouseEvent, downEvent: MouseEvent) => void;

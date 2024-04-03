@@ -1,7 +1,7 @@
 import type TimelineContext from "../context/TimelineContext";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
-import type { MouseEventHandler } from "../../../architecture/mouse-event-handling";
+import type { GlobalEventHandler } from "../../../architecture/mouse-event-handling";
 import {
     getNestedArrayOfDescendants,
     getLastAncestor,
@@ -16,7 +16,7 @@ import type Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 
-export default class ItemHandler implements MouseEventHandler {
+export default class ItemHandler implements GlobalEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
