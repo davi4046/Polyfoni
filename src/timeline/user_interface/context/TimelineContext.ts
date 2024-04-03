@@ -1,5 +1,6 @@
 import Stateful from "../../../architecture/Stateful";
 import TimelinePlayer from "../../features/playback/TimelinePlayer";
+import TimelineHistory from "../../features/undo-redo/TimelineHistory";
 import type Highlight from "../../models/highlight/Highlight";
 import type { ItemState } from "../../models/item/Item";
 import type Item from "../../models/item/Item";
@@ -33,7 +34,9 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
         });
 
         this.player = new TimelinePlayer(timeline);
+        this.history = new TimelineHistory(timeline);
     }
 
     player: TimelinePlayer;
+    history: TimelineHistory;
 }

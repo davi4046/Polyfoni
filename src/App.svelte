@@ -15,6 +15,7 @@
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
     import hotkeys from "hotkeys-js";
+    import TimelineHistory from "./timeline/features/undo-redo/TimelineHistory";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -28,16 +29,28 @@
     hotkeys.unbind("enter");
 
     hotkeys("delete", () => {
+        timelineContext.history.startAction("Delete");
         deleteSelectedItems(timelineContext);
         cropHighlightedItems(timelineContext);
+        timelineContext.history.endAction();
     });
 
     hotkeys("insert", () => {
+        timelineContext.history.startAction("Insert empty items");
         insertEmptyItems(timelineContext);
+        timelineContext.history.endAction();
     });
 
     hotkeys("enter", () => {
         selectHighlightedItems(timelineContext);
+    });
+
+    hotkeys("ctrl+z", () => {
+        timelineContext.history.undoAction();
+    });
+
+    hotkeys("ctrl+shift+z", () => {
+        timelineContext.history.redoAction();
     });
 
     const unlisten = listen("export_to_midi", async (_) => {
