@@ -3,6 +3,7 @@ import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
 import {
     getChildren,
+    getGrandparent,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import type Item from "../../models/item/Item";
@@ -12,10 +13,13 @@ export default class EndGripHandler implements GlobalEventHandler {
     constructor(
         readonly context: TimelineContext,
         readonly item: Item<any>
-    ) {}
+    ) {
+        this._grippedPoint = item.state.end;
+    }
 
     private _isMouseDown = false;
-    private _prevBeat?: number;
+    private _grippedItems: Item<any>[] = [];
+    private _grippedPoint: number = 0;
 
     getIsOverwritable(): boolean {
         return !this._isMouseDown;
@@ -24,11 +28,8 @@ export default class EndGripHandler implements GlobalEventHandler {
     handleMouseDown(event: MouseEvent) {
         this._isMouseDown = true;
 
-        this.context.state = {
-            grips: new Map([
-                [this.item, { property: "end", value: this.item.state.end }],
-            ]),
-        };
+        this._grippedItems = [this.item];
+        this._updateGrips();
     }
 
     handleMouseMove(event: MouseEvent) {
@@ -40,38 +41,66 @@ export default class EndGripHandler implements GlobalEventHandler {
             getBeatAtClientX(this.context.timeline, event.clientX)
         );
 
-        const clampedBeat = Math.max(hoveredBeat, this.item.state.start + 1);
+        const grippedItems = Array.from(this.context.state.grips.keys());
 
-        if (clampedBeat === this._prevBeat) return;
+        const maxStart = grippedItems.reduce(
+            (maxStart, item) =>
+                item.state.start > maxStart ? item.state.start : maxStart,
+            Number.MIN_SAFE_INTEGER
+        );
 
-        this._prevBeat = clampedBeat;
+        const clampedBeat = Math.max(hoveredBeat, maxStart + 1);
 
-        this.context.state = {
-            grips: new Map([
-                [this.item, { property: "end", value: clampedBeat }],
-            ]),
-        };
+        if (clampedBeat === this._grippedPoint) return;
+
+        this._grippedPoint = clampedBeat;
+        this._updateGrips();
     }
 
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
-        Array.from(this.context.state.grips.entries()).forEach(
-            ([item, grip]) => {
-                item.state = {
-                    end: grip.value,
-                };
-                cropItemInterval(item);
-            }
-        );
+        this._grippedItems.forEach((item) => {
+            item.state = {
+                end: this._grippedPoint,
+            };
+            cropItemInterval(item);
+        });
 
-        this.context.state = {
-            grips: new Map(),
-        };
+        this._grippedItems = [];
+        this._updateGrips();
     }
 
     handleKeyDown(event: KeyboardEvent) {
         if (event.key !== "Shift") return;
+
+        const tracks = getChildren(getGrandparent(this.item))
+            .filter((track) => track.itemType !== "NoteItem")
+            .filter((track) => {
+                return !this._grippedItems.some(
+                    (item) => getParent(item) === track
+                );
+            }); // Only search tracks where there is no gripped item
+
+        const matchStartItems = tracks
+            .flatMap((track) => getChildren(track))
+            .filter((item) => {
+                return item.state.end === this._grippedPoint;
+            });
+
+        this._grippedItems = this._grippedItems.concat(matchStartItems);
+        this._updateGrips();
+    }
+
+    private _updateGrips() {
+        this.context.state = {
+            grips: new Map(
+                this._grippedItems.map((item) => [
+                    item,
+                    { property: "end", value: this._grippedPoint },
+                ])
+            ),
+        };
     }
 }
 
