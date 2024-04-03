@@ -160,7 +160,7 @@
     <div
         class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
     >
-        <div class="relative z-30 h-full overflow-clip" style="width: 4096px;">
+        <div class="relative z-40 h-full overflow-clip" style="width: 4096px;">
             <div
                 class="absolute h-full text-black"
                 style="left: {$playbackPosition + 1}px"
