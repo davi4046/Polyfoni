@@ -58,11 +58,15 @@ class GlobalEventListener {
             { capture: true }
         );
 
-        document.addEventListener("keyup", (event) => {
-            if (this._handler?.handleKeyUp) {
-                this._handler.handleKeyUp(event);
-            }
-        });
+        document.addEventListener(
+            "keyup",
+            (event) => {
+                if (this._handler?.handleKeyUp) {
+                    this._handler.handleKeyUp(event);
+                }
+            },
+            { capture: true }
+        );
     }
 }
 
