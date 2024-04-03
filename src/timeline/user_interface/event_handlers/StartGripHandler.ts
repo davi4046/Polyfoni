@@ -2,7 +2,7 @@ import { clamp } from "lodash";
 
 import type TimelineContext from "../context/TimelineContext";
 import cropItemsByInterval from "../../utils/cropItemsByInterval";
-import type { GlobalEventHandler } from "../../../architecture/mouse-event-handling";
+import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
 import { getParent } from "../../../architecture/state-hierarchy-utils";
 import type Item from "../../models/item/Item";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";

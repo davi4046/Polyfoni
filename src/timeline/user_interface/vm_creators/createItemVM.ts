@@ -12,7 +12,7 @@ import EndGripHandler from "../event_handlers/EndGripHandler";
 import ItemHandler from "../event_handlers/ItemHandler";
 import StartGripHandler from "../event_handlers/StartGripHandler";
 import ItemVM from "../view_models/ItemVM";
-import { globalEventListener } from "../../../architecture/mouse-event-handling";
+import { globalEventListener } from "../../../architecture/GlobalEventListener";
 import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 

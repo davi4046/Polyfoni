@@ -1,7 +1,7 @@
 import type TimelineContext from "../context/TimelineContext";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
-import type { GlobalEventHandler } from "../../../architecture/mouse-event-handling";
+import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
 import {
     getNestedArrayOfDescendants,
     getLastAncestor,
