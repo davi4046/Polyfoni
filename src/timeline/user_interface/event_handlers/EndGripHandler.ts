@@ -13,6 +13,10 @@ export default class EndGripHandler implements GlobalEventHandler {
 
     private _isMouseDown = false;
 
+    getIsOverwritable(): boolean {
+        return !this._isMouseDown;
+    }
+
     handleMouseDown(event: MouseEvent) {
         this.context.state = {
             selectedGrips: [this.item],

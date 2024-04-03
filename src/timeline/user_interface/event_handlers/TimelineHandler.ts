@@ -17,6 +17,10 @@ export default class TimelineHandler implements GlobalEventHandler {
 
     private _prevHoveredTrack?: Track<any>;
 
+    getIsOverwritable(): boolean {
+        return !this._clickedBeat && !this._clickedTrack;
+    }
+
     handleMouseDown(event: MouseEvent) {
         this._clickedBeat = getBeatAtClientX(
             this.context.timeline,

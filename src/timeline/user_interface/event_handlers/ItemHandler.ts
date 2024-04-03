@@ -28,6 +28,10 @@ export default class ItemHandler implements GlobalEventHandler {
     private _prevHoveredBeat?: number;
     private _prevHoveredTrack?: Track<any>;
 
+    getIsOverwritable(): boolean {
+        return !this._clickedBeat && !this._clickedTrack;
+    }
+
     handleMouseDown(event: MouseEvent) {
         if (event.shiftKey) {
             toggleItemSelected(this.context, this.item);

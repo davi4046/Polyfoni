@@ -1,9 +1,14 @@
 class GlobalEventListener {
     private _handler?: GlobalEventHandler;
-    private _downEvent?: MouseEvent;
 
     set handler(newHandler: GlobalEventHandler | undefined) {
-        if (this._downEvent) return; //avoid handler updating when dragging
+        if (
+            this._handler &&
+            this._handler.getIsOverwritable &&
+            !this._handler.getIsOverwritable()
+        ) {
+            return;
+        }
 
         if (newHandler !== this._handler) {
             document.body.style.cursor = "default";
@@ -16,7 +21,6 @@ class GlobalEventListener {
         document.addEventListener(
             "mousedown",
             (event) => {
-                this._downEvent = event;
                 if (this._handler?.handleMouseDown) {
                     this._handler.handleMouseDown(event);
                 }
@@ -30,7 +34,6 @@ class GlobalEventListener {
                 if (this._handler?.handleMouseUp) {
                     this._handler.handleMouseUp(event);
                 }
-                this._downEvent = undefined;
             },
             { capture: true }
         );
@@ -66,6 +69,8 @@ class GlobalEventListener {
 export const globalEventListener = new GlobalEventListener();
 
 export interface GlobalEventHandler {
+    getIsOverwritable?: () => boolean;
+
     handleMouseDown?: (event: MouseEvent) => void;
     handleMouseMove?: (event: MouseEvent) => void;
     handleMouseUp?: (event: MouseEvent) => void;
