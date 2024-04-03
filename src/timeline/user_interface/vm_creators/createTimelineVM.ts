@@ -1,6 +1,6 @@
 import { itemEditors } from "../item-type-config";
 import TimelineContext from "../context/TimelineContext";
-import TimelineHandler from "../mouse_event_handlers/TimelineHandler";
+import TimelineHandler from "../event_handlers/TimelineHandler";
 import TimelineVM from "../view_models/TimelineVM";
 import { globalEventListener } from "../../../architecture/mouse-event-handling";
 import {

@@ -8,9 +8,9 @@ import {
     itemTooltipContentFunctions,
 } from "../item-type-config";
 import type TimelineContext from "../context/TimelineContext";
-import EndGripHandler from "../mouse_event_handlers/EndGripHandler";
-import ItemHandler from "../mouse_event_handlers/ItemHandler";
-import StartGripHandler from "../mouse_event_handlers/StartGripHandler";
+import EndGripHandler from "../event_handlers/EndGripHandler";
+import ItemHandler from "../event_handlers/ItemHandler";
+import StartGripHandler from "../event_handlers/StartGripHandler";
 import ItemVM from "../view_models/ItemVM";
 import { globalEventListener } from "../../../architecture/mouse-event-handling";
 import type Item from "../../models/item/Item";
