@@ -17,8 +17,9 @@ class GlobalEventListener {
             "mousedown",
             (event) => {
                 this._downEvent = event;
-                if (this._handler?.handleMouseDown)
+                if (this._handler?.handleMouseDown) {
                     this._handler.handleMouseDown(event);
+                }
             },
             { capture: true }
         );
@@ -26,8 +27,9 @@ class GlobalEventListener {
         document.addEventListener(
             "mouseup",
             (event) => {
-                if (this._handler?.handleMouseUp)
+                if (this._handler?.handleMouseUp) {
                     this._handler.handleMouseUp(event);
+                }
                 this._downEvent = undefined;
             },
             { capture: true }
@@ -36,11 +38,28 @@ class GlobalEventListener {
         document.addEventListener(
             "mousemove",
             (event) => {
-                if (this._handler?.handleMouseMove)
+                if (this._handler?.handleMouseMove) {
                     this._handler.handleMouseMove(event);
+                }
             },
             { capture: true }
         );
+
+        document.addEventListener(
+            "keydown",
+            (event) => {
+                if (this._handler?.handleKeyDown) {
+                    this._handler.handleKeyDown(event);
+                }
+            },
+            { capture: true }
+        );
+
+        document.addEventListener("keyup", (event) => {
+            if (this._handler?.handleKeyUp) {
+                this._handler.handleKeyUp(event);
+            }
+        });
     }
 }
 
@@ -50,4 +69,7 @@ export interface GlobalEventHandler {
     handleMouseDown?: (event: MouseEvent) => void;
     handleMouseMove?: (event: MouseEvent) => void;
     handleMouseUp?: (event: MouseEvent) => void;
+
+    handleKeyDown?: (event: KeyboardEvent) => void;
+    handleKeyUp?: (event: KeyboardEvent) => void;
 }
