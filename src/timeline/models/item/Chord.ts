@@ -95,9 +95,9 @@ export class ChordBuilder {
             if (chordStatus instanceof Chord) {
                 this._root = chordStatus.root;
                 this._decimal = chordStatus.decimal;
-                this._pitches = chordStatus.pitches;
+                this._pitches = Object.assign({}, chordStatus.pitches);
             } else {
-                this._pitches = chordStatus;
+                this._pitches = Object.assign({}, chordStatus);
             }
         }
     }

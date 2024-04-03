@@ -1,16 +1,20 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import type Item from "../../../../models/item/Item";
+    import type TimelineContext from "../../../context/TimelineContext";
 
     export let item: Item<"StringItem">;
+    export let context: TimelineContext;
 
     let value = item.state.content;
 
     function handleKeyDown(event: KeyboardEvent) {
-        if (event.key !== "Enter") return;
+        if (event.key !== "Enter" || value === item.state.content) return;
+        context.history.startAction("Edit string item content");
         item.state = {
             content: value,
         };
+        context.history.endAction();
     }
 
     let inputField: HTMLInputElement;

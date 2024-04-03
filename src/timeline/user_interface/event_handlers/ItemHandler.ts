@@ -143,6 +143,8 @@ export default class ItemHandler implements GlobalEventHandler {
         this._prevHoveredBeat = undefined;
         this._prevHoveredTrack = undefined;
 
+        if (this.context.state.ghostPairs.length === 0) return;
+
         this.context.history.startAction("Move items");
         placeGhostItems(this.context);
         this.context.history.endAction();

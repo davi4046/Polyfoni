@@ -8,8 +8,10 @@
     import { onDestroy } from "svelte";
     import { Chord, ChordBuilder } from "../../../../models/item/Chord";
     import { invoke } from "@tauri-apps/api";
+    import type TimelineContext from "../../../context/TimelineContext";
 
     export let item: Item<"ChordItem">;
+    export let context: TimelineContext;
 
     let builder = new ChordBuilder(item.state.content.chordStatus);
 
@@ -93,9 +95,13 @@
     $: chordStatus = builder.build();
 
     onDestroy(() => {
+        context.history.startAction("Edit chord item content");
+
         item.state = {
             content: { chordStatus, filters },
         };
+
+        context.history.endAction();
     });
 
     let playbackTimeout: NodeJS.Timeout;

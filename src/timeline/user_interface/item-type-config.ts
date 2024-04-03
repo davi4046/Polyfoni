@@ -5,6 +5,7 @@ import { Chord } from "../models/item/Chord";
 import type Item from "../models/item/Item";
 import type { ItemTypes } from "../models/item/ItemTypes";
 
+import type TimelineContext from "./context/TimelineContext";
 import ChordItemEditor from "./visuals/item_editors/chord_item_editor/ChordItemEditor.svelte";
 import StringItemEditor from "./visuals/item_editors/string_item_editor/StringItemEditor.svelte";
 
@@ -66,6 +67,7 @@ type EditorWidget<T extends keyof ItemTypes> = ComponentType<
     SvelteComponent<
         {
             item: Item<T>;
+            context: TimelineContext;
         },
         {},
         {}

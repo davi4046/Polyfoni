@@ -52,6 +52,7 @@ export default class TimelineHistory {
         });
 
         this._redoableActions.push(lastAction);
+        console.log("undo:", lastAction.title);
     }
 
     redoAction() {
@@ -64,6 +65,7 @@ export default class TimelineHistory {
         });
 
         this._undoableActions.push(lastAction);
+        console.log("redo:", lastAction.title);
     }
 }
 

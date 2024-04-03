@@ -93,12 +93,13 @@ export default function createTimelineVM(
 
             if (EditorWidgetCtor && context.state.editItem) {
                 vm.state = {
-                    editorWidget: new SvelteCtorMatchProps<{ item: Item<any> }>(
-                        EditorWidgetCtor,
-                        {
-                            item: context.state.editItem,
-                        }
-                    ),
+                    editorWidget: new SvelteCtorMatchProps<{
+                        item: Item<any>;
+                        context: TimelineContext;
+                    }>(EditorWidgetCtor, {
+                        item: context.state.editItem,
+                        context: context,
+                    }),
                 };
             } else {
                 vm.state = {

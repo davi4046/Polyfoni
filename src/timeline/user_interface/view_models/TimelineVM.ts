@@ -1,3 +1,4 @@
+import type TimelineContext from "../context/TimelineContext";
 import Model from "../../../architecture/Model";
 import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
@@ -14,7 +15,10 @@ interface TimelineVMState {
     handleMouseMove: (event: MouseEvent) => void;
     handleMouseMove_tracks: (event: MouseEvent) => void;
 
-    editorWidget?: SvelteCtorMatchProps<{ item: Item<any> }>;
+    editorWidget?: SvelteCtorMatchProps<{
+        item: Item<any>;
+        context: TimelineContext;
+    }>;
 
     onPlayButtonClick: (event: MouseEvent) => void;
     onPauseButtonClick: (event: MouseEvent) => void;
