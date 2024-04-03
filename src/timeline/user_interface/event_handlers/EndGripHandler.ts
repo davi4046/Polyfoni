@@ -1,7 +1,11 @@
 import type TimelineContext from "../context/TimelineContext";
 import cropItemsByInterval from "../../utils/cropItemsByInterval";
 import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
-import { getParent } from "../../../architecture/state-hierarchy-utils";
+import {
+    getChildren,
+    getGrandparent,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
 import type Item from "../../models/item/Item";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 
@@ -18,11 +22,12 @@ export default class EndGripHandler implements GlobalEventHandler {
     }
 
     handleMouseDown(event: MouseEvent) {
+        this._isMouseDown = true;
+
         this.context.state = {
             selectedGrips: [this.item],
             gripMode: "end",
         };
-        this._isMouseDown = true;
     }
 
     handleMouseMove(event: MouseEvent) {
@@ -34,28 +39,61 @@ export default class EndGripHandler implements GlobalEventHandler {
             getBeatAtClientX(this.context.timeline, event.clientX)
         );
 
-        const newEnd = Math.max(hoveredBeat, this.item.state.start + 1);
+        const maxStart = this.context.state.selectedGrips.reduce(
+            (maxStart, item) =>
+                item.state.start > maxStart ? item.state.start : maxStart,
+            Number.MIN_SAFE_INTEGER
+        );
 
-        if (newEnd !== this.item.state.end) {
-            this.item.state = {
+        const newEnd = Math.max(hoveredBeat, maxStart + 1);
+
+        if (newEnd === this.item.state.end) return;
+
+        this.context.state.selectedGrips.forEach((item) => {
+            item.state = {
                 end: newEnd,
             };
-        }
+        });
     }
 
     handleMouseUp(event: MouseEvent) {
-        const track = getParent(this.item);
-        const otherItems = track.state.children.filter(
-            (item) => item !== this.item
-        );
-        track.state = {
-            children: cropItemsByInterval(otherItems, this.item.state).concat(
-                this.item
-            ),
-        };
+        this._isMouseDown = false;
+
+        this.context.state.selectedGrips.forEach(cropItemInterval);
+
         this.context.state = {
             selectedGrips: [],
         };
-        this._isMouseDown = false;
     }
+
+    handleKeyDown(event: KeyboardEvent) {
+        if (event.key !== "Shift") return;
+
+        const tracks = getChildren(getGrandparent(this.item))
+            .filter((track) => track.itemType !== "NoteItem")
+            .filter((track) => {
+                return !this.context.state.selectedGrips.some(
+                    (item) => getParent(item) === track
+                );
+            }); // Only search on tracks where there is no gripped item
+
+        const matchEndItems = tracks
+            .flatMap((track) => getChildren(track))
+            .filter((item) => {
+                return item.state.end === this.item.state.end;
+            });
+
+        this.context.state = {
+            selectedGrips:
+                this.context.state.selectedGrips.concat(matchEndItems),
+        };
+    }
+}
+
+function cropItemInterval(item: Item<any>) {
+    const track = getParent(item);
+    const siblings = getChildren(track).filter((child) => child !== item);
+    track.state = {
+        children: cropItemsByInterval(siblings, item.state).concat(item),
+    };
 }

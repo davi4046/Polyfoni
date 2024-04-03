@@ -72,16 +72,23 @@ export default class StartGripHandler implements GlobalEventHandler {
     handleKeyDown(event: KeyboardEvent) {
         if (event.key !== "Shift") return;
 
-        const voiceItems = getChildren(getGrandparent(this.item)).flatMap(
-            (track) => getChildren(track)
-        );
+        const tracks = getChildren(getGrandparent(this.item))
+            .filter((track) => track.itemType !== "NoteItem")
+            .filter((track) => {
+                return !this.context.state.selectedGrips.some(
+                    (item) => getParent(item) === track
+                );
+            }); // Only search on tracks where there is no gripped item
 
-        const matchStartItems = voiceItems.filter((item) => {
-            return item.state.start === this.item.state.start;
-        });
+        const matchStartItems = tracks
+            .flatMap((track) => getChildren(track))
+            .filter((item) => {
+                return item.state.start === this.item.state.start;
+            });
 
         this.context.state = {
-            selectedGrips: matchStartItems,
+            selectedGrips:
+                this.context.state.selectedGrips.concat(matchStartItems),
         };
     }
 }
