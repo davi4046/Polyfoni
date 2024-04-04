@@ -23,12 +23,13 @@ export default class TimelineHistory {
         if (this._currAction) {
             console.warn(
                 "Tried to start an action" +
-                    "but the current action" +
-                    "has not been ended yet"
+                    " but the current action" +
+                    " has not been ended yet"
             );
             return;
         }
         this._currAction = new Action(title);
+        this._redoableActions = [];
     }
 
     endAction() {
@@ -36,10 +37,12 @@ export default class TimelineHistory {
             console.warn("Tried to end action but no action has been started");
             return;
         }
-        this._undoableActions.push(this._currAction);
-        this._currAction = undefined;
 
-        console.log(this._undoableActions);
+        if (this._currAction.changes.length > 0) {
+            this._undoableActions.push(this._currAction);
+        }
+
+        this._currAction = undefined;
     }
 
     undoAction() {
@@ -52,7 +55,6 @@ export default class TimelineHistory {
         });
 
         this._redoableActions.push(lastAction);
-        console.log("undo:", lastAction.title);
     }
 
     redoAction() {
@@ -65,7 +67,6 @@ export default class TimelineHistory {
         });
 
         this._undoableActions.push(lastAction);
-        console.log("redo:", lastAction.title);
     }
 }
 
