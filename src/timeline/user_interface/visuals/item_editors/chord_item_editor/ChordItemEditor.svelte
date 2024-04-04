@@ -5,31 +5,32 @@
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
     import { onDestroy } from "svelte";
-    import {
-        Chord,
-        ChordBuilder,
-        type Filter,
-    } from "../../../../models/item/Chord";
+    import { Chord, ChordBuilder } from "../../../../models/item/Chord";
     import { invoke } from "@tauri-apps/api";
     import type { ItemTypes } from "../../../../models/item/ItemTypes";
+    import { isEqual } from "lodash";
 
     export let value: ItemTypes["ChordItem"];
     export let update: (value: ItemTypes["ChordItem"]) => void;
 
-    export const updateFilters = (newFilters: Filter[]) => {
-        filters = newFilters.slice();
-        builder.applyFilters(filters);
-        builder = builder; // Reactivity hack
+    export const reflectChange = (newValue: ItemTypes["ChordItem"]) => {
+        if (!isEqual(value.filters, newValue.filters)) {
+            filters = newValue.filters.slice();
+            builder.applyFilters(filters);
+            builder = builder; // Reactivity hack
+        }
     };
 
-    let filters = value.filters.slice();
+    export const log = (str: string) => {
+        console.log(str);
+    };
+
     let builder = new ChordBuilder(value.chordStatus);
+    let filters = value.filters.slice();
 
     $: chordStatus = builder.build();
 
-    onDestroy(() => {
-        update({ chordStatus, filters });
-    });
+    onDestroy(() => update({ chordStatus, filters }));
 
     let sortedPitchEntries: [string, boolean][];
 
@@ -143,7 +144,6 @@
                 if (midiValues.length > 0) playNextNote();
             }, 500);
         }
-
         playNextNote();
     }
 </script>
@@ -226,7 +226,7 @@
                 class="w-24 bg-gray-200 p-2 text-xl font-medium"
                 type="number"
                 title="Decimal"
-                value={builder.decimal}
+                value={builder.decimal ? builder.decimal : 0}
                 on:change={(e) => {
                     // @ts-ignore
                     updateDecimal(Number(e.target.value));

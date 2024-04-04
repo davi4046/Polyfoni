@@ -4,6 +4,10 @@
     export let value: string;
     export let update: (value: string) => void;
 
+    export const reflectChange = (newValue: string) => {
+        value = newValue;
+    };
+
     let prevValue: string;
 
     function handleKeyDown(event: KeyboardEvent) {

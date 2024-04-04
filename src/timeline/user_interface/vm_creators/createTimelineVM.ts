@@ -106,9 +106,15 @@ function getCreateItemEditor(context: TimelineContext) {
 
     if (!item || !ItemEditor) return;
 
+    let justUpdated = false;
+
     const props = {
         value: item.state.content,
         update: (value: any) => {
+            // 1.
+            justUpdated = true;
+
+            // 2.
             context.history.startAction("Edit item content");
             item.state = {
                 content: value,
@@ -119,6 +125,17 @@ function getCreateItemEditor(context: TimelineContext) {
 
     return (target: Element | Document | ShadowRoot) => {
         // @ts-ignore
-        return new ItemEditor({ target, props });
+        const itemEditor = new ItemEditor({ target, props });
+
+        const subscription = item.subscribe(() => {
+            if (itemEditor.reflectChange) {
+                if (!justUpdated) itemEditor.reflectChange(item.state.content);
+            } else {
+                subscription.unsubscribe();
+            }
+            justUpdated = false;
+        });
+
+        return itemEditor;
     };
 }
