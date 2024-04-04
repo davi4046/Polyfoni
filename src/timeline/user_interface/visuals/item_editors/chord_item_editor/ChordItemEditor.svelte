@@ -4,16 +4,32 @@
     import RotateLeftIcon from "./assets/RotateLeftIcon.svelte";
     import RotateRightIcon from "./assets/RotateRightIcon.svelte";
     import SpeakerIcon from "./assets/SpeakerIcon.svelte";
-    import type Item from "../../../../models/item/Item";
     import { onDestroy } from "svelte";
-    import { Chord, ChordBuilder } from "../../../../models/item/Chord";
+    import {
+        Chord,
+        ChordBuilder,
+        type Filter,
+    } from "../../../../models/item/Chord";
     import { invoke } from "@tauri-apps/api";
-    import type TimelineContext from "../../../context/TimelineContext";
+    import type { ItemTypes } from "../../../../models/item/ItemTypes";
 
-    export let item: Item<"ChordItem">;
-    export let context: TimelineContext;
+    export let value: ItemTypes["ChordItem"];
+    export let update: (value: ItemTypes["ChordItem"]) => void;
 
-    let builder = new ChordBuilder(item.state.content.chordStatus);
+    export const updateFilters = (newFilters: Filter[]) => {
+        filters = newFilters.slice();
+        builder.applyFilters(filters);
+        builder = builder; // Reactivity hack
+    };
+
+    let filters = value.filters.slice();
+    let builder = new ChordBuilder(value.chordStatus);
+
+    $: chordStatus = builder.build();
+
+    onDestroy(() => {
+        update({ chordStatus, filters });
+    });
 
     let sortedPitchEntries: [string, boolean][];
 
@@ -26,15 +42,6 @@
             ...pitchEntries.slice(0, rootIndex),
         ];
     }
-
-    let filters = item.state.content.filters.slice();
-
-    item.subscribe(() => {
-        // Apply new filters from scale track
-        filters = item.state.content.filters.slice();
-        builder.applyFilters(filters);
-        builder = builder; // Reactivity hack
-    });
 
     let allowedPitches: string[];
     let allowedRoots: string[];
@@ -91,18 +98,6 @@
         builder.decimal = decimal;
         builder = builder; // Reactivity hack
     }
-
-    $: chordStatus = builder.build();
-
-    onDestroy(() => {
-        context.history.startAction("Edit chord item content");
-
-        item.state = {
-            content: { chordStatus, filters },
-        };
-
-        context.history.endAction();
-    });
 
     let playbackTimeout: NodeJS.Timeout;
 

@@ -8,9 +8,7 @@ import {
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import compareStates from "../../../utils/compareStates";
-import { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 import getHarmonyOfNotes from "../../features/generation/getHarmonyOfNotes";
-import type Item from "../../models/item/Item";
 import { type ItemTypes } from "../../models/item/ItemTypes";
 import Timeline from "../../models/timeline/Timeline";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
@@ -86,26 +84,9 @@ export default function createTimelineVM(
         }
 
         if (updatedProps.has("editItem")) {
-            const EditorWidgetCtor =
-                itemEditors[
-                    context.state.editItem?.itemType as keyof ItemTypes
-                ];
-
-            if (EditorWidgetCtor && context.state.editItem) {
-                vm.state = {
-                    editorWidget: new SvelteCtorMatchProps<{
-                        item: Item<any>;
-                        context: TimelineContext;
-                    }>(EditorWidgetCtor, {
-                        item: context.state.editItem,
-                        context: context,
-                    }),
-                };
-            } else {
-                vm.state = {
-                    editorWidget: undefined,
-                };
-            }
+            vm.state = {
+                createItemEditor: getCreateItemEditor(context),
+            };
         }
     });
 
@@ -117,4 +98,27 @@ export default function createTimelineVM(
     });
 
     return vm;
+}
+
+function getCreateItemEditor(context: TimelineContext) {
+    const item = context.state.editItem;
+    const ItemEditor = itemEditors[item?.itemType as keyof ItemTypes];
+
+    if (!item || !ItemEditor) return;
+
+    const props = {
+        value: item.state.content,
+        update: (value: any) => {
+            context.history.startAction("Edit item content");
+            item.state = {
+                content: value,
+            };
+            context.history.endAction();
+        },
+    };
+
+    return (target: Element | Document | ShadowRoot) => {
+        // @ts-ignore
+        return new ItemEditor({ target, props });
+    };
 }

@@ -1,9 +1,8 @@
-import type TimelineContext from "../context/TimelineContext";
+import type { SvelteComponent } from "svelte";
+
 import Model from "../../../architecture/Model";
-import type { SvelteCtorMatchProps } from "../../../utils/svelte-utils";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
 import type { Chord } from "../../models/item/Chord";
-import type Item from "../../models/item/Item";
 
 import type VoiceVM from "./VoiceVM";
 
@@ -15,19 +14,18 @@ interface TimelineVMState {
     handleMouseMove: (event: MouseEvent) => void;
     handleMouseMove_tracks: (event: MouseEvent) => void;
 
-    editorWidget?: SvelteCtorMatchProps<{
-        item: Item<any>;
-        context: TimelineContext;
-    }>;
+    playbackMotion: PlaybackMotion;
+    isPlaying: boolean;
 
     onPlayButtonClick: (event: MouseEvent) => void;
     onPauseButtonClick: (event: MouseEvent) => void;
     onStopButtonClick: (event: MouseEvent) => void;
 
-    playbackMotion: PlaybackMotion;
-    isPlaying: boolean;
-
     displayHarmony?: Chord;
+
+    createItemEditor?: (
+        target: Element | Document | ShadowRoot
+    ) => SvelteComponent;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}

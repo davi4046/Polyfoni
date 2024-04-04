@@ -17,8 +17,8 @@
     let hScrollElements: HTMLCollectionOf<Element>;
     let vScrollElememts: HTMLCollectionOf<Element>;
 
-    let editorWidgetContainer: HTMLElement;
-    let editorWidgetComponent: SvelteComponent;
+    let itemEditorContainer: HTMLElement;
+    let itemEditorComponent: SvelteComponent;
 
     let playbackPosition = writable(0);
     let centerDiv: HTMLElement;
@@ -50,14 +50,12 @@
     vm.subscribe((_, oldState) => {
         vm = vm;
 
-        if (vm.state.editorWidget !== oldState.editorWidget) {
-            editorWidgetComponent?.$destroy();
+        if (vm.state.createItemEditor !== oldState.createItemEditor) {
+            itemEditorComponent?.$destroy();
 
-            if (vm.state.editorWidget) {
-                editorWidgetComponent = new vm.state.editorWidget.ctor({
-                    target: editorWidgetContainer,
-                    props: vm.state.editorWidget.props,
-                });
+            if (vm.state.createItemEditor) {
+                itemEditorComponent =
+                    vm.state.createItemEditor(itemEditorContainer);
             }
         }
 
@@ -376,7 +374,7 @@
     <div
         class="col-start-1 col-end-3 row-start-5 row-end-6"
         on:mousemove={vm.state.handleMouseMove}
-        bind:this={editorWidgetContainer}
+        bind:this={itemEditorContainer}
         role="none"
     />
     <!-- TOP HEADERS SHADOW -->
