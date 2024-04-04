@@ -44,10 +44,10 @@ export const itemTooltipContentFunctions: Partial<{
             return `
                     <div>${
                         chordName === primeName
-                            ? `★ ${chordName}`
-                            : `${chordName} (★ ${primeName})`
+                            ? `★${chordName}`
+                            : `${chordName} (★${primeName})`
                     }</div>
-                    <div>[${chordPitchNames.join(", ")}]</div>
+                    <div>[${chordPitchNames.join()}]</div>
                 `;
         }
         return "";
