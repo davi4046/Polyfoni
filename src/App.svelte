@@ -11,10 +11,12 @@
     import { listen } from "@tauri-apps/api/event";
     import { save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
-    import { writeBinaryFile } from "@tauri-apps/api/fs";
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
     import hotkeys from "hotkeys-js";
+    import { readDir, writeBinaryFile } from "@tauri-apps/api/fs";
+    import { resolveResource } from "@tauri-apps/api/path";
+    import { convertFileSrc } from "@tauri-apps/api/tauri";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -63,8 +65,43 @@
     onDestroy(async () => {
         (await unlisten)();
     });
+
+    async function loadFonts() {
+        const fontDir = await resolveResource("res/fonts/");
+        const fontFiles = await readDir(fontDir);
+
+        const promises = [];
+
+        for (const { name, path } of fontFiles) {
+            const [fontName] = name?.split(".") || [];
+
+            if (!fontName) return;
+
+            for (let i = 0; i < 10; i++) {
+                const font = new FontFace(
+                    fontName,
+                    `url(${convertFileSrc(path)})`,
+                    {
+                        weight: `${(i + 1) * 100}`,
+                    }
+                );
+                const loadFont = async () => {
+                    try {
+                        const loadedFont = await font.load();
+                        document.fonts.add(loadedFont);
+                    } catch (error) {
+                        console.log("Failed to load font: " + error);
+                    }
+                };
+                promises.push(loadFont());
+            }
+        }
+        await Promise.all(promises);
+    }
 </script>
 
-<main class="h-full">
-    <Timeline vm={timelineVM}></Timeline>
-</main>
+{#await loadFonts() then}
+    <main class="h-full">
+        <Timeline vm={timelineVM}></Timeline>
+    </main>
+{/await}

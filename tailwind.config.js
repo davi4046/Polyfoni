@@ -2,7 +2,11 @@
 export default {
     content: ["./src/**/*.{svelte,js,ts}"],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                mono: ["ChivoMono-VariableFont_wght"],
+            },
+        },
     },
     plugins: [],
 };

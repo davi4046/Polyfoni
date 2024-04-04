@@ -61,7 +61,9 @@
         role="none"
     >
         {#if vm.state.text}
-            <div class="truncate">{vm.state.text}</div>
+            <div class="truncate font-mono text-base font-semibold">
+                {vm.state.text}
+            </div>
         {/if}
         <!-- start grip-->
         <div

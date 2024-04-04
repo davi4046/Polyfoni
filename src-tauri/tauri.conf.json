@@ -21,8 +21,9 @@
                 "all": true
             },
             "fs": {
-                "scope": ["$RESOURCE/*"],
-                "writeFile": true
+                "scope": ["*/**"],
+                "writeFile": true,
+                "readDir": true
             },
             "dialog": {
                 "all": false,
@@ -31,6 +32,13 @@
                 "message": false,
                 "open": false,
                 "save": true
+            },
+            "path": {
+                "all": true
+            },
+            "protocol": {
+                "asset": true,
+                "assetScope": ["*/**"]
             }
         },
         "bundle": {
@@ -47,7 +55,7 @@
             "resources": ["res/**/*"]
         },
         "security": {
-            "csp": null
+            "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
         },
         "windows": [
             {

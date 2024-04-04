@@ -27,7 +27,7 @@
         bind:this={inputField}
         bind:value
         placeholder="Input..."
-        class="w-full p-1 text-lg font-medium focus:outline-none"
+        class="w-full p-1 font-mono text-lg font-medium focus:outline-none"
         type="text"
     />
 </div>
