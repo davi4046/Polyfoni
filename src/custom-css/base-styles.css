@@ -1,1 +1,3 @@
-
+.tippy-content {
+    @apply font-mono font-semibold;
+}

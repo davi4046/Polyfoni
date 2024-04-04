@@ -23,11 +23,11 @@
 
 <div class="border-t-2 border-black p-2">
     <input
+        class="w-full p-1 font-mono text-lg font-semibold focus:outline-none"
+        type="text"
+        placeholder="Input..."
         on:keydown={handleKeyDown}
         bind:this={inputField}
         bind:value
-        placeholder="Input..."
-        class="w-full p-1 font-mono text-lg font-medium focus:outline-none"
-        type="text"
     />
 </div>
