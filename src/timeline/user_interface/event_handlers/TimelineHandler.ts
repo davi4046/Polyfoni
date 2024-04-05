@@ -222,7 +222,7 @@ class PasteItemsHandler implements GlobalEventHandler {
                     start: item.state.start - minStart + hoveredBeat,
                     end: item.state.end - minStart + hoveredBeat,
                     content: content,
-                    parent: tracks[newTrackIndex],
+                    parent: newTrack,
                 }),
             ] as [Item<any>, Item<any>];
         });
