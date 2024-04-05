@@ -151,8 +151,6 @@
     class="grid h-full grid-cols-[auto,auto] grid-rows-[auto,auto,1fr,auto,auto]"
     on:mousemove={vm.state.handleMouseMove_tracks}
     role="none"
-    data-type="timeline"
-    data-model-id={vm.id}
 >
     <!-- PLAYBACK INDICATOR -->
     <div
@@ -273,7 +271,6 @@
     <!-- TOP TRACKS -->
     <div
         class="h-scroll col-start-2 row-start-2 h-full overflow-hidden"
-        data-type="top"
         role="none"
         on:mousemove|capture={(event) => {
             if (event.buttons === 1) {
@@ -297,7 +294,7 @@
     <!-- CENTER TRACKS -->
     <div
         class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
-        data-type="center"
+        id={vm.state.idPrefix + "-center-tracks"}
         role="none"
         bind:this={centerDiv}
         on:mousemove|capture={(event) => {
@@ -330,7 +327,6 @@
     <!-- BOTTOM TRACKS -->
     <div
         class="h-scroll col-start-2 row-start-4 h-full overflow-hidden"
-        data-type="bottom"
         role="none"
         on:mousemove|capture={(event) => {
             if (event.buttons === 1) {
@@ -355,11 +351,7 @@
     <div
         class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
     >
-        <div
-            class="relative h-full overflow-clip"
-            style="width: 4096px;"
-            data-type="overlay"
-        >
+        <div class="relative h-full overflow-clip" style="width: 4096px;">
             {#each Array(64) as _, index}
                 <div
                     class="absolute h-full text-[var(--timeline-vline-color)]"

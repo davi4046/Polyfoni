@@ -89,35 +89,32 @@ export default function createItemVM<T extends keyof ItemTypes>(
         opacity: "0.75",
     };
 
-    const vm = new ItemVM(
-        {
-            start: model.state.start,
-            end: model.state.end,
-            text: itemTextFunctions[model.itemType](model.state.content),
-            innerDivStyles: createInnerDivStyles(),
+    const vm = new ItemVM({
+        start: model.state.start,
+        end: model.state.end,
+        text: itemTextFunctions[model.itemType](model.state.content),
+        innerDivStyles: createInnerDivStyles(),
 
-            startGripStyles: gripStylesUnselected,
-            endGripStyles: gripStylesUnselected,
+        startGripStyles: gripStylesUnselected,
+        endGripStyles: gripStylesUnselected,
 
-            handleMouseMove: (event: MouseEvent) => {
-                globalEventListener.handler = itemHandler;
-                event.stopPropagation();
-            },
-            handleMouseMove_startGrip: (event: MouseEvent) => {
-                globalEventListener.handler = startGripHandler;
-                event.stopPropagation();
-            },
-            handleMouseMove_endGrip: (event: MouseEvent) => {
-                globalEventListener.handler = endGripHandler;
-                event.stopPropagation();
-            },
-
-            onDestroy: () => {
-                globalEventListener.handler = undefined;
-            },
+        handleMouseMove: (event: MouseEvent) => {
+            globalEventListener.handler = itemHandler;
+            event.stopPropagation();
         },
-        model.id
-    );
+        handleMouseMove_startGrip: (event: MouseEvent) => {
+            globalEventListener.handler = startGripHandler;
+            event.stopPropagation();
+        },
+        handleMouseMove_endGrip: (event: MouseEvent) => {
+            globalEventListener.handler = endGripHandler;
+            event.stopPropagation();
+        },
+
+        onDestroy: () => {
+            globalEventListener.handler = undefined;
+        },
+    });
 
     model.subscribe(() => {
         vm.state = {

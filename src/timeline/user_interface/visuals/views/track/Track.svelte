@@ -9,8 +9,7 @@
 
 <div
     class="relative h-[var(--timeline-track-height)] bg-[var(--timeline-track-color)]"
-    data-type="track"
-    data-model-id={vm.id}
+    id={vm.state.idPrefix + "-root"}
 >
     {#each vm.state.items as itemVM (itemVM.id)}
         <Item vm={itemVM}></Item>

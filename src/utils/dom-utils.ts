@@ -1,9 +1,9 @@
-export default function findClosestElement(
+export default function findClosestElement<T extends Element>(
     x: number,
     y: number,
-    elements: Element[]
-): Element {
-    let closestElement: Element = elements[0];
+    elements: T[]
+): T {
+    let closestElement: T = elements[0];
     let minDistance = Number.MAX_SAFE_INTEGER;
 
     elements.forEach((element) => {

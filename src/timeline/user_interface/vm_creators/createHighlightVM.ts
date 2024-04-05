@@ -6,22 +6,19 @@ export default function createHighlightVM(
     model: Highlight<any>,
     context: TimelineContext
 ): ItemVM {
-    const vm = new ItemVM(
-        {
-            start: model.state.start,
-            end: model.state.end,
+    const vm = new ItemVM({
+        start: model.state.start,
+        end: model.state.end,
 
-            innerDivStyles: {
-                "background-color": "blue",
-                opacity: "0.5",
-                "pointer-events": "none",
-            },
-            outerDivStyles: {
-                "z-index": "10",
-            },
+        innerDivStyles: {
+            "background-color": "blue",
+            opacity: "0.5",
+            "pointer-events": "none",
         },
-        model.id
-    );
+        outerDivStyles: {
+            "z-index": "10",
+        },
+    });
 
     return vm;
 }

@@ -13,13 +13,11 @@ export default function findClosestTrack(
         getNestedArrayOfDescendants(timeline, 3).flat(Infinity) as Track<any>[]
     ).filter(predicate ? predicate : () => true);
 
-    const selectors = tracks
-        .map((track) => `[${Attribute.ModelId}='${track.id}']`)
-        .join(",");
-
-    const trackElements = Array.from(document.querySelectorAll(selectors));
+    const trackElements = tracks.map(
+        (track) => document.getElementById(track.id + "-root")!
+    );
     const trackElement = findClosestElement(0, clientY, trackElements);
-    const modelId = trackElement.getAttribute(Attribute.ModelId)!;
+    const closestTrack = tracks[trackElements.indexOf(trackElement)];
 
-    return tracks.find((track) => track.id === modelId);
+    return closestTrack;
 }

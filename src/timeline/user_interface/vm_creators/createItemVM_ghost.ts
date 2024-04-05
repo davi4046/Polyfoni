@@ -34,15 +34,12 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
         return innerDivStyles;
     }
 
-    const vm = new ItemVM(
-        {
-            start: model.state.start,
-            end: model.state.end,
-            text: itemTextFunctions[model.itemType](model.state.content),
-            innerDivStyles: createInnerDivStyles(),
-        },
-        model.id
-    );
+    const vm = new ItemVM({
+        start: model.state.start,
+        end: model.state.end,
+        text: itemTextFunctions[model.itemType](model.state.content),
+        innerDivStyles: createInnerDivStyles(),
+    });
 
     model.subscribe(() => {
         vm.state = {

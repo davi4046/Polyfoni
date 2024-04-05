@@ -37,28 +37,27 @@ export default function createTimelineVM(
         return { top, center, bottom };
     };
 
-    const vm = new TimelineVM(
-        {
-            ...createSections(),
+    const vm = new TimelineVM({
+        ...createSections(),
 
-            handleMouseMove: (event: MouseEvent) => {
-                globalEventListener.handler = undefined;
-                event.stopPropagation();
-            },
-            handleMouseMove_tracks: (event: MouseEvent) => {
-                globalEventListener.handler = mouseEventHandler;
-                event.stopPropagation();
-            },
-
-            onPlayButtonClick: (_) => context.player.startPlayback(),
-            onPauseButtonClick: (_) => context.player.pausePlayback(),
-            onStopButtonClick: (_) => context.player.resetPlayback(),
-
-            playbackMotion: context.player.state.motion,
-            isPlaying: context.player.state.isPlaying,
+        handleMouseMove: (event: MouseEvent) => {
+            globalEventListener.handler = undefined;
+            event.stopPropagation();
         },
-        model.id
-    );
+        handleMouseMove_tracks: (event: MouseEvent) => {
+            globalEventListener.handler = mouseEventHandler;
+            event.stopPropagation();
+        },
+
+        onPlayButtonClick: (_) => context.player.startPlayback(),
+        onPauseButtonClick: (_) => context.player.pausePlayback(),
+        onStopButtonClick: (_) => context.player.resetPlayback(),
+
+        playbackMotion: context.player.state.motion,
+        isPlaying: context.player.state.isPlaying,
+
+        idPrefix: model.id,
+    });
 
     model.subscribe(() => {
         vm.state = { ...createSections() };

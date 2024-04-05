@@ -54,13 +54,12 @@ export default function createNoteTrackVM(
     remakeItems();
     remakeHighlights();
 
-    const vm = new TrackVM(
-        {
-            label: model.state.label,
-            items: [...items, ...highlights],
-        },
-        model.id
-    );
+    const vm = new TrackVM({
+        label: model.state.label,
+        items: [...items, ...highlights],
+
+        idPrefix: model.id,
+    });
 
     model.subscribe((_, oldState) => {
         if (model.state.children !== oldState.children) remakeItems();

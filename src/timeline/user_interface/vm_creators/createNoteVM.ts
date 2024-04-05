@@ -22,20 +22,17 @@ export default function createNoteVM(
         };
     }
 
-    const vm = new ItemVM(
-        {
-            start: model.state.start,
-            end: model.state.end,
-            tooltip: createTooltip(),
+    const vm = new ItemVM({
+        start: model.state.start,
+        end: model.state.end,
+        tooltip: createTooltip(),
 
-            innerDivStyles: {
-                "background-color": "black",
-                "margin-left": "2px",
-                "margin-right": "2px",
-            },
+        innerDivStyles: {
+            "background-color": "black",
+            "margin-left": "2px",
+            "margin-right": "2px",
         },
-        model.id
-    );
+    });
 
     model.subscribe(() => {
         vm.state = {

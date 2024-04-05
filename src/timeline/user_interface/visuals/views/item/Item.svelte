@@ -45,8 +45,6 @@
     style="width: {width}px; left: {left}px; {vm.state.outerDivStyles
         ? convertToInlineStyles(vm.state.outerDivStyles)
         : ''}"
-    data-type="item"
-    data-model-id={vm.id}
     bind:this={outerDiv}
 >
     <div

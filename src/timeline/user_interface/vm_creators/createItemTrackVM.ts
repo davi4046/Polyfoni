@@ -39,13 +39,12 @@ export default function createItemTrackVM(
     remakeGhostItems();
     remakeHighlights();
 
-    const vm = new TrackVM(
-        {
-            label: model.state.label,
-            items: [...items, ...ghostItems, ...highlights],
-        },
-        model.id
-    );
+    const vm = new TrackVM({
+        label: model.state.label,
+        items: [...items, ...ghostItems, ...highlights],
+
+        idPrefix: model.id,
+    });
 
     model.subscribe((_, oldState) => {
         if (model.state.children !== oldState.children) remakeItems();

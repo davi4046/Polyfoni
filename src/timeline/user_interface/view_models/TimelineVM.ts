@@ -26,6 +26,8 @@ interface TimelineVMState {
     createItemEditor?: (
         target: Element | Document | ShadowRoot
     ) => SvelteComponent;
+
+    idPrefix: string;
 }
 
 export default class TimelineVM extends Model<TimelineVMState> {}
