@@ -41,9 +41,7 @@ export default class EndGripHandler implements GlobalEventHandler {
             getBeatAtClientX(this.context.timeline, event.clientX)
         );
 
-        const grippedItems = Array.from(this.context.state.grips.keys());
-
-        const maxStart = grippedItems.reduce(
+        const maxStart = this._grippedItems.reduce(
             (maxStart, item) =>
                 item.state.start > maxStart ? item.state.start : maxStart,
             Number.MIN_SAFE_INTEGER
@@ -98,11 +96,8 @@ export default class EndGripHandler implements GlobalEventHandler {
 
     private _updateGrips() {
         this.context.state = {
-            grips: new Map(
-                this._grippedItems.map((item) => [
-                    item,
-                    { property: "end", value: this._grippedPoint },
-                ])
+            visualEndOverrideMap: new Map(
+                this._grippedItems.map((item) => [item, this._grippedPoint])
             ),
         };
     }

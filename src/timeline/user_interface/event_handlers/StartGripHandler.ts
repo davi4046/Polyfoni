@@ -43,9 +43,7 @@ export default class StartGripHandler implements GlobalEventHandler {
             getBeatAtClientX(this.context.timeline, event.clientX)
         );
 
-        const grippedItems = Array.from(this.context.state.grips.keys());
-
-        const minEnd = grippedItems.reduce(
+        const minEnd = this._grippedItems.reduce(
             (minEnd, item) =>
                 item.state.end < minEnd ? item.state.end : minEnd,
             Number.MAX_SAFE_INTEGER
@@ -100,11 +98,8 @@ export default class StartGripHandler implements GlobalEventHandler {
 
     private _updateGrips() {
         this.context.state = {
-            grips: new Map(
-                this._grippedItems.map((item) => [
-                    item,
-                    { property: "start", value: this._grippedPoint },
-                ])
+            visualStartOverrideMap: new Map(
+                this._grippedItems.map((item) => [item, this._grippedPoint])
             ),
         };
     }

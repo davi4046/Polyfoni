@@ -130,27 +130,36 @@ export default function createItemVM<T extends keyof ItemTypes>(
     });
 
     context.subscribe(() => {
-        const grip = context.state.grips.get(model);
-
-        const start =
-            grip && grip.property === "start" ? grip.value : model.state.start;
-
-        const end =
-            grip && grip.property === "end" ? grip.value : model.state.end;
+        const visualStartOverride =
+            context.state.visualStartOverrideMap.get(model);
+        const visualEndOverride = context.state.visualEndOverrideMap.get(model);
 
         vm.state = {
-            start: start,
-            end: end,
+            start:
+                visualStartOverride !== undefined
+                    ? visualStartOverride
+                    : model.state.start,
+
+            end:
+                visualEndOverride !== undefined
+                    ? visualEndOverride
+                    : model.state.end,
 
             innerDivStyles: createInnerDivStyles(),
-            outerDivStyles: grip ? { "z-index": "30" } : {},
+
+            outerDivStyles:
+                visualStartOverride !== undefined ||
+                visualEndOverride !== undefined
+                    ? { "z-index": "30" }
+                    : {},
 
             startGripStyles:
-                grip && grip.property === "start"
+                visualStartOverride !== undefined
                     ? gripStylesSelected
                     : gripStylesUnselected,
+
             endGripStyles:
-                grip && grip.property === "end"
+                visualEndOverride !== undefined
                     ? gripStylesSelected
                     : gripStylesUnselected,
         };

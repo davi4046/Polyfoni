@@ -9,10 +9,11 @@ interface TimelineContextState {
     highlights: Highlight<any>[];
     selectedItems: Item<any>[];
     ghostPairs: [Item<any>, Item<any>][];
-    grips: Map<Item<any>, { property: "start" | "end"; value: number }>;
     clipboard: Item<any>[];
-
     editItem?: Item<any>;
+
+    visualStartOverrideMap: Map<Item<any>, number>;
+    visualEndOverrideMap: Map<Item<any>, number>;
 }
 
 export default class TimelineContext extends Stateful<TimelineContextState> {
@@ -21,8 +22,10 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
             highlights: [],
             selectedItems: [],
             ghostPairs: [],
-            grips: new Map(),
             clipboard: [],
+
+            visualStartOverrideMap: new Map(),
+            visualEndOverrideMap: new Map(),
         });
 
         this.player = new TimelinePlayer(timeline);
