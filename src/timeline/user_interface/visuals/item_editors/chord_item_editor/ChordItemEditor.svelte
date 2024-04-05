@@ -14,7 +14,7 @@
     export let update: (value: ItemTypes["ChordItem"]) => void;
 
     export const reflectChange = (newValue: ItemTypes["ChordItem"]) => {
-        if (!isEqual(value.chordStatus, newValue.chordStatus)) {
+        if (!isEqual(chordStatus, newValue.chordStatus)) {
             builder = new ChordBuilder(newValue.chordStatus);
         }
         if (!isEqual(value.filters, newValue.filters)) {

@@ -127,12 +127,14 @@ function getCreateItemEditor(context: TimelineContext) {
         const itemEditor = new ItemEditor({ target, props });
 
         const subscription = item.subscribe(() => {
-            if (itemEditor.reflectChange) {
-                if (!justUpdated) itemEditor.reflectChange(item.state.content);
+            if (itemEditor.reflectChange !== undefined) {
+                if (!justUpdated) {
+                    itemEditor.reflectChange(item.state.content);
+                }
+                justUpdated = false;
             } else {
                 subscription.unsubscribe();
             }
-            justUpdated = false;
         });
 
         return itemEditor;
