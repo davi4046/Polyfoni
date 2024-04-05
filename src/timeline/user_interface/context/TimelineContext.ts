@@ -9,9 +9,10 @@ import type Timeline from "../../models/timeline/Timeline";
 
 interface TimelineContextState {
     highlights: Highlight<any>[];
-    ghostPairs: [Item<any>, Item<any>][];
     selectedItems: Item<any>[];
+    ghostPairs: [Item<any>, Item<any>][];
     grips: Map<Item<any>, ItemKeyValuePair<any, "start" | "end">>;
+    clipboard: Item<any>[];
 
     editItem?: Item<any>;
 }
@@ -28,9 +29,10 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
     constructor(readonly timeline: Timeline) {
         super({
             highlights: [],
-            ghostPairs: [],
             selectedItems: [],
+            ghostPairs: [],
             grips: new Map(),
+            clipboard: [],
         });
 
         this.player = new TimelinePlayer(timeline);
