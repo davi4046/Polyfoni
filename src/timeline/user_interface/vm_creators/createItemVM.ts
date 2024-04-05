@@ -94,6 +94,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         end: model.state.end,
         text: itemTextFunctions[model.itemType](model.state.content),
         innerDivStyles: createInnerDivStyles(),
+        tooltip: createTooltip(),
 
         startGripStyles: gripStylesUnselected,
         endGripStyles: gripStylesUnselected,
