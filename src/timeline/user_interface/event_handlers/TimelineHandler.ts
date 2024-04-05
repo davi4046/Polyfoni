@@ -9,6 +9,10 @@ import {
 } from "../../../architecture/state-hierarchy-utils";
 import Highlight from "../../models/highlight/Highlight";
 import Item from "../../models/item/Item";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
 import Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
@@ -203,13 +207,21 @@ class PasteItemsHandler implements GlobalEventHandler {
                 tracks.indexOf(getParent(item)) -
                 minTrackIndex +
                 trackIndexOffset;
+            const newTrack = tracks[newTrackIndex];
+
+            const content =
+                item.itemType === newTrack.itemType
+                    ? item.state.content
+                    : itemInitialContentFunctions[
+                          newTrack.itemType as keyof ItemTypes
+                      ]();
 
             return [
                 item,
-                new Item(item.itemType, {
-                    ...item.state,
+                new Item(newTrack.itemType, {
                     start: item.state.start - minStart + hoveredBeat,
                     end: item.state.end - minStart + hoveredBeat,
+                    content: content,
                     parent: tracks[newTrackIndex],
                 }),
             ] as [Item<any>, Item<any>];
