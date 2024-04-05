@@ -1,3 +1,5 @@
+import { clamp } from "lodash";
+
 import type TimelineContext from "../context/TimelineContext";
 import placeGhostItems from "../context/operations/placeGhostItems";
 import toggleItemSelected from "../context/operations/toggleItemSelected";
@@ -102,40 +104,53 @@ export default class ItemHandler implements GlobalEventHandler {
         const hoveredIndex = tracks.indexOf(hoveredTrack);
         const clickedIndex = tracks.indexOf(this._clickedTrack);
 
-        const trackOffset = hoveredIndex - clickedIndex;
+        const selectedItems = this.context.state.selectedItems;
+        const trackIndeces = selectedItems.map((item) =>
+            tracks.indexOf(getParent(item))
+        );
+
+        const minTrackIndex = trackIndeces.reduce(
+            (min, curr) => (curr < min ? curr : min),
+            Number.MAX_SAFE_INTEGER
+        );
+        const maxTrackIndex = trackIndeces.reduce(
+            (max, curr) => (curr > max ? curr : max),
+            Number.MIN_SAFE_INTEGER
+        );
+
+        const trackOffset = clamp(
+            hoveredIndex - clickedIndex,
+            -minTrackIndex,
+            tracks.length - maxTrackIndex + 1
+        );
         const beatOffset = hoveredBeat - this._clickedBeat;
 
-        const selectedItems = this.context.state.selectedItems;
+        const ghostPairs = selectedItems.map((item) => {
+            const newStart = item.state.start + beatOffset;
+            const newEnd = item.state.end + beatOffset;
+            const newIndex = tracks.indexOf(getParent(item)) + trackOffset;
+            const newTrack = tracks[newIndex];
 
-        // Will fail if there is no track at newIndex. In that case, no action is needed
-        try {
-            const ghostPairs = selectedItems.map((item) => {
-                const newStart = item.state.start + beatOffset;
-                const newEnd = item.state.end + beatOffset;
-                const newIndex = tracks.indexOf(getParent(item)) + trackOffset;
-                const newTrack = tracks[newIndex];
+            const content =
+                item.itemType === newTrack.itemType
+                    ? item.state.content
+                    : itemInitialContentFunctions[
+                          newTrack.itemType as keyof ItemTypes
+                      ]();
 
-                const content =
-                    item.itemType === newTrack.itemType
-                        ? item.state.content
-                        : itemInitialContentFunctions[
-                              newTrack.itemType as keyof ItemTypes
-                          ]();
+            const clone = new Item(newTrack.itemType, {
+                start: newStart,
+                end: newEnd,
+                content: content,
+                parent: newTrack,
+            });
 
-                const clone = new Item(newTrack.itemType, {
-                    start: newStart,
-                    end: newEnd,
-                    content: content,
-                    parent: newTrack,
-                });
+            return [item, clone];
+        }) as [Item<any>, Item<any>][];
 
-                return [item, clone];
-            }) as [Item<any>, Item<any>][];
-
-            this.context.state = {
-                ghostPairs: ghostPairs,
-            };
-        } catch {}
+        this.context.state = {
+            ghostPairs: ghostPairs,
+        };
     }
 
     handleMouseUp(event: MouseEvent) {
