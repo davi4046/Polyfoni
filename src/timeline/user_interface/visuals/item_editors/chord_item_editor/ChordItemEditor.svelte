@@ -14,11 +14,15 @@
     export let update: (value: ItemTypes["ChordItem"]) => void;
 
     export const reflectChange = (newValue: ItemTypes["ChordItem"]) => {
+        if (!isEqual(value.chordStatus, newValue.chordStatus)) {
+            builder = new ChordBuilder(newValue.chordStatus);
+        }
         if (!isEqual(value.filters, newValue.filters)) {
             filters = newValue.filters.slice();
-            builder.applyFilters(filters);
-            builder = builder; // Reactivity hack
         }
+
+        builder.applyFilters(filters);
+        builder = builder; // Reactivity hack
     };
 
     export const log = (str: string) => {
