@@ -70,8 +70,6 @@
         const fontDir = await resolveResource("res/fonts/");
         const fontFiles = await readDir(fontDir);
 
-        const promises = [];
-
         for (const { name, path } of fontFiles) {
             const [fontName] = name?.split(".") || [];
 
@@ -85,18 +83,14 @@
                         weight: `${(i + 1) * 100}`,
                     }
                 );
-                const loadFont = async () => {
-                    try {
-                        const loadedFont = await font.load();
-                        document.fonts.add(loadedFont);
-                    } catch (error) {
-                        console.log("Failed to load font: " + error);
-                    }
-                };
-                promises.push(loadFont());
+                try {
+                    const loadedFont = await font.load();
+                    document.fonts.add(loadedFont);
+                } catch (error) {
+                    console.log("Failed to load font: " + error);
+                }
             }
         }
-        await Promise.all(promises);
     }
 </script>
 
