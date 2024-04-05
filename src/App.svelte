@@ -17,6 +17,8 @@
     import { readDir, writeBinaryFile } from "@tauri-apps/api/fs";
     import { resolveResource } from "@tauri-apps/api/path";
     import { convertFileSrc } from "@tauri-apps/api/tauri";
+    import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
+    import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -41,6 +43,16 @@
     hotkeys("enter", () => {
         selectHighlightedItems(timelineContext);
     });
+
+    hotkeys("ctrl+c", () => {
+        if (timelineContext.state.highlights.length > 0) {
+            copyHighlightedItems(timelineContext);
+        } else {
+            copySelectedItems(timelineContext);
+        }
+    });
+
+    hotkeys("ctrl+v", () => {});
 
     hotkeys("ctrl+z", () => {
         timelineContext.history.undoAction();
