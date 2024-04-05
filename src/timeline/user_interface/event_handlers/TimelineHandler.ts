@@ -142,6 +142,8 @@ class PasteItemsHandler implements GlobalEventHandler {
     private _prevHoveredTrack?: Track<any>;
 
     handleMouseMove(event: MouseEvent) {
+        if (this.context.state.ghostPairs.length === 0) return;
+
         const hoveredBeat = Math.round(
             getBeatAtClientX(this.context.timeline, event.clientX)
         );
@@ -193,7 +195,7 @@ class PasteItemsHandler implements GlobalEventHandler {
         const trackIndexOffset = clamp(
             tracks.indexOf(hoveredTrack),
             -minTrackIndex,
-            tracks.length - maxTrackIndex + 1
+            tracks.length + minTrackIndex - maxTrackIndex - 1
         );
 
         const newGhostPairs = this.context.state.ghostPairs.map(([item]) => {

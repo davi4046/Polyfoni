@@ -121,7 +121,7 @@ export default class ItemHandler implements GlobalEventHandler {
         const trackOffset = clamp(
             hoveredIndex - clickedIndex,
             -minTrackIndex,
-            tracks.length - maxTrackIndex + 1
+            tracks.length - maxTrackIndex - 1
         );
         const beatOffset = hoveredBeat - this._clickedBeat;
 
