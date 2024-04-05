@@ -13,13 +13,13 @@
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
-    import hotkeys from "hotkeys-js";
     import { readDir, writeBinaryFile } from "@tauri-apps/api/fs";
     import { resolveResource } from "@tauri-apps/api/path";
     import { convertFileSrc } from "@tauri-apps/api/tauri";
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
+    import { register as registerShortcut } from "./utils/keyboard-shortcut";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -28,24 +28,24 @@
     new Generator(timeline);
     new TotalHarmonyGenerator(timeline);
 
-    hotkeys("delete", () => {
+    registerShortcut("delete", () => {
         timelineContext.history.startAction("Delete");
         deleteSelectedItems(timelineContext);
         cropHighlightedItems(timelineContext);
         timelineContext.history.endAction();
     });
 
-    hotkeys("insert", () => {
+    registerShortcut("insert", () => {
         timelineContext.history.startAction("Insert empty items");
         insertEmptyItems(timelineContext);
         timelineContext.history.endAction();
     });
 
-    hotkeys("enter", () => {
+    registerShortcut("enter", () => {
         selectHighlightedItems(timelineContext);
     });
 
-    hotkeys("ctrl+c", () => {
+    registerShortcut("ctrl+c", () => {
         if (timelineContext.state.highlights.length > 0) {
             copyHighlightedItems(timelineContext);
         } else {
@@ -53,15 +53,15 @@
         }
     });
 
-    hotkeys("ctrl+v", () => {
+    registerShortcut("ctrl+v", () => {
         pasteClipboard(timelineContext);
     });
 
-    hotkeys("ctrl+z", () => {
+    registerShortcut("ctrl+z", () => {
         timelineContext.history.undoAction();
     });
 
-    hotkeys("ctrl+shift+z", () => {
+    registerShortcut("ctrl+shift+z", () => {
         timelineContext.history.redoAction();
     });
 
@@ -78,7 +78,7 @@
     });
 
     onDestroy(async () => {
-        (await unlisten)();
+        (await unlisten)(); // avoid opening multiple save dialogs after hot reload
     });
 
     async function loadFonts() {
@@ -102,7 +102,7 @@
                     const loadedFont = await font.load();
                     document.fonts.add(loadedFont);
                 } catch (error) {
-                    console.log("Failed to load font: " + error);
+                    console.warn("Failed to load font: " + error);
                 }
             }
         }
