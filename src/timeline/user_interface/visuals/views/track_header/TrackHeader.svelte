@@ -1,7 +1,7 @@
 <script lang="ts">
     import type TrackVM from "../../../view_models/TrackVM";
 
-    export let vm: TrackVM<any>;
+    export let vm: TrackVM;
 
     vm.subscribe(() => (vm = vm));
 </script>
