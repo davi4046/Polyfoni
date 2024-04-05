@@ -1,13 +1,26 @@
+import { clamp } from "lodash";
+
 import type TimelineContext from "../context/TimelineContext";
+import placeGhostItems from "../context/operations/placeGhostItems";
 import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
-import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
+import {
+    getNestedArrayOfDescendants,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
 import Highlight from "../../models/highlight/Highlight";
+import Item from "../../models/item/Item";
+import type Timeline from "../../models/timeline/Timeline";
 import Track from "../../models/track/Track";
 import findClosestTrack from "../../utils/screen_utils/findClosestTrack";
 import getBeatAtClientX from "../../utils/screen_utils/getBeatAtClientX";
 
 export default class TimelineHandler implements GlobalEventHandler {
-    constructor(readonly context: TimelineContext) {}
+    constructor(
+        readonly timeline: Timeline,
+        readonly context: TimelineContext
+    ) {
+        this._pasteItemsHandler = new PasteItemsHandler(timeline, context);
+    }
 
     private _clickedBeat?: number;
     private _clickedTrack?: Track<any>;
@@ -17,8 +30,14 @@ export default class TimelineHandler implements GlobalEventHandler {
 
     private _prevHoveredTrack?: Track<any>;
 
+    private _pasteItemsHandler;
+
     getIsOverwritable(): boolean {
-        return !this._clickedBeat && !this._clickedTrack;
+        return (
+            !this._clickedBeat &&
+            !this._clickedTrack &&
+            this.context.state.ghostPairs.length === 0
+        );
     }
 
     handleMouseDown(event: MouseEvent) {
@@ -40,6 +59,8 @@ export default class TimelineHandler implements GlobalEventHandler {
     }
 
     handleMouseMove(event: MouseEvent) {
+        this._pasteItemsHandler.handleMouseMove(event);
+
         if (!this._clickedBeat || !this._clickedTrack) return;
 
         const hoveredBeat = getBeatAtClientX(
@@ -98,14 +119,108 @@ export default class TimelineHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._clickedBeat = undefined;
         this._clickedTrack = undefined;
-        this._prevMinBeat = undefined;
-        this._prevMaxBeat = undefined;
-        this._prevHoveredTrack = undefined;
 
-        const currBeat = getBeatAtClientX(this.context.timeline, event.clientX);
-
-        if (this.context.state.highlights.length === 0) {
-            this.context.player.setPlaybackPosition(Math.round(currBeat));
+        if (this.context.state.ghostPairs.length > 0) {
+            this._pasteItemsHandler.handleMouseDown(event);
+        } else if (this.context.state.highlights.length === 0) {
+            const hoveredBeat = getBeatAtClientX(
+                this.context.timeline,
+                event.clientX
+            );
+            this.context.player.setPlaybackPosition(Math.round(hoveredBeat));
         }
+    }
+}
+
+class PasteItemsHandler implements GlobalEventHandler {
+    constructor(
+        readonly timeline: Timeline,
+        readonly context: TimelineContext
+    ) {}
+
+    private _prevHoveredBeat?: number;
+    private _prevHoveredTrack?: Track<any>;
+
+    handleMouseMove(event: MouseEvent) {
+        const hoveredBeat = Math.round(
+            getBeatAtClientX(this.context.timeline, event.clientX)
+        );
+
+        const hoveredTrack = findClosestTrack(
+            this.context.timeline,
+            event.clientY,
+            (track) => track.state.allowUserEdit
+        );
+
+        if (
+            hoveredBeat === this._prevHoveredBeat &&
+            hoveredTrack === this._prevHoveredTrack
+        ) {
+            return;
+        }
+
+        this._prevHoveredBeat = hoveredBeat;
+        this._prevHoveredTrack = hoveredTrack;
+
+        if (!hoveredTrack) return;
+
+        const tracks = (
+            getNestedArrayOfDescendants(this.timeline, 3).flat(
+                Infinity
+            ) as Track<any>[]
+        ).filter((track) => track.state.allowUserEdit);
+
+        const minStart = this.context.state.ghostPairs.reduce(
+            (minStart, [item]) =>
+                item.state.start < minStart ? item.state.start : minStart,
+            Number.MAX_SAFE_INTEGER
+        );
+
+        const trackIndeces = this.context.state.ghostPairs.map(([item]) =>
+            tracks.indexOf(getParent(item))
+        );
+
+        const minTrackIndex = trackIndeces.reduce(
+            (min, curr) => (curr < min ? curr : min),
+            Number.MAX_SAFE_INTEGER
+        );
+
+        const maxTrackIndex = trackIndeces.reduce(
+            (max, curr) => (max > curr ? max : curr),
+            Number.MIN_SAFE_INTEGER
+        );
+
+        const trackIndexOffset = clamp(
+            tracks.indexOf(hoveredTrack),
+            -minTrackIndex,
+            tracks.length - maxTrackIndex + 1
+        );
+
+        const newGhostPairs = this.context.state.ghostPairs.map(([item]) => {
+            const newTrackIndex =
+                tracks.indexOf(getParent(item)) -
+                minTrackIndex +
+                trackIndexOffset;
+
+            return [
+                item,
+                new Item(item.itemType, {
+                    ...item.state,
+                    start: item.state.start - minStart + hoveredBeat,
+                    end: item.state.end - minStart + hoveredBeat,
+                    parent: tracks[newTrackIndex],
+                }),
+            ] as [Item<any>, Item<any>];
+        });
+
+        this.context.state = {
+            ghostPairs: newGhostPairs,
+        };
+    }
+
+    handleMouseDown(event: MouseEvent) {
+        this.context.history.startAction("Paste items");
+        placeGhostItems(this.context);
+        this.context.history.endAction();
     }
 }

@@ -19,6 +19,7 @@
     import { convertFileSrc } from "@tauri-apps/api/tauri";
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
+    import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -52,7 +53,9 @@
         }
     });
 
-    hotkeys("ctrl+v", () => {});
+    hotkeys("ctrl+v", () => {
+        pasteClipboard(timelineContext);
+    });
 
     hotkeys("ctrl+z", () => {
         timelineContext.history.undoAction();

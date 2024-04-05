@@ -19,7 +19,7 @@ export default function createTimelineVM(
     model: Timeline,
     context: TimelineContext
 ): TimelineVM {
-    const mouseEventHandler = new TimelineHandler(context);
+    const mouseEventHandler = new TimelineHandler(model, context);
 
     const createSections = () => {
         const top = getChildren(getChildren(model)[0]).map((voice) => {
