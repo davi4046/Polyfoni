@@ -1,7 +1,7 @@
 import Item from "../item/Item";
 import type { ItemTypes } from "../item/ItemTypes";
 import type Voice from "../voice/Voice";
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
 export interface TrackState<T extends keyof ItemTypes>
@@ -11,7 +11,7 @@ export interface TrackState<T extends keyof ItemTypes>
     allowUserEdit: boolean;
 }
 
-export default class Track<T extends keyof ItemTypes> extends Model<
+export default class Track<T extends keyof ItemTypes> extends Stateful<
     TrackState<T>
 > {
     constructor(

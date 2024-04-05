@@ -1,5 +1,5 @@
 import type Track from "../track/Track";
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
 import { itemInitFunctions, type ItemTypes } from "./ItemTypes";
@@ -12,7 +12,7 @@ export interface ItemState<T extends keyof ItemTypes>
     error?: string;
 }
 
-export default class Item<T extends keyof ItemTypes> extends Model<
+export default class Item<T extends keyof ItemTypes> extends Stateful<
     ItemState<T>
 > {
     constructor(

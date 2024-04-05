@@ -1,27 +1,23 @@
-import Model from "../../../architecture/Model";
+import Section from "../section/Section";
+import Track from "../track/Track";
+import Voice from "../voice/Voice";
+import Stateful from "../../../architecture/Stateful";
 import {
     addChildren,
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
-import Section from "../section/Section";
-import Track from "../track/Track";
-import Voice from "../voice/Voice";
-
 export interface TimelineState extends ParentState<Section> {}
 
-export default class Timeline extends Model<TimelineState> {
+export default class Timeline extends Stateful<TimelineState> {
     readonly tempoTrack;
     readonly scaleTrack;
     readonly totalTrack;
 
-    constructor(id?: string) {
-        super(
-            {
-                children: [],
-            },
-            id
-        );
+    constructor() {
+        super({
+            children: [],
+        });
 
         const sections = Array.from({ length: 3 }, () => {
             return new Section({ parent: this, children: [] });

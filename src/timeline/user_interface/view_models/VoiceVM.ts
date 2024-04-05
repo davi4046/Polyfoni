@@ -1,4 +1,4 @@
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 
 import type TrackVM from "./TrackVM";
 
@@ -7,4 +7,4 @@ interface VoiceVMState {
     isCollapsed: boolean;
 }
 
-export default class VoiceVM extends Model<VoiceVMState> {}
+export default class VoiceVM extends Stateful<VoiceVMState> {}

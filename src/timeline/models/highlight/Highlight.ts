@@ -1,6 +1,6 @@
 import type { ItemTypes } from "../item/ItemTypes";
 import type Track from "../track/Track";
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 import type { ChildState } from "../../../architecture/state-hierarchy-utils";
 
 export interface HighlightState<T extends keyof ItemTypes>
@@ -9,6 +9,6 @@ export interface HighlightState<T extends keyof ItemTypes>
     end: number;
 }
 
-export default class Highlight<T extends keyof ItemTypes> extends Model<
+export default class Highlight<T extends keyof ItemTypes> extends Stateful<
     HighlightState<T>
 > {}

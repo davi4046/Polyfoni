@@ -1,6 +1,6 @@
 import type Timeline from "../timeline/Timeline";
 import type Voice from "../voice/Voice";
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 import type {
     ChildState,
     ParentState,
@@ -10,4 +10,4 @@ export interface SectionState
     extends ChildState<Timeline>,
         ParentState<Voice> {}
 
-export default class Section extends Model<SectionState> {}
+export default class Section extends Stateful<SectionState> {}

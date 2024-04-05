@@ -1,6 +1,6 @@
 import type { Props } from "tippy.js";
 
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 
 interface ItemVMState {
     start: number;
@@ -22,4 +22,4 @@ interface ItemVMState {
     tooltip?: Partial<Props>;
 }
 
-export default class ItemVM extends Model<ItemVMState> {}
+export default class ItemVM extends Stateful<ItemVMState> {}

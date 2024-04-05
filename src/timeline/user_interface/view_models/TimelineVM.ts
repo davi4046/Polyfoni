@@ -1,6 +1,6 @@
 import type { SvelteComponent } from "svelte";
 
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
 import type { Chord } from "../../models/item/Chord";
 
@@ -30,4 +30,4 @@ interface TimelineVMState {
     idPrefix: string;
 }
 
-export default class TimelineVM extends Model<TimelineVMState> {}
+export default class TimelineVM extends Stateful<TimelineVMState> {}

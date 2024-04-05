@@ -1,4 +1,4 @@
-import Model from "../../../architecture/Model";
+import Stateful from "../../../architecture/Stateful";
 
 import type ItemVM from "./ItemVM";
 
@@ -9,4 +9,4 @@ interface TrackVMState {
     idPrefix: string;
 }
 
-export default class TrackVM extends Model<TrackVMState> {}
+export default class TrackVM extends Stateful<TrackVMState> {}

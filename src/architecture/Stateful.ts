@@ -1,15 +1,16 @@
-import { isEqual } from "lodash";
+import { isEqual, uniqueId } from "lodash";
 
 import type { GetState, SetState } from "./state-hierarchy-utils";
 
 export default class Stateful<TState extends object>
     implements GetState<TState>, SetState<TState>
 {
-    private _state: TState;
-
     constructor(state: TState) {
         this._state = state;
     }
+
+    private _state: TState;
+    readonly id = uniqueId();
 
     set state(newState: Partial<TState>) {
         const oldState = this._state;
@@ -17,7 +18,7 @@ export default class Stateful<TState extends object>
         Object.assign(stateClone, newState);
 
         if (isEqual(this._state, stateClone)) return;
-        
+
         this._state = stateClone;
         this._callbacks.forEach((callback) => callback(this, oldState)); //notify subscribers
     }
