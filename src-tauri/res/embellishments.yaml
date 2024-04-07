@@ -1,0 +1,45 @@
+passing-tone: |-
+    if prevNote.pitch < nextNote.pitch:
+        pitchesBetween = range(prevNote.pitch + 1, nextNote.pitch)
+    else:
+        pitchesBetween = reversed(range(nextNote.pitch + 1, prevNote.pitch))
+
+    [pitch for pitch in pitchesBetween if pitch % 12 in scale]
+upper-neighbor-tone: |-
+    if prevNote.pitch != nextNote.pitch:
+        result = None
+    else:
+        result = next(prevNote.pitch + x for x in range(1, 12) if (prevNote.pitch + x) % 12 in scale)
+        result = pitch if pitch - prevNote.pitch <= 2 else None
+    result
+lower-neighbor-tone: |-
+    if prevNote.pitch != nextNote.pitch:
+        result = None
+    else:
+        result = next(prevNote.pitch - x for x in range(1, 12) if (prevNote.pitch - x) % 12 in scale)
+        result = result if prevNote.pitch - result <= 2 else None
+    result
+appogiatura: |-
+    if prevNote.pitch == nextNote.pitch:
+        result = None
+    elif prevNote.pitch < nextNote.pitch:
+        result = next(nextNote.pitch + x for x in range(1, 12) if (nextNote.pitch + x) % 12 in scale)
+        result = result if result - nextNote.pitch <= 2 else None
+    else:
+        result = next(nextNote.pitch - x for x in range(1, 12) if (nextNote.pitch - x) % 12 in scale)
+        result = result if nextNote.pitch - result <= 2 else None
+    result
+escape-tone: |-
+    if prevNote.pitch == nextNote.pitch:
+        result = None
+    elif prevNote.pitch < nextNote.pitch:
+        result = next(prevNote.pitch - x for x in range(1, 12) if (prevNote.pitch - x) % 12 in scale)
+        result = result if prevNote.pitch - result <= 2 else None
+    else:
+        result = next(prevNote.pitch + x for x in range(1, 12) if (prevNote.pitch + x) % 12 in scale)
+        result = result if result - prevNote.pitch <= 2 else None
+    result
+suspension: |-
+    prevNote.pitch if prevNote.pitch % 12 in scale else None
+anticipation: |-
+    nextNote.pitch if nextNote.pitch % 12 in scale else None
