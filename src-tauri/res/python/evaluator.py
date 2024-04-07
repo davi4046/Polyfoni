@@ -5,11 +5,32 @@ from func_timeout import func_set_timeout, FunctionTimedOut
 
 MATH_DICT = {name: getattr(math, name) for name in dir(math)}
 
-GLOBALS = {"__builtins__": None, **MATH_DICT}
+SAFE_BUILTINS = {
+    'abs': abs,
+    'all': all,
+    'any': any,
+    'divmod': divmod,
+    'filter': filter,
+    'len': len,
+    'list': list,
+    'map': map,
+    'max': max,
+    'min': min,
+    'next': next,
+    'pow': pow,
+    'range': range,
+    'reversed': reversed,
+    'round': round,
+    'slice': slice,
+    'sorted': sorted,
+    'sum': sum
+}
+
+GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT}
 
 @func_set_timeout(0.1)
 def evaluate(expr, vars):
-    return eval(expr, GLOBALS, vars)
+    return eval(expr, {**GLOBALS, **vars})
 
 if __name__ == "__main__":
     for line in sys.stdin:
