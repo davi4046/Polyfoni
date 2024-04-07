@@ -19,7 +19,7 @@
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
-    import { register as registerShortcut } from "./utils/keyboard-shortcut";
+    import { registerShortcut } from "./utils/keyboard-shortcut";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);

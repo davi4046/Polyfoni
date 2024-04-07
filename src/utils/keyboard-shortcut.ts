@@ -30,7 +30,7 @@ document.addEventListener(
 
 const shortcuts: Shortcut[] = [];
 
-export function register(
+export function registerShortcut(
     shortcut: string,
     listener: (event: KeyboardEvent) => void
 ) {
