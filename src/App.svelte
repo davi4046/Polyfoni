@@ -13,13 +13,12 @@
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
-    import { readDir, writeBinaryFile } from "@tauri-apps/api/fs";
-    import { resolveResource } from "@tauri-apps/api/path";
-    import { convertFileSrc } from "@tauri-apps/api/tauri";
+    import { writeBinaryFile } from "@tauri-apps/api/fs";
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
     import { registerShortcut } from "./utils/keyboard-shortcut";
+    import loadFonts from "./utils/app-start/loadFonts";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -80,33 +79,6 @@
     onDestroy(async () => {
         (await unlisten)(); // avoid opening multiple save dialogs after hot reload
     });
-
-    async function loadFonts() {
-        const fontDir = await resolveResource("res/fonts/");
-        const fontFiles = await readDir(fontDir);
-
-        for (const { name, path } of fontFiles) {
-            const [fontName] = name?.split(".") || [];
-
-            if (!fontName) return;
-
-            for (let i = 0; i < 10; i++) {
-                const font = new FontFace(
-                    fontName,
-                    `url(${convertFileSrc(path)})`,
-                    {
-                        weight: `${(i + 1) * 100}`,
-                    }
-                );
-                try {
-                    const loadedFont = await font.load();
-                    document.fonts.add(loadedFont);
-                } catch (error) {
-                    console.warn("Failed to load font: " + error);
-                }
-            }
-        }
-    }
 </script>
 
 {#await loadFonts() then}
