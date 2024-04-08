@@ -96,7 +96,7 @@ export default class TimelineHandler implements GlobalEventHandler {
 
         const tracks = getNestedArrayOfDescendants(
             this.context.timeline,
-            3
+            4
         ).flat(Infinity) as Track<any>[];
 
         const hoveredIndex = tracks.indexOf(hoveredTrack);
@@ -171,7 +171,7 @@ class PasteItemsHandler implements GlobalEventHandler {
         if (!hoveredTrack) return;
 
         const tracks = (
-            getNestedArrayOfDescendants(this.timeline, 3).flat(
+            getNestedArrayOfDescendants(this.timeline, 4).flat(
                 Infinity
             ) as Track<any>[]
         ).filter((track) => track.state.allowUserEdit);

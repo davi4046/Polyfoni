@@ -46,7 +46,7 @@ export default class Generator {
 
             switch (objDepth) {
                 // Track
-                case 3: {
+                case 4: {
                     const trackType = trackIndexToType(
                         getIndex(obj as Track<any>)
                     );
@@ -75,7 +75,7 @@ export default class Generator {
                     break;
                 }
                 // Item
-                case 4: {
+                case 5: {
                     const trackType = trackIndexToType(
                         getIndex(getParent(obj as Item<any>))
                     );

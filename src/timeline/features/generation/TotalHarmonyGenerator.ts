@@ -1,23 +1,16 @@
 import { isEqual } from "lodash";
 
-import pitchNames from "../../utils/pitchNames";
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import {
     countAncestors,
     getChildren,
-    getGrandparent,
     getGreatGrandparent,
-    getGreatGreatGrandparent,
     getIndex,
     getLastAncestor,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import compareArrays from "../../../utils/compareArrays";
-import {
-    Chord,
-    createEmptyPitchMap,
-    type PitchMap,
-} from "../../models/item/Chord";
+import { Chord, createEmptyPitchMap } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
@@ -45,7 +38,7 @@ export default class TotalHarmonyGenerator {
 
             switch (objDepth) {
                 // Track
-                case 3: {
+                case 4: {
                     const trackType = trackIndexToType(
                         getIndex(obj as Track<any>)
                     );
@@ -74,7 +67,7 @@ export default class TotalHarmonyGenerator {
                     break;
                 }
                 // Item
-                case 4: {
+                case 5: {
                     const trackType = trackIndexToType(
                         getIndex(getParent(obj as Item<any>))
                     );
@@ -124,12 +117,13 @@ export default class TotalHarmonyGenerator {
 
     private async _updateItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
-        const voices = getChildren(getGrandparent(itemState.parent));
+        const voices = getChildren(getGreatGrandparent(itemState.parent));
         const timeline = getLastAncestor(itemState.parent);
 
-        const outputTracks: Track<"NoteItem">[] = voices.map(
-            (voice) => getChildren(voice)[trackTypeToIndex("output")]
-        );
+        const outputTracks: Track<"NoteItem">[] = voices
+            .map((voice) => getChildren(voice)[0])
+            .map(getChildren)
+            .flatMap((tracks) => tracks[trackTypeToIndex("output")]);
 
         function getTotalHarmonyForInterval(
             interval: Interval
@@ -160,17 +154,15 @@ export default class TotalHarmonyGenerator {
                         },
                     };
                 });
-
                 break;
             }
             case "harmony": {
-                const harmonyTracks: Track<"ChordItem">[] = voices.map(
-                    (voice) => getChildren(voice)[trackTypeToIndex("harmony")]
-                );
+                const harmonyTracks = voices
+                    .map((voice) => getChildren(voice)[0])
+                    .map(getChildren)
+                    .flatMap((tracks) => tracks[trackTypeToIndex("harmony")]);
 
-                const harmonyItems = harmonyTracks.flatMap((track) =>
-                    getChildren(track)
-                );
+                const harmonyItems = harmonyTracks.flatMap(getChildren);
 
                 const intervals = intersectIntervals(
                     harmonyItems.map((item) => item.state)
@@ -198,7 +190,6 @@ export default class TotalHarmonyGenerator {
                         },
                     });
                 });
-
                 this._totalHarmonyItems = newTotalHarmonyItems;
                 break;
             }

@@ -1,7 +1,6 @@
 import type { Subscription } from "../../../architecture/Stateful";
 import {
     getChildren,
-    getGreatGreatGrandparent,
     getLastAncestor,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";

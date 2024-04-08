@@ -96,7 +96,7 @@ export default class ItemHandler implements GlobalEventHandler {
         }
 
         const tracks = (
-            getNestedArrayOfDescendants(getLastAncestor(this.item), 3).flat(
+            getNestedArrayOfDescendants(getLastAncestor(this.item), 4).flat(
                 Infinity
             ) as Track<any>[]
         ).filter((track) => track.state.allowUserEdit);
