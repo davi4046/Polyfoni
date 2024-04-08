@@ -1,14 +1,10 @@
 <script lang="ts">
     import type TrackGroupVM from "../../../view_models/TrackGroupVM";
     import TrackHeader from "../track_header/TrackHeader.svelte";
-    import PipeEnd from "./assets/PipeEnd.svelte";
-    import PipeMid from "./assets/PipeMid.svelte";
 
     export let vm: TrackGroupVM;
 
     vm.subscribe(() => (vm = vm));
-
-    $: trackCount = vm.state.tracks.length;
 </script>
 
 {#if vm.state.label}
