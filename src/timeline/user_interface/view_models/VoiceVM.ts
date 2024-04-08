@@ -1,9 +1,9 @@
 import Stateful from "../../../architecture/Stateful";
 
-import type TrackVM from "./TrackVM";
+import type TrackGroupVM from "./TrackGroupVM";
 
 interface VoiceVMState {
-    tracks: TrackVM[];
+    trackGroups: TrackGroupVM[];
     isCollapsed: boolean;
 }
 

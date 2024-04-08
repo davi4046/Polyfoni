@@ -1,4 +1,3 @@
-import Attribute from "../../../architecture/AttributeEnum";
 import { getNestedArrayOfDescendants } from "../../../architecture/state-hierarchy-utils";
 import findClosestElement from "../../../utils/dom-utils";
 import type Timeline from "../../../timeline/models/timeline/Timeline";
@@ -10,7 +9,7 @@ export default function findClosestTrack(
     predicate?: (track: Track<any>) => boolean
 ): Track<any> | undefined {
     const tracks = (
-        getNestedArrayOfDescendants(timeline, 3).flat(Infinity) as Track<any>[]
+        getNestedArrayOfDescendants(timeline, 4).flat(Infinity) as Track<any>[]
     ).filter(predicate ? predicate : () => true);
 
     const trackElements = tracks.map(
