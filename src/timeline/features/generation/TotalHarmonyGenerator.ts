@@ -21,7 +21,7 @@ import { intersectIntervals } from "../../../utils/interval/intersect_intervals/
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
 import getHarmonyOfNotes from "./getHarmonyOfNotes";
-import { trackIndexToType, trackTypeToIndex } from "./track-config";
+import { getHarmonyTrack, getOutputTrack, getTrackType } from "./track-config";
 
 export default class TotalHarmonyGenerator {
     private _itemChanges: ItemChange[] = [];
@@ -39,10 +39,15 @@ export default class TotalHarmonyGenerator {
             switch (objDepth) {
                 // Track
                 case 4: {
-                    const trackType = trackIndexToType(
-                        getIndex(obj as Track<any>)
-                    );
-                    if (trackType !== "output" && trackType !== "harmony") {
+                    const trackType = getTrackType(obj as Track<any>);
+                    console.log(trackType);
+                    if (trackType === undefined)
+                        console.log("tracktype is undefined:", obj);
+
+                    if (
+                        !trackType ||
+                        (trackType !== "output" && trackType !== "harmony")
+                    ) {
                         return;
                     }
 
@@ -68,10 +73,14 @@ export default class TotalHarmonyGenerator {
                 }
                 // Item
                 case 5: {
-                    const trackType = trackIndexToType(
-                        getIndex(getParent(obj as Item<any>))
-                    );
-                    if (trackType !== "output" && trackType !== "harmony") {
+                    const trackType = getTrackType(getParent(obj as Item<any>));
+                    console.log(trackType);
+                    if (trackType === undefined)
+                        console.log("tracktype is undefined:", obj);
+                    if (
+                        !trackType ||
+                        (trackType !== "output" && trackType !== "harmony")
+                    ) {
                         return;
                     }
 
@@ -102,6 +111,10 @@ export default class TotalHarmonyGenerator {
                         timeline.totalTrack.state = {
                             children: mergedItems,
                         };
+
+                        console.log("rendered harmony !");
+                        console.log(this._totalHarmonyItems);
+                        console.log(mergedItems);
                     }
                 };
                 this._isHandlingChanges = true;
@@ -116,14 +129,11 @@ export default class TotalHarmonyGenerator {
     }
 
     private async _updateItemStateEffect(itemState: ItemState<any>) {
-        const trackType = trackIndexToType(getIndex(itemState.parent));
+        const trackType = getTrackType(itemState.parent);
         const voices = getChildren(getGreatGrandparent(itemState.parent));
         const timeline = getLastAncestor(itemState.parent);
 
-        const outputTracks: Track<"NoteItem">[] = voices
-            .map((voice) => getChildren(voice)[0])
-            .map(getChildren)
-            .flatMap((tracks) => tracks[trackTypeToIndex("output")]);
+        const outputTracks = voices.map(getOutputTrack);
 
         function getTotalHarmonyForInterval(
             interval: Interval
@@ -157,10 +167,7 @@ export default class TotalHarmonyGenerator {
                 break;
             }
             case "harmony": {
-                const harmonyTracks = voices
-                    .map((voice) => getChildren(voice)[0])
-                    .map(getChildren)
-                    .flatMap((tracks) => tracks[trackTypeToIndex("harmony")]);
+                const harmonyTracks = voices.map(getHarmonyTrack);
 
                 const harmonyItems = harmonyTracks.flatMap(getChildren);
 

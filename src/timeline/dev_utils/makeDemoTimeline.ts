@@ -21,7 +21,7 @@ export default function makeDemoTimeline(): Timeline {
             children: [],
         });
 
-        addChildren(voice, createMainTrackGroup(voice));
+        addChildren(voice, ...createDefaultTrackGroups(voice));
 
         return voice;
     });
@@ -58,9 +58,13 @@ function makeRandomItems<T extends keyof ItemTypes>(
     return items;
 }
 
-function createMainTrackGroup(voice: Voice): TrackGroup {
-    const trackGroup = new TrackGroup({
-        label: "main",
+function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
+    const outputGroup = new TrackGroup({
+        parent: voice,
+        children: [],
+    });
+    const frameworkGroup = new TrackGroup({
+        label: "framework",
         parent: voice,
         children: [],
     });
@@ -69,31 +73,31 @@ function createMainTrackGroup(voice: Voice): TrackGroup {
 
     tracks.push(
         new Track("NoteItem", {
-            parent: trackGroup,
+            parent: outputGroup,
             label: "Piano 1",
             children: [],
             allowUserEdit: false,
         }),
         new Track("StringItem", {
-            parent: trackGroup,
+            parent: frameworkGroup,
             label: "Pitch",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            parent: trackGroup,
+            parent: frameworkGroup,
             label: "Duration",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            parent: trackGroup,
+            parent: frameworkGroup,
             label: "Rest",
             children: [],
             allowUserEdit: true,
         }),
         new Track("ChordItem", {
-            parent: trackGroup,
+            parent: frameworkGroup,
             label: "Harmony",
             children: [],
             allowUserEdit: true,
@@ -105,9 +109,10 @@ function createMainTrackGroup(voice: Voice): TrackGroup {
         addChildren(track, ...items);
     });
 
-    addChildren(trackGroup, ...tracks);
+    addChildren(outputGroup, tracks[0]);
+    addChildren(frameworkGroup, ...tracks.slice(1, 5));
 
-    return trackGroup;
+    return [outputGroup, frameworkGroup];
 }
 
 function mapRange(
