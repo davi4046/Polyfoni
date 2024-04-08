@@ -1,12 +1,12 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
+import ArrowDownSwitch from "../visuals/buttons/ArrowDownSwitch.svelte";
 import {
     getChildren,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import type Track from "../../models/track/Track";
-import ArrowDown from "../visuals/views/timeline/assets/ArrowDown.svelte";
 
 import createHighlightVM from "./createHighlightVM";
 import createNoteVM from "./createNoteVM";
@@ -59,7 +59,14 @@ export default function createNoteTrackVM(
         label: model.state.label,
         items: [...items, ...highlights],
 
-        createIcon: (target) => new ArrowDown({ target: target }),
+        createIcon: (target) => {
+            return new ArrowDownSwitch({
+                target,
+                props: {
+                    onClick: (event) => {},
+                },
+            });
+        },
 
         idPrefix: model.id,
     });

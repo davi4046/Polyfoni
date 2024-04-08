@@ -1,6 +1,8 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
+import PipeEnd from "../visuals/icons/PipeEnd.svelte";
+import PipeMid from "../visuals/icons/PipeMid.svelte";
 import {
     getChildren,
     getIndex,
@@ -8,9 +10,6 @@ import {
 } from "../../../architecture/state-hierarchy-utils";
 import compareStates from "../../../utils/compareStates";
 import type Track from "../../models/track/Track";
-import PipeEnd from "../visuals/views/group_header/assets/PipeEnd.svelte";
-import PipeMid from "../visuals/views/group_header/assets/PipeMid.svelte";
-import ArrowDown from "../visuals/views/timeline/assets/ArrowDown.svelte";
 
 import createHighlightVM from "./createHighlightVM";
 import createItemVM from "./createItemVM";
