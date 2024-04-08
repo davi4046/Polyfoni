@@ -22,7 +22,6 @@ export default function createVoiceVM(
 
     const vm = new VoiceVM({
         ...makeTrackGroups(),
-        isCollapsed: false,
     });
 
     model.subscribe((_, oldState) => {

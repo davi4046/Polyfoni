@@ -5,14 +5,10 @@
     export let vm: VoiceVM;
 
     vm.subscribe(() => (vm = vm));
-
-    $: groupsToDisplay = vm.state.isCollapsed
-        ? vm.state.trackGroups.slice(0, 1)
-        : vm.state.trackGroups;
 </script>
 
 <div>
-    {#each groupsToDisplay as trackGroupVM (trackGroupVM.id)}
+    {#each vm.state.trackGroups as trackGroupVM (trackGroupVM.id)}
         <TrackGroupHeader vm={trackGroupVM}></TrackGroupHeader>
     {/each}
 </div>
