@@ -2,6 +2,7 @@ import type { Subscription } from "../../../architecture/Stateful";
 import {
     getChildren,
     getGreatGreatGrandparent,
+    getLastAncestor,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
@@ -33,7 +34,7 @@ export const itemInitFunctions: Partial<{
     [K in keyof ItemTypes]: (item: Item<K>) => void;
 }> = {
     ChordItem: (item) => {
-        const timeline = getGreatGreatGrandparent(item);
+        const timeline = getLastAncestor(item);
 
         if (getParent(item) === timeline.scaleTrack) return;
 

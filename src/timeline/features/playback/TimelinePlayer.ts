@@ -166,7 +166,8 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         endBeat: number,
         tempoChanges: TempoChange[]
     ) {
-        const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
+        const tracks = getChildren(getChildren(voice)[0]);
+        const outputTrack = tracks[trackTypeToIndex("output")];
         const timeouts: NodeJS.Timeout[] = [];
 
         const startTime = calculateTimeAtBeat(tempoChanges, startBeat);

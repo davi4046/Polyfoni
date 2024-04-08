@@ -1,11 +1,10 @@
 import * as midi from "@perry-rylance/midi";
 
-import { getChildren } from "../../../architecture/state-hierarchy-utils";
-import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";
 import { trackTypeToIndex } from "../generation/track-config";
-
-import type Timeline from "../timeline/models/Timeline";
-import type Track from "../timeline/models/Track";
+import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";
+import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import type Timeline from "../../models/timeline/Timeline";
+import type Track from "../../models/track/Track";
 
 export default async function createMidiFileFromTimeline(
     timeline: Timeline
@@ -13,7 +12,8 @@ export default async function createMidiFileFromTimeline(
     const voices = getChildren(getChildren(timeline)[1]);
 
     const outputTracks: Track<"NoteItem">[] = voices.map(
-        (voice) => getChildren(voice)[trackTypeToIndex("output")]
+        (voice) =>
+            getChildren(getChildren(voice)[0])[trackTypeToIndex("output")]
     );
 
     const midiFile = new midi.File();

@@ -1,7 +1,6 @@
 import Item from "../item/Item";
 import type { ItemTypes } from "../item/ItemTypes";
 import type TrackGroup from "../track_group/TrackGroup";
-import type Voice from "../voice/Voice";
 import Stateful from "../../../architecture/Stateful";
 import type {
     ChildState,

@@ -5,6 +5,7 @@ import type Stateful from "../../../architecture/Stateful";
 import {
     countAncestors,
     getChildren,
+    getGrandparent,
     getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
@@ -132,7 +133,7 @@ export default class Generator {
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
-        const voice = getParent(itemState.parent);
+        const voice = getGrandparent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
         const ownedNotes = getNotesStartingWithinInterval(
             voiceNotes,
@@ -190,7 +191,7 @@ export default class Generator {
         itemState: ItemState<any>
     ): Promise<string | undefined> {
         const trackType = trackIndexToType(getIndex(itemState.parent));
-        const voice = getParent(itemState.parent);
+        const voice = getGrandparent(itemState.parent);
         const voiceNotes = this._getVoiceNotes(voice);
         const ownedNotes = getNotesStartingWithinInterval(
             voiceNotes,
@@ -363,9 +364,11 @@ export default class Generator {
         voice: Voice,
         notes: NoteBuilder[]
     ) {
-        const pitchTrack = getChildren(voice)[trackTypeToIndex("pitch")];
-        const restTrack = getChildren(voice)[trackTypeToIndex("rest")];
-        const harmonyTrack = getChildren(voice)[trackTypeToIndex("harmony")];
+        const tracks = getChildren(getChildren(voice)[0]);
+
+        const pitchTrack = tracks[trackTypeToIndex("pitch")];
+        const restTrack = tracks[trackTypeToIndex("rest")];
+        const harmonyTrack = tracks[trackTypeToIndex("harmony")];
 
         // Find all pitch, rest, and harmony items that "own" one or more of the notes
         const items = [pitchTrack, restTrack, harmonyTrack].flatMap((track) => {
@@ -391,7 +394,9 @@ export default class Generator {
 
     private _renderOutput(voice: Voice) {
         const voiceNotes = this._getVoiceNotes(voice);
-        const outputTrack = getChildren(voice)[trackTypeToIndex("output")];
+
+        const tracks = getChildren(getChildren(voice)[0]);
+        const outputTrack = tracks[trackTypeToIndex("output")];
 
         const notes = voiceNotes
             .map((noteBuilder) => {

@@ -1,5 +1,6 @@
 import Section from "../section/Section";
 import Track from "../track/Track";
+import TrackGroup from "../track_group/TrackGroup";
 import Voice from "../voice/Voice";
 import Stateful from "../../../architecture/Stateful";
 import {
@@ -28,14 +29,18 @@ export default class Timeline extends Stateful<TimelineState> {
         };
 
         let voice;
+        let trackGroup;
         let track;
 
         voice = new Voice({ parent: sections[0], children: [] });
         addChildren(voice.state.parent, voice);
 
+        trackGroup = new TrackGroup({ parent: voice, children: [] });
+        addChildren(trackGroup.state.parent, trackGroup);
+
         track = new Track("StringItem", {
             label: "Tempo",
-            parent: voice,
+            parent: trackGroup,
             children: [],
             allowUserEdit: true,
         });
@@ -44,7 +49,7 @@ export default class Timeline extends Stateful<TimelineState> {
 
         track = new Track("ChordItem", {
             label: "Scale",
-            parent: voice,
+            parent: trackGroup,
             children: [],
             allowUserEdit: true,
         });
@@ -54,9 +59,12 @@ export default class Timeline extends Stateful<TimelineState> {
         voice = new Voice({ parent: sections[2], children: [] });
         addChildren(voice.state.parent, voice);
 
+        trackGroup = new TrackGroup({ parent: voice, children: [] });
+        addChildren(trackGroup.state.parent, trackGroup);
+
         track = new Track("ChordItem", {
             label: "Total Harmony",
-            parent: voice,
+            parent: trackGroup,
             children: [],
             allowUserEdit: false,
         });

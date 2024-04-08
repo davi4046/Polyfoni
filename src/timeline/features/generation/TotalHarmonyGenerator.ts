@@ -7,7 +7,9 @@ import {
     getChildren,
     getGrandparent,
     getGreatGrandparent,
+    getGreatGreatGrandparent,
     getIndex,
+    getLastAncestor,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import compareArrays from "../../../utils/compareArrays";
@@ -123,7 +125,7 @@ export default class TotalHarmonyGenerator {
     private async _updateItemStateEffect(itemState: ItemState<any>) {
         const trackType = trackIndexToType(getIndex(itemState.parent));
         const voices = getChildren(getGrandparent(itemState.parent));
-        const timeline = getGreatGrandparent(itemState.parent);
+        const timeline = getLastAncestor(itemState.parent);
 
         const outputTracks: Track<"NoteItem">[] = voices.map(
             (voice) => getChildren(voice)[trackTypeToIndex("output")]
