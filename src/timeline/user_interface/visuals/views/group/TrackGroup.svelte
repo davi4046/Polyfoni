@@ -7,6 +7,9 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
+{#if vm.state.label}
+    <div class="h-[var(--timeline-track-group-gap)]" />
+{/if}
 <div class="space-y-[var(--timeline-track-gap)]">
     {#each vm.state.tracks as trackVM (trackVM.id)}
         <Track vm={trackVM}></Track>
