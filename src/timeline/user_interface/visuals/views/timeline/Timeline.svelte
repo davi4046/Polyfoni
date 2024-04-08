@@ -2,7 +2,7 @@
     import Voice from "../voice/Voice.svelte";
     import VoiceHeader from "../voice_header/VoiceHeader.svelte";
     import TimelineVM from "../../../view_models/TimelineVM";
-    import { SvelteComponent, onMount } from "svelte";
+    import { onMount } from "svelte";
     import MarkerBig from "./assets/MarkerBig.svelte";
     import MarkerSmall from "./assets/MarkerSmall.svelte";
     import VerticalLine from "./assets/VerticalLine.svelte";
@@ -11,14 +11,12 @@
     import StopIcon from "./assets/icons/StopIcon.svelte";
     import { writable } from "svelte/store";
     import ArrowDown from "./assets/ArrowDown.svelte";
+    import DynamicComponent from "../../utils/DynamicComponent.svelte";
 
     export let vm: TimelineVM;
 
     let hScrollElements: HTMLCollectionOf<Element>;
     let vScrollElememts: HTMLCollectionOf<Element>;
-
-    let itemEditorContainer: HTMLElement;
-    let itemEditorComponent: SvelteComponent;
 
     let playbackPosition = writable(0);
     let centerDiv: HTMLElement;
@@ -49,15 +47,6 @@
 
     vm.subscribe((_, oldState) => {
         vm = vm;
-
-        if (vm.state.createItemEditor !== oldState.createItemEditor) {
-            itemEditorComponent?.$destroy();
-
-            if (vm.state.createItemEditor) {
-                itemEditorComponent =
-                    vm.state.createItemEditor(itemEditorContainer);
-            }
-        }
 
         if (!oldState.isPlaying) {
             requestAnimationFrame(updatePlaybackPosition);
@@ -366,9 +355,10 @@
     <div
         class="col-start-1 col-end-3 row-start-5 row-end-6"
         on:mousemove={vm.state.handleMouseMove}
-        bind:this={itemEditorContainer}
         role="none"
-    />
+    >
+        <DynamicComponent bind:createComponent={vm.state.createItemEditor} />
+    </div>
     <!-- TOP HEADERS SHADOW -->
     <div
         class="bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"

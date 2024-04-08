@@ -1,7 +1,9 @@
 <script lang="ts">
     import { type SvelteComponent } from "svelte";
 
-    export let createComponent: (target: Element) => SvelteComponent;
+    export let createComponent:
+        | ((target: Element) => SvelteComponent)
+        | undefined;
 
     let targetElement: HTMLDivElement;
     let component: SvelteComponent;
@@ -9,7 +11,7 @@
     $: {
         if (targetElement) {
             component?.$destroy();
-            component = createComponent(targetElement);
+            if (createComponent) component = createComponent(targetElement);
         }
     }
 </script>

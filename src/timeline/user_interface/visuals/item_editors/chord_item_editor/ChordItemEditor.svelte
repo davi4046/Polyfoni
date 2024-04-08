@@ -25,10 +25,6 @@
         builder = builder; // Reactivity hack
     };
 
-    export const log = (str: string) => {
-        console.log(str);
-    };
-
     let builder = new ChordBuilder(value.chordStatus);
     let filters = value.filters.slice();
 

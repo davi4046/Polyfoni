@@ -23,9 +23,7 @@ interface TimelineVMState {
 
     displayHarmony?: Chord;
 
-    createItemEditor?: (
-        target: Element | Document | ShadowRoot
-    ) => SvelteComponent;
+    createItemEditor?: (target: Element) => SvelteComponent;
 
     idPrefix: string;
 }
