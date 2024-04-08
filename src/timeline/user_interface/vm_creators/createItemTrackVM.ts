@@ -1,8 +1,16 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
-import { getParent } from "../../../architecture/state-hierarchy-utils";
+import {
+    getChildren,
+    getIndex,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
+import compareStates from "../../../utils/compareStates";
 import type Track from "../../models/track/Track";
+import PipeEnd from "../visuals/views/group_header/assets/PipeEnd.svelte";
+import PipeMid from "../visuals/views/group_header/assets/PipeMid.svelte";
+import ArrowDown from "../visuals/views/timeline/assets/ArrowDown.svelte";
 
 import createHighlightVM from "./createHighlightVM";
 import createItemVM from "./createItemVM";
@@ -39,30 +47,54 @@ export default function createItemTrackVM(
     remakeGhostItems();
     remakeHighlights();
 
-    const vm = new TrackVM({
-        label: model.state.label,
-        items: [...items, ...ghostItems, ...highlights],
+    function makeLabel() {
+        return {
+            label: model.state.label,
+        };
+    }
 
+    function makeItems() {
+        return {
+            items: [...items, ...ghostItems, ...highlights],
+        };
+    }
+
+    function makeCreateIcon() {
+        const maxIndex = getChildren(getParent(model)).length - 1;
+        const Component = getIndex(model) === maxIndex ? PipeEnd : PipeMid;
+        return {
+            createIcon: (target: Element) => {
+                return new Component({ target });
+            },
+        };
+    }
+
+    const vm = new TrackVM({
+        ...makeLabel(),
+        ...makeItems(),
+        ...makeCreateIcon(),
         idPrefix: model.id,
     });
 
     model.subscribe((_, oldState) => {
-        if (model.state.children !== oldState.children) remakeItems();
+        const updatedProps = compareStates(model.state, oldState);
+
+        if (updatedProps.has("children")) remakeItems();
 
         vm.state = {
-            label: model.state.label,
-            items: [...items, ...ghostItems, ...highlights],
+            ...(updatedProps.has("label") ? makeLabel() : {}),
+            ...(updatedProps.has("children") ? makeItems() : {}),
         };
     });
 
     context.subscribe((_, oldState) => {
-        if (context.state.ghostPairs !== oldState.ghostPairs)
-            remakeGhostItems();
-        if (context.state.highlights !== oldState.highlights)
-            remakeHighlights();
+        const updatedProps = compareStates(context.state, oldState);
+
+        if (updatedProps.has("ghostPairs")) remakeGhostItems();
+        if (updatedProps.has("highlights")) remakeHighlights();
 
         vm.state = {
-            items: [...items, ...ghostItems, ...highlights],
+            ...makeItems(),
         };
     });
 

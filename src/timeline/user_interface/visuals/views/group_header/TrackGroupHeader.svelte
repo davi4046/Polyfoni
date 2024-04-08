@@ -20,14 +20,6 @@
 {/if}
 <div class="space-y-[var(--timeline-track-gap)]">
     {#each vm.state.tracks as trackVM, index (trackVM.id)}
-        <TrackHeader vm={trackVM}>
-            <span slot="icon">
-                {#if index === trackCount - 1}
-                    <PipeEnd />
-                {:else}
-                    <PipeMid />
-                {/if}
-            </span>
-        </TrackHeader>
+        <TrackHeader vm={trackVM}></TrackHeader>
     {/each}
 </div>

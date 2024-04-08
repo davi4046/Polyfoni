@@ -6,6 +6,7 @@ import {
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import type Track from "../../models/track/Track";
+import ArrowDown from "../visuals/views/timeline/assets/ArrowDown.svelte";
 
 import createHighlightVM from "./createHighlightVM";
 import createNoteVM from "./createNoteVM";
@@ -57,6 +58,8 @@ export default function createNoteTrackVM(
     const vm = new TrackVM({
         label: model.state.label,
         items: [...items, ...highlights],
+
+        createIcon: (target) => new ArrowDown({ target: target }),
 
         idPrefix: model.id,
     });
