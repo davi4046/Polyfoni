@@ -1,12 +1,16 @@
 import Item from "../item/Item";
 import type { ItemTypes } from "../item/ItemTypes";
+import type TrackGroup from "../track_group/TrackGroup";
 import type Voice from "../voice/Voice";
 import Stateful from "../../../architecture/Stateful";
-import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
+import type {
+    ChildState,
+    ParentState,
+} from "../../../architecture/state-hierarchy-utils";
 
 export interface TrackState<T extends keyof ItemTypes>
-    extends stateHierarchyUtils.ChildState<Voice>,
-        stateHierarchyUtils.ParentState<Item<T>> {
+    extends ChildState<TrackGroup>,
+        ParentState<Item<T>> {
     label: string;
     allowUserEdit: boolean;
 }

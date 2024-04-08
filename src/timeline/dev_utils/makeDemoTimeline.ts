@@ -1,15 +1,16 @@
-import Item from "../models/item/Item";
-import Timeline from "../models/timeline/Timeline";
-import Track from "../models/track/Track";
-import Voice from "../models/voice/Voice";
-import {
-    itemInitialContentFunctions,
-    type ItemTypes,
-} from "../models/item/ItemTypes";
 import {
     addChildren,
     getChildren,
 } from "../../architecture/state-hierarchy-utils";
+import Item from "../models/item/Item";
+import {
+    itemInitialContentFunctions,
+    type ItemTypes,
+} from "../models/item/ItemTypes";
+import Timeline from "../models/timeline/Timeline";
+import Track from "../models/track/Track";
+import TrackGroup from "../models/track_group/TrackGroup";
+import Voice from "../models/voice/Voice";
 
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline();
@@ -20,7 +21,7 @@ export default function makeDemoTimeline(): Timeline {
             children: [],
         });
 
-        addChildren(voice, ...createDefaultTracks(voice));
+        addChildren(voice, createMainTrackGroup(voice));
 
         return voice;
     });
@@ -57,36 +58,42 @@ function makeRandomItems<T extends keyof ItemTypes>(
     return items;
 }
 
-function createDefaultTracks(voice: Voice): Track<any>[] {
+function createMainTrackGroup(voice: Voice): TrackGroup {
+    const trackGroup = new TrackGroup({
+        label: "main",
+        parent: voice,
+        children: [],
+    });
+
     const tracks: Track<any>[] = [];
 
     tracks.push(
         new Track("NoteItem", {
-            parent: voice,
+            parent: trackGroup,
             label: "Piano 1",
             children: [],
             allowUserEdit: false,
         }),
         new Track("StringItem", {
-            parent: voice,
+            parent: trackGroup,
             label: "Pitch",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            parent: voice,
+            parent: trackGroup,
             label: "Duration",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            parent: voice,
+            parent: trackGroup,
             label: "Rest",
             children: [],
             allowUserEdit: true,
         }),
         new Track("ChordItem", {
-            parent: voice,
+            parent: trackGroup,
             label: "Harmony",
             children: [],
             allowUserEdit: true,
@@ -98,7 +105,9 @@ function createDefaultTracks(voice: Voice): Track<any>[] {
         addChildren(track, ...items);
     });
 
-    return tracks;
+    addChildren(trackGroup, ...tracks);
+
+    return trackGroup;
 }
 
 function mapRange(

@@ -1,5 +1,5 @@
 import type Section from "../section/Section";
-import type Track from "../track/Track";
+import type TrackGroup from "../track_group/TrackGroup";
 import Stateful from "../../../architecture/Stateful";
 import type {
     ChildState,
@@ -8,6 +8,6 @@ import type {
 
 export interface VoiceState
     extends ChildState<Section>,
-        ParentState<Track<any>> {}
+        ParentState<TrackGroup> {}
 
 export default class Voice extends Stateful<VoiceState> {}
