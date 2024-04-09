@@ -1,9 +1,12 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
-import ArrowDownSwitch from "../visuals/buttons/ArrowDownSwitch.svelte";
+import PipeEnd from "../visuals/icons/PipeEnd.svelte";
+import PipeMid from "../visuals/icons/PipeMid.svelte";
+import Button from "../visuals/utils/Button.svelte";
 import {
     getChildren,
+    getGrandparent,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import type Track from "../../models/track/Track";
@@ -55,18 +58,53 @@ export default function createNoteTrackVM(
     remakeItems();
     remakeHighlights();
 
+    function makeCreateIcon() {
+        let isCollapsed = context.state.collapsedVoices.includes(
+            getGrandparent(model)
+        );
+
+        const props = isCollapsed
+            ? {
+                  createContent: (target: Element) => new PipeMid({ target }),
+                  onClick: () => {
+                      // 1.
+                      context.state = {
+                          collapsedVoices: context.state.collapsedVoices.filter(
+                              (voice) => voice !== getGrandparent(model)
+                          ),
+                      };
+                      // 2.
+                      vm.state = {
+                          ...makeCreateIcon(),
+                      };
+                  },
+              }
+            : {
+                  createContent: (target: Element) => new PipeEnd({ target }),
+                  onClick: () => {
+                      // 1.
+                      context.state = {
+                          collapsedVoices: context.state.collapsedVoices.concat(
+                              getGrandparent(model)
+                          ),
+                      };
+                      // 2.
+                      vm.state = {
+                          ...makeCreateIcon(),
+                      };
+                  },
+              };
+
+        return {
+            createIcon: (target: Element) => new Button({ target, props }),
+        };
+    }
+
     const vm = new TrackVM({
         label: model.state.label,
         items: [...items, ...highlights],
 
-        createIcon: (target) => {
-            return new ArrowDownSwitch({
-                target,
-                props: {
-                    onClick: (event) => {},
-                },
-            });
-        },
+        ...makeCreateIcon(),
 
         idPrefix: model.id,
     });
