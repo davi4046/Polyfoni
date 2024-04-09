@@ -23,7 +23,7 @@ export default function createTrackGroupVM(
     }
 
     function compileTracks() {
-        const isCollapsed = context.state.collapsedTrackGroups.includes(model);
+        const isCollapsed = context.state.collapsed.includes(model);
 
         return {
             tracks: isCollapsed ? [] : tracks,
@@ -37,14 +37,13 @@ export default function createTrackGroupVM(
     function compileIconCreator() {
         return {
             createIcon: (target: Element) => {
-                const value =
-                    context.state.collapsedTrackGroups.includes(model);
+                const value = context.state.collapsed.includes(model);
 
                 const onToggle = (value: boolean) => {
                     context.state = {
-                        collapsedTrackGroups: value
-                            ? context.state.collapsedTrackGroups.concat(model)
-                            : context.state.collapsedTrackGroups.filter(
+                        collapsed: value
+                            ? context.state.collapsed.concat(model)
+                            : context.state.collapsed.filter(
                                   (trackGroup) => trackGroup !== model
                               ),
                     };
@@ -82,8 +81,7 @@ export default function createTrackGroupVM(
 
     context.subscribe((_, oldState) => {
         vm.state = {
-            ...(context.state.collapsedTrackGroups !==
-            oldState.collapsedTrackGroups
+            ...(context.state.collapsed !== oldState.collapsed
                 ? compileTracks()
                 : {}),
         };
