@@ -40,10 +40,6 @@ export default class TotalHarmonyGenerator {
                 // Track
                 case 4: {
                     const trackType = getTrackType(obj as Track<any>);
-                    console.log(trackType);
-                    if (trackType === undefined)
-                        console.log("tracktype is undefined:", obj);
-
                     if (
                         !trackType ||
                         (trackType !== "output" && trackType !== "harmony")
@@ -74,9 +70,6 @@ export default class TotalHarmonyGenerator {
                 // Item
                 case 5: {
                     const trackType = getTrackType(getParent(obj as Item<any>));
-                    console.log(trackType);
-                    if (trackType === undefined)
-                        console.log("tracktype is undefined:", obj);
                     if (
                         !trackType ||
                         (trackType !== "output" && trackType !== "harmony")
@@ -111,10 +104,6 @@ export default class TotalHarmonyGenerator {
                         timeline.totalTrack.state = {
                             children: mergedItems,
                         };
-
-                        console.log("rendered harmony !");
-                        console.log(this._totalHarmonyItems);
-                        console.log(mergedItems);
                     }
                 };
                 this._isHandlingChanges = true;
