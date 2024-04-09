@@ -1,5 +1,6 @@
 <script lang="ts">
     import type TrackGroupVM from "../../../view_models/TrackGroupVM";
+    import DynamicComponent from "../../utils/DynamicComponent.svelte";
     import TrackHeader from "../track_header/TrackHeader.svelte";
 
     export let vm: TrackGroupVM;
@@ -9,8 +10,11 @@
 
 {#if vm.state.label}
     <div
-        class="flex h-[var(--timeline-track-group-gap)] items-center pl-4 text-sm text-black text-opacity-50"
+        class="flex h-[var(--timeline-track-group-gap)] items-center p-2 text-sm text-black text-opacity-50"
     >
+        <div class="mr-2 h-6 w-6 overflow-clip">
+            <DynamicComponent bind:createComponent={vm.state.createIcon} />
+        </div>
         {vm.state.label}
     </div>
 {/if}
