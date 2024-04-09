@@ -8,15 +8,24 @@ export default function findClosestTrack(
     clientY: number,
     predicate?: (track: Track<any>) => boolean
 ): Track<any> | undefined {
-    const tracks = (
-        getNestedArrayOfDescendants(timeline, 4).flat(Infinity) as Track<any>[]
-    ).filter(predicate ? predicate : () => true);
+    const tracks = getNestedArrayOfDescendants(timeline, 4)
+        .flat(Infinity)
+        .filter(predicate || (() => true));
 
-    const trackElements = tracks.map(
-        (track) => document.getElementById(track.id + "-root")!
+    const elements = tracks.map((track) =>
+        document.getElementById(track.id + "-root")
     );
-    const trackElement = findClosestElement(0, clientY, trackElements);
-    const closestTrack = tracks[trackElements.indexOf(trackElement)];
+
+    const trackElementMap = new Map(
+        tracks.map((track, index) => [elements[index], track])
+    );
+
+    const filteredElements = elements.filter(
+        (value): value is HTMLElement => value !== null
+    );
+
+    const closestElement = findClosestElement(0, clientY, filteredElements);
+    const closestTrack = trackElementMap.get(closestElement);
 
     return closestTrack;
 }
