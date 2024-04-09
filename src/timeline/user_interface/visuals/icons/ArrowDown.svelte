@@ -1,8 +1,10 @@
-<svg viewBox="0 0 100 100" shape-rendering="crispEdges">
-    <path
-        stroke="currentColor"
-        stroke-width="8"
-        fill="currentColor"
-        d="M 25 50 L 75 50 L 50 75 Z"
-    />
+<svg
+    class="h-full"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 -960 960 960"
+    fill="currentColor"
+>
+    <path d="M480-360 280-560h400L480-360Z" />
 </svg>
+
+<!-- https://fonts.google.com/icons?selected=Material%20Symbols%20Outlined%3Aarrow_drop_down%3AFILL%401%3Bwght%40400%3BGRAD%400%3Bopsz%4024 -->

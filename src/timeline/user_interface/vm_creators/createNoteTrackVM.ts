@@ -1,8 +1,8 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
-import PipeEnd from "../visuals/icons/PipeEnd.svelte";
-import PipeMid from "../visuals/icons/PipeMid.svelte";
+import ArrowDown from "../visuals/icons/ArrowDown.svelte";
+import ArrowRight from "../visuals/icons/ArrowRight.svelte";
 import Button from "../visuals/utils/Button.svelte";
 import {
     getChildren,
@@ -65,7 +65,8 @@ export default function createNoteTrackVM(
 
         const props = isCollapsed
             ? {
-                  createContent: (target: Element) => new PipeMid({ target }),
+                  createContent: (target: Element) =>
+                      new ArrowRight({ target }),
                   onClick: () => {
                       // 1.
                       context.state = {
@@ -80,7 +81,7 @@ export default function createNoteTrackVM(
                   },
               }
             : {
-                  createContent: (target: Element) => new PipeEnd({ target }),
+                  createContent: (target: Element) => new ArrowDown({ target }),
                   onClick: () => {
                       // 1.
                       context.state = {
