@@ -8,10 +8,13 @@
     let targetElement: HTMLDivElement;
     let component: SvelteComponent;
 
+    let prev: any;
+
     $: {
-        if (targetElement) {
+        if (targetElement && createComponent !== prev) {
             component?.$destroy();
             if (createComponent) component = createComponent(targetElement);
+            prev = createComponent;
         }
     }
 </script>

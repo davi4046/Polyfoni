@@ -1,9 +1,7 @@
 import type TimelineContext from "../context/TimelineContext";
 import type ItemVM from "../view_models/ItemVM";
 import TrackVM from "../view_models/TrackVM";
-import ArrowDown from "../visuals/icons/ArrowDown.svelte";
-import ArrowRight from "../visuals/icons/ArrowRight.svelte";
-import Button from "../visuals/utils/Button.svelte";
+import ArrowDropDownButton from "../visuals/buttons/ArrowDropDownButton.svelte";
 import {
     getChildren,
     getGrandparent,
@@ -58,54 +56,37 @@ export default function createNoteTrackVM(
     remakeItems();
     remakeHighlights();
 
-    function makeCreateIcon() {
-        let isCollapsed = context.state.collapsedVoices.includes(
-            getGrandparent(model)
-        );
-
-        const props = isCollapsed
-            ? {
-                  createContent: (target: Element) =>
-                      new ArrowRight({ target }),
-                  onClick: () => {
-                      // 1.
-                      context.state = {
-                          collapsedVoices: context.state.collapsedVoices.filter(
-                              (voice) => voice !== getGrandparent(model)
-                          ),
-                      };
-                      // 2.
-                      vm.state = {
-                          ...makeCreateIcon(),
-                      };
-                  },
-              }
-            : {
-                  createContent: (target: Element) => new ArrowDown({ target }),
-                  onClick: () => {
-                      // 1.
-                      context.state = {
-                          collapsedVoices: context.state.collapsedVoices.concat(
-                              getGrandparent(model)
-                          ),
-                      };
-                      // 2.
-                      vm.state = {
-                          ...makeCreateIcon(),
-                      };
-                  },
-              };
-
-        return {
-            createIcon: (target: Element) => new Button({ target, props }),
-        };
-    }
-
     const vm = new TrackVM({
         label: model.state.label,
         items: [...items, ...highlights],
 
-        ...makeCreateIcon(),
+        createIcon: (target: Element) =>
+            new ArrowDropDownButton({
+                target,
+                props: {
+                    value: context.state.collapsedVoices.includes(
+                        getGrandparent(model)
+                    ),
+                    onToggle: (value) => {
+                        if (value) {
+                            context.state = {
+                                collapsedVoices:
+                                    context.state.collapsedVoices.concat(
+                                        getGrandparent(model)
+                                    ),
+                            };
+                        } else {
+                            context.state = {
+                                collapsedVoices:
+                                    context.state.collapsedVoices.filter(
+                                        (voice) =>
+                                            voice !== getGrandparent(model)
+                                    ),
+                            };
+                        }
+                    },
+                },
+            }),
 
         idPrefix: model.id,
     });
