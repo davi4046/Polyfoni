@@ -1,33 +1,51 @@
 import type TimelineContext from "../context/TimelineContext";
+import type TrackGroupVM from "../view_models/TrackGroupVM";
 import VoiceVM from "../view_models/VoiceVM";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
-import compareStates from "../../../utils/compareStates";
 import type Voice from "../../models/voice/Voice";
 
-import createItemTrackVM from "./createItemTrackVM";
-import createNoteTrackVM from "./createNoteTrackVM";
 import createTrackGroupVM from "./createTrackGroupVM";
 
 export default function createVoiceVM(
     model: Voice,
     context: TimelineContext
 ): VoiceVM {
-    function makeTrackGroups() {
+    let trackGroups: TrackGroupVM[] = [];
+
+    function updateTrackGroups() {
+        trackGroups = getChildren(model).map((trackGroup) =>
+            createTrackGroupVM(trackGroup, context)
+        );
+    }
+
+    function compileTrackGroups() {
+        const isCollapsed = context.state.collapsedVoices.includes(model);
         return {
-            trackGroups: getChildren(model).map((trackGroup) =>
-                createTrackGroupVM(trackGroup, context)
-            ),
+            trackGroups: trackGroups.slice(0, isCollapsed ? 1 : undefined),
         };
     }
 
+    updateTrackGroups();
+
     const vm = new VoiceVM({
-        ...makeTrackGroups(),
+        ...compileTrackGroups(),
     });
 
     model.subscribe((_, oldState) => {
-        const updatedProps = compareStates(model.state, oldState);
+        const hasChildrenUpdated = model.state.children !== oldState.children;
+
+        if (hasChildrenUpdated) updateTrackGroups();
+
         vm.state = {
-            ...(updatedProps.has("children") ? makeTrackGroups() : {}),
+            ...(hasChildrenUpdated ? compileTrackGroups() : {}),
+        };
+    });
+
+    context.subscribe((_, oldState) => {
+        vm.state = {
+            ...(context.state.collapsedVoices !== oldState.collapsedVoices
+                ? compileTrackGroups()
+                : {}),
         };
     });
 
