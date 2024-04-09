@@ -64,9 +64,7 @@ export default function createTimelineVM(
     });
 
     context.subscribe((_, oldState) => {
-        const updatedProps = compareStates(context.state, oldState);
-
-        if (updatedProps.has("highlights")) {
+        if (context.state.highlights !== oldState.highlights) {
             const highlights = context.state.highlights.filter((highlight) => {
                 return getParent(highlight).itemType === "NoteItem";
             });
@@ -82,7 +80,10 @@ export default function createTimelineVM(
             };
         }
 
-        if (updatedProps.has("editItem")) {
+        if (
+            context.state.selectedItems.findLast(() => true) !==
+            oldState.selectedItems.findLast(() => true)
+        ) {
             vm.state = {
                 createItemEditor: getCreateItemEditor(context),
             };
@@ -100,7 +101,7 @@ export default function createTimelineVM(
 }
 
 function getCreateItemEditor(context: TimelineContext) {
-    const item = context.state.editItem;
+    const item = context.state.selectedItems.findLast(() => true);
     const ItemEditor = itemEditors[item?.itemType as keyof ItemTypes];
 
     if (!item || !ItemEditor) return;

@@ -43,7 +43,6 @@ export default class ItemHandler implements GlobalEventHandler {
             };
         }
         this.context.state = {
-            editItem: this.item,
             highlights: [],
         };
         this._clickedBeat = Math.round(

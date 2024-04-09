@@ -58,7 +58,6 @@ export default class TimelineHandler implements GlobalEventHandler {
         this.context.state = {
             highlights: [],
             selectedItems: [],
-            editItem: undefined,
         };
     }
 

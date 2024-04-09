@@ -22,7 +22,9 @@ export default function selectHighlightedItems(context: TimelineContext) {
         });
     context.state = {
         highlights: [],
-        selectedItems: items,
+        selectedItems: context.state.selectedItems
+            .concat(items)
+            .filter((item, index, array) => array.indexOf(item) === index),
     };
 }
 

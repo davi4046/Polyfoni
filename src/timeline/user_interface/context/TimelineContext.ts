@@ -10,7 +10,6 @@ interface TimelineContextState {
     selectedItems: Item<any>[];
     ghostPairs: [Item<any>, Item<any>][];
     clipboard: Item<any>[];
-    editItem?: Item<any>;
 
     visualStartOverrideMap: Map<Item<any>, number>;
     visualEndOverrideMap: Map<Item<any>, number>;
