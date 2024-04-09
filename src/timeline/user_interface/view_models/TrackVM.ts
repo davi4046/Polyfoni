@@ -8,7 +8,7 @@ interface TrackVMState {
     label: string;
     items: ItemVM[];
 
-    createIcon: (target: Element) => SvelteComponent;
+    createIcon?: (target: Element) => SvelteComponent;
 
     idPrefix: string;
 }

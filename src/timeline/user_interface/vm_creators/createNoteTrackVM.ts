@@ -59,35 +59,6 @@ export default function createNoteTrackVM(
     const vm = new TrackVM({
         label: model.state.label,
         items: [...items, ...highlights],
-
-        createIcon: (target: Element) =>
-            new ArrowDropDownButton({
-                target,
-                props: {
-                    value: context.state.collapsedVoices.includes(
-                        getGrandparent(model)
-                    ),
-                    onToggle: (value) => {
-                        if (value) {
-                            context.state = {
-                                collapsedVoices:
-                                    context.state.collapsedVoices.concat(
-                                        getGrandparent(model)
-                                    ),
-                            };
-                        } else {
-                            context.state = {
-                                collapsedVoices:
-                                    context.state.collapsedVoices.filter(
-                                        (voice) =>
-                                            voice !== getGrandparent(model)
-                                    ),
-                            };
-                        }
-                    },
-                },
-            }),
-
         idPrefix: model.id,
     });
 

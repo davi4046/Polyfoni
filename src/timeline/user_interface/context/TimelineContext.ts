@@ -12,7 +12,6 @@ interface TimelineContextState {
     selectedItems: Item<any>[];
     ghostPairs: [Item<any>, Item<any>][];
     clipboard: Item<any>[];
-    collapsedVoices: Voice[];
     collapsedTrackGroups: TrackGroup[];
 
     visualStartOverrideMap: Map<Item<any>, number>;
@@ -26,7 +25,6 @@ export default class TimelineContext extends Stateful<TimelineContextState> {
             selectedItems: [],
             ghostPairs: [],
             clipboard: [],
-            collapsedVoices: [],
             collapsedTrackGroups: [],
 
             visualStartOverrideMap: new Map(),

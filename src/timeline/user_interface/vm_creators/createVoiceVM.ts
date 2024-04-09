@@ -10,40 +10,21 @@ export default function createVoiceVM(
     model: Voice,
     context: TimelineContext
 ): VoiceVM {
-    let trackGroups: TrackGroupVM[] = [];
-
-    function updateTrackGroups() {
-        trackGroups = getChildren(model).map((trackGroup) =>
-            createTrackGroupVM(trackGroup, context)
-        );
-    }
-
     function compileTrackGroups() {
-        const isCollapsed = context.state.collapsedVoices.includes(model);
         return {
-            trackGroups: trackGroups.slice(0, isCollapsed ? 1 : undefined),
+            trackGroups: getChildren(model).map((trackGroup) =>
+                createTrackGroupVM(trackGroup, context)
+            ),
         };
     }
-
-    updateTrackGroups();
 
     const vm = new VoiceVM({
         ...compileTrackGroups(),
     });
 
     model.subscribe((_, oldState) => {
-        const hasChildrenUpdated = model.state.children !== oldState.children;
-
-        if (hasChildrenUpdated) updateTrackGroups();
-
         vm.state = {
-            ...(hasChildrenUpdated ? compileTrackGroups() : {}),
-        };
-    });
-
-    context.subscribe((_, oldState) => {
-        vm.state = {
-            ...(context.state.collapsedVoices !== oldState.collapsedVoices
+            ...(model.state.children !== oldState.children
                 ? compileTrackGroups()
                 : {}),
         };

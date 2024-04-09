@@ -10,7 +10,7 @@
 
 {#if vm.state.label}
     <div
-        class="flex h-[var(--timeline-track-group-gap)] items-center p-2 text-sm text-black text-opacity-50"
+        class="flex h-[var(--timeline-track-group-gap)] items-center p-2 text-sm"
     >
         <div class="mr-2 h-6 w-6 overflow-clip">
             <DynamicComponent bind:createComponent={vm.state.createIcon} />
