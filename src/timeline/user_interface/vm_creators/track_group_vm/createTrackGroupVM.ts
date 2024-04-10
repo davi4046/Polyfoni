@@ -6,6 +6,7 @@ import type TrackVM from "../../view_models/TrackVM";
 import ArrowDropDownButton from "../../visuals/buttons/ArrowDropDownButton.svelte";
 import { getChildren } from "../../../../architecture/state-hierarchy-utils";
 import type TrackGroup from "../../../models/track_group/TrackGroup";
+import type { TrackGroupRole } from "../../../models/track_group/TrackGroup";
 
 export default function createTrackGroupVM(
     model: TrackGroup,
@@ -30,7 +31,7 @@ export default function createTrackGroupVM(
     }
 
     function compileLabel() {
-        return { label: model.state.role };
+        return { label: trackGroupLabels[model.state.role] };
     }
 
     function compileIconCreator() {
@@ -59,22 +60,28 @@ export default function createTrackGroupVM(
         };
     }
 
+    function compileNoshow() {
+        return { noshow: noshowTrackGroupRoles.includes(model.state.role) };
+    }
+
     updateTracks();
 
     const vm = new TrackGroupVM({
         ...compileLabel(),
         ...compileTracks(),
         ...compileIconCreator(),
+        ...compileNoshow(),
     });
 
     model.subscribe((_, oldState) => {
-        const hasChildrenUpdated = model.state.children !== oldState.children;
-
-        if (hasChildrenUpdated) updateTracks();
+        if (model.state.children !== oldState.children) updateTracks();
 
         vm.state = {
             ...(model.state.role !== oldState.role ? compileLabel() : {}),
-            ...(hasChildrenUpdated ? compileTracks() : {}),
+            ...(model.state.role !== oldState.role ? compileNoshow() : {}),
+            ...(model.state.children !== oldState.children
+                ? compileTracks()
+                : {}),
         };
     });
 
@@ -88,3 +95,16 @@ export default function createTrackGroupVM(
 
     return vm;
 }
+
+const noshowTrackGroupRoles: TrackGroupRole[] = [
+    "timeline_settings",
+    "timeline_analysis",
+    "voice_output",
+] as const;
+
+const trackGroupLabels: { [K in TrackGroupRole]: string } = {
+    timeline_settings: "Settings",
+    timeline_analysis: "Analysis",
+    voice_output: "Output",
+    voice_framework: "Framework",
+} as const;

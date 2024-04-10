@@ -3,6 +3,7 @@ import type { ComponentType, SvelteComponent } from "svelte";
 import pitchNames from "../utils/pitchNames";
 import { Chord } from "../models/item/Chord";
 import type { ItemTypes } from "../models/item/ItemTypes";
+import type { TrackGroupRole } from "../models/track_group/TrackGroup";
 
 import ChordItemEditor from "./visuals/item_editors/chord_item_editor/ChordItemEditor.svelte";
 import StringItemEditor from "./visuals/item_editors/string_item_editor/StringItemEditor.svelte";
@@ -71,3 +72,4 @@ type EditorWidget<K extends keyof ItemTypes> = ComponentType<
         {}
     >
 >;
+

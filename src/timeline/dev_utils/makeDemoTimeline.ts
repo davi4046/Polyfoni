@@ -60,12 +60,12 @@ function makeRandomItems<T extends keyof ItemTypes>(
 
 function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
     const outputGroup = new TrackGroup({
-        role: "output",
+        role: "voice_output",
         parent: voice,
         children: [],
     });
     const frameworkGroup = new TrackGroup({
-        role: "framework",
+        role: "voice_framework",
         parent: voice,
         children: [],
     });
