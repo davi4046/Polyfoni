@@ -60,6 +60,7 @@ function makeRandomItems<T extends keyof ItemTypes>(
 
 function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
     const outputGroup = new TrackGroup({
+        label: "output",
         parent: voice,
         children: [],
     });

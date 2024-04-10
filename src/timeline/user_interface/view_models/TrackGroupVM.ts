@@ -5,7 +5,7 @@ import Stateful from "../../../architecture/Stateful";
 import type TrackVM from "./TrackVM";
 
 interface TrackGroupVMState {
-    label?: string;
+    label: string;
     tracks: TrackVM[];
 
     createIcon: (target: Element) => SvelteComponent;
