@@ -1,4 +1,5 @@
 import { itemEditors } from "../../item-type-config";
+import createVoiceVM from "../voice_vm/createVoiceVM";
 import TimelineContext from "../../context/TimelineContext";
 import TimelineHandler from "../../event_handlers/TimelineHandler";
 import TimelineVM from "../../view_models/TimelineVM";
@@ -7,13 +8,10 @@ import {
     getChildren,
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
-import compareStates from "../../../../utils/compareStates";
 import getHarmonyOfNotes from "../../../features/generation/getHarmonyOfNotes";
 import { type ItemTypes } from "../../../models/item/ItemTypes";
 import Timeline from "../../../models/timeline/Timeline";
 import isOverlapping from "../../../../utils/interval/is_overlapping/isOverlapping";
-
-import createVoiceVM from "../voice_vm/createVoiceVM";
 
 export default function createTimelineVM(
     model: Timeline,
@@ -21,7 +19,7 @@ export default function createTimelineVM(
 ): TimelineVM {
     const mouseEventHandler = new TimelineHandler(model, context);
 
-    const createSections = () => {
+    function compileSections() {
         const top = getChildren(getChildren(model)[0]).map((voice) => {
             return createVoiceVM(voice, context);
         });
@@ -35,10 +33,86 @@ export default function createTimelineVM(
         });
 
         return { top, center, bottom };
-    };
+    }
+
+    function compilePlaybackMotion() {
+        return {
+            playbackMotion: context.player.state.motion,
+        };
+    }
+
+    function compileIsPlaying() {
+        return {
+            isPlaying: context.player.state.isPlaying,
+        };
+    }
+
+    function compileDisplayHarmony() {
+        const highlights = context.state.highlights.filter((highlight) => {
+            return getParent(highlight).itemType === "NoteItem";
+        });
+
+        const notes = highlights.flatMap((highlight) => {
+            return getChildren(getParent(highlight)).filter((noteItem) => {
+                return isOverlapping(noteItem.state, highlight.state);
+            });
+        });
+
+        return {
+            displayHarmony: getHarmonyOfNotes(notes),
+        };
+    }
+
+    function compileCreateItemEditor() {
+        const item = context.state.selectedItems.findLast(() => true);
+        const ItemEditor = itemEditors[item?.itemType as keyof ItemTypes];
+
+        if (!item || !ItemEditor) return { createItemEditor: undefined };
+
+        let justUpdated = false;
+
+        const props = {
+            value: item.state.content,
+            update: (value: any) => {
+                // 1.
+                justUpdated = true;
+
+                // 2.
+                context.history.startAction("Edit item content");
+                item.state = {
+                    content: value,
+                };
+                context.history.endAction();
+            },
+        };
+
+        const createItemEditor = (target: Element) => {
+            // @ts-ignore
+            const itemEditor = new ItemEditor({ target, props });
+
+            const subscription = item.subscribe(() => {
+                if (itemEditor.reflectChange !== undefined) {
+                    if (!justUpdated) {
+                        itemEditor.reflectChange(item.state.content);
+                    }
+                    justUpdated = false;
+                } else {
+                    subscription.unsubscribe();
+                }
+            });
+
+            return itemEditor;
+        };
+
+        return { createItemEditor: createItemEditor };
+    }
 
     const vm = new TimelineVM({
-        ...createSections(),
+        ...compileSections(),
+        ...compilePlaybackMotion(),
+        ...compileIsPlaying(),
+        ...compileDisplayHarmony(),
+        ...compileCreateItemEditor(),
 
         handleMouseMove: (event: MouseEvent) => {
             globalEventListener.handler = undefined;
@@ -53,91 +127,40 @@ export default function createTimelineVM(
         onPauseButtonClick: (_) => context.player.pausePlayback(),
         onStopButtonClick: (_) => context.player.resetPlayback(),
 
-        playbackMotion: context.player.state.motion,
-        isPlaying: context.player.state.isPlaying,
-
         idPrefix: model.id,
     });
 
-    model.subscribe(() => {
-        vm.state = { ...createSections() };
+    model.subscribe((_, oldState) => {
+        vm.state = {
+            ...(model.state.children !== oldState.children
+                ? compileSections()
+                : {}),
+        };
     });
 
     context.subscribe((_, oldState) => {
-        if (context.state.highlights !== oldState.highlights) {
-            const highlights = context.state.highlights.filter((highlight) => {
-                return getParent(highlight).itemType === "NoteItem";
-            });
+        vm.state = {
+            ...(context.state.highlights !== oldState.highlights
+                ? compileDisplayHarmony()
+                : {}),
 
-            const notes = highlights.flatMap((highlight) => {
-                return getChildren(getParent(highlight)).filter((noteItem) => {
-                    return isOverlapping(noteItem.state, highlight.state);
-                });
-            });
-
-            vm.state = {
-                displayHarmony: getHarmonyOfNotes(notes),
-            };
-        }
-
-        if (
-            context.state.selectedItems.findLast(() => true) !==
+            ...(context.state.selectedItems.findLast(() => true) !==
             oldState.selectedItems.findLast(() => true)
-        ) {
-            vm.state = {
-                createItemEditor: getCreateItemEditor(context),
-            };
-        }
+                ? compileCreateItemEditor()
+                : {}),
+        };
     });
 
-    context.player.subscribe(() => {
+    context.player.subscribe((_, oldState) => {
         vm.state = {
-            playbackMotion: context.player.state.motion,
-            isPlaying: context.player.state.isPlaying,
+            ...(context.player.state.motion !== oldState.motion
+                ? compilePlaybackMotion()
+                : {}),
+            ...(context.player.state.isPlaying !== oldState.isPlaying
+                ? compileIsPlaying()
+                : {}),
         };
     });
 
     return vm;
-}
-
-function getCreateItemEditor(context: TimelineContext) {
-    const item = context.state.selectedItems.findLast(() => true);
-    const ItemEditor = itemEditors[item?.itemType as keyof ItemTypes];
-
-    if (!item || !ItemEditor) return;
-
-    let justUpdated = false;
-
-    const props = {
-        value: item.state.content,
-        update: (value: any) => {
-            // 1.
-            justUpdated = true;
-
-            // 2.
-            context.history.startAction("Edit item content");
-            item.state = {
-                content: value,
-            };
-            context.history.endAction();
-        },
-    };
-
-    return (target: Element | Document | ShadowRoot) => {
-        // @ts-ignore
-        const itemEditor = new ItemEditor({ target, props });
-
-        const subscription = item.subscribe(() => {
-            if (itemEditor.reflectChange !== undefined) {
-                if (!justUpdated) {
-                    itemEditor.reflectChange(item.state.content);
-                }
-                justUpdated = false;
-            } else {
-                subscription.unsubscribe();
-            }
-        });
-
-        return itemEditor;
-    };
 }
