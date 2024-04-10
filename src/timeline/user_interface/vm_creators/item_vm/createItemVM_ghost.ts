@@ -20,7 +20,25 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
 
     const colorFunction = itemColorFunctions[model.itemType];
 
-    function createInnerDivStyles() {
+    function compileStart() {
+        return {
+            start: model.state.start,
+        };
+    }
+
+    function compileEnd() {
+        return {
+            end: model.state.end,
+        };
+    }
+
+    function compileText() {
+        return {
+            text: itemTextFunctions[model.itemType](model.state.content),
+        };
+    }
+
+    function compileInnerDivStyles() {
         const innerDivStyles = Object.assign({}, baseInnerDivStyles);
 
         const customColor = colorFunction
@@ -31,22 +49,25 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
             ? customColor.css()
             : chroma.hcl(0, 0, 80).css();
 
-        return innerDivStyles;
+        return {
+            innerDivStyles: innerDivStyles,
+        };
     }
 
     const vm = new ItemVM({
-        start: model.state.start,
-        end: model.state.end,
-        text: itemTextFunctions[model.itemType](model.state.content),
-        innerDivStyles: createInnerDivStyles(),
+        ...compileStart(),
+        ...compileEnd(),
+        ...compileText(),
+        ...compileInnerDivStyles(),
     });
 
-    model.subscribe(() => {
+    model.subscribe((_, oldState) => {
         vm.state = {
-            start: model.state.start,
-            end: model.state.end,
-            text: itemTextFunctions[model.itemType](model.state.content),
-            innerDivStyles: createInnerDivStyles(),
+            ...(model.state.start !== oldState.start ? compileStart() : {}),
+            ...(model.state.end !== oldState.end ? compileEnd() : {}),
+            ...(model.state.content !== oldState.content
+                ? { ...compileText(), ...compileInnerDivStyles() }
+                : {}),
         };
     });
 
