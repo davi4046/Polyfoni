@@ -12,20 +12,34 @@ export default function createNoteVM(
     model: Item<"NoteItem">,
     context: TimelineContext
 ) {
-    function createTooltip(): Partial<Props> {
+    function compileStart() {
         return {
-            content: `${
-                getPitchName(model.state.content) +
-                getPitchOctave(model.state.content)
-            } (${model.state.content})`,
-            theme: "material",
+            start: model.state.start,
+        };
+    }
+
+    function compileEnd() {
+        return {
+            end: model.state.end,
+        };
+    }
+
+    function compileTooltip() {
+        return {
+            tooltip: {
+                content: `${
+                    getPitchName(model.state.content) +
+                    getPitchOctave(model.state.content)
+                } (${model.state.content})`,
+                theme: "material",
+            },
         };
     }
 
     const vm = new ItemVM({
-        start: model.state.start,
-        end: model.state.end,
-        tooltip: createTooltip(),
+        ...compileStart(),
+        ...compileEnd(),
+        ...compileTooltip(),
 
         innerDivStyles: {
             "background-color": "black",
@@ -34,11 +48,13 @@ export default function createNoteVM(
         },
     });
 
-    model.subscribe(() => {
+    model.subscribe((_, oldState) => {
         vm.state = {
-            start: model.state.start,
-            end: model.state.end,
-            tooltip: createTooltip(),
+            ...(model.state.start !== oldState.start ? compileStart() : {}),
+            ...(model.state.end !== oldState.end ? compileEnd() : {}),
+            ...(model.state.content !== oldState.content
+                ? compileTooltip()
+                : {}),
         };
     });
 
