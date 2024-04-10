@@ -36,7 +36,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
-            label: "none",
+            role: "timeline_settings",
             parent: voice,
             children: [],
         });
@@ -64,7 +64,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
-            label: "none",
+            role: "timeline_analysis",
             parent: voice,
             children: [],
         });

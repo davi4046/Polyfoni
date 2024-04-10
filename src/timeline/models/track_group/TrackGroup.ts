@@ -9,7 +9,7 @@ import type {
 export interface TrackGroupState
     extends ChildState<Voice>,
         ParentState<Track<any>> {
-    label: string;
+    role: string;
 }
 
 export default class TrackGroup extends Stateful<TrackGroupState> {}

@@ -30,7 +30,7 @@ export default function createTrackGroupVM(
     }
 
     function compileLabel() {
-        return { label: model.state.label };
+        return { label: model.state.role };
     }
 
     function compileIconCreator() {
@@ -73,7 +73,7 @@ export default function createTrackGroupVM(
         if (hasChildrenUpdated) updateTracks();
 
         vm.state = {
-            ...(model.state.label !== oldState.label ? compileLabel() : {}),
+            ...(model.state.role !== oldState.role ? compileLabel() : {}),
             ...(hasChildrenUpdated ? compileTracks() : {}),
         };
     });
