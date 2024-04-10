@@ -16,7 +16,7 @@ export default function createNoteTrackVM(
     let items: ItemVM[] = [];
     let highlights: ItemVM[] = [];
 
-    function remakeItems() {
+    function updateItems() {
         const pitches = getChildren(model).map(
             (noteItem) => noteItem.state.content
         );
@@ -44,36 +44,53 @@ export default function createNoteTrackVM(
         });
     }
 
-    function remakeHighlights() {
+    function updateHighlights() {
         highlights = context.state.highlights
             .filter((highlight) => getParent(highlight) === model)
             .map((highlight) => createHighlightVM(highlight, context));
     }
 
-    remakeItems();
-    remakeHighlights();
+    function compileLabel() {
+        return {
+            label: model.state.label,
+        };
+    }
+
+    function compileItems() {
+        return {
+            items: [...items, ...highlights],
+        };
+    }
+
+    updateItems();
+    updateHighlights();
 
     const vm = new TrackVM({
-        label: model.state.label,
-        items: [...items, ...highlights],
+        ...compileLabel(),
+        ...compileItems(),
+
         idPrefix: model.id,
     });
 
     model.subscribe((_, oldState) => {
-        if (model.state.children !== oldState.children) remakeItems();
+        const hasChildrenChanged = model.state.children !== oldState.children;
+
+        if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            label: model.state.label,
-            items: [...items, ...highlights],
+            ...(model.state.label !== oldState.label ? compileLabel() : {}),
+            ...(hasChildrenChanged ? compileItems() : {}),
         };
     });
 
     context.subscribe((_, oldState) => {
-        if (context.state.highlights !== oldState.highlights)
-            remakeHighlights();
+        const hasHighlightsChanged =
+            context.state.highlights !== oldState.highlights;
+
+        if (hasHighlightsChanged) updateHighlights();
 
         vm.state = {
-            items: [...items, ...highlights],
+            ...(hasHighlightsChanged ? compileItems() : {}),
         };
     });
 
