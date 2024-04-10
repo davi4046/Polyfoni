@@ -11,7 +11,6 @@ import {
     getIndex,
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
-import compareStates from "../../../../utils/compareStates";
 import type Track from "../../../models/track/Track";
 
 export default function createItemTrackVM(
@@ -22,42 +21,38 @@ export default function createItemTrackVM(
     let ghostItems: ItemVM[] = [];
     let highlights: ItemVM[] = [];
 
-    function remakeItems() {
+    function updateItems() {
         items = model.state.children.map((item) => {
             return createItemVM(item, context);
         });
     }
 
-    function remakeGhostItems() {
+    function updateGhostItems() {
         ghostItems = context.state.ghostPairs
             .map((pair) => pair[1])
             .filter((item) => item.state.parent === model)
             .map((item) => createItemVM_ghost(item, context));
     }
 
-    function remakeHighlights() {
+    function updateHighlights() {
         highlights = context.state.highlights
             .filter((highlight) => getParent(highlight) === model)
             .map((highlight) => createHighlightVM(highlight, context));
     }
 
-    remakeItems();
-    remakeGhostItems();
-    remakeHighlights();
-
-    function makeLabel() {
+    function compileLabel() {
         return {
             label: model.state.label,
         };
     }
 
-    function makeItems() {
+    function compileItems() {
         return {
             items: [...items, ...ghostItems, ...highlights],
         };
     }
 
-    function makeCreateIcon() {
+    function compileCreateIcon() {
         const maxIndex = getChildren(getParent(model)).length - 1;
         const Component = getIndex(model) === maxIndex ? PipeEnd : PipeMid;
         return {
@@ -67,32 +62,42 @@ export default function createItemTrackVM(
         };
     }
 
+    updateItems();
+    updateGhostItems();
+    updateHighlights();
+
     const vm = new TrackVM({
-        ...makeLabel(),
-        ...makeItems(),
-        ...makeCreateIcon(),
+        ...compileLabel(),
+        ...compileItems(),
+        ...compileCreateIcon(),
+
         idPrefix: model.id,
     });
 
     model.subscribe((_, oldState) => {
-        const updatedProps = compareStates(model.state, oldState);
+        const hasChildrenChanged = model.state.children !== oldState.children;
 
-        if (updatedProps.has("children")) remakeItems();
+        if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(updatedProps.has("label") ? makeLabel() : {}),
-            ...(updatedProps.has("children") ? makeItems() : {}),
+            ...(model.state.label !== oldState.label ? compileLabel() : {}),
+            ...(hasChildrenChanged ? compileItems() : {}),
         };
     });
 
     context.subscribe((_, oldState) => {
-        const updatedProps = compareStates(context.state, oldState);
+        const hasGhostPairsChanged =
+            context.state.ghostPairs !== oldState.ghostPairs;
+        const hasHighlightsChanged =
+            context.state.highlights !== oldState.highlights;
 
-        if (updatedProps.has("ghostPairs")) remakeGhostItems();
-        if (updatedProps.has("highlights")) remakeHighlights();
+        if (hasGhostPairsChanged) updateGhostItems();
+        if (hasHighlightsChanged) updateHighlights();
 
         vm.state = {
-            ...makeItems(),
+            ...(hasGhostPairsChanged || hasHighlightsChanged
+                ? compileItems()
+                : {}),
         };
     });
 
