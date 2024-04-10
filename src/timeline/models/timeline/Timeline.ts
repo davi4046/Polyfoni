@@ -35,7 +35,11 @@ export default class Timeline extends Stateful<TimelineState> {
         voice = new Voice({ parent: sections[0], children: [] });
         addChildren(voice.state.parent, voice);
 
-        trackGroup = new TrackGroup({ parent: voice, children: [] });
+        trackGroup = new TrackGroup({
+            label: "none",
+            parent: voice,
+            children: [],
+        });
         addChildren(trackGroup.state.parent, trackGroup);
 
         track = new Track("StringItem", {
@@ -59,7 +63,11 @@ export default class Timeline extends Stateful<TimelineState> {
         voice = new Voice({ parent: sections[2], children: [] });
         addChildren(voice.state.parent, voice);
 
-        trackGroup = new TrackGroup({ parent: voice, children: [] });
+        trackGroup = new TrackGroup({
+            label: "none",
+            parent: voice,
+            children: [],
+        });
         addChildren(trackGroup.state.parent, trackGroup);
 
         track = new Track("ChordItem", {
