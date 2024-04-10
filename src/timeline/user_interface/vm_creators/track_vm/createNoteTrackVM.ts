@@ -1,16 +1,13 @@
-import type TimelineContext from "../context/TimelineContext";
-import type ItemVM from "../view_models/ItemVM";
-import TrackVM from "../view_models/TrackVM";
-import ArrowDropDownButton from "../visuals/buttons/ArrowDropDownButton.svelte";
+import createHighlightVM from "../item_vm/createHighlightVM";
+import createNoteVM from "../item_vm/createNoteVM";
+import type TimelineContext from "../../context/TimelineContext";
+import type ItemVM from "../../view_models/ItemVM";
+import TrackVM from "../../view_models/TrackVM";
 import {
     getChildren,
-    getGrandparent,
     getParent,
-} from "../../../architecture/state-hierarchy-utils";
-import type Track from "../../models/track/Track";
-
-import createHighlightVM from "./createHighlightVM";
-import createNoteVM from "./createNoteVM";
+} from "../../../../architecture/state-hierarchy-utils";
+import type Track from "../../../models/track/Track";
 
 export default function createNoteTrackVM(
     model: Track<"NoteItem">,

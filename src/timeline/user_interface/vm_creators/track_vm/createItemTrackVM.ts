@@ -1,19 +1,18 @@
-import type TimelineContext from "../context/TimelineContext";
-import type ItemVM from "../view_models/ItemVM";
-import TrackVM from "../view_models/TrackVM";
-import PipeEnd from "../visuals/icons/PipeEnd.svelte";
-import PipeMid from "../visuals/icons/PipeMid.svelte";
+import createHighlightVM from "../item_vm/createHighlightVM";
+import createItemVM from "../item_vm/createItemVM";
+import createItemVM_ghost from "../item_vm/createItemVM_ghost";
+import type TimelineContext from "../../context/TimelineContext";
+import type ItemVM from "../../view_models/ItemVM";
+import TrackVM from "../../view_models/TrackVM";
+import PipeEnd from "../../visuals/icons/PipeEnd.svelte";
+import PipeMid from "../../visuals/icons/PipeMid.svelte";
 import {
     getChildren,
     getIndex,
     getParent,
-} from "../../../architecture/state-hierarchy-utils";
-import compareStates from "../../../utils/compareStates";
-import type Track from "../../models/track/Track";
-
-import createHighlightVM from "./createHighlightVM";
-import createItemVM from "./createItemVM";
-import createItemVM_ghost from "./createItemVM_ghost";
+} from "../../../../architecture/state-hierarchy-utils";
+import compareStates from "../../../../utils/compareStates";
+import type Track from "../../../models/track/Track";
 
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,

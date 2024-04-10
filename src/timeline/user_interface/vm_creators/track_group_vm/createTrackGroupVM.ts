@@ -1,12 +1,11 @@
-import type TimelineContext from "../context/TimelineContext";
-import TrackGroupVM from "../view_models/TrackGroupVM";
-import type TrackVM from "../view_models/TrackVM";
-import ArrowDropDownButton from "../visuals/buttons/ArrowDropDownButton.svelte";
-import { getChildren } from "../../../architecture/state-hierarchy-utils";
-import type TrackGroup from "../../models/track_group/TrackGroup";
-
-import createItemTrackVM from "./createItemTrackVM";
-import createNoteTrackVM from "./createNoteTrackVM";
+import createItemTrackVM from "../track_vm/createItemTrackVM";
+import createNoteTrackVM from "../track_vm/createNoteTrackVM";
+import type TimelineContext from "../../context/TimelineContext";
+import TrackGroupVM from "../../view_models/TrackGroupVM";
+import type TrackVM from "../../view_models/TrackVM";
+import ArrowDropDownButton from "../../visuals/buttons/ArrowDropDownButton.svelte";
+import { getChildren } from "../../../../architecture/state-hierarchy-utils";
+import type TrackGroup from "../../../models/track_group/TrackGroup";
 
 export default function createTrackGroupVM(
     model: TrackGroup,

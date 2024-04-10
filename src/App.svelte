@@ -12,7 +12,7 @@
     import { save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
-    import createTimelineVM from "./timeline/user_interface/vm_creators/createTimelineVM";
+    import createTimelineVM from "./timeline/user_interface/vm_creators/timeline_vm/createTimelineVM";
     import { writeBinaryFile } from "@tauri-apps/api/fs";
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";

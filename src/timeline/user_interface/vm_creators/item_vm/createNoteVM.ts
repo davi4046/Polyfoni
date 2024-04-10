@@ -1,12 +1,12 @@
 import type { Props } from "tippy.js";
 
-import type TimelineContext from "../context/TimelineContext";
-import ItemVM from "../view_models/ItemVM";
+import type TimelineContext from "../../context/TimelineContext";
+import ItemVM from "../../view_models/ItemVM";
 import pitchNames, {
     getPitchName,
     getPitchOctave,
-} from "../../utils/pitchNames";
-import type Item from "../../models/item/Item";
+} from "../../../utils/pitchNames";
+import type Item from "../../../models/item/Item";
 
 export default function createNoteVM(
     model: Item<"NoteItem">,

@@ -6,15 +6,15 @@ import {
     itemColorFunctions,
     itemTextFunctions,
     itemTooltipContentFunctions,
-} from "../item-type-config";
-import type TimelineContext from "../context/TimelineContext";
-import EndGripHandler from "../event_handlers/EndGripHandler";
-import ItemHandler from "../event_handlers/ItemHandler";
-import StartGripHandler from "../event_handlers/StartGripHandler";
-import ItemVM from "../view_models/ItemVM";
-import { globalEventListener } from "../../../architecture/GlobalEventListener";
-import type Item from "../../models/item/Item";
-import { type ItemTypes } from "../../models/item/ItemTypes";
+} from "../../item-type-config";
+import type TimelineContext from "../../context/TimelineContext";
+import EndGripHandler from "../../event_handlers/EndGripHandler";
+import ItemHandler from "../../event_handlers/ItemHandler";
+import StartGripHandler from "../../event_handlers/StartGripHandler";
+import ItemVM from "../../view_models/ItemVM";
+import { globalEventListener } from "../../../../architecture/GlobalEventListener";
+import type Item from "../../../models/item/Item";
+import { type ItemTypes } from "../../../models/item/ItemTypes";
 
 export default function createItemVM<T extends keyof ItemTypes>(
     model: Item<T>,

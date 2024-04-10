@@ -1,19 +1,19 @@
-import { itemEditors } from "../item-type-config";
-import TimelineContext from "../context/TimelineContext";
-import TimelineHandler from "../event_handlers/TimelineHandler";
-import TimelineVM from "../view_models/TimelineVM";
-import { globalEventListener } from "../../../architecture/GlobalEventListener";
+import { itemEditors } from "../../item-type-config";
+import TimelineContext from "../../context/TimelineContext";
+import TimelineHandler from "../../event_handlers/TimelineHandler";
+import TimelineVM from "../../view_models/TimelineVM";
+import { globalEventListener } from "../../../../architecture/GlobalEventListener";
 import {
     getChildren,
     getParent,
-} from "../../../architecture/state-hierarchy-utils";
-import compareStates from "../../../utils/compareStates";
-import getHarmonyOfNotes from "../../features/generation/getHarmonyOfNotes";
-import { type ItemTypes } from "../../models/item/ItemTypes";
-import Timeline from "../../models/timeline/Timeline";
-import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
+} from "../../../../architecture/state-hierarchy-utils";
+import compareStates from "../../../../utils/compareStates";
+import getHarmonyOfNotes from "../../../features/generation/getHarmonyOfNotes";
+import { type ItemTypes } from "../../../models/item/ItemTypes";
+import Timeline from "../../../models/timeline/Timeline";
+import isOverlapping from "../../../../utils/interval/is_overlapping/isOverlapping";
 
-import createVoiceVM from "./createVoiceVM";
+import createVoiceVM from "../voice_vm/createVoiceVM";
 
 export default function createTimelineVM(
     model: Timeline,
