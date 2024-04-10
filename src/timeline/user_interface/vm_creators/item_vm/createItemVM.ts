@@ -34,7 +34,33 @@ export default function createItemVM<T extends keyof ItemTypes>(
         padding: "0 8px 0 8px",
     };
 
-    function createInnerDivStyles() {
+    const gripStylesUnselected = {
+        "background-color": "black",
+        opacity: "0.25",
+    };
+
+    const gripStylesSelected = {
+        "background-color": "white",
+        opacity: "0.75",
+    };
+
+    function compileStart() {
+        const startOverride = context.state.visualStartOverrideMap.get(model);
+        return { start: startOverride ? startOverride : model.state.start };
+    }
+
+    function compileEnd() {
+        const endOverride = context.state.visualEndOverrideMap.get(model);
+        return { end: endOverride ? endOverride : model.state.end };
+    }
+
+    function compileText() {
+        return {
+            text: itemTextFunctions[model.itemType](model.state.content),
+        };
+    }
+
+    function compileInnerDivStyles() {
         const innerDivStyles = Object.assign({}, baseInnerDivStyles);
 
         if (model.state.error) {
@@ -54,10 +80,36 @@ export default function createItemVM<T extends keyof ItemTypes>(
             innerDivStyles["outline-color"] = chroma.hcl(240, 80, 80).css();
         }
 
-        return innerDivStyles;
+        return { innerDivStyles: innerDivStyles };
     }
 
-    function createTooltip(): Partial<Props> | undefined {
+    function compileOuterDivStyles() {
+        return {
+            outerDivStyles:
+                context.state.visualStartOverrideMap.has(model) ||
+                context.state.visualEndOverrideMap.has(model)
+                    ? { "z-index": "30" }
+                    : { "z-index": "20" },
+        };
+    }
+
+    function compileStartGripStyles() {
+        return {
+            startGripStyles: context.state.visualStartOverrideMap.has(model)
+                ? gripStylesSelected
+                : gripStylesUnselected,
+        };
+    }
+
+    function compileEndGripStyles() {
+        return {
+            endGripStyles: context.state.visualEndOverrideMap.has(model)
+                ? gripStylesSelected
+                : gripStylesUnselected,
+        };
+    }
+
+    function compileTooltip() {
         let content = "";
 
         if (tooltipContentFunction) {
@@ -70,34 +122,26 @@ export default function createItemVM<T extends keyof ItemTypes>(
             `;
         }
 
-        if (content === "") return;
-
-        return {
+        const tooltip = {
             content: content,
             allowHTML: true,
             theme: "material",
         };
+
+        return {
+            tooltip: content === "" ? undefined : tooltip,
+        };
     }
 
-    const gripStylesUnselected = {
-        "background-color": "black",
-        opacity: "0.25",
-    };
-
-    const gripStylesSelected = {
-        "background-color": "white",
-        opacity: "0.75",
-    };
-
     const vm = new ItemVM({
-        start: model.state.start,
-        end: model.state.end,
-        text: itemTextFunctions[model.itemType](model.state.content),
-        innerDivStyles: createInnerDivStyles(),
-        tooltip: createTooltip(),
-
-        startGripStyles: gripStylesUnselected,
-        endGripStyles: gripStylesUnselected,
+        ...compileStart(),
+        ...compileEnd(),
+        ...compileText(),
+        ...compileInnerDivStyles(),
+        ...compileOuterDivStyles(),
+        ...compileStartGripStyles(),
+        ...compileEndGripStyles(),
+        ...compileTooltip(),
 
         handleMouseMove: (event: MouseEvent) => {
             globalEventListener.handler = itemHandler;
@@ -111,55 +155,49 @@ export default function createItemVM<T extends keyof ItemTypes>(
             globalEventListener.handler = endGripHandler;
             event.stopPropagation();
         },
-
         onDestroy: () => {
             globalEventListener.handler = undefined;
         },
     });
 
-    model.subscribe(() => {
+    model.subscribe((_, oldState) => {
         vm.state = {
-            start: model.state.start,
-            end: model.state.end,
-            text: itemTextFunctions[model.itemType](model.state.content),
-            innerDivStyles: createInnerDivStyles(),
-            tooltip: createTooltip(),
+            ...(model.state.start !== oldState.start ? compileStart() : {}),
+            ...(model.state.end !== oldState.end ? compileEnd() : {}),
+            ...(model.state.content !== oldState.content ? compileText() : {}),
+            ...(model.state.content !== oldState.content ||
+            model.state.error !== oldState.error
+                ? { ...compileInnerDivStyles(), ...compileTooltip() }
+                : {}),
         };
     });
 
-    context.subscribe(() => {
-        const visualStartOverride =
-            context.state.visualStartOverrideMap.get(model);
-        const visualEndOverride = context.state.visualEndOverrideMap.get(model);
+    context.subscribe((_, oldState) => {
+        const hasStartOverrideChanged =
+            context.state.visualStartOverrideMap.get(model) !==
+            oldState.visualStartOverrideMap.get(model);
+
+        const hasEndOverrideChanged =
+            context.state.visualEndOverrideMap.get(model) !==
+            oldState.visualEndOverrideMap.get(model);
 
         vm.state = {
-            start:
-                visualStartOverride !== undefined
-                    ? visualStartOverride
-                    : model.state.start,
+            ...(hasStartOverrideChanged
+                ? { ...compileStart(), ...compileStartGripStyles() }
+                : {}),
 
-            end:
-                visualEndOverride !== undefined
-                    ? visualEndOverride
-                    : model.state.end,
+            ...(hasEndOverrideChanged
+                ? { ...compileEnd(), ...compileEndGripStyles() }
+                : {}),
 
-            innerDivStyles: createInnerDivStyles(),
+            ...(context.state.selectedItems.includes(model) !==
+            oldState.selectedItems.includes(model)
+                ? compileInnerDivStyles()
+                : {}),
 
-            outerDivStyles:
-                visualStartOverride !== undefined ||
-                visualEndOverride !== undefined
-                    ? { "z-index": "30" }
-                    : {},
-
-            startGripStyles:
-                visualStartOverride !== undefined
-                    ? gripStylesSelected
-                    : gripStylesUnselected,
-
-            endGripStyles:
-                visualEndOverride !== undefined
-                    ? gripStylesSelected
-                    : gripStylesUnselected,
+            ...(hasStartOverrideChanged || hasEndOverrideChanged
+                ? compileOuterDivStyles()
+                : {}),
         };
     });
 
