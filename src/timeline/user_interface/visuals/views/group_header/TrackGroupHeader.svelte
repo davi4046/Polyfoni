@@ -8,7 +8,7 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
-{#if vm.state.label}
+{#if !vm.state.noshow}
     <div
         class="flex h-[var(--timeline-track-group-gap)] items-center p-2 text-sm"
     >

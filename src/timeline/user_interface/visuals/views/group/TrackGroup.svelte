@@ -7,7 +7,7 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
-{#if vm.state.label}
+{#if !vm.state.noshow}
     <div class="h-[var(--timeline-track-group-gap)]" />
 {/if}
 <div class="space-y-[var(--timeline-track-gap)]">

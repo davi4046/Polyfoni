@@ -6,9 +6,9 @@ import type TrackVM from "./TrackVM";
 
 interface TrackGroupVMState {
     label: string;
-    tracks: TrackVM[];
-
     createIcon: (target: Element) => SvelteComponent;
+    tracks: TrackVM[];
+    noshow?: boolean;
 }
 
 export default class TrackGroupVM extends Stateful<TrackGroupVMState> {}
