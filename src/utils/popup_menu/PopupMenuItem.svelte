@@ -6,8 +6,6 @@
 
     export let menuItem: MenuItem;
 
-    const isSubmenu = menuItem.action instanceof Menu;
-
     let buttonElement: HTMLButtonElement;
 
     onMount(() => {
@@ -38,8 +36,9 @@
     class="px-2 py-1 text-left text-sm hover:bg-gray-100 active:bg-white"
     bind:this={buttonElement}
     on:click={(_) => {
-        // @ts-ignore
-        if (!isSubmenu) menuItem.action();
+        if (!(menuItem.action instanceof Menu)) {
+            menuItem.action();
+        }
     }}
 >
     {menuItem.title}

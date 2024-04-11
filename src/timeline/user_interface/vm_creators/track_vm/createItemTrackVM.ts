@@ -82,18 +82,23 @@ export default function createItemTrackVM(
                     new MenuItem("Hejsa", () => {}),
                     new MenuItem(
                         "Submenu",
-                        new Menu([new MenuItem("Blah", () => {})])
+                        new Menu([
+                            new MenuItem("Blah", () => {}),
+                            new MenuItem("Blah", () => {}),
+                        ])
                     ),
                 ]);
 
                 const component = new PopupMenu({
                     target: document.documentElement,
                     props: {
-                        x: event.clientX,
-                        y: event.clientY,
+                        x: event.clientX - 8,
+                        y: event.clientY - 8,
                         menu: menu,
                     },
                 });
+
+                component.$on("mouseleave", (_) => component.$destroy());
             },
         },
 
