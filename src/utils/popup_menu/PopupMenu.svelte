@@ -14,13 +14,15 @@
 </script>
 
 <div
-    class="absolute z-50 flex w-36 flex-col border bg-white"
+    class="absolute z-50 w-36 border bg-white"
     style="left: {x}px; top: {y}px;"
     on:mouseleave={(event) => dispatch("mouseleave", event)}
     role="none"
     {id}
 >
-    {#each menu.items as menuItem}
-        <PopupMenuItem {menuItem} />
-    {/each}
+    <div class="flex max-h-32 flex-col overflow-y-auto">
+        {#each menu.items as menuItem}
+            <PopupMenuItem {menuItem} />
+        {/each}
+    </div>
 </div>

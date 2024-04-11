@@ -2,39 +2,52 @@
     import tippy from "tippy.js";
     import PopupMenu from "./PopupMenu.svelte";
     import { Menu, type MenuItem } from "./menu";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
     export let menuItem: MenuItem;
 
-    let buttonElement: HTMLButtonElement;
+    let button: HTMLButtonElement;
+
+    let destroySubmenu: () => void;
 
     onMount(() => {
         if (menuItem.action instanceof Menu) {
-            const submenu = new PopupMenu({
+            const submenuComponent = new PopupMenu({
                 target: document.documentElement,
                 props: {
-                    x: buttonElement.clientLeft,
-                    y: buttonElement.clientTop,
-                    // @ts-ignore
+                    x: button.clientLeft,
+                    y: button.clientTop,
                     menu: menuItem.action,
                 },
             });
 
-            const element = document.getElementById(submenu.id)!;
+            const submenuElement = document.getElementById(
+                submenuComponent.id
+            )!;
 
-            tippy(buttonElement, {
-                content: element,
+            const submenuTippy = tippy(button, {
+                content: submenuElement,
                 placement: "right-start",
                 offset: [0, 0],
                 interactive: true,
+                appendTo: button.parentElement!.parentElement!,
             });
+
+            destroySubmenu = () => {
+                submenuComponent.$destroy();
+                submenuTippy.destroy();
+            };
         }
+    });
+
+    onDestroy(() => {
+        if (destroySubmenu) destroySubmenu();
     });
 </script>
 
 <button
-    class="px-2 py-1 text-left text-sm hover:bg-gray-100 active:bg-white"
-    bind:this={buttonElement}
+    class="semig px-2 py-1 text-left text-sm hover:bg-gray-100 active:bg-white"
+    bind:this={button}
     on:click={(_) => {
         if (!(menuItem.action instanceof Menu)) {
             menuItem.action();

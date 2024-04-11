@@ -85,8 +85,17 @@ export default function createItemTrackVM(
                         new Menu([
                             new MenuItem("Blah", () => {}),
                             new MenuItem("Blah", () => {}),
+                            new MenuItem(
+                                "Submenu",
+                                new Menu([
+                                    new MenuItem("Blah", () => {}),
+                                    new MenuItem("Blah", () => {}),
+                                ])
+                            ),
                         ])
                     ),
+                    new MenuItem("Hejsa", () => {}),
+                    new MenuItem("Hejsa", () => {}),
                 ]);
 
                 const component = new PopupMenu({
