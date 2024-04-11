@@ -1,6 +1,3 @@
-import "tippy.js/dist/tippy.css";
-import "tippy.js/themes/material.css";
-
 import App from "./App.svelte";
 import "./styles.css";
 

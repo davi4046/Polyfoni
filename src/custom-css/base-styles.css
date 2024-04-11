@@ -1,3 +1,3 @@
-.tippy-content {
+.tippy-box[data-theme="mono"] .tippy-content {
     @apply font-mono font-semibold;
 }

@@ -12,6 +12,8 @@ import {
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
+import PopupMenu from "../../../../utils/popup_menu/PopupMenu.svelte";
+import { Menu, MenuItem } from "../../../../utils/popup_menu/menu";
 
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,
@@ -75,7 +77,23 @@ export default function createItemTrackVM(
             handleContextMenu: (event) => {
                 event.preventDefault();
 
-                console.log("menu");
+                const menu = new Menu([
+                    new MenuItem("Hello", () => {}),
+                    new MenuItem("Hejsa", () => {}),
+                    new MenuItem(
+                        "Submenu",
+                        new Menu([new MenuItem("Blah", () => {})])
+                    ),
+                ]);
+
+                const component = new PopupMenu({
+                    target: document.documentElement,
+                    props: {
+                        x: event.clientX,
+                        y: event.clientY,
+                        menu: menu,
+                    },
+                });
             },
         },
 
