@@ -18,7 +18,7 @@
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
     import { registerShortcut } from "./utils/keyboard-shortcut";
-    import loadFonts from "./utils/app-start/loadFonts";
+    import loadFonts from "./utils/app_start/loadFonts";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
