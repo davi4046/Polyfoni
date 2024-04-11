@@ -125,7 +125,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         const tooltip = {
             content: content,
             allowHTML: true,
-            theme: "material",
+            theme: "default",
         };
 
         return {

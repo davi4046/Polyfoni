@@ -1,3 +1,5 @@
+@import "./custom-css/tippy_themes/default.css";
+
 @import "tailwindcss/base";
 @import "./custom-css/base-styles.css";
 

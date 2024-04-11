@@ -31,7 +31,7 @@ export default function createNoteVM(
                     getPitchName(model.state.content) +
                     getPitchOctave(model.state.content)
                 } (${model.state.content})`,
-                theme: "material",
+                theme: "default",
             },
         };
     }
