@@ -2,6 +2,8 @@ class GlobalEventListener {
     private _handler?: GlobalEventHandler;
 
     set handler(newHandler: GlobalEventHandler | undefined) {
+        if (newHandler === this._handler) return;
+
         if (
             this._handler &&
             this._handler.getIsOverwritable &&
@@ -10,10 +12,7 @@ class GlobalEventListener {
             return;
         }
 
-        if (newHandler !== this._handler) {
-            document.body.style.cursor = "default";
-        }
-
+        document.body.style.cursor = "default";
         this._handler = newHandler;
     }
 
@@ -67,6 +66,16 @@ class GlobalEventListener {
             },
             { capture: true }
         );
+
+        document.addEventListener(
+            "contextmenu",
+            (event) => {
+                if (this._handler?.handleContextMenu) {
+                    this._handler.handleContextMenu(event);
+                }
+            },
+            { capture: true }
+        );
     }
 }
 
@@ -76,8 +85,9 @@ export interface GlobalEventHandler {
     getIsOverwritable?: () => boolean;
 
     handleMouseDown?: (event: MouseEvent) => void;
-    handleMouseMove?: (event: MouseEvent) => void;
     handleMouseUp?: (event: MouseEvent) => void;
+    handleMouseMove?: (event: MouseEvent) => void;
+    handleContextMenu?: (event: MouseEvent) => void;
 
     handleKeyDown?: (event: KeyboardEvent) => void;
     handleKeyUp?: (event: KeyboardEvent) => void;

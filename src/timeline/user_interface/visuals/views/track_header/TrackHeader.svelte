@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { globalEventListener } from "../../../../../architecture/GlobalEventListener";
     import type TrackVM from "../../../view_models/TrackVM";
     import DynamicComponent from "../../utils/DynamicComponent.svelte";
 
@@ -9,6 +10,11 @@
 
 <div
     class="flex h-[var(--timeline-track-height)] w-full items-center whitespace-nowrap p-2"
+    on:mousemove={(event) => {
+        globalEventListener.handler = vm.state.headerEventHandler;
+        event.stopPropagation();
+    }}
+    role="none"
 >
     <div class="mr-2 h-6 w-6 overflow-clip">
         <DynamicComponent bind:createComponent={vm.state.createIcon} />

@@ -71,6 +71,14 @@ export default function createItemTrackVM(
         ...compileItems(),
         ...compileCreateIcon(),
 
+        headerEventHandler: {
+            handleContextMenu: (event) => {
+                event.preventDefault();
+
+                console.log("menu");
+            },
+        },
+
         idPrefix: model.id,
     });
 
