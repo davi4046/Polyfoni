@@ -25,9 +25,11 @@
         const eventHandler = () => {
             component.$destroy();
             document.removeEventListener("click", eventHandler);
+            document.removeEventListener("contextmenu", eventHandler, true);
         };
 
         document.addEventListener("click", eventHandler);
+        document.addEventListener("contextmenu", eventHandler, true);
     }
 </script>
 

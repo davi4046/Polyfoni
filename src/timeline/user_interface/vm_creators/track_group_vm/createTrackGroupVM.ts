@@ -7,6 +7,7 @@ import ArrowDropDownButton from "../../visuals/buttons/ArrowDropDownButton.svelt
 import { getChildren } from "../../../../architecture/state-hierarchy-utils";
 import type TrackGroup from "../../../models/track_group/TrackGroup";
 import type { TrackGroupRole } from "../../../models/track_group/TrackGroup";
+import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
 export default function createTrackGroupVM(
     model: TrackGroup,
@@ -71,6 +72,8 @@ export default function createTrackGroupVM(
         ...compileTracks(),
         ...compileIconCreator(),
         ...compileNoshow(),
+
+        headerMenu: new Menu([new MenuItem("hej", () => {})]),
     });
 
     model.subscribe((_, oldState) => {

@@ -1,13 +1,15 @@
 import type { SvelteComponent } from "svelte";
 
 import Stateful from "../../../architecture/Stateful";
+import type { Menu } from "../../../utils/popup_menu/popup-menu-types";
 
 import type TrackVM from "./TrackVM";
 
 interface TrackGroupVMState {
     label: string;
-    createIcon: (target: Element) => SvelteComponent;
     tracks: TrackVM[];
+    createIcon?: (target: Element) => SvelteComponent;
+    headerMenu?: Menu;
     noshow?: boolean;
 }
 
