@@ -1,6 +1,6 @@
 <script lang="ts">
     import type VoiceVM from "../../../view_models/VoiceVM";
-    import TrackGroup from "../group/TrackGroup.svelte";
+    import TrackGroup from "../trackgroup/TrackGroup.svelte";
 
     export let vm: VoiceVM;
 

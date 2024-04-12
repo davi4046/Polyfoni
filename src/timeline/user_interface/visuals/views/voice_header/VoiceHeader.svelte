@@ -1,6 +1,6 @@
 <script lang="ts">
     import type VoiceVM from "../../../view_models/VoiceVM";
-    import TrackGroupHeader from "../group_header/TrackGroupHeader.svelte";
+    import TrackGroupHeader from "../trackgroup_header/TrackGroupHeader.svelte";
 
     export let vm: VoiceVM;
 
