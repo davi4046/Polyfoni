@@ -56,7 +56,7 @@
         }
     }}
 >
-    <div class="mx-2 my-1">
+    <div class="my-1 ml-2 truncate whitespace-nowrap">
         {menuItem.title}
     </div>
     {#if menuItem.action instanceof Menu}
