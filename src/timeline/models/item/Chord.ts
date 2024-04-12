@@ -72,7 +72,7 @@ export class Chord {
 
     convertDegreeToMidiValue(degree: number): number {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
-        const octave = Math.floor(degree / midiValues.length) + 4;
+        const octave = Math.floor(degree / midiValues.length) + 5;
         let index = degree % midiValues.length;
         while (index < 0) index += midiValues.length;
         return midiValues[index] + octave * 12;
