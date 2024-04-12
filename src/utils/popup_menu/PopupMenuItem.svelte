@@ -32,6 +32,7 @@
                 offset: [0, 0],
                 interactive: true,
                 appendTo: button.parentElement!.parentElement!,
+                onMount: (_) => submenuComponent.focus(),
             });
 
             destroySubmenu = () => {

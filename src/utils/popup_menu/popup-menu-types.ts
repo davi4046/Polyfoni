@@ -1,3 +1,5 @@
+import { uniqueId } from "lodash";
+
 export class Menu {
     constructor(
         readonly items: readonly MenuItem[],
@@ -10,6 +12,8 @@ export class MenuItem {
         readonly title: string,
         readonly action: Menu | (() => void)
     ) {}
+
+    readonly id = uniqueId();
 }
 
 export type MenuOptions = Partial<

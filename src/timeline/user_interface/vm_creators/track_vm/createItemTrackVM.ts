@@ -82,17 +82,17 @@ export default function createItemTrackVM(
                     new MenuItem("Hejsa", () => {}),
                     new MenuItem(
                         "Submenu",
-                        new Menu([
-                            new MenuItem("Blah", () => {}),
-                            new MenuItem("Blah", () => {}),
-                            new MenuItem(
-                                "Submenu",
-                                new Menu([
-                                    new MenuItem("Blah", () => {}),
-                                    new MenuItem("Blah", () => {}),
-                                ])
-                            ),
-                        ])
+                        new Menu(
+                            [
+                                new MenuItem("Blah", () => {}),
+                                new MenuItem("Blah", () => {}),
+                                new MenuItem(
+                                    "Submenu",
+                                    new Menu([], { searchBar: true })
+                                ),
+                            ],
+                            { searchBar: true }
+                        )
                     ),
                     new MenuItem("Hejsa", () => {}),
                     new MenuItem("Hejsa", () => {}),
