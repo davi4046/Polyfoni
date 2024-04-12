@@ -18,6 +18,7 @@ export default function makeDemoTimeline(): Timeline {
     const voices = Array.from({ length: 3 }, (_, index) => {
         const voice = new Voice({
             label: `Voice ${index}`,
+            instrument: 0,
             parent: getChildren(timeline)[1],
             children: [],
         });

@@ -10,6 +10,7 @@ export interface VoiceState
     extends ChildState<VoiceGroup>,
         ParentState<TrackGroup> {
     label: string;
+    instrument: number;
 }
 
 export default class Voice extends Stateful<VoiceState> {}

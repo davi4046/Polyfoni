@@ -55,6 +55,7 @@
             menuItem.action();
         }
     }}
+    title={menuItem.title}
 >
     <div class="my-1 ml-2 truncate whitespace-nowrap">
         {menuItem.title}

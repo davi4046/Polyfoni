@@ -11,6 +11,7 @@ import {
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
 import { moveElementDown, moveElementUp } from "../../../../utils/array-utils";
+import { midiInstrumentFamilies } from "../../../../utils/midiInstrumentFamilies";
 import type Track from "../../../models/track/Track";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
@@ -116,7 +117,21 @@ export default function createNoteTrackVM(
                     children: updatedChildren,
                 };
             }),
-            new MenuItem("Change instrument", new Menu([])),
+            new MenuItem(
+                "Change instrument",
+                new Menu(
+                    midiInstrumentFamilies
+                        .flatMap((familiy) => familiy[1])
+                        .map((instrumentName, index) => {
+                            return new MenuItem(instrumentName, () => {
+                                getGrandparent(model).state = {
+                                    instrument: index,
+                                };
+                            });
+                        }),
+                    { maxHeight: "154px", searchBar: true }
+                )
+            ),
         ]),
 
         idPrefix: model.id,

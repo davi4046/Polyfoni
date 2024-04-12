@@ -6,8 +6,8 @@ import type {
     ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
-export interface SectionState
+export interface VoiceGroupState
     extends ChildState<Timeline>,
         ParentState<Voice> {}
 
-export default class VoiceGroup extends Stateful<SectionState> {}
+export default class VoiceGroup extends Stateful<VoiceGroupState> {}

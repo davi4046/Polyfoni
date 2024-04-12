@@ -32,7 +32,12 @@ export default class Timeline extends Stateful<TimelineState> {
         let trackGroup;
         let track;
 
-        voice = new Voice({ label: "", parent: voiceGroups[0], children: [] });
+        voice = new Voice({
+            label: "",
+            instrument: 0,
+            parent: voiceGroups[0],
+            children: [],
+        });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
@@ -60,7 +65,12 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(track.state.parent, track);
         this.scaleTrack = track;
 
-        voice = new Voice({ label: "", parent: voiceGroups[2], children: [] });
+        voice = new Voice({
+            label: "",
+            instrument: 0,
+            parent: voiceGroups[2],
+            children: [],
+        });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({

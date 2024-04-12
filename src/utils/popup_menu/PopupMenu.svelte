@@ -28,7 +28,7 @@
 </script>
 
 <div
-    class="absolute z-50 w-36 border bg-white"
+    class="absolute z-50 w-44 border bg-white"
     style="left: {x}px; top: {y}px;"
     on:mouseleave={(event) => dispatch("mouseleave", event)}
     role="none"

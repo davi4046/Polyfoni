@@ -22,7 +22,12 @@
             },
         });
 
-        component.$on("mouseleave", (_) => component.$destroy());
+        const eventHandler = () => {
+            component.$destroy();
+            document.removeEventListener("click", eventHandler);
+        };
+
+        document.addEventListener("click", eventHandler);
     }
 </script>
 
