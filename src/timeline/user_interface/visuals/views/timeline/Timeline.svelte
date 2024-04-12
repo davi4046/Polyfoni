@@ -12,6 +12,8 @@
     import { writable } from "svelte/store";
     import ArrowDown from "./assets/ArrowDown.svelte";
     import DynamicComponent from "../../utils/DynamicComponent.svelte";
+    import VoiceGroupHeader from "../voicegroup_header/VoiceGroupHeader.svelte";
+    import VoiceGroup from "../voicegroup/VoiceGroup.svelte";
 
     export let vm: TimelineVM;
 
@@ -233,9 +235,7 @@
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
-        {#each vm.state.top as voiceVM (voiceVM.id)}
-            <VoiceHeader vm={voiceVM}></VoiceHeader>
-        {/each}
+        <VoiceGroupHeader vm={vm.state.top}></VoiceGroupHeader>
     </div>
     <!-- CENTER HEADERS -->
     <div
@@ -243,9 +243,7 @@
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
-        {#each vm.state.center as voiceVM (voiceVM.id)}
-            <VoiceHeader vm={voiceVM}></VoiceHeader>
-        {/each}
+        <VoiceGroupHeader vm={vm.state.center}></VoiceGroupHeader>
     </div>
     <!-- BOTTOM HEADERS -->
     <div
@@ -253,9 +251,7 @@
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
-        {#each vm.state.bottom as voiceVM (voiceVM.id)}
-            <VoiceHeader vm={voiceVM}></VoiceHeader>
-        {/each}
+        <VoiceGroupHeader vm={vm.state.bottom}></VoiceGroupHeader>
     </div>
     <!-- TOP TRACKS -->
     <div
@@ -275,9 +271,7 @@
             class="flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-clip"
             style="width: 4096px;"
         >
-            {#each vm.state.top as voiceVM (voiceVM.id)}
-                <Voice vm={voiceVM}></Voice>
-            {/each}
+            <VoiceGroup vm={vm.state.top}></VoiceGroup>
         </div>
     </div>
     <!-- CENTER TRACKS -->
@@ -308,9 +302,7 @@
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
             style="width: 4096px;"
         >
-            {#each vm.state.center as voiceVM (voiceVM.id)}
-                <Voice vm={voiceVM}></Voice>
-            {/each}
+            <VoiceGroup vm={vm.state.center}></VoiceGroup>
         </div>
     </div>
     <!-- BOTTOM TRACKS -->
@@ -331,9 +323,7 @@
             class="flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
             style="width: 4096px;"
         >
-            {#each vm.state.bottom as voiceVM (voiceVM.id)}
-                <Voice vm={voiceVM}></Voice>
-            {/each}
+            <VoiceGroup vm={vm.state.bottom}></VoiceGroup>
         </div>
     </div>
     <!-- SEPARATORS -->

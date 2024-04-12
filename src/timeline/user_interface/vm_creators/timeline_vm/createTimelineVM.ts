@@ -1,4 +1,5 @@
 import { itemEditors } from "../../item-type-config";
+import createVoiceGroupVM from "../voice_group_vm/createVoiceGroupVM";
 import createVoiceVM from "../voice_vm/createVoiceVM";
 import TimelineContext from "../../context/TimelineContext";
 import TimelineHandler from "../../event_handlers/TimelineHandler";
@@ -20,18 +21,9 @@ export default function createTimelineVM(
     const mouseEventHandler = new TimelineHandler(model, context);
 
     function compileSections() {
-        const top = getChildren(getChildren(model)[0]).map((voice) => {
-            return createVoiceVM(voice, context);
-        });
-
-        const center = getChildren(getChildren(model)[1]).map((voice) => {
-            return createVoiceVM(voice, context);
-        });
-
-        const bottom = getChildren(getChildren(model)[2]).map((voice) => {
-            return createVoiceVM(voice, context);
-        });
-
+        const top = createVoiceGroupVM(getChildren(model)[0], context);
+        const center = createVoiceGroupVM(getChildren(model)[1], context);
+        const bottom = createVoiceGroupVM(getChildren(model)[2], context);
         return { top, center, bottom };
     }
 

@@ -4,12 +4,12 @@ import Stateful from "../../../architecture/Stateful";
 import type { PlaybackMotion } from "../../features/playback/TimelinePlayer";
 import type { Chord } from "../../models/item/Chord";
 
-import type VoiceVM from "./VoiceVM";
+import type VoiceGroupVM from "./VoiceGroupVM";
 
 interface TimelineVMState {
-    top: VoiceVM[];
-    center: VoiceVM[];
-    bottom: VoiceVM[];
+    top: VoiceGroupVM;
+    center: VoiceGroupVM;
+    bottom: VoiceGroupVM;
 
     handleMouseMove: (event: MouseEvent) => void;
     handleMouseMove_tracks: (event: MouseEvent) => void;
