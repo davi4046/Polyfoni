@@ -78,8 +78,12 @@ export default function createNoteTrackVM(
             new MenuItem("Move up", () => {
                 const voiceGroup = getGreatGrandparent(model);
                 const voiceIndex = getIndex(getGrandparent(model));
+
+                if (voiceIndex === -1) return;
+
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementUp(updatedChildren, voiceIndex);
+
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
@@ -87,13 +91,29 @@ export default function createNoteTrackVM(
             new MenuItem("Move down", () => {
                 const voiceGroup = getGreatGrandparent(model);
                 const voiceIndex = getIndex(getGrandparent(model));
+
+                if (voiceIndex === -1) return;
+
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementDown(updatedChildren, voiceIndex);
+
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
             }),
-            new MenuItem("Delete", () => {}),
+            new MenuItem("Delete", () => {
+                const voiceGroup = getGreatGrandparent(model);
+                const voiceIndex = getIndex(getGrandparent(model));
+
+                if (voiceIndex === -1) return;
+
+                const updatedChildren = voiceGroup.state.children.slice();
+                updatedChildren.splice(voiceIndex, 1);
+
+                voiceGroup.state = {
+                    children: updatedChildren,
+                };
+            }),
             new MenuItem("Change instrument", new Menu([])),
         ]),
 
