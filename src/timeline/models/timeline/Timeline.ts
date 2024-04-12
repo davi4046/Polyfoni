@@ -1,14 +1,14 @@
-import Section from "../section/Section";
 import Track from "../track/Track";
 import TrackGroup from "../track_group/TrackGroup";
 import Voice from "../voice/Voice";
+import VoiceGroup from "../voice_group/VoiceGroup";
 import Stateful from "../../../architecture/Stateful";
 import {
     addChildren,
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
-export interface TimelineState extends ParentState<Section> {}
+export interface TimelineState extends ParentState<VoiceGroup> {}
 
 export default class Timeline extends Stateful<TimelineState> {
     readonly tempoTrack;
@@ -20,19 +20,19 @@ export default class Timeline extends Stateful<TimelineState> {
             children: [],
         });
 
-        const sections = Array.from({ length: 3 }, () => {
-            return new Section({ parent: this, children: [] });
+        const voiceGroups = Array.from({ length: 3 }, () => {
+            return new VoiceGroup({ parent: this, children: [] });
         });
 
         super.state = {
-            children: sections,
+            children: voiceGroups,
         };
 
         let voice;
         let trackGroup;
         let track;
 
-        voice = new Voice({ parent: sections[0], children: [] });
+        voice = new Voice({ parent: voiceGroups[0], children: [] });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
@@ -60,7 +60,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(track.state.parent, track);
         this.scaleTrack = track;
 
-        voice = new Voice({ parent: sections[2], children: [] });
+        voice = new Voice({ parent: voiceGroups[2], children: [] });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({

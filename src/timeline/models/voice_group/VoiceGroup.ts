@@ -10,4 +10,4 @@ export interface SectionState
     extends ChildState<Timeline>,
         ParentState<Voice> {}
 
-export default class Section extends Stateful<SectionState> {}
+export default class VoiceGroup extends Stateful<SectionState> {}
