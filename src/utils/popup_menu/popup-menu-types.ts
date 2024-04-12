@@ -1,7 +1,7 @@
 export class Menu {
     constructor(
         readonly items: readonly MenuItem[],
-        readonly options?: MenuOptions
+        readonly options: MenuOptions = {}
     ) {}
 }
 
@@ -14,7 +14,7 @@ export class MenuItem {
 
 export type MenuOptions = Partial<
     Readonly<{
-        maxHeight: number;
+        maxHeight: string;
         searchBar: boolean;
     }>
 >;

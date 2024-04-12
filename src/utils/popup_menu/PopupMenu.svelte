@@ -20,7 +20,10 @@
     role="none"
     {id}
 >
-    <div class="flex max-h-32 flex-col overflow-y-auto">
+    <div
+        class="flex flex-col overflow-y-auto"
+        style="max-height: {menu.options.maxHeight};"
+    >
         {#each menu.items as menuItem}
             <PopupMenuItem {menuItem} />
         {/each}
