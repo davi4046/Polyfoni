@@ -3,6 +3,7 @@
     import PopupMenu from "./PopupMenu.svelte";
     import { Menu, type MenuItem } from "./popup-menu-types";
     import { onDestroy, onMount } from "svelte";
+    import ArrowRight from "./ArrowRight.svelte";
 
     export let menuItem: MenuItem;
 
@@ -46,7 +47,7 @@
 </script>
 
 <button
-    class="semig px-2 py-1 text-left text-sm hover:bg-gray-100 active:bg-white"
+    class="flex place-content-between items-center text-left text-sm hover:bg-gray-100 active:bg-white"
     bind:this={button}
     on:click={(_) => {
         if (!(menuItem.action instanceof Menu)) {
@@ -54,5 +55,12 @@
         }
     }}
 >
-    {menuItem.title}
+    <div class="mx-2 my-1">
+        {menuItem.title}
+    </div>
+    {#if menuItem.action instanceof Menu}
+        <div class="h-6 w-6">
+            <ArrowRight />
+        </div>
+    {/if}
 </button>

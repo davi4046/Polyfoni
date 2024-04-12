@@ -77,29 +77,26 @@ export default function createItemTrackVM(
             handleContextMenu: (event) => {
                 event.preventDefault();
 
-                const menu = new Menu(
-                    [
-                        new MenuItem("Hello", () => {}),
-                        new MenuItem("Hejsa", () => {}),
-                        new MenuItem(
-                            "Submenu",
-                            new Menu([
-                                new MenuItem("Blah", () => {}),
-                                new MenuItem("Blah", () => {}),
-                                new MenuItem(
-                                    "Submenu",
-                                    new Menu([
-                                        new MenuItem("Blah", () => {}),
-                                        new MenuItem("Blah", () => {}),
-                                    ])
-                                ),
-                            ])
-                        ),
-                        new MenuItem("Hejsa", () => {}),
-                        new MenuItem("Hejsa", () => {}),
-                    ],
-                    { maxHeight: "6rem" }
-                );
+                const menu = new Menu([
+                    new MenuItem("Hello", () => {}),
+                    new MenuItem("Hejsa", () => {}),
+                    new MenuItem(
+                        "Submenu",
+                        new Menu([
+                            new MenuItem("Blah", () => {}),
+                            new MenuItem("Blah", () => {}),
+                            new MenuItem(
+                                "Submenu",
+                                new Menu([
+                                    new MenuItem("Blah", () => {}),
+                                    new MenuItem("Blah", () => {}),
+                                ])
+                            ),
+                        ])
+                    ),
+                    new MenuItem("Hejsa", () => {}),
+                    new MenuItem("Hejsa", () => {}),
+                ]);
 
                 const component = new PopupMenu({
                     target: document.documentElement,
