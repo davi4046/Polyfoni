@@ -87,9 +87,11 @@ export default function createNoteTrackVM(
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementUp(updatedChildren, voiceIndex);
 
+                context.history.startAction("Move voice");
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
+                context.history.endAction();
             }),
             new MenuItem("Move down", () => {
                 const voiceGroup = getGreatGrandparent(model);
@@ -100,9 +102,11 @@ export default function createNoteTrackVM(
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementDown(updatedChildren, voiceIndex);
 
+                context.history.startAction("Move voice");
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
+                context.history.endAction();
             }),
             new MenuItem("Delete", () => {
                 const voiceGroup = getGreatGrandparent(model);
@@ -113,9 +117,11 @@ export default function createNoteTrackVM(
                 const updatedChildren = voiceGroup.state.children.slice();
                 updatedChildren.splice(voiceIndex, 1);
 
+                context.history.startAction("Delete voice");
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
+                context.history.endAction();
             }),
             new MenuItem(
                 "Change instrument",
@@ -124,9 +130,13 @@ export default function createNoteTrackVM(
                         .flatMap((familiy) => familiy[1])
                         .map((instrumentName, index) => {
                             return new MenuItem(instrumentName, () => {
+                                context.history.startAction(
+                                    "Change voice instrument"
+                                );
                                 getGrandparent(model).state = {
                                     instrument: index,
                                 };
+                                context.history.endAction();
                             });
                         }),
                     { maxHeight: "154px", searchBar: true }
