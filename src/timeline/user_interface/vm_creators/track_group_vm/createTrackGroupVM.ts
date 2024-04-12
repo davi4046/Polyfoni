@@ -11,7 +11,7 @@ import type { TrackGroupRole } from "../../../models/track_group/TrackGroup";
 export default function createTrackGroupVM(
     model: TrackGroup,
     context: TimelineContext
-) {
+): TrackGroupVM {
     let tracks: TrackVM[] = [];
 
     function updateTracks() {
