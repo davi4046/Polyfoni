@@ -110,4 +110,5 @@ const trackGroupLabels: { [K in TrackGroupRole]: string } = {
     timeline_analysis: "Analysis",
     voice_output: "Output",
     voice_framework: "Framework",
+    voice_decoration: "Decoration",
 } as const;

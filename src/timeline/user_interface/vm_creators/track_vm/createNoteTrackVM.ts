@@ -3,6 +3,7 @@ import createNoteVM from "../item_vm/createNoteVM";
 import type TimelineContext from "../../context/TimelineContext";
 import type ItemVM from "../../view_models/ItemVM";
 import TrackVM from "../../view_models/TrackVM";
+import createDecorationPass from "../../../utils/createDecorationPass";
 import {
     getChildren,
     getGrandparent,
@@ -108,19 +109,9 @@ export default function createNoteTrackVM(
                 };
                 context.history.endAction();
             }),
-            new MenuItem("Delete", () => {
-                const voiceGroup = getGreatGrandparent(model);
-                const voiceIndex = getIndex(getGrandparent(model));
-
-                if (voiceIndex === -1) return;
-
-                const updatedChildren = voiceGroup.state.children.slice();
-                updatedChildren.splice(voiceIndex, 1);
-
-                context.history.startAction("Delete voice");
-                voiceGroup.state = {
-                    children: updatedChildren,
-                };
+            new MenuItem("Add decoration pass", () => {
+                context.history.startAction("Add decoration pass");
+                createDecorationPass(getGrandparent(model));
                 context.history.endAction();
             }),
             new MenuItem(
@@ -142,6 +133,21 @@ export default function createNoteTrackVM(
                     { maxHeight: "154px", searchBar: true }
                 )
             ),
+            new MenuItem("Delete", () => {
+                const voiceGroup = getGreatGrandparent(model);
+                const voiceIndex = getIndex(getGrandparent(model));
+
+                if (voiceIndex === -1) return;
+
+                const updatedChildren = voiceGroup.state.children.slice();
+                updatedChildren.splice(voiceIndex, 1);
+
+                context.history.startAction("Delete voice");
+                voiceGroup.state = {
+                    children: updatedChildren,
+                };
+                context.history.endAction();
+            }),
         ]),
 
         idPrefix: model.id,
