@@ -10,7 +10,7 @@ interface TrackGroupVMState {
     tracks: TrackVM[];
     createIcon?: (target: Element) => SvelteComponent;
     headerMenu?: Menu;
-    noshow?: boolean;
+    hidden?: boolean;
 }
 
 export default class TrackGroupVM extends Stateful<TrackGroupVMState> {}

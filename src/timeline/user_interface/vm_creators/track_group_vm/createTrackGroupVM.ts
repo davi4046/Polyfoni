@@ -61,8 +61,8 @@ export default function createTrackGroupVM(
         };
     }
 
-    function compileNoshow() {
-        return { noshow: noshowTrackGroupRoles.includes(model.state.role) };
+    function compileHidden() {
+        return { hidden: hiddenTrackGroupRoles.includes(model.state.role) };
     }
 
     updateTracks();
@@ -71,7 +71,7 @@ export default function createTrackGroupVM(
         ...compileLabel(),
         ...compileTracks(),
         ...compileIconCreator(),
-        ...compileNoshow(),
+        ...compileHidden(),
 
         headerMenu: new Menu([new MenuItem("hej", () => {})]),
     });
@@ -81,7 +81,7 @@ export default function createTrackGroupVM(
 
         vm.state = {
             ...(model.state.role !== oldState.role ? compileLabel() : {}),
-            ...(model.state.role !== oldState.role ? compileNoshow() : {}),
+            ...(model.state.role !== oldState.role ? compileHidden() : {}),
             ...(model.state.children !== oldState.children
                 ? compileTracks()
                 : {}),
@@ -99,7 +99,7 @@ export default function createTrackGroupVM(
     return vm;
 }
 
-const noshowTrackGroupRoles: TrackGroupRole[] = [
+const hiddenTrackGroupRoles: TrackGroupRole[] = [
     "timeline_settings",
     "timeline_analysis",
     "voice_output",

@@ -33,7 +33,7 @@
     }
 </script>
 
-{#if !vm.state.noshow}
+{#if !vm.state.hidden}
     <div
         class="flex h-[var(--timeline-track-group-gap)] items-center p-2 text-sm"
         on:contextmenu={handleContextMenu}
