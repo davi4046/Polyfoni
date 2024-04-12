@@ -69,6 +69,7 @@ fn main() {
             eval::evaluate, 
             midi_note_on, 
             midi_note_off, 
+            midi_program_change,
             midi_control_change
         ])
         .run(tauri::generate_context!())
@@ -87,6 +88,12 @@ fn midi_note_on(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: 
 fn midi_note_off(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::NoteOff { channel, key }).ok();
+}
+
+#[tauri::command]
+fn midi_program_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, program_id: u8) {
+    let midi_player_locked = midi_player.lock().unwrap();
+    midi_player_locked.sender.send(MidiEvent::ProgramChange { channel, program_id }).ok();
 }
 
 #[tauri::command]

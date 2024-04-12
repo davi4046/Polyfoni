@@ -105,6 +105,7 @@
     function playMidiValuesConcurrently(midiValues: number[]) {
         clearTimeout(playbackTimeout);
 
+        invoke("midi_program_change", { channel: 0, programId: 0 });
         invoke("midi_control_change", { channel: 0, control: 120, value: 0 }); // All sound off
 
         midiValues.forEach((midiValue) => {
@@ -127,6 +128,7 @@
     function playMidiValuesSequentially(midiValues: number[]) {
         clearTimeout(playbackTimeout);
 
+        invoke("midi_program_change", { channel: 0, programId: 0 });
         invoke("midi_control_change", { channel: 0, control: 120, value: 0 }); // All sound off
 
         function playNextNote() {

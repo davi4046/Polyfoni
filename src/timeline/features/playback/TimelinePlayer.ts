@@ -171,6 +171,13 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
         const startTime = calculateTimeAtBeat(tempoChanges, startBeat);
 
+        const channel = getIndex(voice);
+
+        invoke("midi_program_change", {
+            channel: channel,
+            programId: voice.state.instrument,
+        });
+
         getChildren(outputTrack).forEach((note: Item<"NoteItem">) => {
             if (note.state.start < startBeat || note.state.start >= endBeat) {
                 return;
@@ -187,7 +194,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
             const startTimeout = setTimeout(() => {
                 invoke("midi_note_on", {
-                    channel: getIndex(voice),
+                    channel: channel,
                     key: note.state.content,
                     vel: 100,
                 });
@@ -198,7 +205,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
 
             const endTimeout = setTimeout(() => {
                 invoke("midi_note_off", {
-                    channel: getIndex(voice),
+                    channel: channel,
                     key: note.state.content,
                 });
                 this.state = {
