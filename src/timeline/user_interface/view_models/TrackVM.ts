@@ -1,7 +1,7 @@
 import type { SvelteComponent } from "svelte";
 
-import type { GlobalEventHandler } from "../../../architecture/GlobalEventListener";
 import Stateful from "../../../architecture/Stateful";
+import type { Menu } from "../../../utils/popup_menu/popup-menu-types";
 
 import type ItemVM from "./ItemVM";
 
@@ -9,8 +9,9 @@ interface TrackVMState {
     label: string;
     items: ItemVM[];
     createIcon?: (target: Element) => SvelteComponent;
+    headerMenu?: Menu;
+
     idPrefix: string;
-    headerEventHandler?: GlobalEventHandler;
 }
 
 export default class TrackVM extends Stateful<TrackVMState> {}

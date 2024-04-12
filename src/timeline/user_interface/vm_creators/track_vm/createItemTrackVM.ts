@@ -73,44 +73,6 @@ export default function createItemTrackVM(
         ...compileItems(),
         ...compileCreateIcon(),
 
-        headerEventHandler: {
-            handleContextMenu: (event) => {
-                event.preventDefault();
-
-                const menu = new Menu([
-                    new MenuItem("Hello", () => {}),
-                    new MenuItem("Hejsa", () => {}),
-                    new MenuItem(
-                        "Submenu",
-                        new Menu(
-                            [
-                                new MenuItem("Blah", () => {}),
-                                new MenuItem("Blah", () => {}),
-                                new MenuItem(
-                                    "Submenu",
-                                    new Menu([], { searchBar: true })
-                                ),
-                            ],
-                            { searchBar: true }
-                        )
-                    ),
-                    new MenuItem("Hejsa", () => {}),
-                    new MenuItem("Hejsa", () => {}),
-                ]);
-
-                const component = new PopupMenu({
-                    target: document.documentElement,
-                    props: {
-                        x: event.clientX - 8,
-                        y: event.clientY - 8,
-                        menu: menu,
-                    },
-                });
-
-                component.$on("mouseleave", (_) => component.$destroy());
-            },
-        },
-
         idPrefix: model.id,
     });
 
