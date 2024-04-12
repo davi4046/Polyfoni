@@ -14,6 +14,7 @@ export class MenuItem {
 
 export type MenuOptions = Partial<
     Readonly<{
-        searchable: boolean;
+        maxHeight: number;
+        searchBar: boolean;
     }>
 >;
