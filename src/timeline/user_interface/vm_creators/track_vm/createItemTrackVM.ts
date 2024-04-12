@@ -15,6 +15,8 @@ import type Track from "../../../models/track/Track";
 import PopupMenu from "../../../../utils/popup_menu/PopupMenu.svelte";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
+import { deriveTrackLabel } from "./track-vm-common";
+
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,
     context: TimelineContext
@@ -44,7 +46,7 @@ export default function createItemTrackVM(
 
     function compileLabel() {
         return {
-            label: model.state.label,
+            label: deriveTrackLabel(model),
         };
     }
 
@@ -82,7 +84,7 @@ export default function createItemTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.label !== oldState.label ? compileLabel() : {}),
+            ...(model.state.role !== oldState.role ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });

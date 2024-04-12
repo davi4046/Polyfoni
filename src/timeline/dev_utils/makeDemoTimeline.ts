@@ -15,8 +15,9 @@ import Voice from "../models/voice/Voice";
 export default function makeDemoTimeline(): Timeline {
     const timeline = new Timeline();
 
-    const voices = Array.from({ length: 3 }, () => {
+    const voices = Array.from({ length: 3 }, (_, index) => {
         const voice = new Voice({
+            label: `Voice ${index}`,
             parent: getChildren(timeline)[1],
             children: [],
         });
@@ -74,32 +75,33 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
 
     tracks.push(
         new Track("NoteItem", {
+            role: "output",
+
             parent: outputGroup,
-            label: "Piano 1",
             children: [],
             allowUserEdit: false,
         }),
         new Track("StringItem", {
+            role: "pitch",
             parent: frameworkGroup,
-            label: "Pitch",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
+            role: "duration",
             parent: frameworkGroup,
-            label: "Duration",
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
+            role: "rest",
             parent: frameworkGroup,
-            label: "Rest",
             children: [],
             allowUserEdit: true,
         }),
         new Track("ChordItem", {
+            role: "harmony",
             parent: frameworkGroup,
-            label: "Harmony",
             children: [],
             allowUserEdit: true,
         })

@@ -14,6 +14,8 @@ import { moveElementDown, moveElementUp } from "../../../../utils/array-utils";
 import type Track from "../../../models/track/Track";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
+import { deriveTrackLabel } from "./track-vm-common";
+
 export default function createNoteTrackVM(
     model: Track<"NoteItem">,
     context: TimelineContext
@@ -57,7 +59,7 @@ export default function createNoteTrackVM(
 
     function compileLabel() {
         return {
-            label: model.state.label,
+            label: deriveTrackLabel(model),
         };
     }
 
@@ -126,7 +128,7 @@ export default function createNoteTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.label !== oldState.label ? compileLabel() : {}),
+            ...(model.state.role !== oldState.role ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });

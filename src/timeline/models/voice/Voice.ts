@@ -1,5 +1,5 @@
-import type VoiceGroup from "../voice_group/VoiceGroup";
 import type TrackGroup from "../track_group/TrackGroup";
+import type VoiceGroup from "../voice_group/VoiceGroup";
 import Stateful from "../../../architecture/Stateful";
 import type {
     ChildState,
@@ -8,6 +8,8 @@ import type {
 
 export interface VoiceState
     extends ChildState<VoiceGroup>,
-        ParentState<TrackGroup> {}
+        ParentState<TrackGroup> {
+    label: string;
+}
 
 export default class Voice extends Stateful<VoiceState> {}

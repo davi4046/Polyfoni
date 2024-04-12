@@ -10,9 +10,19 @@ import type {
 export interface TrackState<T extends keyof ItemTypes>
     extends ChildState<TrackGroup>,
         ParentState<Item<T>> {
-    label: string;
+    role: TrackRole;
     allowUserEdit: boolean;
 }
+
+export type TrackRole =
+    | "timeline_tempo"
+    | "timeline_scale"
+    | "timeline_total"
+    | "output"
+    | "pitch"
+    | "duration"
+    | "rest"
+    | "harmony";
 
 export default class Track<T extends keyof ItemTypes> extends Stateful<
     TrackState<T>

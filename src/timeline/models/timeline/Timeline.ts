@@ -32,7 +32,7 @@ export default class Timeline extends Stateful<TimelineState> {
         let trackGroup;
         let track;
 
-        voice = new Voice({ parent: voiceGroups[0], children: [] });
+        voice = new Voice({ label: "", parent: voiceGroups[0], children: [] });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
@@ -43,7 +43,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(trackGroup.state.parent, trackGroup);
 
         track = new Track("StringItem", {
-            label: "Tempo",
+            role: "timeline_tempo",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
@@ -52,7 +52,7 @@ export default class Timeline extends Stateful<TimelineState> {
         this.tempoTrack = track;
 
         track = new Track("ChordItem", {
-            label: "Scale",
+            role: "timeline_scale",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
@@ -60,7 +60,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(track.state.parent, track);
         this.scaleTrack = track;
 
-        voice = new Voice({ parent: voiceGroups[2], children: [] });
+        voice = new Voice({ label: "", parent: voiceGroups[2], children: [] });
         addChildren(voice.state.parent, voice);
 
         trackGroup = new TrackGroup({
@@ -71,7 +71,7 @@ export default class Timeline extends Stateful<TimelineState> {
         addChildren(trackGroup.state.parent, trackGroup);
 
         track = new Track("ChordItem", {
-            label: "Total Harmony",
+            role: "timeline_total",
             parent: trackGroup,
             children: [],
             allowUserEdit: false,
