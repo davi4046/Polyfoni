@@ -13,7 +13,7 @@ import {
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
 import PopupMenu from "../../../../utils/popup_menu/PopupMenu.svelte";
-import { Menu, MenuItem } from "../../../../utils/popup_menu/menu";
+import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,

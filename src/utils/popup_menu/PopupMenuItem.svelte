@@ -1,7 +1,7 @@
 <script lang="ts">
     import tippy from "tippy.js";
     import PopupMenu from "./PopupMenu.svelte";
-    import { Menu, type MenuItem } from "./menu";
+    import { Menu, type MenuItem } from "./popup-menu-types";
     import { onDestroy, onMount } from "svelte";
 
     export let menuItem: MenuItem;
