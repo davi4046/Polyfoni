@@ -78,25 +78,25 @@ fn main() {
 
 // Commands
 
-#[tauri::command]
+#[tauri::command(async)]
 fn midi_note_on(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8, vel: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::NoteOn { channel, key, vel }).ok();
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 fn midi_note_off(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, key: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::NoteOff { channel, key }).ok();
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 fn midi_program_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, program_id: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::ProgramChange { channel, program_id }).ok();
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 fn midi_control_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, control: u8, value: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::ControlChange { channel, ctrl: control, value }).ok();

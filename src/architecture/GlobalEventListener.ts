@@ -2,7 +2,8 @@ class GlobalEventListener {
     private _handler?: GlobalEventHandler;
 
     set handler(newHandler: GlobalEventHandler | undefined) {
-        if (newHandler === this._handler) return;
+        // CAUSES LAG DURING PLAYBACK!!!
+        // if (newHandler === this._handler) return;
 
         if (
             this._handler &&
