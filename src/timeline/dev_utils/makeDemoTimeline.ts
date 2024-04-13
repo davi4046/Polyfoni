@@ -76,27 +76,22 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
         new Track("NoteItem", {
             parent: outputGroup,
             children: [],
-            allowUserEdit: false,
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
-            allowUserEdit: true,
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
-            allowUserEdit: true,
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
-            allowUserEdit: true,
         }),
         new Track("ChordItem", {
             parent: frameworkGroup,
             children: [],
-            allowUserEdit: true,
         })
     );
 

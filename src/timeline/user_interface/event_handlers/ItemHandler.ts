@@ -51,7 +51,7 @@ export default class ItemHandler implements GlobalEventHandler {
         this._clickedTrack = findClosestTrack(
             this.context.timeline,
             event.clientY,
-            (track) => track.state.allowUserEdit
+            (track) => track.isUserEditable()
         );
         event.stopPropagation();
     }
@@ -71,7 +71,7 @@ export default class ItemHandler implements GlobalEventHandler {
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
             event.clientY,
-            (track) => track.state.allowUserEdit
+            (track) => track.isUserEditable()
         );
 
         if (
@@ -98,7 +98,7 @@ export default class ItemHandler implements GlobalEventHandler {
             getNestedArrayOfDescendants(getLastAncestor(this.item), 4).flat(
                 Infinity
             ) as Track<any>[]
-        ).filter((track) => track.state.allowUserEdit);
+        ).filter((track) => track.isUserEditable());
 
         const hoveredIndex = tracks.indexOf(hoveredTrack);
         const clickedIndex = tracks.indexOf(this._clickedTrack);

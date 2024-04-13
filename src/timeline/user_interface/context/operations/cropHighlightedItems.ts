@@ -7,7 +7,7 @@ export default function cropHighlightedItems(context: TimelineContext) {
     context.state.highlights.forEach((highlight) => {
         const track = getParent(highlight);
 
-        if (!track.state.allowUserEdit) return;
+        if (!track.isUserEditable()) return;
 
         track.state = {
             children: cropItemsByInterval(

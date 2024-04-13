@@ -154,7 +154,7 @@ class PasteItemsHandler implements GlobalEventHandler {
         const hoveredTrack = findClosestTrack(
             this.context.timeline,
             event.clientY,
-            (track) => track.state.allowUserEdit
+            (track) => track.isUserEditable()
         );
 
         if (
@@ -173,7 +173,7 @@ class PasteItemsHandler implements GlobalEventHandler {
             getNestedArrayOfDescendants(this.timeline, 4).flat(
                 Infinity
             ) as Track<any>[]
-        ).filter((track) => track.state.allowUserEdit);
+        ).filter((track) => track.isUserEditable());
 
         const minStart = this.context.state.ghostPairs.reduce(
             (minStart, [item]) =>

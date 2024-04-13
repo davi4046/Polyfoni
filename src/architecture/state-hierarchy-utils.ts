@@ -151,42 +151,49 @@ export function getPosition(obj: any): number[] {
     return position;
 }
 
+export function validatePositionPattern(
+    position: number[],
+    pattern: string
+): boolean {
+    const parts = pattern.split(",");
+    let match = true;
+    position.forEach((value, index) => {
+        if (parts[index].includes("-")) {
+            const subparts = parts[index].split("-");
+
+            if (subparts.length !== 2)
+                throw new Error(`Invalid pattern: "${pattern}"`);
+
+            const min =
+                subparts[0] === "*"
+                    ? Number.MIN_SAFE_INTEGER
+                    : Number(subparts[0]);
+            const max =
+                subparts[1] === "*"
+                    ? Number.MAX_SAFE_INTEGER
+                    : Number(subparts[1]);
+
+            if (isNaN(min) || isNaN(max))
+                throw new Error(`Invalid pattern: "${pattern}"`);
+
+            if (value < min || value > max) {
+                match = false;
+                return;
+            }
+        } else if (parts[index] !== "*" && String(value) !== parts[index]) {
+            match = false;
+            return;
+        }
+    });
+    return match;
+}
+
 export function matchPosition<T>(
     position: number[],
     map: Map<string, T>
 ): T | undefined {
     for (const [pattern, value] of map) {
-        const parts = pattern.split(",");
-        let match = true;
-        position.forEach((value, index) => {
-            if (parts[index].includes("-")) {
-                const subparts = parts[index].split("-");
-
-                if (subparts.length !== 2)
-                    throw new Error(`Invalid pattern: "${pattern}"`);
-
-                const min =
-                    subparts[0] === "*"
-                        ? Number.MIN_SAFE_INTEGER
-                        : Number(subparts[0]);
-                const max =
-                    subparts[1] === "*"
-                        ? Number.MAX_SAFE_INTEGER
-                        : Number(subparts[1]);
-
-                if (isNaN(min) || isNaN(max))
-                    throw new Error(`Invalid pattern: "${pattern}"`);
-
-                if (value < min || value > max) {
-                    match = false;
-                    return;
-                }
-            } else if (parts[index] !== "*" && String(value) !== parts[index]) {
-                match = false;
-                return;
-            }
-        });
-        if (match) {
+        if (validatePositionPattern(position, pattern)) {
             return value;
         }
     }

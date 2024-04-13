@@ -7,7 +7,7 @@ import Item from "../../../models/item/Item";
 
 export default function copyHighlightedItems(context: TimelineContext) {
     const items = context.state.highlights
-        .filter((highlight) => getParent(highlight).state.allowUserEdit)
+        .filter((highlight) => getParent(highlight).isUserEditable())
         .flatMap((highlight) => {
             return getChildren(getParent(highlight))
                 .map((item) => {

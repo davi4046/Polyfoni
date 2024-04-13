@@ -7,7 +7,7 @@ import type Interval from "../../../../utils/interval/Interval";
 
 export default function selectHighlightedItems(context: TimelineContext) {
     const items = context.state.highlights
-        .filter((highlight) => getParent(highlight).state.allowUserEdit)
+        .filter((highlight) => getParent(highlight).isUserEditable())
         .flatMap((highlight) => {
             return getChildren(getParent(highlight)).filter((item) => {
                 const interval = {
