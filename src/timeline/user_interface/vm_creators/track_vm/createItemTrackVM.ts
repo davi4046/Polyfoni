@@ -85,6 +85,7 @@ export default function createItemTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
+            ...(model.state.parent !== oldState.parent ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });
