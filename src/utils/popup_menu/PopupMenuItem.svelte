@@ -9,6 +9,9 @@
 
     let button: HTMLButtonElement;
 
+    $: disabled = menuItem.options.disabled ? menuItem.options.disabled : false;
+    $: if (button) button.disabled = disabled;
+
     let destroySubmenu: () => void;
 
     onMount(() => {
@@ -32,6 +35,9 @@
                 offset: [0, 0],
                 interactive: true,
                 appendTo: button.parentElement!.parentElement!,
+                onShow: (_) => {
+                    if (disabled) return false;
+                },
                 onMount: (_) => submenuComponent.focus(),
             });
 
@@ -48,7 +54,7 @@
 </script>
 
 <button
-    class="flex place-content-between items-center text-left text-sm hover:bg-gray-100 active:bg-white"
+    class="flex place-content-between items-center text-left text-sm hover:bg-gray-100 active:bg-white disabled:opacity-50 disabled:hover:bg-white"
     bind:this={button}
     on:click={(_) => {
         if (!(menuItem.action instanceof Menu)) {

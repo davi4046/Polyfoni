@@ -10,7 +10,8 @@ export class Menu {
 export class MenuItem {
     constructor(
         readonly title: string,
-        readonly action: Menu | (() => void)
+        readonly action: Menu | (() => void),
+        readonly options: MenuItemOptions = {}
     ) {}
 
     readonly id = uniqueId();
@@ -20,5 +21,11 @@ export type MenuOptions = Partial<
     Readonly<{
         maxHeight: string;
         searchBar: boolean;
+    }>
+>;
+
+export type MenuItemOptions = Partial<
+    Readonly<{
+        disabled: boolean;
     }>
 >;
