@@ -137,20 +137,3 @@ export function getNestedArrayOfDescendants(
             .filter((value) => value !== undefined);
     }
 }
-
-export function getDescendants(obj: HasGettableChildren<any>) {
-    const checkedObjects: any[] = [];
-
-    function recursive(obj: HasGettableChildren<any>): any[] {
-        if (checkedObjects.includes(obj)) return [];
-        checkedObjects.push(obj);
-        return [
-            obj.state.children,
-            obj.state.children
-                .filter((child) => child.state.children)
-                .map(recursive),
-        ];
-    }
-
-    return recursive(obj).flat(Infinity);
-}
