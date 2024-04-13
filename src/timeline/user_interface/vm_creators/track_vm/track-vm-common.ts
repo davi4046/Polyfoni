@@ -1,6 +1,7 @@
 import type TimelineContext from "../../context/TimelineContext";
 import createDecorationPass from "../../../utils/createDecorationPass";
 import {
+    getChildren,
     getGrandparent,
     getIndex,
     getParent,
@@ -37,37 +38,43 @@ export const positionMenuMap = new Map<
 ]);
 
 function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
-    const menu: Menu = new Menu([
-        new MenuItem("Move up", () => {
-            const voiceGroup = getParent(voice);
-            const voiceIndex = getIndex(voice);
+    const voiceGroup = getParent(voice);
+    const voiceIndex = getIndex(voice);
+    const maxIndex = getChildren(getParent(voice)).length - 1;
 
-            if (voiceIndex === -1) return;
+    return new Menu([
+        new MenuItem(
+            "Move up",
+            () => {
+                if (voiceIndex === -1) return;
 
-            const updatedChildren = voiceGroup.state.children.slice();
-            moveElementUp(updatedChildren, voiceIndex);
+                const updatedChildren = voiceGroup.state.children.slice();
+                moveElementUp(updatedChildren, voiceIndex);
 
-            context.history.startAction("Move voice");
-            voiceGroup.state = {
-                children: updatedChildren,
-            };
-            context.history.endAction();
-        }),
-        new MenuItem("Move down", () => {
-            const voiceGroup = getParent(voice);
-            const voiceIndex = getIndex(voice);
+                context.history.startAction("Move voice");
+                voiceGroup.state = {
+                    children: updatedChildren,
+                };
+                context.history.endAction();
+            },
+            { disabled: voiceIndex === 0 }
+        ),
+        new MenuItem(
+            "Move down",
+            () => {
+                if (voiceIndex === -1) return;
 
-            if (voiceIndex === -1) return;
+                const updatedChildren = voiceGroup.state.children.slice();
+                moveElementDown(updatedChildren, voiceIndex);
 
-            const updatedChildren = voiceGroup.state.children.slice();
-            moveElementDown(updatedChildren, voiceIndex);
-
-            context.history.startAction("Move voice");
-            voiceGroup.state = {
-                children: updatedChildren,
-            };
-            context.history.endAction();
-        }),
+                context.history.startAction("Move voice");
+                voiceGroup.state = {
+                    children: updatedChildren,
+                };
+                context.history.endAction();
+            },
+            { disabled: voiceIndex === maxIndex }
+        ),
         new MenuItem("Add decoration pass", () => {
             context.history.startAction("Add decoration pass");
             createDecorationPass(voice);
@@ -93,9 +100,6 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
             )
         ),
         new MenuItem("Delete", () => {
-            const voiceGroup = getParent(voice);
-            const voiceIndex = getIndex(voice);
-
             if (voiceIndex === -1) return;
 
             const updatedChildren = voiceGroup.state.children.slice();
@@ -108,5 +112,4 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
             context.history.endAction();
         }),
     ]);
-    return menu;
 }

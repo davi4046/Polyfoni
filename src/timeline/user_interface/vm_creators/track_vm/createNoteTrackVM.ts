@@ -91,7 +91,6 @@ export default function createNoteTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.parent !== oldState.parent ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });

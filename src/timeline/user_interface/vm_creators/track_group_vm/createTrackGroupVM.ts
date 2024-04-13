@@ -93,9 +93,6 @@ export default function createTrackGroupVM(
         if (model.state.children !== oldState.children) updateTracks();
 
         vm.state = {
-            ...(model.state.parent !== oldState.parent
-                ? { ...compileLabel(), ...compileHidden, ...compileMenu }
-                : {}),
             ...(model.state.children !== oldState.children
                 ? compileTracks()
                 : {}),

@@ -15,7 +15,7 @@ import {
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
 
-import { positionLabelMap } from "./track-vm-common";
+import { positionLabelMap, positionMenuMap } from "./track-vm-common";
 
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,
@@ -67,6 +67,13 @@ export default function createItemTrackVM(
         };
     }
 
+    function compileHeaderMenu() {
+        const createMenu = matchPosition(getPosition(model), positionMenuMap);
+        return {
+            headerMenu: createMenu ? createMenu(model, context) : undefined,
+        };
+    }
+
     updateItems();
     updateGhostItems();
     updateHighlights();
@@ -75,6 +82,7 @@ export default function createItemTrackVM(
         ...compileLabel(),
         ...compileItems(),
         ...compileCreateIcon(),
+        ...compileHeaderMenu(),
 
         idPrefix: model.id,
     });
@@ -85,7 +93,6 @@ export default function createItemTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.parent !== oldState.parent ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });
