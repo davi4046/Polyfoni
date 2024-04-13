@@ -8,15 +8,6 @@ import type {
 
 export interface TrackGroupState
     extends ChildState<Voice>,
-        ParentState<Track<any>> {
-    role: TrackGroupRole;
-}
-
-export type TrackGroupRole =
-    | "timeline_settings"
-    | "timeline_analysis"
-    | "voice_output"
-    | "voice_framework"
-    | "voice_decoration";
+        ParentState<Track<any>> {}
 
 export default class TrackGroup extends Stateful<TrackGroupState> {}

@@ -5,7 +5,6 @@ import type Voice from "../models/voice/Voice";
 
 export default function createDecorationPass(voice: Voice) {
     const trackGroup = new TrackGroup({
-        role: "voice_decoration",
         parent: voice,
         children: [],
     });

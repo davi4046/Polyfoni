@@ -8,9 +8,10 @@ import {
     getChildren,
     getIndex,
     getParent,
+    getPosition,
+    matchPosition,
 } from "../../../../architecture/state-hierarchy-utils";
 import type TrackGroup from "../../../models/track_group/TrackGroup";
-import type { TrackGroupRole } from "../../../models/track_group/TrackGroup";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
 export default function createTrackGroupVM(
@@ -36,7 +37,8 @@ export default function createTrackGroupVM(
     }
 
     function compileLabel() {
-        return { label: roleToLabel[model.state.role] };
+        const label = matchPosition(getPosition(model), positionLabelMap);
+        return { label: label ? label : "MISSING LABEL" };
     }
 
     function compileIconCreator() {
@@ -66,11 +68,12 @@ export default function createTrackGroupVM(
     }
 
     function compileHidden() {
-        return { hidden: hiddenTrackGroupRoles.includes(model.state.role) };
+        const hidden = matchPosition(getPosition(model), positionHiddenMap);
+        return { hidden: hidden !== undefined ? hidden : true };
     }
 
     function compileMenu() {
-        const createMenu = roleToMenuCreator[model.state.role];
+        const createMenu = matchPosition(getPosition(model), positionMenuMap);
         return {
             headerMenu: createMenu ? createMenu(model, context) : undefined,
         };
@@ -90,7 +93,7 @@ export default function createTrackGroupVM(
         if (model.state.children !== oldState.children) updateTracks();
 
         vm.state = {
-            ...(model.state.role !== oldState.role
+            ...(model.state.parent !== oldState.parent
                 ? { ...compileLabel(), ...compileHidden, ...compileMenu }
                 : {}),
             ...(model.state.children !== oldState.children
@@ -110,43 +113,37 @@ export default function createTrackGroupVM(
     return vm;
 }
 
-const hiddenTrackGroupRoles: TrackGroupRole[] = [
-    "timeline_settings",
-    "timeline_analysis",
-    "voice_output",
-] as const;
+const positionHiddenMap = new Map<string, boolean>([["1,*,1-*", false]]);
 
-const roleToLabel: { [K in TrackGroupRole]: string } = {
-    timeline_settings: "Settings",
-    timeline_analysis: "Analysis",
-    voice_output: "Output",
-    voice_framework: "Framework",
-    voice_decoration: "Decoration",
-} as const;
+const positionLabelMap = new Map<string, string>([
+    ["1,*,1", "Framework"],
+    ["1,*,2-*", "Decoration"],
+]);
 
-const roleToMenuCreator: Partial<{
-    [K in TrackGroupRole]: (
-        model: TrackGroup,
-        context: TimelineContext
-    ) => Menu;
-}> = {
-    voice_decoration: (model, context) => {
-        return new Menu([
-            new MenuItem("Delete", () => {
-                const voice = getParent(model);
-                const index = getIndex(model);
+const positionMenuMap = new Map<
+    string,
+    (model: TrackGroup, context: TimelineContext) => Menu
+>([["1,*,2-*", createTrackGroupMenu]]);
 
-                if (index === -1) return;
+function createTrackGroupMenu(
+    model: TrackGroup,
+    context: TimelineContext
+): Menu {
+    return new Menu([
+        new MenuItem("Delete", () => {
+            const voice = getParent(model);
+            const index = getIndex(model);
 
-                const updatedChildren = voice.state.children.slice();
-                updatedChildren.splice(index, 1);
+            if (index === -1) return;
 
-                context.history.startAction("Delete decoration pass");
-                voice.state = {
-                    children: updatedChildren,
-                };
-                context.history.endAction();
-            }),
-        ]);
-    },
-};
+            const updatedChildren = voice.state.children.slice();
+            updatedChildren.splice(index, 1);
+
+            context.history.startAction("Delete decoration pass");
+            voice.state = {
+                children: updatedChildren,
+            };
+            context.history.endAction();
+        }),
+    ]);
+}

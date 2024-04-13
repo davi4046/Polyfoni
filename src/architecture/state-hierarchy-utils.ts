@@ -159,7 +159,29 @@ export function matchPosition<T>(
         const parts = pattern.split(",");
         let match = true;
         position.forEach((value, index) => {
-            if (parts[index] !== "*" && String(value) !== parts[index]) {
+            if (parts[index].includes("-")) {
+                const subparts = parts[index].split("-");
+
+                if (subparts.length !== 2)
+                    throw new Error(`Invalid pattern: "${pattern}"`);
+
+                const min =
+                    subparts[0] === "*"
+                        ? Number.MIN_SAFE_INTEGER
+                        : Number(subparts[0]);
+                const max =
+                    subparts[1] === "*"
+                        ? Number.MAX_SAFE_INTEGER
+                        : Number(subparts[1]);
+
+                if (isNaN(min) || isNaN(max))
+                    throw new Error(`Invalid pattern: "${pattern}"`);
+
+                if (value < min || value > max) {
+                    match = false;
+                    return;
+                }
+            } else if (parts[index] !== "*" && String(value) !== parts[index]) {
                 match = false;
                 return;
             }
