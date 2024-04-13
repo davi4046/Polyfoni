@@ -9,9 +9,9 @@ export const positionLabelMap = new Map<string, (track: Track<any>) => string>([
     ["1,*,1,1", (_) => "Duration"],
     ["1,*,1,2", (_) => "Rest?"],
     ["1,*,1,3", (_) => "Harmony"],
-    ["1,*,2,0", (_) => "Pitches"],
-    ["1,*,2,1", (_) => "Fraction"],
-    ["1,*,2,2", (_) => "Skip?"],
-    ["1,*,2,3", (_) => "Harmony"],
+    ["1,*,2-*,0", (_) => "Pitches"],
+    ["1,*,2-*,1", (_) => "Fraction"],
+    ["1,*,2-*,2", (_) => "Skip?"],
+    ["1,*,2-*,3", (_) => "Harmony"],
     ["2,*,*,0", (_) => "Harmonic Sum"],
 ]);
