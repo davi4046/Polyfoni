@@ -137,3 +137,35 @@ export function getNestedArrayOfDescendants(
             .filter((value) => value !== undefined);
     }
 }
+
+export function getPosition(obj: any): number[] {
+    const position = [];
+
+    let curr = obj;
+
+    while (curr.state.parent) {
+        position.unshift(curr.state.parent.state.children.indexOf(curr));
+        curr = curr.state.parent;
+    }
+
+    return position;
+}
+
+export function matchPosition<T>(
+    position: number[],
+    map: Map<string, T>
+): T | undefined {
+    for (const [pattern, value] of map) {
+        const parts = pattern.split(",");
+        let match = true;
+        position.forEach((value, index) => {
+            if (parts[index] !== "*" && String(value) !== parts[index]) {
+                match = false;
+                return;
+            }
+        });
+        if (match) {
+            return value;
+        }
+    }
+}

@@ -76,32 +76,26 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
 
     tracks.push(
         new Track("NoteItem", {
-            role: "output",
-
             parent: outputGroup,
             children: [],
             allowUserEdit: false,
         }),
         new Track("StringItem", {
-            role: "pitch",
             parent: frameworkGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            role: "duration",
             parent: frameworkGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            role: "rest",
             parent: frameworkGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("ChordItem", {
-            role: "harmony",
             parent: frameworkGroup,
             children: [],
             allowUserEdit: true,

@@ -10,13 +10,15 @@ import {
     getGreatGrandparent,
     getIndex,
     getParent,
+    getPosition,
+    matchPosition,
 } from "../../../../architecture/state-hierarchy-utils";
 import { moveElementDown, moveElementUp } from "../../../../utils/array-utils";
 import { midiInstrumentFamilies } from "../../../../utils/midiInstrumentFamilies";
 import type Track from "../../../models/track/Track";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
-import { deriveTrackLabel } from "./track-vm-common";
+import { positionLabelMap } from "./track-vm-common";
 
 export default function createNoteTrackVM(
     model: Track<"NoteItem">,
@@ -60,8 +62,9 @@ export default function createNoteTrackVM(
     }
 
     function compileLabel() {
+        const createLabel = matchPosition(getPosition(model), positionLabelMap);
         return {
-            label: deriveTrackLabel(model),
+            label: createLabel ? createLabel(model) : "MISSING LABEL",
         };
     }
 
@@ -159,7 +162,6 @@ export default function createNoteTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.role !== oldState.role ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });

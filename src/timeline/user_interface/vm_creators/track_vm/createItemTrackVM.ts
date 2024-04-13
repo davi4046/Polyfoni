@@ -10,12 +10,12 @@ import {
     getChildren,
     getIndex,
     getParent,
+    getPosition,
+    matchPosition,
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
-import PopupMenu from "../../../../utils/popup_menu/PopupMenu.svelte";
-import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
-import { deriveTrackLabel } from "./track-vm-common";
+import { positionLabelMap } from "./track-vm-common";
 
 export default function createItemTrackVM(
     model: Track<"StringItem" | "ChordItem">,
@@ -45,8 +45,9 @@ export default function createItemTrackVM(
     }
 
     function compileLabel() {
+        const createLabel = matchPosition(getPosition(model), positionLabelMap);
         return {
-            label: deriveTrackLabel(model),
+            label: createLabel ? createLabel(model) : "MISSING LABEL",
         };
     }
 
@@ -84,7 +85,6 @@ export default function createItemTrackVM(
         if (hasChildrenChanged) updateItems();
 
         vm.state = {
-            ...(model.state.role !== oldState.role ? compileLabel() : {}),
             ...(hasChildrenChanged ? compileItems() : {}),
         };
     });

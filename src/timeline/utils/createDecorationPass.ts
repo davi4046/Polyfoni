@@ -12,25 +12,21 @@ export default function createDecorationPass(voice: Voice) {
 
     const tracks = [
         new Track("StringItem", {
-            role: "pitch",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            role: "duration",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("StringItem", {
-            role: "rest",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
         }),
         new Track("ChordItem", {
-            role: "harmony",
             parent: trackGroup,
             children: [],
             allowUserEdit: true,
