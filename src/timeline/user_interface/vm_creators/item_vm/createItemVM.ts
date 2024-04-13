@@ -1,7 +1,5 @@
 import chroma from "chroma-js";
 
-import type { Props } from "tippy.js";
-
 import {
     itemColorFunctions,
     itemTextFunctions,
