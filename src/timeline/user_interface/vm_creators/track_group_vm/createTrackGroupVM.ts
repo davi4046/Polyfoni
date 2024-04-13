@@ -41,7 +41,12 @@ export default function createTrackGroupVM(
         return { label: label ? label : "MISSING LABEL" };
     }
 
-    function compileIconCreator() {
+    function compileHidden() {
+        const hidden = matchPosition(getPosition(model), positionHiddenMap);
+        return { hidden: hidden !== undefined ? hidden : true };
+    }
+
+    function compileCreateIcon() {
         return {
             createIcon: (target: Element) => {
                 const value = context.state.collapsed.includes(model);
@@ -67,12 +72,7 @@ export default function createTrackGroupVM(
         };
     }
 
-    function compileHidden() {
-        const hidden = matchPosition(getPosition(model), positionHiddenMap);
-        return { hidden: hidden !== undefined ? hidden : true };
-    }
-
-    function compileMenu() {
+    function compileHeaderMenu() {
         const createMenu = matchPosition(getPosition(model), positionMenuMap);
         return {
             headerMenu: createMenu ? createMenu(model, context) : undefined,
@@ -84,9 +84,9 @@ export default function createTrackGroupVM(
     const vm = new TrackGroupVM({
         ...compileLabel(),
         ...compileTracks(),
-        ...compileIconCreator(),
         ...compileHidden(),
-        ...compileMenu(),
+        ...compileCreateIcon(),
+        ...compileHeaderMenu(),
     });
 
     model.subscribe((_, oldState) => {
