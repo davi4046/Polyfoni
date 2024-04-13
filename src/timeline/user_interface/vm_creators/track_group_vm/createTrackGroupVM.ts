@@ -102,7 +102,7 @@ export default function createTrackGroupVM(
     context.subscribe((_, oldState) => {
         vm.state = {
             ...(context.state.collapsed !== oldState.collapsed
-                ? compileTracks()
+                ? { ...compileTracks(), ...compileCreateIcon() }
                 : {}),
         };
     });
