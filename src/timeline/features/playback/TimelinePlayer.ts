@@ -10,7 +10,7 @@ import {
     getChildren,
     getIndex,
 } from "../../../architecture/state-hierarchy-utils";
-import mapRange from "../../../utils/math-utils";
+import { mapRange } from "../../../utils/math-utils";
 import type Item from "../../models/item/Item";
 import type Timeline from "../../models/timeline/Timeline";
 import type Voice from "../../models/voice/Voice";

@@ -1,4 +1,4 @@
-export default function mapRange(
+export function mapRange(
     value: number,
     inMin: number,
     inMax: number,
@@ -7,4 +7,11 @@ export default function mapRange(
 ): number {
     if (inMin === inMax) return outMin;
     return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+}
+
+export function circWrap(value: number, rmin: number, rmax: number): number {
+    const range = rmax - rmin;
+    while (value >= rmax) value -= range;
+    while (value < rmin) value += range;
+    return value;
 }
