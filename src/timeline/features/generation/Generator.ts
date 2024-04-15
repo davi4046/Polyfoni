@@ -466,7 +466,7 @@ function getPitchFromChordStatusAndDegree(
     if (!(chordStatus instanceof Chord)) return;
 
     if (degree !== undefined) {
-        return chordStatus.convertDegreeToMidiValue(degree);
+        return chordStatus.degreeToMidi(degree);
     }
 }
 

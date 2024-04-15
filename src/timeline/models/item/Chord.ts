@@ -73,7 +73,7 @@ export class Chord {
         return builder.build() as Chord;
     }
 
-    convertDegreeToMidiValue(degree: number): number {
+    degreeToMidi(degree: number): number {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
         const octave = Math.floor(degree / midiValues.length) + baseOctave;
         let index = degree % midiValues.length;
@@ -81,7 +81,7 @@ export class Chord {
         return midiValues[index] + octave * 12;
     }
 
-    convertMidiValueToDegree(midiValue: number): number {
+    midiToDegree(midiValue: number): number {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
 
         // 1.
