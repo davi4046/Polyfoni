@@ -3,7 +3,7 @@ class GlobalEventListener {
 
     set handler(newHandler: GlobalEventHandler | undefined) {
         // CAUSES LAG DURING PLAYBACK!!!
-        // if (newHandler === this._handler) return;
+        if (newHandler === this._handler) return;
 
         if (
             this._handler &&
