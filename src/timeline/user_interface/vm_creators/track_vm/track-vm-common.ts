@@ -43,20 +43,6 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
     const maxIndex = getChildren(getParent(voice)).length - 1;
 
     return new Menu([
-        new MenuItem("Collapse", () => {
-            const collapsed = context.state.collapsed
-                .concat(getChildren(voice).slice(1))
-                .filter((value, index, array) => {
-                    return index === array.indexOf(value);
-                });
-            context.state = { collapsed };
-        }),
-        new MenuItem("Expand", () => {
-            const collapsed = context.state.collapsed.filter((value) => {
-                return !getChildren(voice).includes(value);
-            });
-            context.state = { collapsed };
-        }),
         new MenuItem(
             "Move up",
             () => {
