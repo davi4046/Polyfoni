@@ -89,7 +89,7 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
             },
             { disabled: voiceIndex === maxIndex }
         ),
-        new MenuItem("Add decoration pass", () => {
+        new MenuItem("Create Decoration Pass", () => {
             context.history.startAction();
             createDecorationPass(voice);
             context.history.endAction("Created Decoration Pass");
