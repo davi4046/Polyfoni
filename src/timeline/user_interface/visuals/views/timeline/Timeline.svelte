@@ -231,7 +231,7 @@
     </div>
     <!-- TOP HEADERS -->
     <div
-        class="col-start-1 row-start-2 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
+        class="col-start-1 row-start-2 h-full overflow-hidden"
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
@@ -239,7 +239,7 @@
     </div>
     <!-- CENTER HEADERS -->
     <div
-        class="v-scroll col-start-1 row-start-3 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
+        class="v-scroll col-start-1 row-start-3 h-full overflow-hidden py-4"
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >
@@ -247,7 +247,7 @@
     </div>
     <!-- BOTTOM HEADERS -->
     <div
-        class="col-start-1 row-start-4 flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
+        class="col-start-1 row-start-4 h-full overflow-hidden"
         on:mousemove={vm.state.handleMouseMove}
         role="none"
     >

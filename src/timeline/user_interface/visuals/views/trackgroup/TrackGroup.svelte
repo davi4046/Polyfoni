@@ -7,11 +7,13 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
-{#if !vm.state.hidden}
-    <div class="h-[var(--timeline-track-group-gap)]" />
-{/if}
-<div class="space-y-[var(--timeline-track-gap)]">
-    {#each vm.state.tracks as trackVM (trackVM.id)}
-        <Track vm={trackVM}></Track>
-    {/each}
+<div>
+    {#if !vm.state.hidden}
+        <div class="h-[var(--timeline-track-group-gap)]" />
+    {/if}
+    <div class="space-y-[var(--timeline-track-gap)]">
+        {#each vm.state.tracks as trackVM (trackVM.id)}
+            <Track vm={trackVM}></Track>
+        {/each}
+    </div>
 </div>

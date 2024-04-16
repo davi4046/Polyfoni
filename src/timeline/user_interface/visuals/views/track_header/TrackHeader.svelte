@@ -34,7 +34,7 @@
 </script>
 
 <div
-    class="flex h-[var(--timeline-track-height)] w-full items-center whitespace-nowrap p-2"
+    class=" flex h-[var(--timeline-track-height)] w-full items-center whitespace-nowrap p-2"
     on:contextmenu={handleContextMenu}
     role="none"
 >

@@ -3,7 +3,7 @@
     --timeline-track-gap: theme("gap.2");
     --timeline-track-height: theme("height.12");
 
-    --timeline-track-group-gap: theme("gap.4");
+    --timeline-track-group-gap: theme("gap.6");
 
     --timeline-voice-color: theme("colors.gray.50");
     --timeline-voice-gap: theme("gap.4");

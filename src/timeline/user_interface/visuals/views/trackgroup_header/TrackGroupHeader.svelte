@@ -33,20 +33,22 @@
     }
 </script>
 
-{#if !vm.state.hidden}
-    <div
-        class="flex h-[var(--timeline-track-group-gap)] items-center bg-gray-500 p-2 text-sm text-white"
-        on:contextmenu={handleContextMenu}
-        role="none"
-    >
-        <div class="mr-2 h-6 w-6 overflow-clip">
-            <DynamicComponent bind:createComponent={vm.state.createIcon} />
+<div>
+    {#if !vm.state.hidden}
+        <div
+            class=" flex h-[var(--timeline-track-group-gap)] items-center bg-gray-500 p-2 text-sm text-white"
+            on:contextmenu={handleContextMenu}
+            role="none"
+        >
+            <div class="mr-2 h-6 w-6 overflow-clip">
+                <DynamicComponent bind:createComponent={vm.state.createIcon} />
+            </div>
+            {vm.state.label}
         </div>
-        {vm.state.label}
+    {/if}
+    <div class="space-y-[var(--timeline-track-gap)]">
+        {#each vm.state.tracks as trackVM (trackVM.id)}
+            <TrackHeader vm={trackVM}></TrackHeader>
+        {/each}
     </div>
-{/if}
-<div class="space-y-[var(--timeline-track-gap)]">
-    {#each vm.state.tracks as trackVM (trackVM.id)}
-        <TrackHeader vm={trackVM}></TrackHeader>
-    {/each}
 </div>

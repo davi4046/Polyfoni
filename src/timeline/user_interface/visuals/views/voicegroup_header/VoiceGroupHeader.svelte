@@ -7,6 +7,8 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
-{#each vm.state.voices as voiceVM (voiceVM.id)}
-    <VoiceHeader vm={voiceVM}></VoiceHeader>
-{/each}
+<div class="space-y-[var(--timeline-voice-gap)]">
+    {#each vm.state.voices as voiceVM (voiceVM.id)}
+        <VoiceHeader vm={voiceVM}></VoiceHeader>
+    {/each}
+</div>
