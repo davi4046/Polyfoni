@@ -76,22 +76,27 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
         new Track("NoteItem", {
             parent: outputGroup,
             children: [],
+            role: "output",
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
+            role: "pitch",
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
+            role: "duration",
         }),
         new Track("StringItem", {
             parent: frameworkGroup,
             children: [],
+            role: "rest",
         }),
         new Track("ChordItem", {
             parent: frameworkGroup,
             children: [],
+            role: "harmony",
         })
     );
 
