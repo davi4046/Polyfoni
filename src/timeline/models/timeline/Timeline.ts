@@ -49,7 +49,6 @@ export default class Timeline extends Stateful<TimelineState> {
         track = new Track("StringItem", {
             parent: trackGroup,
             children: [],
-            role: "tempo",
         });
         addChildren(track.state.parent, track);
         this.tempoTrack = track;
@@ -57,7 +56,6 @@ export default class Timeline extends Stateful<TimelineState> {
         track = new Track("ChordItem", {
             parent: trackGroup,
             children: [],
-            role: "scale",
         });
         addChildren(track.state.parent, track);
         this.scaleTrack = track;
@@ -79,7 +77,6 @@ export default class Timeline extends Stateful<TimelineState> {
         track = new Track("ChordItem", {
             parent: trackGroup,
             children: [],
-            role: "total",
         });
         addChildren(track.state.parent, track);
         this.totalTrack = track;

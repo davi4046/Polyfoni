@@ -6,10 +6,12 @@ import TrackVM from "../../view_models/TrackVM";
 import {
     getChildren,
     getParent,
+    getPosition,
+    matchPosition,
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
 
-import { roleLabelMap, roleMenuMap } from "./track-vm-common";
+import { positionLabelMap, positionMenuMap } from "./track-vm-common";
 
 export default function createNoteTrackVM(
     model: Track<"NoteItem">,
@@ -53,7 +55,7 @@ export default function createNoteTrackVM(
     }
 
     function compileLabel() {
-        const createLabel = roleLabelMap.get(model.state.role);
+        const createLabel = matchPosition(getPosition(model), positionLabelMap);
         return {
             label: createLabel ? createLabel(model) : "MISSING LABEL",
         };
@@ -66,7 +68,7 @@ export default function createNoteTrackVM(
     }
 
     function compileHeaderMenu() {
-        const createMenu = roleMenuMap.get(model.state.role);
+        const createMenu = matchPosition(getPosition(model), positionMenuMap);
         return {
             headerMenu: createMenu ? createMenu(model, context) : undefined,
         };

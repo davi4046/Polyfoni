@@ -13,22 +13,18 @@ export default function createDecorationPass(voice: Voice) {
         new Track("StringItem", {
             parent: trackGroup,
             children: [],
-            role: "pitches",
         }),
         new Track("StringItem", {
             parent: trackGroup,
             children: [],
-            role: "fraction",
         }),
         new Track("StringItem", {
             parent: trackGroup,
             children: [],
-            role: "skip",
         }),
         new Track("ChordItem", {
             parent: trackGroup,
             children: [],
-            role: "harmony",
         }),
     ];
 

@@ -11,9 +11,7 @@ import {
 
 export interface TrackState<T extends keyof ItemTypes>
     extends ChildState<TrackGroup>,
-        ParentState<Item<T>> {
-    role: string;
-}
+        ParentState<Item<T>> {}
 
 export default class Track<T extends keyof ItemTypes> extends Stateful<
     TrackState<T>
