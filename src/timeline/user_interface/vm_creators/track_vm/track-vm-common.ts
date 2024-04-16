@@ -1,6 +1,7 @@
 import type TimelineContext from "../../context/TimelineContext";
 import createDecorationPass from "../../../utils/createDecorationPass";
 import {
+    addChildren,
     getChildren,
     getGrandparent,
     getIndex,
@@ -8,7 +9,8 @@ import {
 } from "../../../../architecture/state-hierarchy-utils";
 import { moveElementDown, moveElementUp } from "../../../../utils/array-utils";
 import { midiInstrumentFamilies } from "../../../../utils/midiInstrumentFamilies";
-import type Track from "../../../models/track/Track";
+import Track from "../../../models/track/Track";
+import TrackGroup from "../../../models/track_group/TrackGroup";
 import type Voice from "../../../models/voice/Voice";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
@@ -92,7 +94,17 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
         ),
         new MenuItem("Create Decoration Pass", () => {
             context.history.startAction();
-            createDecorationPass(voice);
+            const trackGroup = new TrackGroup({
+                parent: voice,
+                children: [],
+            });
+            const track = new Track("StringItem", {
+                parent: trackGroup,
+                children: [],
+                role: "pitches",
+            });
+            addChildren(trackGroup, track);
+            addChildren(voice, trackGroup);
             context.history.endAction("Created Decoration Pass");
         }),
         new MenuItem(
