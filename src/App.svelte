@@ -117,7 +117,7 @@
             class="absolute bottom-64 right-0 z-50 flex max-h-64 flex-col-reverse items-end overflow-clip"
         >
             {#each messages as message}
-                <div class="border bg-black bg-opacity-75 px-4 py-2 text-white">
+                <div class="m-0.5 bg-black bg-opacity-75 px-4 py-2 text-white">
                     {message}
                 </div>
             {/each}
