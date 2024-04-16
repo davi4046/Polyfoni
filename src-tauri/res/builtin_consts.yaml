@@ -1,0 +1,49 @@
+PASSING_TONE: >-
+    degrees
+    if (degrees := list(range(
+      floor(pitch_to_degree(prev_pitch)) + 1,
+      ceil(pitch_to_degree(next_pitch))
+    )))
+    and (pitches := [degree_to_pitch(degree) for degree in degrees])
+    and all(abs(pitches[i] - pitches[i - 1]) <= 2 for i in range(1, len(pitches)))
+    else None
+UPPER_NEIGHBOR_TONE: >-
+    degree 
+    if degree_to_pitch(degree := floor(pitch_to_degree(prev_pitch)) + 1) - prev_pitch <= 2 
+    else None 
+    if prev_pitch == next_pitch 
+    else None
+LOWER_NEIGHBOR_TONE: >-
+    degree 
+    if prev_pitch - degree_to_pitch(degree := ceil(pitch_to_degree(prev_pitch)) - 1) <= 2 
+    else None 
+    if prev_pitch == next_pitch 
+    else None
+APPOGIATURA: >-
+    degree 
+    if abs(next_pitch - degree_to_pitch(degree := ( 
+      floor(pitch_to_degree(next_pitch)) + 1 
+      if prev_pitch < next_pitch 
+      else ceil(pitch_to_degree(next_pitch)) - 1 
+    ))) <= 2 
+    else None 
+    if prev_pitch != next_pitch 
+    else None
+ESCAPE_TONE: >-
+    degree 
+    if abs(next_pitch - degree_to_pitch(degree := ( 
+      ceil(pitch_to_degree(prev_pitch)) - 1 
+      if prev_pitch < next_pitch 
+      else floor(pitch_to_degree(next_pitch)) + 1 
+    ))) <= 2 
+    else None 
+    if prev_pitch != next_pitch 
+    else None
+SUSPENSION: >-
+    degree
+    if (degree := pitch_to_degree(prev_pitch)) % 1 == 0 
+    else None
+ANTICIPATION: >-
+    degree 
+    if (degree := pitch_to_degree(next_pitch)) % 1 == 0 
+    else None
