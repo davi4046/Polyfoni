@@ -8,7 +8,7 @@
     import selectHighlightedItems from "./timeline/user_interface/context/operations/selectHighlightedItems";
     import Generator from "./timeline/features/generation/Generator";
     import TotalHarmonyGenerator from "./timeline/features/generation/TotalHarmonyGenerator";
-    import { listen } from "@tauri-apps/api/event";
+    import { emit, listen } from "@tauri-apps/api/event";
     import { save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
@@ -32,6 +32,7 @@
         deleteSelectedItems(timelineContext);
         cropHighlightedItems(timelineContext);
         timelineContext.history.endAction();
+        emit("displayMessage", { message: "Cropped item(s)" });
     });
 
     registerShortcut("insert", () => {
@@ -79,10 +80,33 @@
     onDestroy(async () => {
         (await unlisten)(); // avoid opening multiple save dialogs after hot reload
     });
+
+    let messages: string[] = [];
+
+    listen("displayMessage", (event) => {
+        const payload = event.payload as { message: string };
+
+        messages = [payload.message + ` (${messages.length})`, ...messages];
+
+        setTimeout(() => {
+            messages = messages.toSpliced(-1, 1);
+        }, 3000);
+    });
 </script>
 
 {#await loadFonts() then}
     <main class="h-full">
         <Timeline vm={timelineVM}></Timeline>
+        <div
+            class="absolute bottom-64 right-0 z-50 flex max-h-64 flex-col-reverse items-end overflow-clip"
+        >
+            {#each messages as message}
+                <div
+                    class="border bg-black bg-opacity-75 px-4 py-2 text-lg text-white"
+                >
+                    {message}
+                </div>
+            {/each}
+        </div>
     </main>
 {/await}
