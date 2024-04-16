@@ -136,11 +136,11 @@ function createTrackGroupMenu(
             const updatedChildren = voice.state.children.slice();
             updatedChildren.splice(index, 1);
 
-            context.history.startAction("Delete decoration pass");
+            context.history.startAction();
             voice.state = {
                 children: updatedChildren,
             };
-            context.history.endAction();
+            context.history.endAction("Deleted Decoration Pass");
         }),
     ]);
 }

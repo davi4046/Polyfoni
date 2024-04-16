@@ -1,8 +1,7 @@
 import Item from "../models/item/Item";
-import type Interval from "../../../utils/interval/Interval";
+import type { ItemTypes } from "../models/item/ItemTypes";
+import type Interval from "../../utils/interval/Interval";
 import clearInterval from "../../utils/interval/clear_interval/clearInterval";
-
-import type { ItemTypes } from "./ItemTypes";
 
 export default function cropItemsByInterval<T extends keyof ItemTypes>(
     items: Item<T>[],

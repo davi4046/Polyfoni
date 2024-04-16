@@ -65,11 +65,11 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementUp(updatedChildren, voiceIndex);
 
-                context.history.startAction("Move voice");
+                context.history.startAction();
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
-                context.history.endAction();
+                context.history.endAction("Moved voice up");
             },
             { disabled: voiceIndex === 0 }
         ),
@@ -81,18 +81,18 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
                 const updatedChildren = voiceGroup.state.children.slice();
                 moveElementDown(updatedChildren, voiceIndex);
 
-                context.history.startAction("Move voice");
+                context.history.startAction();
                 voiceGroup.state = {
                     children: updatedChildren,
                 };
-                context.history.endAction();
+                context.history.endAction("Moved voice down");
             },
             { disabled: voiceIndex === maxIndex }
         ),
         new MenuItem("Add decoration pass", () => {
-            context.history.startAction("Add decoration pass");
+            context.history.startAction();
             createDecorationPass(voice);
-            context.history.endAction();
+            context.history.endAction("Created Decoration Pass");
         }),
         new MenuItem(
             "Change instrument",
@@ -101,13 +101,11 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
                     .flatMap((familiy) => familiy[1])
                     .map((instrumentName, index) => {
                         return new MenuItem(instrumentName, () => {
-                            context.history.startAction(
-                                "Change voice instrument"
-                            );
+                            context.history.startAction();
                             voice.state = {
                                 instrument: index,
                             };
-                            context.history.endAction();
+                            context.history.endAction("Changed instrument");
                         });
                     }),
                 { maxHeight: "154px", searchBar: true }
@@ -119,11 +117,11 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
             const updatedChildren = voiceGroup.state.children.slice();
             updatedChildren.splice(voiceIndex, 1);
 
-            context.history.startAction("Delete voice");
+            context.history.startAction();
             voiceGroup.state = {
                 children: updatedChildren,
             };
-            context.history.endAction();
+            context.history.endAction("Deleted voice");
         }),
     ]);
 }

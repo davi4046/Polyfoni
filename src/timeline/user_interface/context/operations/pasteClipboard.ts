@@ -7,8 +7,6 @@ export default function pasteClipboard(context: TimelineContext) {
     if (context.state.clipboard.length === 1) {
         const clipboardItem = context.state.clipboard[0];
 
-        context.history.startAction("Paste item content");
-
         for (const item of context.state.selectedItems) {
             if (item.itemType !== clipboardItem.itemType) continue;
 
@@ -31,8 +29,6 @@ export default function pasteClipboard(context: TimelineContext) {
                 ),
             };
         }
-
-        context.history.endAction();
     } else {
         const newGhostPairs = context.state.clipboard.map((item) => {
             return [

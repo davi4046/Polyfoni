@@ -160,8 +160,8 @@ export default class ItemHandler implements GlobalEventHandler {
 
         if (this.context.state.ghostPairs.length === 0) return;
 
-        this.context.history.startAction("Move items");
+        this.context.history.startAction();
         placeGhostItems(this.context);
-        this.context.history.endAction();
+        this.context.history.endAction("Moved items");
     }
 }

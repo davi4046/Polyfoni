@@ -58,7 +58,7 @@ export default class EndGripHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
-        this.context.history.startAction("Edit item end");
+        this.context.history.startAction();
 
         this._grippedItems.forEach((item) => {
             item.state = {
@@ -67,7 +67,7 @@ export default class EndGripHandler implements GlobalEventHandler {
             cropItemInterval(item);
         });
 
-        this.context.history.endAction();
+        this.context.history.endAction("Adjusted item end");
 
         this._grippedItems = [];
         this._updateGrips();

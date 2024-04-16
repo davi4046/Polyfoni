@@ -60,7 +60,7 @@ export default class StartGripHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
-        this.context.history.startAction("Edit item start");
+        this.context.history.startAction();
 
         this._grippedItems.forEach((item) => {
             item.state = {
@@ -69,7 +69,7 @@ export default class StartGripHandler implements GlobalEventHandler {
             cropItemInterval(item);
         });
 
-        this.context.history.endAction();
+        this.context.history.endAction("Adjusted item start");
 
         this._grippedItems = [];
         this._updateGrips();

@@ -1,3 +1,5 @@
+import { emit } from "@tauri-apps/api/event";
+
 import type TimelineContext from "../TimelineContext";
 import cropItemsByInterval from "../../../utils/cropItemsByInterval";
 import {
@@ -12,6 +14,8 @@ import {
 } from "../../../models/item/ItemTypes";
 
 export default function insertEmptyItems(context: TimelineContext) {
+    const newItems: Item<any>[] = [];
+
     context.state.highlights.forEach((highlight: Highlight<any>) => {
         const track = getParent(highlight);
 
@@ -24,20 +28,23 @@ export default function insertEmptyItems(context: TimelineContext) {
             ),
         };
 
-        addChildren(
-            track,
-            new Item(track.itemType, {
-                parent: track,
-                start: highlight.state.start,
-                end: highlight.state.end,
-                content:
-                    itemInitialContentFunctions[
-                        track.itemType as keyof ItemTypes
-                    ](),
-            })
-        );
+        const item = new Item(track.itemType, {
+            parent: track,
+            start: highlight.state.start,
+            end: highlight.state.end,
+            content:
+                itemInitialContentFunctions[
+                    track.itemType as keyof ItemTypes
+                ](),
+        });
+
+        newItems.push(item);
+
+        addChildren(track, item);
     });
     context.state = {
         highlights: [],
     };
+
+    return newItems;
 }

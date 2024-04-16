@@ -1,3 +1,6 @@
+import { emit } from "@tauri-apps/api/event";
+import { message } from "@tauri-apps/api/dialog";
+
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
 import type Timeline from "../../models/timeline/Timeline";
@@ -19,7 +22,7 @@ export default class TimelineHistory {
     private _undoableActions: Action[] = [];
     private _redoableActions: Action[] = [];
 
-    startAction(title: string) {
+    startAction() {
         if (this._currAction) {
             console.warn(
                 "Tried to start an action" +
@@ -28,18 +31,20 @@ export default class TimelineHistory {
             );
             return;
         }
-        this._currAction = new Action(title);
+        this._currAction = new Action();
         this._redoableActions = [];
     }
 
-    endAction() {
+    endAction(title: string) {
         if (!this._currAction) {
             console.warn("Tried to end action but no action has been started");
             return;
         }
 
         if (this._currAction.changes.length > 0) {
+            this._currAction.title = title;
             this._undoableActions.push(this._currAction);
+            emit("display-message", { message: this._currAction.title });
         }
 
         this._currAction = undefined;
@@ -55,6 +60,7 @@ export default class TimelineHistory {
         });
 
         this._redoableActions.push(lastAction);
+        emit("display-message", { message: `Undo "${lastAction.title}"` });
     }
 
     redoAction() {
@@ -67,13 +73,14 @@ export default class TimelineHistory {
         });
 
         this._undoableActions.push(lastAction);
+        emit("display-message", { message: `Redo "${lastAction.title}"` });
     }
 }
 
 class Action {
     constructor(
-        readonly title: string,
-        readonly changes: StateChange<any>[] = []
+        public title: string = "",
+        public changes: StateChange<any>[] = []
     ) {}
 }
 

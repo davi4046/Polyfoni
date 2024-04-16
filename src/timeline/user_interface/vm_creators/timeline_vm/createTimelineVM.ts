@@ -70,11 +70,11 @@ export default function createTimelineVM(
                 justUpdated = true;
 
                 // 2.
-                context.history.startAction("Edit item content");
+                context.history.startAction();
                 item.state = {
                     content: value,
                 };
-                context.history.endAction();
+                context.history.endAction("Updated item content");
             },
         };
 

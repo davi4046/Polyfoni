@@ -28,17 +28,27 @@
     new TotalHarmonyGenerator(timeline);
 
     registerShortcut("delete", () => {
-        timelineContext.history.startAction("Delete");
-        deleteSelectedItems(timelineContext);
-        cropHighlightedItems(timelineContext);
-        timelineContext.history.endAction();
-        emit("displayMessage", { message: "Cropped item(s)" });
+        timelineContext.history.startAction();
+
+        if (timelineContext.state.highlights.length > 0) {
+            cropHighlightedItems(timelineContext);
+            timelineContext.history.endAction("Cropped selection");
+        } else {
+            deleteSelectedItems(timelineContext);
+            timelineContext.history.endAction("Deleted selected items");
+        }
     });
 
     registerShortcut("insert", () => {
-        timelineContext.history.startAction("Insert empty items");
-        insertEmptyItems(timelineContext);
-        timelineContext.history.endAction();
+        timelineContext.history.startAction();
+
+        const newItems = insertEmptyItems(timelineContext);
+
+        timelineContext.history.endAction(
+            newItems.length > 1
+                ? `Inserted ${newItems.length} empty items`
+                : `Inserted 1 empty item`
+        );
     });
 
     registerShortcut("enter", () => {
@@ -51,10 +61,16 @@
         } else {
             copySelectedItems(timelineContext);
         }
+        emit("display-message", {
+            message: "Copied selection to clipbaord",
+        });
     });
 
     registerShortcut("ctrl+v", () => {
         pasteClipboard(timelineContext);
+        emit("display-message", {
+            message: "Pasted clipboard",
+        });
     });
 
     registerShortcut("ctrl+z", () => {
@@ -83,10 +99,10 @@
 
     let messages: string[] = [];
 
-    listen("displayMessage", (event) => {
+    listen("display-message", (event) => {
         const payload = event.payload as { message: string };
 
-        messages = [payload.message + ` (${messages.length})`, ...messages];
+        messages = [payload.message, ...messages];
 
         setTimeout(() => {
             messages = messages.toSpliced(-1, 1);
@@ -101,9 +117,7 @@
             class="absolute bottom-64 right-0 z-50 flex max-h-64 flex-col-reverse items-end overflow-clip"
         >
             {#each messages as message}
-                <div
-                    class="border bg-black bg-opacity-75 px-4 py-2 text-lg text-white"
-                >
+                <div class="border bg-black bg-opacity-75 px-4 py-2 text-white">
                     {message}
                 </div>
             {/each}
