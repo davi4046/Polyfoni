@@ -5,14 +5,12 @@ import TrackGroupVM from "../../view_models/TrackGroupVM";
 import type TrackVM from "../../view_models/TrackVM";
 import ArrowDropDownButton from "../../visuals/buttons/ArrowDropDownButton.svelte";
 import {
-    addChildren,
     getChildren,
     getIndex,
     getParent,
     getPosition,
     matchPosition,
 } from "../../../../architecture/state-hierarchy-utils";
-import Track from "../../../models/track/Track";
 import type TrackGroup from "../../../models/track_group/TrackGroup";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
 
@@ -128,8 +126,6 @@ function createTrackGroupMenu(
     model: TrackGroup,
     context: TimelineContext
 ): Menu {
-    const trackOrder = ["pitches", "fraction", "skip", "harmony"];
-
     return new Menu([
         new MenuItem("Delete", () => {
             const voice = getParent(model);
@@ -146,86 +142,5 @@ function createTrackGroupMenu(
             };
             context.history.endAction("Deleted Decoration Pass");
         }),
-        new MenuItem(
-            "Create Fraction Track",
-            () => {
-                const track = new Track("StringItem", {
-                    parent: model,
-                    children: [],
-                    role: "fraction",
-                });
-                context.history.startAction();
-                model.state = {
-                    children: model.state.children
-                        .concat(track)
-                        .sort((a, b) => {
-                            return (
-                                trackOrder.indexOf(a.state.role) -
-                                trackOrder.indexOf(b.state.role)
-                            );
-                        }),
-                };
-                context.history.endAction("Created Fraction Track");
-            },
-            {
-                disabled: getChildren(model).some(
-                    (track) => track.state.role === "fraction"
-                ),
-            }
-        ),
-        new MenuItem(
-            "Create Skip Track",
-            () => {
-                const track = new Track("StringItem", {
-                    parent: model,
-                    children: [],
-                    role: "skip",
-                });
-                context.history.startAction();
-                model.state = {
-                    children: model.state.children
-                        .concat(track)
-                        .sort((a, b) => {
-                            return (
-                                trackOrder.indexOf(a.state.role) -
-                                trackOrder.indexOf(b.state.role)
-                            );
-                        }),
-                };
-                context.history.endAction("Created Skip Track");
-            },
-            {
-                disabled: getChildren(model).some(
-                    (track) => track.state.role === "skip"
-                ),
-            }
-        ),
-        new MenuItem(
-            "Create Harmony Track",
-            () => {
-                const track = new Track("StringItem", {
-                    parent: model,
-                    children: [],
-                    role: "harmony",
-                });
-                context.history.startAction();
-                model.state = {
-                    children: model.state.children
-                        .concat(track)
-                        .sort((a, b) => {
-                            return (
-                                trackOrder.indexOf(a.state.role) -
-                                trackOrder.indexOf(b.state.role)
-                            );
-                        }),
-                };
-                context.history.endAction("Created Harmony Track");
-            },
-            {
-                disabled: getChildren(model).some(
-                    (track) => track.state.role === "harmony"
-                ),
-            }
-        ),
     ]);
 }
