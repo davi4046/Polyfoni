@@ -44,12 +44,17 @@ export default function createItemVM<T extends keyof ItemTypes>(
 
     function compileStart() {
         const startOverride = context.state.visualStartOverrideMap.get(model);
-        return { start: startOverride ? startOverride : model.state.start };
+        return {
+            start:
+                startOverride !== undefined ? startOverride : model.state.start,
+        };
     }
 
     function compileEnd() {
         const endOverride = context.state.visualEndOverrideMap.get(model);
-        return { end: endOverride ? endOverride : model.state.end };
+        return {
+            end: endOverride !== undefined ? endOverride : model.state.end,
+        };
     }
 
     function compileText() {
