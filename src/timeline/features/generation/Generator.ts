@@ -6,17 +6,16 @@ import {
     countAncestors,
     getChildren,
     getGrandparent,
-    getIndex,
     getParent,
 } from "../../../architecture/state-hierarchy-utils";
 import compareArrays from "../../../utils/compareArrays";
-import compareStates from "../../../utils/compareStates";
 import { Chord } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
 import type Track from "../../models/track/Track";
+import type TrackGroup from "../../models/track_group/TrackGroup";
 import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
@@ -35,6 +34,23 @@ export default class Generator {
             this._voiceNotesMap.set(voice, notes);
         }
         return notes;
+    }
+
+    private _decorationGenerationMap = new Map<
+        TrackGroup,
+        SimpleNoteBuilder[][]
+    >();
+
+    private _getDecorationGeneration(
+        trackGroup: TrackGroup
+    ): SimpleNoteBuilder[][] {
+        let generation = this._decorationGenerationMap.get(trackGroup);
+        if (!generation) {
+            const voiceNotes = this._getVoiceNotes(getParent(trackGroup));
+            generation = new Array(voiceNotes.length - 1).fill([]); // One element per space between two notes
+            this._decorationGenerationMap.set(trackGroup, generation);
+        }
+        return generation;
     }
 
     constructor(timeline: Timeline) {
@@ -77,13 +93,8 @@ export default class Generator {
                     const trackType = getTrackType(getParent(obj as Item<any>));
                     if (trackType === "output" || !trackType) return;
 
-                    const updatedProps = compareStates<ItemState<any>>(
-                        oldState,
-                        newState
-                    );
-
                     const isValidChange = ["start", "end", "content"].some(
-                        (key) => updatedProps.has(key as keyof ItemState<any>)
+                        (key) => oldState[key] !== newState[key]
                     );
 
                     if (isValidChange) {
@@ -178,6 +189,29 @@ export default class Generator {
                         ),
                     };
                 }
+                break;
+            }
+            case "decorationPitches": {
+                const decorations = this._getDecorationGeneration(
+                    getParent(itemState.parent)
+                );
+                const ownedDecorations = decorations.slice(
+                    voiceNotes.indexOf(ownedNotes[0]),
+                    voiceNotes.indexOf(ownedNotes[ownedNotes.length - 1])
+                );
+                ownedDecorations.forEach((array) => (array.length = 0));
+                break;
+            }
+            case "decorationFraction": {
+                // recalculate duration of notes in owned decorations
+                break;
+            }
+            case "decorationSkip": {
+                // set owned decorations to skipped some way
+                break;
+            }
+            case "decorationHarmony": {
+                // recalculate pitches for owned decorations
                 break;
             }
         }
@@ -355,6 +389,22 @@ export default class Generator {
                 await this._remakePropertiesForNotes(voice, newNotes);
                 break;
             }
+            case "decorationPitches": {
+                // recalculate pitches for owned decorations
+                break;
+            }
+            case "decorationFraction": {
+                // recalculate durations of notes in owned decorations
+                break;
+            }
+            case "decorationSkip": {
+                // recalculate skip for owned decorations
+                break;
+            }
+            case "decorationHarmony": {
+                // recalculate pitches for owned decorations
+                break;
+            }
         }
     }
 
@@ -434,6 +484,12 @@ class NoteBuilder {
     degree?: number;
     pitch?: number;
     isRest?: boolean;
+}
+
+class SimpleNoteBuilder {
+    duration?: number;
+    pitch?: number;
+    isSkip?: boolean;
 }
 
 function isNoteStartWithinInterval(
