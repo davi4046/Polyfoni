@@ -26,15 +26,15 @@ export default class Generator {
     private _itemChanges: ItemChange[] = [];
     private _isHandlingChanges = false;
 
-    private _voiceMap = new Map<Voice, NoteBuilder[]>();
+    private _voiceNotesMap = new Map<Voice, NoteBuilder[]>();
 
     private _getVoiceNotes(voice: Voice): NoteBuilder[] {
-        let noteBuilders = this._voiceMap.get(voice);
-        if (!noteBuilders) {
-            noteBuilders = [];
-            this._voiceMap.set(voice, noteBuilders);
+        let notes = this._voiceNotesMap.get(voice);
+        if (!notes) {
+            notes = [];
+            this._voiceNotesMap.set(voice, notes);
         }
-        return noteBuilders;
+        return notes;
     }
 
     constructor(timeline: Timeline) {
@@ -105,7 +105,7 @@ export default class Generator {
                     } else {
                         this._isHandlingChanges = false;
                         //render output
-                        for (const voice of this._voiceMap.keys()) {
+                        for (const voice of this._voiceNotesMap.keys()) {
                             this._renderOutput(voice);
                         }
                     }
