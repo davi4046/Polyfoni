@@ -349,20 +349,40 @@
     >
         <DynamicComponent bind:createComponent={vm.state.createItemEditor} />
     </div>
+
+    <!-- HORISONTAL SHADOWS -->
+
     <!-- TOP HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="pointer-events-none bottom-0 z-20 col-start-1 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-black to-transparent opacity-75"
     />
     <!-- BOTTOM HEADERS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-1 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="pointer-events-none bottom-0 z-20 col-start-1 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-black to-transparent opacity-75"
     />
     <!-- TOP TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-gray-800 to-transparent"
+        class="pointer-events-none bottom-0 z-20 col-start-2 row-start-2 h-1 translate-y-1 self-end bg-gradient-to-b from-black to-transparent opacity-75"
     />
     <!-- BOTTOM TRACKS SHADOW -->
     <div
-        class="bottom-0 z-20 col-start-2 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-gray-800 to-transparent"
+        class="pointer-events-none bottom-0 z-20 col-start-2 row-start-4 h-1 -translate-y-1 bg-gradient-to-t from-black to-transparent opacity-75"
+    />
+
+    <!-- VERTICAL SHADOWS -->
+
+    <!-- TOP HEADERS SHADOW -->
+    <div
+        class="pointer-events-none bottom-0 z-20 col-start-2 row-start-2 h-full w-1 bg-gradient-to-r from-black to-transparent opacity-50"
+    />
+
+    <!-- CENTER HEADERS SHADOW -->
+    <div
+        class="pointer-events-none bottom-0 z-20 col-start-2 row-start-3 h-full w-1 bg-gradient-to-r from-black to-transparent opacity-50"
+    />
+
+    <!-- BOTTOM HEADERS SHADOW -->
+    <div
+        class="pointer-events-none bottom-0 z-20 col-start-2 row-start-4 h-full w-1 bg-gradient-to-r from-black to-transparent opacity-50"
     />
 </div>

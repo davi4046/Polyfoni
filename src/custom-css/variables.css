@@ -1,7 +1,7 @@
 :root {
     --timeline-track-color: theme("colors.gray.200");
-    --timeline-track-gap: theme("gap.2");
-    --timeline-track-height: theme("height.12");
+    --timeline-track-gap: theme("gap.1");
+    --timeline-track-height: theme("height.11");
 
     --timeline-track-group-gap: theme("gap.6");
 

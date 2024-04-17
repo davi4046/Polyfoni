@@ -7,7 +7,7 @@
     vm.subscribe(() => (vm = vm));
 </script>
 
-<div class="space-y-0.5 bg-[color:var(--timeline-voice-color)]">
+<div class="bg-[color:var(--timeline-voice-color)]">
     {#each vm.state.trackGroups as trackGroupVM (trackGroupVM.id)}
         <TrackGroup vm={trackGroupVM}></TrackGroup>
     {/each}

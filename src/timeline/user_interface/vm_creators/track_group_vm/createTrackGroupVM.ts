@@ -87,6 +87,8 @@ export default function createTrackGroupVM(
         ...compileHidden(),
         ...compileCreateIcon(),
         ...compileHeaderMenu(),
+
+        isCollapsed: false,
     });
 
     model.subscribe((_, oldState) => {

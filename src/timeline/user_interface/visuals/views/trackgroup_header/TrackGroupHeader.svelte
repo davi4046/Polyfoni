@@ -36,7 +36,7 @@
 <div>
     {#if !vm.state.hidden}
         <div
-            class=" flex h-[var(--timeline-track-group-gap)] items-center bg-gray-500 p-2 text-sm text-white"
+            class=" flex h-[var(--timeline-track-group-gap)] items-center border-t-2 border-white bg-gray-500 p-2 text-sm text-white"
             on:contextmenu={handleContextMenu}
             role="none"
         >
