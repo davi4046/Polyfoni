@@ -21,7 +21,7 @@ import { intersectIntervals } from "../../../utils/interval/intersect_intervals/
 import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping";
 
 import getHarmonyOfNotes from "./getHarmonyOfNotes";
-import { getHarmonyTrack, getOutputTrack, getTrackType } from "./track-config";
+import { getTrackType, getTracksOfType } from "./track-config";
 
 export default class TotalHarmonyGenerator {
     private _itemChanges: ItemChange[] = [];
@@ -42,7 +42,8 @@ export default class TotalHarmonyGenerator {
                     const trackType = getTrackType(obj as Track<any>);
                     if (
                         !trackType ||
-                        (trackType !== "output" && trackType !== "harmony")
+                        (trackType !== "output" &&
+                            trackType !== "frameworkHarmony")
                     ) {
                         return;
                     }
@@ -72,7 +73,8 @@ export default class TotalHarmonyGenerator {
                     const trackType = getTrackType(getParent(obj as Item<any>));
                     if (
                         !trackType ||
-                        (trackType !== "output" && trackType !== "harmony")
+                        (trackType !== "output" &&
+                            trackType !== "frameworkHarmony")
                     ) {
                         return;
                     }
@@ -122,7 +124,9 @@ export default class TotalHarmonyGenerator {
         const voices = getChildren(getGreatGrandparent(itemState.parent));
         const timeline = getLastAncestor(itemState.parent);
 
-        const outputTracks = voices.map(getOutputTrack);
+        const outputTracks = voices.map(
+            (voice) => getTracksOfType(voice, "output")[0]
+        );
 
         function getTotalHarmonyForInterval(
             interval: Interval
@@ -155,8 +159,10 @@ export default class TotalHarmonyGenerator {
                 });
                 break;
             }
-            case "harmony": {
-                const harmonyTracks = voices.map(getHarmonyTrack);
+            case "frameworkHarmony": {
+                const harmonyTracks = voices.map(
+                    (voice) => getTracksOfType(voice, "frameworkHarmony")[0]
+                );
 
                 const harmonyItems = harmonyTracks.flatMap(getChildren);
 

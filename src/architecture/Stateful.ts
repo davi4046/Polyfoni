@@ -1,4 +1,4 @@
-import { isEqual, uniqueId } from "lodash";
+import { isEqual, uniqueId } from "lodash-es";
 
 import type { GetState, SetState } from "./state-hierarchy-utils";
 

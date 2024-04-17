@@ -20,13 +20,7 @@ import type Track from "../../models/track/Track";
 import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
-import {
-    getHarmonyTrack,
-    getOutputTrack,
-    getPitchTrack,
-    getRestTrack,
-    getTrackType,
-} from "./track-config";
+import { getTrackType, getTracksOfType } from "./track-config";
 
 export default class Generator {
     private _itemChanges: ItemChange[] = [];
@@ -145,26 +139,26 @@ export default class Generator {
         if (ownedNotes.length === 0) return;
 
         switch (trackType) {
-            case "pitch": {
+            case "frameworkPitch": {
                 ownedNotes.forEach((note) => {
                     note.degree = undefined;
                     note.pitch = undefined;
                 });
                 break;
             }
-            case "rest": {
+            case "frameworkRest": {
                 ownedNotes.forEach((note) => {
                     note.isRest = undefined;
                 });
                 break;
             }
-            case "harmony": {
+            case "frameworkHarmony": {
                 ownedNotes.forEach((note) => {
                     note.pitch = undefined;
                 });
                 break;
             }
-            case "duration": {
+            case "frameworkDuration": {
                 ownedNotes.forEach((note) => {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
@@ -203,7 +197,7 @@ export default class Generator {
         if (itemState.content === "") return;
 
         switch (trackType) {
-            case "pitch": {
+            case "frameworkPitch": {
                 const promises = [];
 
                 for (let i = 0; i < ownedNotes.length; i++) {
@@ -230,7 +224,10 @@ export default class Generator {
 
                 // Recalculate pitch based on harmony for ownedNotes
                 const voice = getGrandparent(itemState.parent);
-                const harmonyTrack = getHarmonyTrack(voice);
+                const [harmonyTrack] = getTracksOfType(
+                    voice,
+                    "frameworkHarmony"
+                );
 
                 ownedNotes.forEach((note) => {
                     const harmonyItem = getChildren(harmonyTrack).find((item) =>
@@ -244,7 +241,7 @@ export default class Generator {
                 });
                 break;
             }
-            case "rest": {
+            case "frameworkRest": {
                 const promises = [];
 
                 for (let i = 0; i < ownedNotes.length; i++) {
@@ -271,7 +268,7 @@ export default class Generator {
 
                 break;
             }
-            case "harmony": {
+            case "frameworkHarmony": {
                 const ownedNotes = getNotesStartingWithinInterval(
                     voiceNotes,
                     itemState
@@ -284,7 +281,7 @@ export default class Generator {
                 });
                 break;
             }
-            case "duration": {
+            case "frameworkDuration": {
                 ownedNotes.forEach((note) => {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
@@ -365,9 +362,9 @@ export default class Generator {
         voice: Voice,
         notes: NoteBuilder[]
     ) {
-        const pitchTrack = getPitchTrack(voice);
-        const restTrack = getRestTrack(voice);
-        const harmonyTrack = getHarmonyTrack(voice);
+        const [pitchTrack] = getTracksOfType(voice, "frameworkPitch");
+        const [restTrack] = getTracksOfType(voice, "frameworkRest");
+        const [harmonyTrack] = getTracksOfType(voice, "frameworkHarmony");
 
         // Find all pitch, rest, and harmony items that "own" one or more of the notes
         const items = [pitchTrack, restTrack, harmonyTrack].flatMap((track) => {
@@ -393,7 +390,7 @@ export default class Generator {
 
     private _renderOutput(voice: Voice) {
         const voiceNotes = this._getVoiceNotes(voice);
-        const outputTrack = getOutputTrack(voice);
+        const [outputTrack] = getTracksOfType(voice, "output");
 
         const notes = voiceNotes
             .map((noteBuilder) => {

@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { getOutputTrack } from "../generation/track-config";
+import { getTracksOfType } from "../generation/track-config";
 import {
     deriveTempoChangesFromItems,
     type TempoChange,
@@ -166,7 +166,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         endBeat: number,
         tempoChanges: TempoChange[]
     ) {
-        const outputTrack = getOutputTrack(voice);
+        const [outputTrack] = getTracksOfType(voice, "output");
         const timeouts: NodeJS.Timeout[] = [];
 
         const startTime = calculateTimeAtBeat(tempoChanges, startBeat);
