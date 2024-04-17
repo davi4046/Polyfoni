@@ -4,7 +4,7 @@ import type TrackGroup from "../track_group/TrackGroup";
 import Stateful from "../../../architecture/Stateful";
 import {
     getPosition,
-    validatePositionPattern,
+    isPositionOnPath,
     type ChildState,
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
@@ -26,7 +26,7 @@ export default class Track<T extends keyof ItemTypes> extends Stateful<
     isUserEditable(): boolean {
         const position = getPosition(this);
         return !["1,*,0,0", "2,0,0,0"].some((pattern) =>
-            validatePositionPattern(position, pattern)
+            isPositionOnPath(position, pattern)
         );
     }
 }

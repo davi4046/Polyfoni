@@ -11,7 +11,7 @@ import {
     getIndex,
     getParent,
     getPosition,
-    matchPosition,
+    matchPositionToPath,
 } from "../../../../architecture/state-hierarchy-utils";
 import type Track from "../../../models/track/Track";
 
@@ -45,7 +45,10 @@ export default function createItemTrackVM(
     }
 
     function compileLabel() {
-        const createLabel = matchPosition(getPosition(model), positionLabelMap);
+        const createLabel = matchPositionToPath(
+            getPosition(model),
+            positionLabelMap
+        );
         return {
             label: createLabel ? createLabel(model) : "MISSING LABEL",
         };
@@ -68,7 +71,10 @@ export default function createItemTrackVM(
     }
 
     function compileHeaderMenu() {
-        const createMenu = matchPosition(getPosition(model), positionMenuMap);
+        const createMenu = matchPositionToPath(
+            getPosition(model),
+            positionMenuMap
+        );
         return {
             headerMenu: createMenu ? createMenu(model, context) : undefined,
         };

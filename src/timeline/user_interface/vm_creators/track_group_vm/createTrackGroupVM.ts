@@ -9,7 +9,7 @@ import {
     getIndex,
     getParent,
     getPosition,
-    matchPosition,
+    matchPositionToPath,
 } from "../../../../architecture/state-hierarchy-utils";
 import type TrackGroup from "../../../models/track_group/TrackGroup";
 import { Menu, MenuItem } from "../../../../utils/popup_menu/popup-menu-types";
@@ -37,12 +37,15 @@ export default function createTrackGroupVM(
     }
 
     function compileLabel() {
-        const label = matchPosition(getPosition(model), positionLabelMap);
+        const label = matchPositionToPath(getPosition(model), positionLabelMap);
         return { label: label ? label : "MISSING LABEL" };
     }
 
     function compileHidden() {
-        const hidden = matchPosition(getPosition(model), positionHiddenMap);
+        const hidden = matchPositionToPath(
+            getPosition(model),
+            positionHiddenMap
+        );
         return { hidden: hidden !== undefined ? hidden : true };
     }
 
@@ -73,7 +76,10 @@ export default function createTrackGroupVM(
     }
 
     function compileHeaderMenu() {
-        const createMenu = matchPosition(getPosition(model), positionMenuMap);
+        const createMenu = matchPositionToPath(
+            getPosition(model),
+            positionMenuMap
+        );
         return {
             headerMenu: createMenu ? createMenu(model, context) : undefined,
         };
@@ -87,8 +93,6 @@ export default function createTrackGroupVM(
         ...compileHidden(),
         ...compileCreateIcon(),
         ...compileHeaderMenu(),
-
-        isCollapsed: false,
     });
 
     model.subscribe((_, oldState) => {

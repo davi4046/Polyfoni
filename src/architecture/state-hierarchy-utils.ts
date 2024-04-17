@@ -151,36 +151,36 @@ export function getPosition(obj: any): number[] {
     return position;
 }
 
-export function validatePositionPattern(
-    position: number[],
-    pattern: string
-): boolean {
-    const parts = pattern.split(",");
+export function doesValueMatchSymbol(value: number, symbol: string): boolean {
+    if (symbol.includes("-")) {
+        const subparts = symbol.split("-");
+
+        if (subparts.length !== 2)
+            throw new Error(`Invalid symbol: "${symbol}"`);
+
+        const min =
+            subparts[0] === "*" ? Number.MIN_SAFE_INTEGER : Number(subparts[0]);
+        const max =
+            subparts[1] === "*" ? Number.MAX_SAFE_INTEGER : Number(subparts[1]);
+
+        if (isNaN(min) || isNaN(max))
+            throw new Error(`Invalid symbol: "${symbol}"`);
+
+        if (value < min || value > max) {
+            return false;
+        }
+    } else if (symbol !== "*" && String(value) !== symbol) {
+        return false;
+    }
+    return true;
+}
+
+export function isPositionOnPath(position: number[], pattern: string): boolean {
+    const symbols = pattern.split(",");
     let match = true;
     position.forEach((value, index) => {
-        if (parts[index].includes("-")) {
-            const subparts = parts[index].split("-");
-
-            if (subparts.length !== 2)
-                throw new Error(`Invalid pattern: "${pattern}"`);
-
-            const min =
-                subparts[0] === "*"
-                    ? Number.MIN_SAFE_INTEGER
-                    : Number(subparts[0]);
-            const max =
-                subparts[1] === "*"
-                    ? Number.MAX_SAFE_INTEGER
-                    : Number(subparts[1]);
-
-            if (isNaN(min) || isNaN(max))
-                throw new Error(`Invalid pattern: "${pattern}"`);
-
-            if (value < min || value > max) {
-                match = false;
-                return;
-            }
-        } else if (parts[index] !== "*" && String(value) !== parts[index]) {
+        if (index === symbols.length) return;
+        if (!doesValueMatchSymbol(value, symbols[index])) {
             match = false;
             return;
         }
@@ -188,12 +188,12 @@ export function validatePositionPattern(
     return match;
 }
 
-export function matchPosition<T>(
+export function matchPositionToPath<T>(
     position: number[],
     map: Map<string, T>
 ): T | undefined {
     for (const [pattern, value] of map) {
-        if (validatePositionPattern(position, pattern)) {
+        if (isPositionOnPath(position, pattern)) {
             return value;
         }
     }
