@@ -8,7 +8,11 @@ import {
     type ParentState,
 } from "../../../architecture/state-hierarchy-utils";
 
-export interface TimelineState extends ParentState<VoiceGroup> {}
+export interface TimelineState extends ParentState<VoiceGroup> {
+    aliases: ValueAlias[];
+}
+
+export type ValueAlias = { name: string; value: string };
 
 export default class Timeline extends Stateful<TimelineState> {
     readonly tempoTrack;
@@ -18,6 +22,7 @@ export default class Timeline extends Stateful<TimelineState> {
     constructor() {
         super({
             children: [],
+            aliases: [],
         });
 
         const voiceGroups = Array.from({ length: 3 }, () => {

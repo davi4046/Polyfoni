@@ -22,6 +22,7 @@
             },
             "fs": {
                 "scope": ["*/**"],
+                "readFile": true,
                 "writeFile": true,
                 "readDir": true
             },
