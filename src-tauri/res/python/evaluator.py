@@ -5,6 +5,13 @@ import ast
 
 from func_timeout import func_set_timeout, FunctionTimedOut
 
+class VariableVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.nodes = []
+    
+    def visit_Name(self, node: ast.Name):
+        self.nodes.append(node)
+
 MATH_DICT = {name: getattr(math, name) for name in dir(math)}
 
 SAFE_BUILTINS = {
@@ -34,22 +41,35 @@ GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT}
 def evaluate(args: list[str]):       
     expr, vars = args
     vars = json.loads(vars)
-    return eval(expr, {**GLOBALS, **vars})
+
+    str_vars = {key: value for key, value in vars.items() if isinstance(value, str)}
+    
+    tree = ast.parse(expr, mode="eval")
+    visitor = VariableVisitor()
+    visitor.visit(tree)
+        
+    nodes = [node for node in visitor.nodes if node.id in str_vars]
+
+    if len(nodes) > 0:
+        new_expr = expr[0:nodes[0].col_offset]
+        
+        for i in range(0, len(nodes)):
+            val = str_vars[nodes[i].id]
+            start = nodes[i].end_col_offset
+            end = nodes[i+1].col_offset if i+1 < len(nodes) else None
+            new_expr += val + expr[start:end]
+    else:
+        new_expr = expr
+            
+    return eval(new_expr, {**GLOBALS, **vars})
 
 def find_vars(args: list[str]):
     tree = ast.parse(args[0], mode="eval")
     
-    class VariableVisitor(ast.NodeVisitor):
-        def __init__(self):
-            self.variables = set()
-        
-        def visit_Name(self, node: ast.Name):
-            self.variables.add(node.id)
-    
     visitor = VariableVisitor()
     visitor.visit(tree)
     
-    return list(visitor.variables)
+    return [node.id for node in visitor.nodes]
 
 COMMANDS = {
     "eval": evaluate, 
