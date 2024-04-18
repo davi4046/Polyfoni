@@ -7,8 +7,7 @@
     import insertEmptyItems from "./timeline/user_interface/context/operations/insertEmptyItems";
     import selectHighlightedItems from "./timeline/user_interface/context/operations/selectHighlightedItems";
     import Generator from "./timeline/features/generation/Generator";
-    import TotalHarmonyGenerator from "./timeline/features/generation/TotalHarmonyGenerator";
-    import { emit, listen } from "@tauri-apps/api/event";
+    import HarmonicSumGenerator from "./timeline/features/generation/HarmonicSumGenerator";
     import { save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
@@ -19,13 +18,14 @@
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
     import { registerShortcut } from "./utils/keyboard-shortcut";
     import loadFonts from "./utils/app_start/loadFonts";
+    import { emit, listen } from "@tauri-apps/api/event";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
     const timelineVM = createTimelineVM(timeline, timelineContext);
 
     new Generator(timeline);
-    new TotalHarmonyGenerator(timeline);
+    new HarmonicSumGenerator(timeline);
 
     registerShortcut("delete", () => {
         timelineContext.history.startAction();

@@ -23,7 +23,7 @@ import isOverlapping from "../../../utils/interval/is_overlapping/isOverlapping"
 import getHarmonyOfNotes from "./getHarmonyOfNotes";
 import { getTrackType, getTracksOfType } from "./track-config";
 
-export default class TotalHarmonyGenerator {
+export default class HarmonicSumGenerator {
     private _itemChanges: ItemChange[] = [];
     private _isHandlingChanges = false;
 
