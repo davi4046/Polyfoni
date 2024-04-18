@@ -38,9 +38,7 @@ export default class Generator {
 
     private _decorationsMap = new Map<TrackGroup, SimpleNoteBuilder[][]>();
 
-    private _getDecorationGeneration(
-        trackGroup: TrackGroup
-    ): SimpleNoteBuilder[][] {
+    private _getDecoration(trackGroup: TrackGroup): SimpleNoteBuilder[][] {
         let generation = this._decorationsMap.get(trackGroup);
         if (!generation) {
             const voiceNotes = this._getVoiceNotes(getParent(trackGroup));
@@ -189,7 +187,7 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
-                const decorations = this._getDecorationGeneration(
+                const decorations = this._getDecoration(
                     getParent(itemState.parent)
                 );
                 const ownedDecorations = decorations.slice(
