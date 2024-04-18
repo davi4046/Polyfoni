@@ -36,19 +36,16 @@ export default class Generator {
         return notes;
     }
 
-    private _decorationGenerationMap = new Map<
-        TrackGroup,
-        SimpleNoteBuilder[][]
-    >();
+    private _decorationsMap = new Map<TrackGroup, SimpleNoteBuilder[][]>();
 
     private _getDecorationGeneration(
         trackGroup: TrackGroup
     ): SimpleNoteBuilder[][] {
-        let generation = this._decorationGenerationMap.get(trackGroup);
+        let generation = this._decorationsMap.get(trackGroup);
         if (!generation) {
             const voiceNotes = this._getVoiceNotes(getParent(trackGroup));
             generation = new Array(voiceNotes.length - 1).fill([]); // One element per space between two notes
-            this._decorationGenerationMap.set(trackGroup, generation);
+            this._decorationsMap.set(trackGroup, generation);
         }
         return generation;
     }
