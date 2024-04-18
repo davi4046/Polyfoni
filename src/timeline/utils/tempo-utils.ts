@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import type Item from "../models/Item";
+import type Item from "../models/item/Item";
 
 export type TempoChange = {
     beat: number;
@@ -21,7 +21,7 @@ export async function deriveTempoChangesFromItems(
 
     items.forEach((item) => {
         const promise = invoke("evaluate", {
-            task: `${item.state.content} ||| {}`,
+            task: `eval ||| ${item.state.content} ||| {}`,
         }).then((result) => {
             const parsedResult = Number(result);
 

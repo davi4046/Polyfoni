@@ -237,7 +237,7 @@ export default class Generator {
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
                         const result = await invoke("evaluate", {
-                            task: `${itemState.content} ||| {"x": ${i}}`,
+                            task: `eval ||| ${itemState.content} ||| {"x": ${i}}`,
                         });
                         return Math.round(Number(result));
                     })();
@@ -281,7 +281,7 @@ export default class Generator {
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
                         const result: string = await invoke("evaluate", {
-                            task: `${itemState.content} ||| {"x": ${i}}`,
+                            task: `eval ||| ${itemState.content} ||| {"x": ${i}}`,
                         });
                         return result.trim();
                     })();
@@ -337,7 +337,7 @@ export default class Generator {
 
                 while (beat < itemState.end) {
                     const result = await invoke("evaluate", {
-                        task: `${itemState.content} ||| {"x": ${index}}`,
+                        task: `eval ||| ${itemState.content} ||| {"x": ${index}}`,
                     });
 
                     index++;
