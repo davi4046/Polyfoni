@@ -3,10 +3,11 @@ import { invoke } from "@tauri-apps/api";
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
 import {
-    countAncestors,
     getChildren,
     getGrandparent,
     getParent,
+    getPosition,
+    isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import compareArrays from "../../../utils/compareArrays";
 import { Chord } from "../../models/item/Chord";
@@ -48,14 +49,14 @@ export default class Generator {
         return generation;
     }
 
-    constructor(timeline: Timeline) {
-        const watcher = new StateHierarchyWatcher(getChildren(timeline)[1]);
-
+    constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
-            const objDepth = countAncestors(obj);
+            const position = getPosition(obj);
             const newState = obj.state as any;
 
-            switch (objDepth) {
+            if (!isPositionOnPath(position, "1")) return; // Return if object not in second VoiceGroup
+
+            switch (position.length) {
                 // Track
                 case 4: {
                     const trackType = getTrackType(obj as Track<any>);
@@ -329,6 +330,8 @@ export default class Generator {
                 let skippedIndeces = 0;
 
                 const newNotes: NoteBuilder[] = [];
+
+                //console.log(this.timeline.state.aliases);
 
                 while (beat < itemState.end) {
                     const result = await invoke("evaluate", {
