@@ -293,13 +293,13 @@ export default class Generator {
                 const results = await Promise.all(promises);
 
                 for (const result of results) {
-                    if (result !== "True" && result !== "False") {
+                    if (result !== "true" && result !== "false") {
                         return "Failed to evaluate to a boolean";
                     }
                 }
 
                 for (let i = 0; i < ownedNotes.length; i++) {
-                    ownedNotes[i].isRest = results[i] === "True";
+                    ownedNotes[i].isRest = results[i] === "true";
                 }
 
                 break;

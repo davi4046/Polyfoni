@@ -82,7 +82,7 @@ if __name__ == "__main__":
         try:
             cmd, *args = [part.strip() for part in line.split("|||")]
             
-            result = COMMANDS[cmd](args) if cmd in COMMANDS else "No such command"
+            result = json.dumps(COMMANDS[cmd](args)) if cmd in COMMANDS else "No such command"
             
             sys.stdout.write(str(result) + "\n")
             sys.stdout.flush()
