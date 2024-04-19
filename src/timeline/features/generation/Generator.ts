@@ -393,7 +393,53 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
-                // recalculate pitches for owned decorations
+                const indeces = ownedNotes
+                    .slice(0, -1)
+                    .map((note) => voiceNotes.indexOf(note));
+
+                const promises = [];
+
+                for (const index of indeces) {
+                    const prevNote = voiceNotes[index];
+                    const nextNote = voiceNotes[index + 1];
+
+                    if (!prevNote.pitch || !nextNote.pitch) return;
+
+                    const promise = this._evaluateWithAliases(
+                        itemState.content,
+                        {
+                            prev_pitch: prevNote.pitch,
+                            next_pitch: nextNote.pitch,
+                            scale: [0, 2, 4, 5, 6, 7, 9, 11],
+                        }
+                    );
+
+                    promises.push(promise);
+                }
+
+                const results = await Promise.all(promises);
+                const parsedResults = [];
+
+                for (const result of results) {
+                    try {
+                        const parsedResult = JSON.parse(result);
+                        if (
+                            parsedResult !== null &&
+                            !Number.isInteger(parsedResult) &&
+                            !isIntegerArray(parsedResult)
+                        ) {
+                            throw new Error();
+                        }
+                        parsedResults.push(
+                            parsedResult ? [parsedResult].flat() : parsedResult
+                        );
+                    } catch {
+                        return "Failed to evaluate pitches";
+                    }
+                }
+
+                console.log(parsedResults);
+
                 break;
             }
             case "decorationFraction": {
@@ -413,7 +459,7 @@ export default class Generator {
 
     private async _evaluateWithAliases(
         code: string,
-        args: Record<string, number>
+        args: Record<string, any>
     ): Promise<string> {
         const combined_args: any = {};
 
@@ -545,4 +591,10 @@ function getPitchFromChordStatusAndDegree(
 
 function roundToNearestMultiple(value: number, factor: number) {
     return Math.pow(factor, Math.round(Math.log(value) / Math.log(factor)));
+}
+
+function isIntegerArray(value: any): boolean {
+    if (!Array.isArray(value)) return false;
+    if (value.some((item) => !Number.isInteger(item))) return false;
+    return true;
 }
