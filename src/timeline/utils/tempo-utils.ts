@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
+import { getLastAncestor } from "../../architecture/state-hierarchy-utils";
 import type Item from "../models/item/Item";
 
 export type TempoChange = {
@@ -20,23 +21,38 @@ export async function deriveTempoChangesFromItems(
     const promises: Promise<void>[] = [];
 
     items.forEach((item) => {
+        const args: any = getLastAncestor(item).state.aliases.reduce(
+            (args, { name, value }) => ((args[name] = value), args),
+            {} as any
+        );
+
         const promise = invoke("evaluate", {
-            task: `eval ||| ${item.state.content} ||| {}`,
+            task: `eval ||| ${item.state.content} ||| ${JSON.stringify(args)}`,
         }).then((result) => {
             const parsedResult = Number(result);
 
             if (isNaN(parsedResult)) {
-                console.warn("tempo item result error");
+                item.state = {
+                    error: "Failed to evaluate to a number",
+                };
                 return;
             }
             if (parsedResult < 15) {
-                console.warn("tempo item result too small");
+                item.state = {
+                    error: "Result is too small (range: 15-360)",
+                };
                 return;
             }
             if (parsedResult > 360) {
-                console.warn("tempo item result too big");
+                item.state = {
+                    error: "Result is too large (range: 15-360)",
+                };
                 return;
             }
+
+            item.state = {
+                error: undefined,
+            };
 
             tempoChanges.set(item.state.start, parsedResult);
             tempoChanges.set(item.state.end, defaultTempo);
