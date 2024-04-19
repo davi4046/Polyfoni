@@ -43,6 +43,7 @@ def evaluate(args: list[str]):
     vars = json.loads(vars)
 
     str_vars = {key: value for key, value in vars.items() if isinstance(value, str)}
+    non_str_vars = {key: value for key, value in vars.items() if key not in str_vars}
     
     tree = ast.parse(expr, mode="eval")
     visitor = VariableVisitor()
@@ -51,17 +52,17 @@ def evaluate(args: list[str]):
     nodes = [node for node in visitor.nodes if node.id in str_vars]
 
     if len(nodes) > 0:
-        new_expr = expr[0:nodes[0].col_offset]
+        fmt_expr = expr[0:nodes[0].col_offset]
         
         for i in range(0, len(nodes)):
             val = str_vars[nodes[i].id]
             start = nodes[i].end_col_offset
             end = nodes[i+1].col_offset if i+1 < len(nodes) else None
-            new_expr += val + expr[start:end]
+            fmt_expr += val + expr[start:end]
     else:
-        new_expr = expr
+        fmt_expr = expr
             
-    return eval(new_expr, {**GLOBALS, **vars})
+    return eval(fmt_expr, {**GLOBALS, **non_str_vars})
 
 def find_vars(args: list[str]):
     tree = ast.parse(args[0], mode="eval")
@@ -79,8 +80,7 @@ COMMANDS = {
 if __name__ == "__main__":
     for line in sys.stdin:
         try:
-            line = line.replace(" ", "")
-            cmd, *args = line.split("|||")
+            cmd, *args = [part.strip() for part in line.split("|||")]
             
             result = COMMANDS[cmd](args) if cmd in COMMANDS else "No such command"
             
