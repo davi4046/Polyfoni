@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Menu } from "../../../../../utils/popup_menu/popup-menu-types";
     import type TrackVM from "../../../view_models/TrackVM";
     import PopupMenu from "../../../../../utils/popup_menu/PopupMenu.svelte";
     import DynamicComponent from "../../utils/DynamicComponent.svelte";

@@ -16,6 +16,7 @@ export default async function loadFonts() {
                 fontName,
                 `url(${convertFileSrc(path)})`,
                 {
+                    style: fontName.toLowerCase().includes("italic") ? "italic" : "normal",
                     weight: `${(i + 1) * 100}`,
                 }
             );

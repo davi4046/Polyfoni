@@ -4,7 +4,14 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                mono: ["ChivoMono-VariableFont_wght"],
+                sans: [
+                    "Chivo-VariableFont_wght",
+                    "Chivo-Italic-VariableFont_wght",
+                ],
+                mono: [
+                    "ChivoMono-VariableFont_wght",
+                    "ChivoMono-Italic-VariableFont_wght",
+                ],
             },
         },
     },
