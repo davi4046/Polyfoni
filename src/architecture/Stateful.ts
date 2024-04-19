@@ -50,7 +50,6 @@ export type Subscription<T extends Stateful<any> = any> = {
     unsubscribe: () => void;
 };
 
-export type SubscriptionCallback<TState extends object> = (
-    obj: Stateful<TState>,
-    oldState: TState
-) => void | Promise<void>;
+export type SubscriptionCallback<TState extends object> =
+    | ((obj: Stateful<TState>, oldState: TState) => void)
+    | ((obj: Stateful<TState>, oldState: TState) => Promise<void>);
