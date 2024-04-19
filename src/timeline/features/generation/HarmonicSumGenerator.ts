@@ -8,6 +8,8 @@ import {
     getIndex,
     getLastAncestor,
     getParent,
+    getPosition,
+    isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import compareArrays from "../../../utils/compareArrays";
 import { Chord, createEmptyPitchMap } from "../../models/item/Chord";
@@ -29,14 +31,15 @@ export default class HarmonicSumGenerator {
 
     private _totalHarmonyItems: Item<"ChordItem">[] = [];
 
-    constructor(timeline: Timeline) {
-        const watcher = new StateHierarchyWatcher(getChildren(timeline)[1]);
-
+    constructor(watcher: StateHierarchyWatcher<Timeline>) {
         watcher.subscribe((obj, oldState) => {
-            const objDepth = countAncestors(obj);
+            const timeline = watcher.root;
+            const position = getPosition(obj);
             const newState = obj.state as any;
 
-            switch (objDepth) {
+            if (!isPositionOnPath(position, "1")) return; // Return if object not in second VoiceGroup
+
+            switch (position.length) {
                 // Track
                 case 4: {
                     const trackType = getTrackType(obj as Track<any>);
