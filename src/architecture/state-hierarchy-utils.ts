@@ -175,16 +175,15 @@ export function doesValueMatchSymbol(value: number, symbol: string): boolean {
     return true;
 }
 
-export function isPositionOnPath(position: number[], pattern: string): boolean {
-    const symbols = pattern.split(",");
+export function isPositionOnPath(position: number[], path: string): boolean {
+    const symbols = path.split(",");
     let match = true;
-    position.forEach((value, index) => {
-        if (index === symbols.length) return;
-        if (!doesValueMatchSymbol(value, symbols[index])) {
+    for (let i = 0; i < Math.min(position.length, symbols.length); i++) {
+        if (!doesValueMatchSymbol(position[i], symbols[i])) {
             match = false;
-            return;
+            break;
         }
-    });
+    }
     return match;
 }
 
