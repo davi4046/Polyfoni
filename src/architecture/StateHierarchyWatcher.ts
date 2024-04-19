@@ -38,15 +38,16 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
 
     private _subscriptions: Subscription[] = [];
 
-    private _reportStateChange(obj: Stateful<any>, oldState: any) {
-        this._callbacks.forEach((callback) => callback(obj, oldState));
+    private async _reportStateChange(obj: Stateful<any>, oldState: any) {
+        for (const callback of this._callbacks) {
+            await callback(obj, oldState);
+        }
     }
 
     private _watchNonRecursively(obj: Stateful<any>) {
-        const subscription = obj.subscribe((_, oldState) => {
-            if (isEqual(oldState, obj.state)) return;
-            this._reportStateChange(obj, oldState);
-        });
+        const subscription = obj.subscribe((_, oldState) =>
+            this._reportStateChange(obj, oldState)
+        );
 
         this._subscriptions.push(subscription);
     }
@@ -83,7 +84,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
 
                 if (subscription) {
                     throw new Error(
-                        "An object which is already subscribed to by HistoryManager " +
+                        "An object which is already subscribed to " +
                             "has been added to children of another object (meaning the " +
                             "object is referenced in two children arrays, or there is a " +
                             "cyclic reference). This is not allowed!"

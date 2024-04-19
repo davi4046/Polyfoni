@@ -26,13 +26,14 @@
     const timelineContext = new TimelineContext(timeline);
     const timelineVM = createTimelineVM(timeline, timelineContext);
 
-    new Generator(timeline);
-    new HarmonicSumGenerator(timeline);
-
     const watcher = new StateHierarchyWatcher(timeline);
 
     const aliasManager = new AliasManager();
-    aliasManager.init(watcher);
+
+    aliasManager.init(watcher).then(() => {
+        new Generator(watcher);
+        new HarmonicSumGenerator(watcher);
+    });
 
     registerShortcut("delete", () => {
         timelineContext.history.startAction();
