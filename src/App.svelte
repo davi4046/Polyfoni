@@ -19,7 +19,7 @@
     import { registerShortcut } from "./utils/keyboard-shortcut";
     import loadFonts from "./utils/app_start/loadFonts";
     import { emit, listen } from "@tauri-apps/api/event";
-    import AliasManager from "./timeline/features/generation/manageValueAliases";
+    import AliasManager from "./timeline/features/generation/AliasManager";
     import StateHierarchyWatcher from "./architecture/StateHierarchyWatcher";
 
     const timeline = makeDemoTimeline();
