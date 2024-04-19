@@ -37,16 +37,18 @@ export default class Generator {
         return notes;
     }
 
-    private _decorationsMap = new Map<TrackGroup, SimpleNoteBuilder[][]>();
+    private _decorationsMap = new Map<TrackGroup, Decoration[]>();
 
-    private _getDecoration(trackGroup: TrackGroup): SimpleNoteBuilder[][] {
-        let generation = this._decorationsMap.get(trackGroup);
-        if (!generation) {
+    private _getDecorations(trackGroup: TrackGroup): Decoration[] {
+        let decorations = this._decorationsMap.get(trackGroup);
+        if (!decorations) {
             const voiceNotes = this._getVoiceNotes(getParent(trackGroup));
-            generation = new Array(voiceNotes.length - 1).fill([]); // One element per space between two notes
-            this._decorationsMap.set(trackGroup, generation);
+            decorations = Array.from({ length: voiceNotes.length - 1 }, () => {
+                return { notes: [], skip: false };
+            }); // One element per space between two notes
+            this._decorationsMap.set(trackGroup, decorations);
         }
-        return generation;
+        return decorations;
     }
 
     private _timeline: Timeline;
@@ -192,14 +194,16 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
-                const decorations = this._getDecoration(
+                const decorations = this._getDecorations(
                     getParent(itemState.parent)
                 );
                 const ownedDecorations = decorations.slice(
                     voiceNotes.indexOf(ownedNotes[0]),
                     voiceNotes.indexOf(ownedNotes[ownedNotes.length - 1])
                 );
-                ownedDecorations.forEach((array) => (array.length = 0));
+                ownedDecorations.forEach(
+                    (decoration) => (decoration.notes.length = 0)
+                );
                 break;
             }
             case "decorationFraction": {
@@ -413,12 +417,11 @@ export default class Generator {
                             scale: [0, 2, 4, 5, 6, 7, 9, 11],
                         }
                     );
-
                     promises.push(promise);
                 }
 
                 const results = await Promise.all(promises);
-                const parsedResults = [];
+                const parsedResults: (number[] | null)[] = [];
 
                 for (const result of results) {
                     try {
@@ -434,11 +437,37 @@ export default class Generator {
                             parsedResult ? [parsedResult].flat() : parsedResult
                         );
                     } catch {
-                        return "Failed to evaluate pitches";
+                        return "Failed to evaluate to pitches";
                     }
                 }
 
-                console.log(parsedResults);
+                const decorations = this._getDecorations(
+                    getParent(itemState.parent)
+                );
+
+                for (let i = 0; i < indeces.length; i++) {
+                    const pitches = parsedResults[i];
+
+                    if (pitches === null) continue;
+
+                    const prevNote = voiceNotes[indeces[i]];
+
+                    const fraction = 1;
+
+                    const subdivisions = fraction * pitches.length + 1;
+                    const totalDuration = prevNote.end - prevNote.start;
+                    const beatsPerSubdivision = totalDuration / subdivisions;
+                    const duration = beatsPerSubdivision * fraction;
+
+                    decorations[indeces[i]] = {
+                        notes: pitches.map((pitch) => {
+                            return { pitch, duration };
+                        }),
+                        skip: false,
+                    };
+                }
+
+                console.log(decorations);
 
                 break;
             }
@@ -552,11 +581,10 @@ class NoteBuilder {
     isRest?: boolean;
 }
 
-class SimpleNoteBuilder {
-    duration?: number;
-    pitch?: number;
-    isSkip?: boolean;
-}
+type Decoration = {
+    notes: { pitch: number; duration: number }[];
+    skip: boolean;
+};
 
 function isNoteStartWithinInterval(
     note: NoteBuilder,
