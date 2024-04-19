@@ -49,7 +49,11 @@ export default class Generator {
         return generation;
     }
 
+    private _timeline: Timeline;
+
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
+        this._timeline = watcher.root;
+
         watcher.subscribe((obj, oldState) => {
             const position = getPosition(obj);
             const newState = obj.state as any;
@@ -232,9 +236,10 @@ export default class Generator {
 
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
-                        const result = await invoke("evaluate", {
-                            task: `eval ||| ${itemState.content} ||| {"x": ${i}}`,
-                        });
+                        const result = await this._evaluateWithAliases(
+                            itemState.content,
+                            { x: i }
+                        );
                         return Math.round(Number(result));
                     })();
                     promises.push(promise);
@@ -276,9 +281,10 @@ export default class Generator {
 
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
-                        const result: string = await invoke("evaluate", {
-                            task: `eval ||| ${itemState.content} ||| {"x": ${i}}`,
-                        });
+                        const result = await this._evaluateWithAliases(
+                            itemState.content,
+                            { x: i }
+                        );
                         return result.trim();
                     })();
                     promises.push(promise);
@@ -331,12 +337,11 @@ export default class Generator {
 
                 const newNotes: NoteBuilder[] = [];
 
-                //console.log(this.timeline.state.aliases);
-
                 while (beat < itemState.end) {
-                    const result = await invoke("evaluate", {
-                        task: `eval ||| ${itemState.content} ||| {"x": ${index}}`,
-                    });
+                    const result = await this._evaluateWithAliases(
+                        itemState.content,
+                        { x: index }
+                    );
 
                     index++;
 
@@ -404,6 +409,23 @@ export default class Generator {
                 break;
             }
         }
+    }
+
+    private async _evaluateWithAliases(
+        code: string,
+        args: Record<string, number>
+    ): Promise<string> {
+        const combined_args: any = {};
+
+        for (const key in args) combined_args[key] = args[key];
+
+        this._timeline.state.aliases.forEach(
+            ({ name, value }) => (combined_args[name] = value)
+        );
+
+        return await invoke("evaluate", {
+            task: `eval ||| ${code} ||| ${JSON.stringify(combined_args)}`,
+        });
     }
 
     private async _remakePropertiesForNotes(

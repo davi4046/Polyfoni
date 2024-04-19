@@ -68,3 +68,5 @@ ANTICIPATION: >-
         if next_pitch % 12 in scale 
         else None
     }
+TEST_ALIAS: >-
+    sin( x / pi * 8 ) + x % 8
