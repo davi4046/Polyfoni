@@ -19,7 +19,7 @@
     import { registerShortcut } from "./utils/keyboard-shortcut";
     import loadFonts from "./utils/app_start/loadFonts";
     import { emit, listen } from "@tauri-apps/api/event";
-    import manageValueAliases from "./timeline/features/generation/manageValueAliases";
+    import AliasManager from "./timeline/features/generation/manageValueAliases";
     import StateHierarchyWatcher from "./architecture/StateHierarchyWatcher";
 
     const timeline = makeDemoTimeline();
@@ -30,7 +30,9 @@
     new HarmonicSumGenerator(timeline);
 
     const watcher = new StateHierarchyWatcher(timeline);
-    manageValueAliases(watcher);
+
+    const aliasManager = new AliasManager();
+    aliasManager.init(watcher);
 
     registerShortcut("delete", () => {
         timelineContext.history.startAction();

@@ -14,128 +14,129 @@ import compareArrays from "../../../utils/compareArrays";
 import type Item from "../../models/item/Item";
 import type Timeline from "../../models/timeline/Timeline";
 
-export default async function manageValueAliases(
-    watcher: StateHierarchyWatcher<Timeline>
-) {
-    const timeline = watcher.root;
-    const trackedAliases = await loadTimelineAliases(timeline);
+export default class AliasManager {
+    async init(watcher: StateHierarchyWatcher<Timeline>) {
+        const timeline = watcher.root;
+        const trackedAliases = await loadTimelineAliases(timeline);
 
-    // Remove unused aliases
-    {
-        const unusedAliases: string[] = [];
+        // Remove unused aliases
+        {
+            const unusedAliases: string[] = [];
 
-        trackedAliases.forEach((refCount, alias) => {
-            if (refCount === 0) unusedAliases.push(alias);
-        });
-
-        timeline.state = {
-            aliases: watcher.root.state.aliases.filter(
-                (alias) => !unusedAliases.includes(alias.name)
-            ),
-        };
-
-        unusedAliases.forEach((alias) => trackedAliases.delete(alias));
-    }
-
-    const builtins = new Map<string, string>();
-
-    // Load builtin aliases
-    {
-        const path = await resolveResource("res/builtin_aliases.yaml");
-        const content = await readTextFile(path);
-
-        Object.entries(load(content) as object).forEach(([alias, value]) => {
-            const cleanedValue = value
-                .replace(/\r?\n|\r/g, "") // Remove linebreaks
-                .replace(/\s+/g, " "); // Remove redundant spaces
-
-            builtins.set(alias, cleanedValue);
-        });
-    }
-
-    function handleAddedName(name: string) {
-        if (trackedAliases.has(name)) {
-            trackedAliases.set(name, trackedAliases.get(name)! + 1);
-        } else if (builtins.has(name)) {
-            trackedAliases.set(name, 1);
-            timeline.state = {
-                aliases: timeline.state.aliases.concat({
-                    name: name,
-                    value: builtins.get(name)!,
-                }),
-            };
-            emit("display-message", {
-                message: `Added builtin alias: ${name}`,
+            trackedAliases.forEach((refCount, alias) => {
+                if (refCount === 0) unusedAliases.push(alias);
             });
-        }
-    }
 
-    function handleRemovedName(name: string) {
-        if (!trackedAliases.has(name)) return;
-
-        const newValue = trackedAliases.get(name)! - 1;
-
-        if (newValue > 0) {
-            trackedAliases.set(name, newValue);
-        } else {
-            trackedAliases.delete(name);
             timeline.state = {
-                aliases: timeline.state.aliases.filter(
-                    (alias) => alias.name !== name
+                aliases: watcher.root.state.aliases.filter(
+                    (alias) => !unusedAliases.includes(alias.name)
                 ),
             };
-            emit("display-message", {
-                message: `Removed builtin alias: ${name}`,
-            });
+
+            unusedAliases.forEach((alias) => trackedAliases.delete(alias));
         }
+
+        const builtins = new Map<string, string>();
+
+        // Load builtin aliases
+        {
+            const path = await resolveResource("res/builtin_aliases.yaml");
+            const content = await readTextFile(path);
+
+            Object.entries(load(content) as object).forEach(
+                ([alias, value]) => {
+                    const cleanedValue = value
+                        .replace(/\r?\n|\r/g, "") // Remove linebreaks
+                        .replace(/\s+/g, " "); // Remove redundant spaces
+
+                    builtins.set(alias, cleanedValue);
+                }
+            );
+        }
+
+        function handleAddedName(name: string) {
+            if (trackedAliases.has(name)) {
+                trackedAliases.set(name, trackedAliases.get(name)! + 1);
+            } else if (builtins.has(name)) {
+                trackedAliases.set(name, 1);
+                timeline.state = {
+                    aliases: timeline.state.aliases.concat({
+                        name: name,
+                        value: builtins.get(name)!,
+                    }),
+                };
+                emit("display-message", {
+                    message: `Added builtin alias: ${name}`,
+                });
+            }
+        }
+
+        function handleRemovedName(name: string) {
+            if (!trackedAliases.has(name)) return;
+
+            const newValue = trackedAliases.get(name)! - 1;
+
+            if (newValue > 0) {
+                trackedAliases.set(name, newValue);
+            } else {
+                trackedAliases.delete(name);
+                timeline.state = {
+                    aliases: timeline.state.aliases.filter(
+                        (alias) => alias.name !== name
+                    ),
+                };
+                emit("display-message", {
+                    message: `Removed builtin alias: ${name}`,
+                });
+            }
+        }
+
+        watcher.subscribe(async (obj, oldState) => {
+            const objDepth = countAncestors(obj);
+            const newState = obj.state as any;
+
+            switch (objDepth) {
+                // Track
+                case 4: {
+                    const { removedItems, addedItems } = compareArrays<
+                        Item<any>
+                    >(oldState.children, newState.children);
+
+                    const removedPromises = removedItems.map((item) =>
+                        getVariableNames(item.state.content)
+                    );
+                    const addedPromises = addedItems.map((item) =>
+                        getVariableNames(item.state.content)
+                    );
+
+                    const [removedVarNames, addedVarNames] = await Promise.all([
+                        Promise.all(removedPromises),
+                        Promise.all(addedPromises),
+                    ]);
+
+                    addedVarNames.flat().forEach(handleAddedName);
+                    removedVarNames.flat().forEach(handleRemovedName);
+                    break;
+                }
+                // Item
+                case 5: {
+                    const [oldVarNames, newVarNames] = await Promise.all([
+                        getVariableNames(oldState.content),
+                        getVariableNames(newState.content),
+                    ]);
+
+                    const { removedItems, addedItems } = compareArrays(
+                        oldVarNames,
+                        newVarNames
+                    );
+
+                    addedItems.forEach(handleAddedName);
+                    removedItems.forEach(handleRemovedName);
+                    break;
+                }
+            }
+        });
     }
-
-    return watcher.subscribe(async (obj, oldState) => {
-        const objDepth = countAncestors(obj);
-        const newState = obj.state as any;
-
-        switch (objDepth) {
-            // Track
-            case 4: {
-                const { removedItems, addedItems } = compareArrays<Item<any>>(
-                    oldState.children,
-                    newState.children
-                );
-
-                const removedPromises = removedItems.map((item) =>
-                    getVariableNames(item.state.content)
-                );
-                const addedPromises = addedItems.map((item) =>
-                    getVariableNames(item.state.content)
-                );
-
-                const [removedVarNames, addedVarNames] = await Promise.all([
-                    Promise.all(removedPromises),
-                    Promise.all(addedPromises),
-                ]);
-
-                addedVarNames.flat().forEach(handleAddedName);
-                removedVarNames.flat().forEach(handleRemovedName);
-                break;
-            }
-            // Item
-            case 5: {
-                const [oldVarNames, newVarNames] = await Promise.all([
-                    getVariableNames(oldState.content),
-                    getVariableNames(newState.content),
-                ]);
-
-                const { removedItems, addedItems } = compareArrays(
-                    oldVarNames,
-                    newVarNames
-                );
-
-                addedItems.forEach(handleAddedName);
-                removedItems.forEach(handleRemovedName);
-                break;
-            }
-        }
-    });
 }
 
 async function loadTimelineAliases(
