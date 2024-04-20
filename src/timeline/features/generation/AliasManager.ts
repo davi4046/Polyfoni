@@ -66,7 +66,7 @@ export default class AliasManager {
                     }),
                 };
                 emit("display-message", {
-                    message: `Added builtin alias: ${name}`,
+                    message: `Added Builtin: ${name}`,
                 });
             }
         }
@@ -86,7 +86,7 @@ export default class AliasManager {
                     ),
                 };
                 emit("display-message", {
-                    message: `Removed builtin alias: ${name}`,
+                    message: `Removed Builtin: ${name}`,
                 });
             }
         }
