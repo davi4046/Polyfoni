@@ -43,15 +43,15 @@ export default class Generator {
         return notes;
     }
 
-    private _decorationsMap = new Map<TrackGroup, Decoration[]>();
+    private _decorationsMap = new Map<
+        TrackGroup,
+        Map<NoteBuilder, Decoration>
+    >();
 
-    private _getDecorations(trackGroup: TrackGroup): Decoration[] {
+    private _getDecorations(trackGroup: TrackGroup) {
         let decorations = this._decorationsMap.get(trackGroup);
         if (!decorations) {
-            const voiceNotes = this._getVoiceNotes(getParent(trackGroup));
-            decorations = Array.from({ length: voiceNotes.length - 1 }, () => {
-                return { notes: [], skip: false };
-            }); // One element per space between two notes
+            decorations = new Map();
             this._decorationsMap.set(trackGroup, decorations);
         }
         return decorations;
@@ -203,10 +203,13 @@ export default class Generator {
                 const decorations = this._getDecorations(
                     getParent(itemState.parent)
                 );
-                const ownedDecorations = decorations.slice(
-                    voiceNotes.indexOf(ownedNotes[0]),
-                    voiceNotes.indexOf(ownedNotes[ownedNotes.length - 1])
-                );
+                const ownedDecorations = ownedNotes
+                    .slice(0, -1)
+                    .map((note) => decorations.get(note))
+                    .filter((value): value is Decoration => {
+                        return value !== undefined;
+                    });
+
                 ownedDecorations.forEach((decoration) => {
                     decoration.notes.length = 0;
                 });
@@ -472,12 +475,12 @@ export default class Generator {
                     );
                     const duration = beatsPerSubdivision * fraction;
 
-                    decorations[indeces[i]] = {
+                    decorations.set(prevNote, {
                         notes: pitches.map((pitch) => {
                             return { pitch, duration };
                         }),
                         skip: false,
-                    };
+                    });
                 }
                 break;
             }
@@ -552,13 +555,13 @@ export default class Generator {
         );
         const decorationOutput = decorationGroups
             .map((trackGroup) => this._decorationsMap.get(trackGroup))
-            .filter((value): value is Decoration[] => value !== undefined);
+            .filter((value): value is Map<NoteBuilder, Decoration> => {
+                return value !== undefined;
+            });
 
-        const getFirstValidDecorationAtIndex = (index: number) => {
-            if (index >= voiceNotes.length - 1) return;
-
+        const getFirstValidDecoration = (note: NoteBuilder) => {
             for (const decorations of decorationOutput) {
-                const decoration = decorations[index];
+                const decoration = decorations.get(note);
                 if (
                     decoration &&
                     decoration.notes.length > 0 &&
@@ -569,7 +572,7 @@ export default class Generator {
             }
         };
 
-        const notes = voiceNotes.flatMap((noteBuilder, index) => {
+        const noteItems = voiceNotes.flatMap((noteBuilder) => {
             if (
                 noteBuilder.pitch === undefined ||
                 noteBuilder.isRest === undefined ||
@@ -578,20 +581,18 @@ export default class Generator {
                 return [];
             }
 
-            const decoration = getFirstValidDecorationAtIndex(index);
+            const decoration = getFirstValidDecoration(noteBuilder);
             const decorationDuration = decoration
                 ? sum(decoration.notes.map(({ duration }) => duration))
                 : 0;
 
-            const originalNote = {
+            const note = {
                 pitch: noteBuilder.pitch,
                 duration:
                     noteBuilder.end - noteBuilder.start - decorationDuration,
             };
 
-            const notes = decoration
-                ? [originalNote, ...decoration.notes]
-                : [originalNote];
+            const notes = decoration ? [note, ...decoration.notes] : [note];
 
             let start = noteBuilder.start;
 
@@ -609,7 +610,7 @@ export default class Generator {
         });
 
         outputTrack.state = {
-            children: notes,
+            children: noteItems,
         };
     }
 }
