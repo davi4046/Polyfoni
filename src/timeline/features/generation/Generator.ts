@@ -1,10 +1,14 @@
 import { invoke } from "@tauri-apps/api";
 
+import { sum } from "lodash";
+
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
 import {
+    doesValueMatchSymbol,
     getChildren,
     getGrandparent,
+    getIndex,
     getParent,
     getPosition,
     isPositionOnPath,
@@ -21,6 +25,8 @@ import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
 import { getTrackType, getTracksOfType } from "./track-config";
+
+const MIN_DURATION = 0.03125;
 
 export default class Generator {
     private _itemChanges: ItemChange[] = [];
@@ -201,9 +207,9 @@ export default class Generator {
                     voiceNotes.indexOf(ownedNotes[0]),
                     voiceNotes.indexOf(ownedNotes[ownedNotes.length - 1])
                 );
-                ownedDecorations.forEach(
-                    (decoration) => (decoration.notes.length = 0)
-                );
+                ownedDecorations.forEach((decoration) => {
+                    decoration.notes.length = 0;
+                });
                 break;
             }
             case "decorationFraction": {
@@ -360,7 +366,7 @@ export default class Generator {
                         2
                     );
 
-                    if (duration < 0.015625) {
+                    if (duration < MIN_DURATION) {
                         if (skippedIndeces === 3) {
                             return "Failed to return a large enough value too many times";
                         } else {
@@ -414,7 +420,7 @@ export default class Generator {
                         {
                             prev_pitch: prevNote.pitch,
                             next_pitch: nextNote.pitch,
-                            scale: [0, 2, 4, 5, 6, 7, 9, 11],
+                            scale: [0, 2, 4, 5, 7, 9, 11],
                         }
                     );
                     promises.push(promise);
@@ -457,6 +463,13 @@ export default class Generator {
                     const subdivisions = fraction * pitches.length + 1;
                     const totalDuration = prevNote.end - prevNote.start;
                     const beatsPerSubdivision = totalDuration / subdivisions;
+
+                    if (beatsPerSubdivision < MIN_DURATION) continue;
+
+                    console.log(
+                        "Generated decoration with beatsPerSubdivision:",
+                        beatsPerSubdivision
+                    );
                     const duration = beatsPerSubdivision * fraction;
 
                     decorations[indeces[i]] = {
@@ -466,9 +479,6 @@ export default class Generator {
                         skip: false,
                     };
                 }
-
-                console.log(decorations);
-
                 break;
             }
             case "decorationFraction": {
@@ -537,24 +547,66 @@ export default class Generator {
         const voiceNotes = this._getVoiceNotes(voice);
         const [outputTrack] = getTracksOfType(voice, "output");
 
-        const notes = voiceNotes
-            .map((noteBuilder) => {
+        const decorationGroups = getChildren(voice).filter(
+            (trackGroup) => getIndex(trackGroup) !== 0
+        );
+        const decorationOutput = decorationGroups
+            .map((trackGroup) => this._decorationsMap.get(trackGroup))
+            .filter((value): value is Decoration[] => value !== undefined);
+
+        const getFirstValidDecorationAtIndex = (index: number) => {
+            if (index >= voiceNotes.length - 1) return;
+
+            for (const decorations of decorationOutput) {
+                const decoration = decorations[index];
                 if (
-                    noteBuilder.pitch !== undefined &&
-                    noteBuilder.isRest !== undefined &&
-                    !noteBuilder.isRest
+                    decoration &&
+                    decoration.notes.length > 0 &&
+                    !decoration.skip
                 ) {
-                    return new Item("NoteItem", {
-                        parent: outputTrack,
-                        start: noteBuilder.start,
-                        end: noteBuilder.end,
-                        content: noteBuilder.pitch,
-                    });
+                    return decoration;
                 }
-            })
-            .filter((value): value is Item<"NoteItem"> => {
-                return value !== undefined;
+            }
+        };
+
+        const notes = voiceNotes.flatMap((noteBuilder, index) => {
+            if (
+                noteBuilder.pitch === undefined ||
+                noteBuilder.isRest === undefined ||
+                noteBuilder.isRest
+            ) {
+                return [];
+            }
+
+            const decoration = getFirstValidDecorationAtIndex(index);
+            const decorationDuration = decoration
+                ? sum(decoration.notes.map(({ duration }) => duration))
+                : 0;
+
+            const originalNote = {
+                pitch: noteBuilder.pitch,
+                duration:
+                    noteBuilder.end - noteBuilder.start - decorationDuration,
+            };
+
+            const notes = decoration
+                ? [originalNote, ...decoration.notes]
+                : [originalNote];
+
+            let start = noteBuilder.start;
+
+            return notes.map((note) => {
+                const end = start + note.duration;
+                const noteItem = new Item("NoteItem", {
+                    parent: outputTrack,
+                    start: start,
+                    end: end,
+                    content: note.pitch,
+                });
+                start = end;
+                return noteItem;
             });
+        });
 
         outputTrack.state = {
             children: notes,
