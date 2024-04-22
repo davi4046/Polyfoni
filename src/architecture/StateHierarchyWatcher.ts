@@ -1,12 +1,12 @@
-import { isEqual } from "lodash";
-
-import type { UnsubscribeFn, SubscriptionCallback } from "./Stateful";
+import type { UnsubscribeFn } from "./Stateful";
 import type Stateful from "./Stateful";
 import {
     getChildren,
     getDescendants,
     type ParentState,
 } from "./state-hierarchy-utils";
+
+type MultiSubscriberFn = (obj: any, oldState: any, newState: any) => void;
 
 export default class StateHierarchyWatcher<T extends Stateful<any>> {
     constructor(readonly root: T) {
@@ -17,9 +17,9 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
         }
     }
 
-    private _callbacks: SubscriptionCallback<any>[] = [];
+    private _callbacks: MultiSubscriberFn[] = [];
 
-    subscribe(callback: SubscriptionCallback<any>): UnsubscribeFn {
+    subscribe(callback: MultiSubscriberFn): UnsubscribeFn {
         this._callbacks.push(callback);
 
         return () => {
@@ -32,8 +32,10 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
     private _subscriptions = new Map<object, UnsubscribeFn>();
 
     private async _reportStateChange(obj: Stateful<any>, oldState: any) {
+        let newState = {}; // TEMP
+
         for (const callback of this._callbacks) {
-            await callback(obj, oldState);
+            await callback(obj, oldState, newState);
         }
     }
 
@@ -71,14 +73,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             this._reportStateChange(obj, oldState);
 
             for (const addedChild of addedChildren) {
-                if (this._subscriptions.has(addedChild)) {
-                    throw new Error(
-                        "An object which is already subscribed to " +
-                            "has been added to children of another object (meaning the " +
-                            "object is referenced in two children arrays, or there is a " +
-                            "cyclic reference). This is not allowed!"
-                    );
-                }
+                if (this._subscriptions.has(addedChild)) return;
 
                 if (addedChild.state.children) {
                     this._watchRecursively(addedChild);
