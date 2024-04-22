@@ -120,9 +120,9 @@ export function getLastAncestor<T extends HasGettableParent<any>>(
 
 export function getNestedArrayOfDescendants(
     obj: HasGettableChildren<any>,
-    endDepth: number
+    depth: number
 ) {
-    return recursive(obj, endDepth);
+    return recursive(obj, depth);
 
     function recursive(
         obj: HasGettableChildren<any>,
