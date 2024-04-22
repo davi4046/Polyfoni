@@ -118,6 +118,23 @@ export function getLastAncestor<T extends HasGettableParent<any>>(
     return curr as LastAncestor<T>;
 }
 
+export function getDescendants(obj: any): any[] {
+    const visitied = new Set<object>();
+
+    const recursive = (obj: any): any[] => {
+        if (!(obj.state && obj.state.children) || visitied.has(obj)) return [];
+
+        visitied.add(obj);
+
+        return obj.state.children.flatMap((child: any) => [
+            child,
+            recursive(child),
+        ]);
+    };
+
+    return recursive(obj);
+}
+
 export function getNestedArrayOfDescendants(
     obj: HasGettableChildren<any>,
     depth: number
