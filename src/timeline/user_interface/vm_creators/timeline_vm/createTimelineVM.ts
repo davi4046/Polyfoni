@@ -122,33 +122,33 @@ export default function createTimelineVM(
         idPrefix: model.id,
     });
 
-    model.subscribe((oldState) => {
+    model.subscribe((oldState, newState) => {
         vm.state = {
-            ...(model.state.children !== oldState.children
+            ...(oldState.children !== newState.children
                 ? compileSections()
                 : {}),
         };
     });
 
-    context.subscribe((oldState) => {
+    context.subscribe((oldState, newState) => {
         vm.state = {
-            ...(context.state.highlights !== oldState.highlights
+            ...(oldState.highlights !== newState.highlights
                 ? compileDisplayHarmony()
                 : {}),
 
-            ...(context.state.selectedItems.findLast(() => true) !==
-            oldState.selectedItems.findLast(() => true)
+            ...(oldState.selectedItems.findLast(() => true) !==
+            newState.selectedItems.findLast(() => true)
                 ? compileCreateItemEditor()
                 : {}),
         };
     });
 
-    context.player.subscribe((oldState) => {
+    context.player.subscribe((oldState, newState) => {
         vm.state = {
-            ...(context.player.state.motion !== oldState.motion
+            ...(oldState.motion !== newState.motion
                 ? compilePlaybackMotion()
                 : {}),
-            ...(context.player.state.isPlaying !== oldState.isPlaying
+            ...(oldState.isPlaying !== newState.isPlaying
                 ? compileIsPlaying()
                 : {}),
         };

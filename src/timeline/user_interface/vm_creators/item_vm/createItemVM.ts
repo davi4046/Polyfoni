@@ -163,26 +163,26 @@ export default function createItemVM<T extends keyof ItemTypes>(
         },
     });
 
-    model.subscribe((oldState) => {
+    model.subscribe((oldState, newState) => {
         vm.state = {
-            ...(model.state.start !== oldState.start ? compileStart() : {}),
-            ...(model.state.end !== oldState.end ? compileEnd() : {}),
-            ...(model.state.content !== oldState.content ? compileText() : {}),
-            ...(model.state.content !== oldState.content ||
-            model.state.error !== oldState.error
+            ...(oldState.start !== newState.start ? compileStart() : {}),
+            ...(oldState.end !== newState.end ? compileEnd() : {}),
+            ...(oldState.content !== newState.content ? compileText() : {}),
+            ...(oldState.content !== newState.content ||
+            oldState.error !== newState.error
                 ? { ...compileInnerDivStyles(), ...compileTooltip() }
                 : {}),
         };
     });
 
-    context.subscribe((oldState) => {
+    context.subscribe((oldState, newState) => {
         const hasStartOverrideChanged =
-            context.state.visualStartOverrideMap.get(model) !==
-            oldState.visualStartOverrideMap.get(model);
+            oldState.visualStartOverrideMap.get(model) !==
+            newState.visualStartOverrideMap.get(model);
 
         const hasEndOverrideChanged =
-            context.state.visualEndOverrideMap.get(model) !==
-            oldState.visualEndOverrideMap.get(model);
+            oldState.visualEndOverrideMap.get(model) !==
+            newState.visualEndOverrideMap.get(model);
 
         vm.state = {
             ...(hasStartOverrideChanged
@@ -193,8 +193,8 @@ export default function createItemVM<T extends keyof ItemTypes>(
                 ? { ...compileEnd(), ...compileEndGripStyles() }
                 : {}),
 
-            ...(context.state.selectedItems.includes(model) !==
-            oldState.selectedItems.includes(model)
+            ...(oldState.selectedItems.includes(model) !==
+            newState.selectedItems.includes(model)
                 ? compileInnerDivStyles()
                 : {}),
 

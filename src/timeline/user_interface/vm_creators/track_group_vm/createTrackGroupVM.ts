@@ -95,19 +95,17 @@ export default function createTrackGroupVM(
         ...compileHeaderMenu(),
     });
 
-    model.subscribe((oldState) => {
-        if (model.state.children !== oldState.children) updateTracks();
+    model.subscribe((oldState, newState) => {
+        if (oldState.children !== newState.children) updateTracks();
 
         vm.state = {
-            ...(model.state.children !== oldState.children
-                ? compileTracks()
-                : {}),
+            ...(oldState.children !== newState.children ? compileTracks() : {}),
         };
     });
 
-    context.subscribe((oldState) => {
+    context.subscribe((oldState, newState) => {
         vm.state = {
-            ...(context.state.collapsed !== oldState.collapsed
+            ...(oldState.collapsed !== newState.collapsed
                 ? { ...compileTracks(), ...compileCreateIcon() }
                 : {}),
         };

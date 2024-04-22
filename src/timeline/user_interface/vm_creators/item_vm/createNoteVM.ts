@@ -48,18 +48,16 @@ export default function createNoteVM(
         },
     });
 
-    model.subscribe((oldState) => {
+    model.subscribe((oldState, newState) => {
         vm.state = {
-            ...(model.state.start !== oldState.start ? compileStart() : {}),
-            ...(model.state.end !== oldState.end ? compileEnd() : {}),
-            ...(model.state.content !== oldState.content
-                ? compileTooltip()
-                : {}),
+            ...(oldState.start !== newState.start ? compileStart() : {}),
+            ...(oldState.end !== newState.end ? compileEnd() : {}),
+            ...(oldState.content !== newState.content ? compileTooltip() : {}),
         };
     });
 
-    context.player.subscribe(() => {
-        const isPlaying = context.player.state.playingNotes.includes(model);
+    context.player.subscribe((_, newState) => {
+        const isPlaying = newState.playingNotes.includes(model);
         const alteredStyles = Object.assign({}, vm.state.innerDivStyles);
         alteredStyles["background-color"] = isPlaying ? "blue" : "black";
 
