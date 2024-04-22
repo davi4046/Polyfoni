@@ -93,7 +93,7 @@ export default function createItemTrackVM(
         idPrefix: model.id,
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         const hasChildrenChanged = model.state.children !== oldState.children;
 
         if (hasChildrenChanged) updateItems();
@@ -103,7 +103,7 @@ export default function createItemTrackVM(
         };
     });
 
-    context.subscribe((_, oldState) => {
+    context.subscribe((oldState) => {
         const hasGhostPairsChanged =
             context.state.ghostPairs !== oldState.ghostPairs;
         const hasHighlightsChanged =

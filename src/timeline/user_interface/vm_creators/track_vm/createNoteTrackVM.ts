@@ -91,7 +91,7 @@ export default function createNoteTrackVM(
         idPrefix: model.id,
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         const hasChildrenChanged = model.state.children !== oldState.children;
 
         if (hasChildrenChanged) updateItems();
@@ -101,7 +101,7 @@ export default function createNoteTrackVM(
         };
     });
 
-    context.subscribe((_, oldState) => {
+    context.subscribe((oldState) => {
         const hasHighlightsChanged =
             context.state.highlights !== oldState.highlights;
 

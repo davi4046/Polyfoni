@@ -20,16 +20,16 @@ export default class Stateful<TState extends object>
         if (isEqual(this._state, stateClone)) return;
 
         this._state = stateClone;
-        this._callbacks.forEach((callback) => callback(this, oldState)); //notify subscribers
+        this._callbacks.forEach((callback) => callback(oldState, this._state)); //notify subscribers
     }
 
     get state(): Readonly<TState> {
         return Object.assign({}, this._state);
     }
 
-    private _callbacks: SubscriptionCallback<TState>[] = [];
+    private _callbacks: SubscriberFn<TState>[] = [];
 
-    subscribe(callback: SubscriptionCallback<TState>): UnsubscribeFn {
+    subscribe(callback: SubscriberFn<TState>): UnsubscribeFn {
         this._callbacks.push(callback);
 
         return () => {
@@ -42,6 +42,6 @@ export default class Stateful<TState extends object>
 
 export type UnsubscribeFn = () => void;
 
-export type SubscriptionCallback<TState extends object> =
-    | ((obj: Stateful<TState>, oldState: TState) => void)
-    | ((obj: Stateful<TState>, oldState: TState) => Promise<void>);
+export type SubscriberFn<TState extends object> =
+    | ((oldState: TState, newState: TState) => void)
+    | ((oldState: TState, newState: TState) => Promise<void>);

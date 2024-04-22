@@ -83,16 +83,16 @@ export const itemInitFunctions: Partial<{
             }
         });
 
-        const subscriptionHandles: UnsubscribeFn<any>[] = [];
+        const unsubscribeFuncs: UnsubscribeFn[] = [];
 
         timeline.scaleTrack.subscribe(() => {
             updateFilters(); // Update filters when a new item is added to the scale track
 
-            subscriptionHandles.forEach((handle) => handle.unsubscribe());
-            subscriptionHandles.length = 0; // Clear old handles
+            unsubscribeFuncs.forEach((unsubscribe) => unsubscribe());
+            unsubscribeFuncs.length = 0;
 
             getChildren(timeline.scaleTrack).forEach((scaleItem) => {
-                subscriptionHandles.push(scaleItem.subscribe(updateFilters)); // Update filters when state of a scale item changes
+                unsubscribeFuncs.push(scaleItem.subscribe(updateFilters)); // Update filters when state of a scale item changes
             });
         });
     },

@@ -19,7 +19,7 @@ export default function createVoiceGroupVM(
         ...compileVoices(),
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         vm.state = {
             ...(model.state.children !== oldState.children
                 ? compileVoices()

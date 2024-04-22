@@ -31,20 +31,18 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
 
     private _subscriptions = new Map<object, UnsubscribeFn>();
 
-    private async _reportStateChange(obj: Stateful<any>, oldState: any) {
-        let newState = {}; // TEMP
-
+    private async _reportStateChange(obj: any, oldState: any, newState: any) {
         for (const callback of this._callbacks) {
             await callback(obj, oldState, newState);
         }
     }
 
     private _watchNonRecursively(obj: Stateful<any>) {
-        const subscription = obj.subscribe((_, oldState) =>
-            this._reportStateChange(obj, oldState)
+        const unsubscribe = obj.subscribe((oldState, newState) =>
+            this._reportStateChange(obj, oldState, newState)
         );
 
-        this._subscriptions.set(obj, subscription);
+        this._subscriptions.set(obj, unsubscribe);
     }
 
     private _watchRecursively(obj: Stateful<ParentState<Stateful<any>>>) {
@@ -56,7 +54,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             }
         });
 
-        const subscription = obj.subscribe((_, oldState) => {
+        const unsubscribe = obj.subscribe((oldState, newState) => {
             const oldChildren = oldState.children;
             const newChildren = getChildren(obj);
 
@@ -70,7 +68,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
                 (child) => !newChildren.includes(child)
             );
 
-            this._reportStateChange(obj, oldState);
+            this._reportStateChange(obj, oldState, newState);
 
             for (const addedChild of addedChildren) {
                 if (this._subscriptions.has(addedChild)) return;
@@ -91,6 +89,6 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             }
         });
 
-        this._subscriptions.set(obj, subscription);
+        this._subscriptions.set(obj, unsubscribe);
     }
 }

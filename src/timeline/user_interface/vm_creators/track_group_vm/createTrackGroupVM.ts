@@ -95,7 +95,7 @@ export default function createTrackGroupVM(
         ...compileHeaderMenu(),
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         if (model.state.children !== oldState.children) updateTracks();
 
         vm.state = {
@@ -105,7 +105,7 @@ export default function createTrackGroupVM(
         };
     });
 
-    context.subscribe((_, oldState) => {
+    context.subscribe((oldState) => {
         vm.state = {
             ...(context.state.collapsed !== oldState.collapsed
                 ? { ...compileTracks(), ...compileCreateIcon() }

@@ -47,7 +47,7 @@
         requestAnimationFrame(updatePlaybackPosition);
     }
 
-    vm.subscribe((_, oldState) => {
+    vm.subscribe((oldState) => {
         vm = vm;
 
         if (!oldState.isPlaying) {

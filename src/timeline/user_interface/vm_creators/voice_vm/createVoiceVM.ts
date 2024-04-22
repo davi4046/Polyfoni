@@ -20,7 +20,7 @@ export default function createVoiceVM(
         ...compileTrackGroups(),
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         vm.state = {
             ...(model.state.children !== oldState.children
                 ? compileTrackGroups()

@@ -11,7 +11,7 @@
 
     let tooltip: Instance<Props> | undefined = undefined;
 
-    vm.subscribe((_, oldState) => {
+    vm.subscribe((oldState) => {
         vm = vm;
 
         if (vm.state.tooltip !== oldState.tooltip) {

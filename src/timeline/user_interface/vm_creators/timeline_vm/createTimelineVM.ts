@@ -82,14 +82,14 @@ export default function createTimelineVM(
             // @ts-ignore
             const itemEditor = new ItemEditor({ target, props });
 
-            const subscription = item.subscribe(() => {
+            const unsubscribe = item.subscribe(() => {
                 if (itemEditor.reflectChange !== undefined) {
                     if (!justUpdated) {
                         itemEditor.reflectChange(item.state.content);
                     }
                     justUpdated = false;
                 } else {
-                    subscription.unsubscribe();
+                    unsubscribe();
                 }
             });
 
@@ -122,7 +122,7 @@ export default function createTimelineVM(
         idPrefix: model.id,
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         vm.state = {
             ...(model.state.children !== oldState.children
                 ? compileSections()
@@ -130,7 +130,7 @@ export default function createTimelineVM(
         };
     });
 
-    context.subscribe((_, oldState) => {
+    context.subscribe((oldState) => {
         vm.state = {
             ...(context.state.highlights !== oldState.highlights
                 ? compileDisplayHarmony()
@@ -143,7 +143,7 @@ export default function createTimelineVM(
         };
     });
 
-    context.player.subscribe((_, oldState) => {
+    context.player.subscribe((oldState) => {
         vm.state = {
             ...(context.player.state.motion !== oldState.motion
                 ? compilePlaybackMotion()

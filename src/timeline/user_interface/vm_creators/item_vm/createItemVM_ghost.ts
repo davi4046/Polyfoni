@@ -61,7 +61,7 @@ export default function createItemVM_ghost<T extends keyof ItemTypes>(
         ...compileInnerDivStyles(),
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         vm.state = {
             ...(model.state.start !== oldState.start ? compileStart() : {}),
             ...(model.state.end !== oldState.end ? compileEnd() : {}),

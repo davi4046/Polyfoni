@@ -163,7 +163,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         },
     });
 
-    model.subscribe((_, oldState) => {
+    model.subscribe((oldState) => {
         vm.state = {
             ...(model.state.start !== oldState.start ? compileStart() : {}),
             ...(model.state.end !== oldState.end ? compileEnd() : {}),
@@ -175,7 +175,7 @@ export default function createItemVM<T extends keyof ItemTypes>(
         };
     });
 
-    context.subscribe((_, oldState) => {
+    context.subscribe((oldState) => {
         const hasStartOverrideChanged =
             context.state.visualStartOverrideMap.get(model) !==
             oldState.visualStartOverrideMap.get(model);
