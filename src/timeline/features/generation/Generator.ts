@@ -31,15 +31,17 @@ export default class Generator {
     private _itemChanges: ItemChange[] = [];
     private _isHandlingChanges = false;
 
-    private _voiceNotesMap = new Map<Voice, NoteBuilder[]>();
+    private _frameworkMap = new FrameworkMap({});
 
-    private _getVoiceNotes(voice: Voice): NoteBuilder[] {
-        let notes = this._voiceNotesMap.get(voice);
-        if (!notes) {
-            notes = [];
-            this._voiceNotesMap.set(voice, notes);
+    private _getFramework(voice: Voice): readonly NoteBuilder[] {
+        let framework = this._frameworkMap.state[voice.id];
+        if (!framework) {
+            framework = [];
+            this._frameworkMap.state = {
+                [voice.id]: framework,
+            };
         }
-        return notes;
+        return framework;
     }
 
     private _decorationsMap = new Map<
@@ -123,9 +125,10 @@ export default class Generator {
                     } else {
                         this._isHandlingChanges = false;
                         //render output
-                        for (const voice of this._voiceNotesMap.keys()) {
-                            this._renderOutput(voice);
-                        }
+                        const voices = getChildren(
+                            getChildren(this._timeline)[1]
+                        );
+                        for (const voice of voices) this._renderOutput(voice);
                     }
                 };
                 this._isHandlingChanges = true;
@@ -148,7 +151,8 @@ export default class Generator {
     private async _clearItemStateEffect(itemState: ItemState<any>) {
         const trackType = getTrackType(itemState.parent);
         const voice = getGrandparent(itemState.parent);
-        const voiceNotes = this._getVoiceNotes(voice);
+
+        const voiceNotes = this._getFramework(voice).slice();
         const ownedNotes = getNotesStartingWithinInterval(
             voiceNotes,
             itemState
@@ -179,6 +183,8 @@ export default class Generator {
                 ownedNotes.forEach((note) => {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
+
+                this._frameworkMap.state = { [voice.id]: voiceNotes };
 
                 const durationItems = getChildren(itemState.parent).slice();
                 durationItems.sort((a, b) => a.state.start - b.state.start);
@@ -233,7 +239,8 @@ export default class Generator {
     ): Promise<string | undefined> {
         const trackType = getTrackType(itemState.parent);
         const voice = getGrandparent(itemState.parent);
-        const voiceNotes = this._getVoiceNotes(voice);
+
+        const voiceNotes = this._getFramework(voice).slice();
         const ownedNotes = getNotesStartingWithinInterval(
             voiceNotes,
             itemState
@@ -312,7 +319,9 @@ export default class Generator {
                 }
 
                 for (let i = 0; i < ownedNotes.length; i++) {
-                    ownedNotes[i].state = { isRest: results[i] === "true" };
+                    ownedNotes[i].state = {
+                        isRest: results[i] === "true",
+                    };
                 }
 
                 break;
@@ -389,6 +398,7 @@ export default class Generator {
 
                 voiceNotes.push(...newNotes);
                 voiceNotes.sort((a, b) => a.state.start - b.state.end);
+                this._frameworkMap.state = { [voice.id]: voiceNotes };
 
                 const durationItems = getChildren(itemState.parent).slice();
                 durationItems.sort((a, b) => a.state.start - b.state.start);
@@ -474,10 +484,6 @@ export default class Generator {
 
                     if (beatsPerSubdivision < MIN_DURATION) continue;
 
-                    console.log(
-                        "Generated decoration with beatsPerSubdivision:",
-                        beatsPerSubdivision
-                    );
                     const duration = beatsPerSubdivision * fraction;
 
                     decorations.set(prevNote, {
@@ -552,7 +558,9 @@ export default class Generator {
     }
 
     private _renderOutput(voice: Voice) {
-        const voiceNotes = this._getVoiceNotes(voice);
+        const voiceNotes = this._frameworkMap.state[voice.id];
+        if (!voiceNotes) return;
+
         const [outputTrack] = getTracksOfType(voice, "output");
 
         const decorationGroups = getChildren(voice).filter(
@@ -630,13 +638,16 @@ type StateChange<TState extends object> = {
 
 type ItemChange = StateChange<ItemState<any>>;
 
-
 class NoteBuilder extends Stateful<{
     start: number;
     end: number;
     degree?: number;
     pitch?: number;
     isRest?: boolean;
+}> {}
+
+class FrameworkMap extends Stateful<{
+    [key: string]: readonly NoteBuilder[];
 }> {}
 
 type Decoration = {
@@ -654,7 +665,7 @@ function isNoteStartWithinInterval(
 }
 
 function getNotesStartingWithinInterval(
-    notes: NoteBuilder[],
+    notes: readonly NoteBuilder[],
     interval: Interval
 ) {
     const firstIndex = notes.findIndex((note) =>
