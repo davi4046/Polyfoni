@@ -1,10 +1,10 @@
 import { isEqual } from "lodash";
 
-import type { Subscription, SubscriptionCallback } from "./Stateful";
+import type { UnsubscribeFn, SubscriptionCallback } from "./Stateful";
 import type Stateful from "./Stateful";
 import {
     getChildren,
-    isDescendant,
+    getDescendants,
     type ParentState,
 } from "./state-hierarchy-utils";
 
@@ -19,24 +19,17 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
 
     private _callbacks: SubscriptionCallback<any>[] = [];
 
-    subscribe(callback: SubscriptionCallback<any>): Subscription<any> {
+    subscribe(callback: SubscriptionCallback<any>): UnsubscribeFn {
         this._callbacks.push(callback);
 
-        return {
-            obj: this,
-            unsubscribe: () => {
-                this._callbacks = this._callbacks.filter(
-                    (func) => func !== callback
-                );
-            },
+        return () => {
+            this._callbacks = this._callbacks.filter(
+                (func) => func !== callback
+            );
         };
     }
 
-    getWatchedObjects(): object[] {
-        return this._subscriptions.map((subscription) => subscription.obj);
-    }
-
-    private _subscriptions: Subscription[] = [];
+    private _subscriptions = new Map<object, UnsubscribeFn>();
 
     private async _reportStateChange(obj: Stateful<any>, oldState: any) {
         for (const callback of this._callbacks) {
@@ -49,7 +42,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             this._reportStateChange(obj, oldState)
         );
 
-        this._subscriptions.push(subscription);
+        this._subscriptions.set(obj, subscription);
     }
 
     private _watchRecursively(obj: Stateful<ParentState<Stateful<any>>>) {
@@ -78,11 +71,7 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             this._reportStateChange(obj, oldState);
 
             for (const addedChild of addedChildren) {
-                const subscription = this._subscriptions.find(
-                    (subscription) => subscription.obj === addedChild
-                );
-
-                if (subscription) {
+                if (this._subscriptions.has(addedChild)) {
                     throw new Error(
                         "An object which is already subscribed to " +
                             "has been added to children of another object (meaning the " +
@@ -99,22 +88,14 @@ export default class StateHierarchyWatcher<T extends Stateful<any>> {
             }
 
             for (const removedChild of removedChildren) {
-                this._subscriptions = this._subscriptions.filter(
-                    (subscription) => {
-                        const isRelatedSubscription =
-                            subscription.obj === removedChild ||
-                            isDescendant(subscription.obj, removedChild);
+                const descendants = getDescendants(removedChild);
 
-                        if (isRelatedSubscription) {
-                            subscription.unsubscribe();
-                        }
-
-                        return !isRelatedSubscription;
-                    }
-                );
+                [removedChild, ...descendants].forEach((obj) => {
+                    this._subscriptions.delete(obj);
+                });
             }
         });
 
-        this._subscriptions.push(subscription);
+        this._subscriptions.set(obj, subscription);
     }
 }

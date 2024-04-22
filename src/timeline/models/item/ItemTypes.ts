@@ -1,4 +1,4 @@
-import type { Subscription } from "../../../architecture/Stateful";
+import type { UnsubscribeFn } from "../../../architecture/Stateful";
 import {
     getChildren,
     getLastAncestor,
@@ -83,7 +83,7 @@ export const itemInitFunctions: Partial<{
             }
         });
 
-        const subscriptionHandles: Subscription<any>[] = [];
+        const subscriptionHandles: UnsubscribeFn<any>[] = [];
 
         timeline.scaleTrack.subscribe(() => {
             updateFilters(); // Update filters when a new item is added to the scale track

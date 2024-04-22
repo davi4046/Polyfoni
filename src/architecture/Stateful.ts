@@ -29,26 +29,18 @@ export default class Stateful<TState extends object>
 
     private _callbacks: SubscriptionCallback<TState>[] = [];
 
-    subscribe(
-        callback: SubscriptionCallback<TState>
-    ): Subscription<typeof this> {
+    subscribe(callback: SubscriptionCallback<TState>): UnsubscribeFn {
         this._callbacks.push(callback);
 
-        return {
-            obj: this,
-            unsubscribe: () => {
-                this._callbacks = this._callbacks.filter(
-                    (func) => func !== callback
-                );
-            },
+        return () => {
+            this._callbacks = this._callbacks.filter(
+                (func) => func !== callback
+            );
         };
     }
 }
 
-export type Subscription<T extends Stateful<any> = any> = {
-    obj: T;
-    unsubscribe: () => void;
-};
+export type UnsubscribeFn = () => void;
 
 export type SubscriptionCallback<TState extends object> =
     | ((obj: Stateful<TState>, oldState: TState) => void)
