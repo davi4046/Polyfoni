@@ -3,9 +3,8 @@ import { invoke } from "@tauri-apps/api";
 import { sum } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
-import type Stateful from "../../../architecture/Stateful";
+import Stateful from "../../../architecture/Stateful";
 import {
-    doesValueMatchSymbol,
     getChildren,
     getGrandparent,
     getIndex,
@@ -160,20 +159,19 @@ export default class Generator {
         switch (trackType) {
             case "frameworkPitch": {
                 ownedNotes.forEach((note) => {
-                    note.degree = undefined;
-                    note.pitch = undefined;
+                    note.state = { degree: undefined, pitch: undefined };
                 });
                 break;
             }
             case "frameworkRest": {
                 ownedNotes.forEach((note) => {
-                    note.isRest = undefined;
+                    note.state = { isRest: undefined };
                 });
                 break;
             }
             case "frameworkHarmony": {
                 ownedNotes.forEach((note) => {
-                    note.pitch = undefined;
+                    note.state = { pitch: undefined };
                 });
                 break;
             }
@@ -267,7 +265,7 @@ export default class Generator {
                 }
 
                 for (let i = 0; i < ownedNotes.length; i++) {
-                    ownedNotes[i].degree = values[i];
+                    ownedNotes[i].state = { degree: values[i] };
                 }
 
                 // Recalculate pitch based on harmony for ownedNotes
@@ -282,10 +280,12 @@ export default class Generator {
                         isNoteStartWithinInterval(note, item.state)
                     );
                     if (!harmonyItem) return;
-                    note.pitch = getPitchFromChordStatusAndDegree(
-                        harmonyItem.state.content.chordStatus,
-                        note.degree
-                    );
+                    note.state = {
+                        pitch: getPitchFromChordStatusAndDegree(
+                            harmonyItem.state.content.chordStatus,
+                            note.state.degree
+                        ),
+                    };
                 });
                 break;
             }
@@ -312,7 +312,7 @@ export default class Generator {
                 }
 
                 for (let i = 0; i < ownedNotes.length; i++) {
-                    ownedNotes[i].isRest = results[i] === "true";
+                    ownedNotes[i].state = { isRest: results[i] === "true" };
                 }
 
                 break;
@@ -323,10 +323,12 @@ export default class Generator {
                     itemState
                 );
                 ownedNotes.forEach((note) => {
-                    note.pitch = getPitchFromChordStatusAndDegree(
-                        itemState.content.chordStatus,
-                        note.degree
-                    );
+                    note.state = {
+                        pitch: getPitchFromChordStatusAndDegree(
+                            itemState.content.chordStatus,
+                            note.state.degree
+                        ),
+                    };
                 });
                 break;
             }
@@ -337,13 +339,13 @@ export default class Generator {
 
                 const firstOverlappingNote = voiceNotes.find((note) => {
                     return (
-                        note.start < itemState.start &&
-                        note.end > itemState.start
+                        note.state.start < itemState.start &&
+                        note.state.end > itemState.start
                     );
                 });
 
                 let beat = firstOverlappingNote
-                    ? Math.max(itemState.start, firstOverlappingNote.end)
+                    ? Math.max(itemState.start, firstOverlappingNote.state.end)
                     : itemState.start;
                 let index = 0;
                 let skippedIndeces = 0;
@@ -379,12 +381,14 @@ export default class Generator {
                     }
                     skippedIndeces = 0;
 
-                    newNotes.push(new NoteBuilder(beat, beat + duration));
+                    newNotes.push(
+                        new NoteBuilder({ start: beat, end: beat + duration })
+                    );
                     beat += duration;
                 }
 
                 voiceNotes.push(...newNotes);
-                voiceNotes.sort((a, b) => a.start - b.start);
+                voiceNotes.sort((a, b) => a.state.start - b.state.end);
 
                 const durationItems = getChildren(itemState.parent).slice();
                 durationItems.sort((a, b) => a.state.start - b.state.start);
@@ -416,13 +420,13 @@ export default class Generator {
                     const prevNote = voiceNotes[index];
                     const nextNote = voiceNotes[index + 1];
 
-                    if (!prevNote.pitch || !nextNote.pitch) return;
+                    if (!prevNote.state.pitch || !nextNote.state.pitch) return;
 
                     const promise = this._evaluateWithAliases(
                         itemState.content,
                         {
-                            prev_pitch: prevNote.pitch,
-                            next_pitch: nextNote.pitch,
+                            prev_pitch: prevNote.state.pitch,
+                            next_pitch: nextNote.state.pitch,
                             scale: [0, 2, 4, 5, 7, 9, 11],
                         }
                     );
@@ -464,7 +468,8 @@ export default class Generator {
                     const fraction = 1;
 
                     const subdivisions = fraction * pitches.length + 1;
-                    const totalDuration = prevNote.end - prevNote.start;
+                    const totalDuration =
+                        prevNote.state.end - prevNote.state.start;
                     const beatsPerSubdivision = totalDuration / subdivisions;
 
                     if (beatsPerSubdivision < MIN_DURATION) continue;
@@ -574,9 +579,9 @@ export default class Generator {
 
         const noteItems = voiceNotes.flatMap((noteBuilder) => {
             if (
-                noteBuilder.pitch === undefined ||
-                noteBuilder.isRest === undefined ||
-                noteBuilder.isRest
+                noteBuilder.state.pitch === undefined ||
+                noteBuilder.state.isRest === undefined ||
+                noteBuilder.state.isRest
             ) {
                 return [];
             }
@@ -587,14 +592,16 @@ export default class Generator {
                 : 0;
 
             const note = {
-                pitch: noteBuilder.pitch,
+                pitch: noteBuilder.state.pitch,
                 duration:
-                    noteBuilder.end - noteBuilder.start - decorationDuration,
+                    noteBuilder.state.end -
+                    noteBuilder.state.start -
+                    decorationDuration,
             };
 
             const notes = decoration ? [note, ...decoration.notes] : [note];
 
-            let start = noteBuilder.start;
+            let start = noteBuilder.state.start;
 
             return notes.map((note) => {
                 const end = start + note.duration;
@@ -623,16 +630,14 @@ type StateChange<TState extends object> = {
 
 type ItemChange = StateChange<ItemState<any>>;
 
-class NoteBuilder {
-    constructor(
-        public start: number,
-        public end: number
-    ) {}
 
+class NoteBuilder extends Stateful<{
+    start: number;
+    end: number;
     degree?: number;
     pitch?: number;
     isRest?: boolean;
-}
+}> {}
 
 type Decoration = {
     notes: { pitch: number; duration: number }[];
@@ -643,7 +648,9 @@ function isNoteStartWithinInterval(
     note: NoteBuilder,
     interval: Interval
 ): boolean {
-    return note.start >= interval.start && note.start < interval.end;
+    return (
+        note.state.start >= interval.start && note.state.start < interval.end
+    );
 }
 
 function getNotesStartingWithinInterval(
