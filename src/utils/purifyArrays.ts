@@ -1,4 +1,4 @@
-/** Returns only the elements which are unique to each array */
+/** Returns new arrays with the elements that are unique to each provided array */
 export default function purifyArrays<T>(...arrays: readonly (readonly T[])[]) {
     const purifiedArrays = [];
 
