@@ -12,7 +12,7 @@ import {
     getPosition,
     isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
-import compareArrays from "../../../utils/compareArrays";
+import purifyArrays from "../../../utils/purifyArrays";
 import { Chord } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
@@ -75,7 +75,7 @@ export default class Generator {
                     const trackType = getTrackType(obj as Track<any>);
                     if (trackType === "output" || !trackType) return;
 
-                    const [removedItems, addedItems] = compareArrays<Item<any>>(
+                    const [removedItems, addedItems] = purifyArrays<Item<any>>(
                         oldState.children,
                         newState.children
                     );

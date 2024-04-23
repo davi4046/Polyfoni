@@ -10,7 +10,7 @@ import {
     countAncestors,
     getNestedArrayOfDescendants,
 } from "../../../architecture/state-hierarchy-utils";
-import compareArrays from "../../../utils/compareArrays";
+import purifyArrays from "../../../utils/purifyArrays";
 import type Item from "../../models/item/Item";
 import type Timeline from "../../models/timeline/Timeline";
 
@@ -98,7 +98,7 @@ export default class AliasManager {
             switch (objDepth) {
                 // Track
                 case 4: {
-                    const [removedItems, addedItems] = compareArrays<Item<any>>(
+                    const [removedItems, addedItems] = purifyArrays<Item<any>>(
                         oldState.children,
                         newState.children
                     );
@@ -126,7 +126,7 @@ export default class AliasManager {
                         getVariableNames(newState.content),
                     ]);
 
-                    const [removedNames, addedNames] = compareArrays(
+                    const [removedNames, addedNames] = purifyArrays(
                         oldNames,
                         newNames
                     );

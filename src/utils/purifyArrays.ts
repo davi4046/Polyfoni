@@ -1,5 +1,5 @@
 /** Returns only the elements which are unique to each array */
-export default function compareArrays<T>(...arrays: readonly (readonly T[])[]) {
+export default function purifyArrays<T>(...arrays: readonly (readonly T[])[]) {
     const purifiedArrays = [];
 
     for (let i = 0; i < arrays.length; i++) {
