@@ -6,7 +6,6 @@ import {
     isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import type Track from "../../models/track/Track";
-import type Voice from "../../models/voice/Voice";
 
 type TrackType =
     | "output"
@@ -41,7 +40,7 @@ export const trackTypeToPathMap = new Map<TrackType, string>(
 );
 
 export function getTracksOfType(
-    voice: Voice,
+    obj: object,
     trackType: TrackType
 ): Track<any>[] {
     const trackTypePath = trackTypeToPathMap.get(trackType);
@@ -52,11 +51,24 @@ export function getTracksOfType(
         );
     }
 
-    if (!isPositionOnPath(getPosition(voice), trackTypePath)) {
+    const position = getPosition(obj);
+
+    if (!isPositionOnPath(position, trackTypePath)) {
+        throw new Error("Given tracktype cannot exist on given object");
+    }
+
+    const symbols = trackTypePath.split(",");
+
+    if (position.length > symbols.length) {
+        // The given object does not contain tracks of the given
+        // type because it is deeper in the hierarchy than these
         throw new Error(
-            `Given tracktype does not exist on given voice: ${trackType}`
+            "Given tracktype cannot exist on given object" +
+                "because object is deeper than given tracktype"
         );
     }
+
+    symbols.splice(0, position.length); // The remaining symbols to check children against
 
     function filterChildrenRecursive(obj: Object, symbols: string[]): any[] {
         const symbol = symbols.shift();
@@ -72,9 +84,7 @@ export function getTracksOfType(
         );
     }
 
-    const symbols = trackTypePath.split(",").slice(2);
-
-    return filterChildrenRecursive(voice, symbols) as Track<any>[];
+    return filterChildrenRecursive(obj, symbols) as Track<any>[];
 }
 
 export function getTrackType(track: Track<any>): TrackType | undefined {

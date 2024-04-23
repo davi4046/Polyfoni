@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { sum } from "lodash";
+import { sum, uniqBy } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
@@ -110,7 +110,6 @@ export default class Generator {
                     if (isValidChange) {
                         this._itemChanges.push({ obj, oldState, newState });
                     }
-
                     break;
                 }
             }
@@ -139,35 +138,23 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
-        const subscriptions = new Map<NoteBuilder, UnsubscribeFn>();
+        const subscriptions: UnsubscribeFn[] = [];
 
         const updatedNotes = new Set<NoteBuilder>();
 
-        const subscribeNote = (note: NoteBuilder) => {
-            subscriptions.set(
-                note,
-                note.subscribe(() => updatedNotes.add(note))
-            );
-        };
-
-        const unsubscribeNote = (note: NoteBuilder) => {
-            const unsubscribe = subscriptions.get(note);
-            if (unsubscribe) {
-                unsubscribe();
-                subscriptions.delete(note);
-            }
-        };
-
-        Object.entries(this._frameworkMap.state).forEach(
-            ([voiceId, framework]) => {
-                for (let i = 0; i < framework.length; i++) {
-                    subscribeNote(framework[i]);
-                }
-            }
+        Object.values(this._frameworkMap.state).forEach((framework) =>
+            framework.forEach((note, index) => {
+                const unsubscribe = note.subscribe(() => {
+                    updatedNotes.add(note);
+                    const prevNote = framework[index - 1];
+                    if (prevNote) updatedNotes.add(prevNote);
+                });
+                subscriptions.push(unsubscribe);
+            })
         );
 
-        const unsubscribe = this._frameworkMap.subscribe(
-            (oldState, newState) => {
+        subscriptions.push(
+            this._frameworkMap.subscribe((oldState, newState) => {
                 const voiceIds = new Set([
                     ...Object.keys(oldState),
                     ...Object.keys(newState),
@@ -185,27 +172,74 @@ export default class Generator {
                         ? [oldFramework.slice(), []]
                         : purifyArrays(oldFramework, newFramework);
 
-                    removedNotes.forEach(unsubscribeNote);
-                    removedNotes.forEach((note) => updatedNotes.delete(note));
+                    removedNotes.forEach((note) => {
+                        updatedNotes.add(note);
+                        const prevNote =
+                            oldFramework[oldFramework.indexOf(note) - 1];
+                        if (prevNote) updatedNotes.add(prevNote);
+                    });
 
-                    addedNotes.forEach(subscribeNote);
-                    addedNotes.forEach((note) => updatedNotes.add(note));
+                    addedNotes.forEach((note) => {
+                        updatedNotes.add(note);
+                        const prevNote =
+                            newFramework[newFramework.indexOf(note) - 1];
+                        if (prevNote) updatedNotes.add(prevNote);
+                    });
                 });
-            }
+            })
         );
 
         if (change.oldState) {
             await this._clearItemStateEffect(change.oldState);
         }
         if (change.newState) {
-            change.obj.state = {
-                error: await this._applyItemStateEffect(change.newState),
-            };
+            const error = await this._applyItemStateEffect(change.newState);
+            change.obj.state = { error };
         }
 
         console.log("updated notes:", updatedNotes);
 
-        unsubscribe();
+        this._decorationsMap.forEach((decorations, trackGroup) => {
+            const voice = getParent(trackGroup);
+            const framework = this._frameworkMap.state[voice.id];
+
+            if (!framework) return;
+
+            updatedNotes.forEach((note) => {
+                const index = framework.indexOf(note);
+
+                if (index === -1) {
+                    decorations.delete(note);
+                    return;
+                }
+
+                const nextNote = framework[index + 1];
+
+                if (!nextNote) {
+                    decorations.delete(note);
+                    return;
+                }
+
+                if (
+                    note.state.pitch === undefined ||
+                    nextNote.state.pitch === undefined
+                ) {
+                    decorations.delete(note);
+                    return;
+                }
+
+                createDecoration(
+                    trackGroup,
+                    note.state.start,
+                    note.state.pitch,
+                    nextNote.state.pitch
+                ).then((decoration) => {
+                    if (decoration) decorations.set(note, decoration);
+                });
+            });
+        });
+
+        subscriptions.forEach((unsubscribe) => unsubscribe());
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
@@ -344,7 +378,7 @@ export default class Generator {
 
                 ownedNotes.forEach((note) => {
                     const harmonyItem = getChildren(harmonyTrack).find((item) =>
-                        isNoteStartWithinInterval(note, item.state)
+                        isPointWithinInterval(note.state.start, item.state)
                     );
                     if (!harmonyItem) return;
                     note.state = {
@@ -451,7 +485,10 @@ export default class Generator {
                     skippedIndeces = 0;
 
                     newNotes.push(
-                        new NoteBuilder({ start: beat, end: beat + duration })
+                        new NoteBuilder({
+                            start: beat,
+                            end: beat + duration,
+                        })
                     );
                     beat += duration;
                 }
@@ -597,11 +634,11 @@ export default class Generator {
 
         // Find all pitch, rest, and harmony items that "own" one or more of the notes
         const items = [pitchTrack, restTrack, harmonyTrack].flatMap((track) => {
-            return getChildren(track).filter((item) =>
-                notes.find((note) =>
-                    isNoteStartWithinInterval(note, item.state)
-                )
-            );
+            return getChildren(track).filter((item) => {
+                return notes.find((note) => {
+                    return isPointWithinInterval(note.state.start, item.state);
+                });
+            });
         });
 
         const promises = [];
@@ -715,13 +752,8 @@ type Decoration = {
     skip: boolean;
 };
 
-function isNoteStartWithinInterval(
-    note: NoteBuilder,
-    interval: Interval
-): boolean {
-    return (
-        note.state.start >= interval.start && note.state.start < interval.end
-    );
+function isPointWithinInterval(point: number, interval: Interval): boolean {
+    return point >= interval.start && point < interval.end;
 }
 
 function getNotesStartingWithinInterval(
@@ -729,10 +761,10 @@ function getNotesStartingWithinInterval(
     interval: Interval
 ) {
     const firstIndex = notes.findIndex((note) =>
-        isNoteStartWithinInterval(note, interval)
+        isPointWithinInterval(note.state.start, interval)
     );
     const lastIndex = notes.findLastIndex((note) =>
-        isNoteStartWithinInterval(note, interval)
+        isPointWithinInterval(note.state.start, interval)
     );
     return notes.slice(firstIndex, lastIndex + 1);
 }
@@ -756,4 +788,31 @@ function isIntegerArray(value: any): boolean {
     if (!Array.isArray(value)) return false;
     if (value.some((item) => !Number.isInteger(item))) return false;
     return true;
+}
+
+async function createDecoration(
+    trackGroup: TrackGroup,
+    prevStart: number,
+    prevPitch: number,
+    nextPitch: number
+): Promise<Decoration | undefined> {
+    const [pitchesTrack] = getTracksOfType(trackGroup, "decorationPitches");
+    const [fractionTrack] = getTracksOfType(trackGroup, "decorationFraction");
+    const [skipTrack] = getTracksOfType(trackGroup, "decorationSkip");
+    const [harmonyTrack] = getTracksOfType(trackGroup, "decorationHarmony");
+
+    const isPrevStartWithinItem = (item: Item<any>) => {
+        return isPointWithinInterval(prevStart, item.state);
+    };
+
+    const pitchesItem = getChildren(pitchesTrack).find(isPrevStartWithinItem);
+    const fractionItem = getChildren(fractionTrack).find(isPrevStartWithinItem);
+    const skipItem = getChildren(skipTrack).find(isPrevStartWithinItem);
+    const harmonyItem = getChildren(harmonyTrack).find(isPrevStartWithinItem);
+
+    if (!pitchesItem) return;
+
+    // Do stuff
+
+    return { notes: [], skip: false };
 }
