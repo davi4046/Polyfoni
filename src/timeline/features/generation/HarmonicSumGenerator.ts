@@ -51,9 +51,10 @@ export default class HarmonicSumGenerator {
                         return;
                     }
 
-                    const { removedItems, addedItems } = compareArrays<
-                        Item<any>
-                    >(oldState.children, newState.children);
+                    const [removedItems, addedItems] = compareArrays<Item<any>>(
+                        oldState.children,
+                        newState.children
+                    );
 
                     this._itemChanges.push(
                         ...removedItems.map((item) => {

@@ -98,9 +98,10 @@ export default class AliasManager {
             switch (objDepth) {
                 // Track
                 case 4: {
-                    const { removedItems, addedItems } = compareArrays<
-                        Item<any>
-                    >(oldState.children, newState.children);
+                    const [removedItems, addedItems] = compareArrays<Item<any>>(
+                        oldState.children,
+                        newState.children
+                    );
 
                     const removedPromises = removedItems.map((item) =>
                         getVariableNames(item.state.content)
@@ -109,29 +110,29 @@ export default class AliasManager {
                         getVariableNames(item.state.content)
                     );
 
-                    const [removedVarNames, addedVarNames] = await Promise.all([
+                    const [removedNames, addedNames] = await Promise.all([
                         Promise.all(removedPromises),
                         Promise.all(addedPromises),
                     ]);
 
-                    addedVarNames.flat().forEach(handleAddedName);
-                    removedVarNames.flat().forEach(handleRemovedName);
+                    addedNames.flat().forEach(handleAddedName);
+                    removedNames.flat().forEach(handleRemovedName);
                     break;
                 }
                 // Item
                 case 5: {
-                    const [oldVarNames, newVarNames] = await Promise.all([
+                    const [oldNames, newNames] = await Promise.all([
                         getVariableNames(oldState.content),
                         getVariableNames(newState.content),
                     ]);
 
-                    const { removedItems, addedItems } = compareArrays(
-                        oldVarNames,
-                        newVarNames
+                    const [removedNames, addedNames] = compareArrays(
+                        oldNames,
+                        newNames
                     );
 
-                    addedItems.forEach(handleAddedName);
-                    removedItems.forEach(handleRemovedName);
+                    addedNames.forEach(handleAddedName);
+                    removedNames.forEach(handleRemovedName);
                     break;
                 }
             }

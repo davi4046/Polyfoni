@@ -1,11 +1,28 @@
-export default function compareArrays<T>(oldArray: T[], newArray: T[]) {
-    const removedItems = oldArray.filter((child) => {
-        return !newArray.includes(child);
-    });
+/** Returns only the elements which are unique to each array */
+export default function compareArrays<T>(...arrays: readonly (readonly T[])[]) {
+    const purifiedArrays = [];
 
-    const addedItems = newArray.filter((child) => {
-        return !oldArray.includes(child);
-    });
+    for (let i = 0; i < arrays.length; i++) {
+        const array = arrays[i];
+        const otherArrays = [...arrays.slice(0, i), ...arrays.slice(i + 1)];
 
-    return { removedItems, addedItems };
+        const purifiedArray = [];
+
+        for (const element of array) {
+            if (!isElementInAnyArray(element, otherArrays)) {
+                purifiedArray.push(element);
+            }
+        }
+        purifiedArrays.push(purifiedArray);
+    }
+
+    return purifiedArrays;
+}
+
+function isElementInAnyArray<T>(element: T, arrays: readonly (readonly T[])[]) {
+    return arrays.some((array) => {
+        return array.some((otherElement) => {
+            return otherElement === element;
+        });
+    });
 }

@@ -75,9 +75,10 @@ export default class Generator {
                     const trackType = getTrackType(obj as Track<any>);
                     if (trackType === "output" || !trackType) return;
 
-                    const { removedItems, addedItems } = compareArrays<
-                        Item<any>
-                    >(oldState.children, newState.children);
+                    const [removedItems, addedItems] = compareArrays<Item<any>>(
+                        oldState.children,
+                        newState.children
+                    );
 
                     this._itemChanges.push(
                         ...removedItems.map((item) => {
