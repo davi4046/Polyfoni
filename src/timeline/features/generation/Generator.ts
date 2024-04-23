@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api";
 import { sum } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
-import Stateful from "../../../architecture/Stateful";
+import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
 import {
     getChildren,
     getGrandparent,
@@ -139,6 +139,61 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
+        const subscriptions = new Map<NoteBuilder, UnsubscribeFn>();
+
+        const updatedNotes = new Set<NoteBuilder>();
+
+        const subscribeNote = (note: NoteBuilder) => {
+            subscriptions.set(
+                note,
+                note.subscribe(() => updatedNotes.add(note))
+            );
+        };
+
+        const unsubscribeNote = (note: NoteBuilder) => {
+            const unsubscribe = subscriptions.get(note);
+            if (unsubscribe) {
+                unsubscribe();
+                subscriptions.delete(note);
+            }
+        };
+
+        Object.entries(this._frameworkMap.state).forEach(
+            ([voiceId, framework]) => {
+                for (let i = 0; i < framework.length; i++) {
+                    subscribeNote(framework[i]);
+                }
+            }
+        );
+
+        const unsubscribe = this._frameworkMap.subscribe(
+            (oldState, newState) => {
+                const voiceIds = new Set([
+                    ...Object.keys(oldState),
+                    ...Object.keys(newState),
+                ]);
+
+                voiceIds.forEach((voiceId) => {
+                    const oldFramework = oldState[voiceId];
+                    const newFramework = newState[voiceId];
+
+                    if (oldFramework === newFramework) return;
+
+                    const [removedNotes, addedNotes] = !oldFramework
+                        ? [[], newFramework.slice()]
+                        : !newFramework
+                        ? [oldFramework.slice(), []]
+                        : purifyArrays(oldFramework, newFramework);
+
+                    removedNotes.forEach(unsubscribeNote);
+                    removedNotes.forEach((note) => updatedNotes.delete(note));
+
+                    addedNotes.forEach(subscribeNote);
+                    addedNotes.forEach((note) => updatedNotes.add(note));
+                });
+            }
+        );
+
         if (change.oldState) {
             await this._clearItemStateEffect(change.oldState);
         }
@@ -147,6 +202,10 @@ export default class Generator {
                 error: await this._applyItemStateEffect(change.newState),
             };
         }
+
+        console.log("updated notes:", updatedNotes);
+
+        unsubscribe();
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
