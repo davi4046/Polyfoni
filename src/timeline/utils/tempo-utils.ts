@@ -21,10 +21,7 @@ export async function deriveTempoChangesFromItems(
     const promises: Promise<void>[] = [];
 
     items.forEach((item) => {
-        const args: any = getLastAncestor(item).state.aliases.reduce(
-            (args, { name, value }) => ((args[name] = value), args),
-            {} as any
-        );
+        const args = getLastAncestor(item).state.aliases;
 
         const promise = invoke("evaluate", {
             task: `eval ||| ${item.state.content} ||| ${JSON.stringify(args)}`,

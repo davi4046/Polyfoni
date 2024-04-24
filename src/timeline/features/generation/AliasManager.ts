@@ -28,8 +28,10 @@ export default class AliasManager {
             });
 
             timeline.state = {
-                aliases: watcher.root.state.aliases.filter(
-                    (alias) => !unusedAliases.includes(alias.name)
+                aliases: Object.fromEntries(
+                    Object.entries(timeline.state.aliases).filter(
+                        ([key]) => !unusedAliases.includes(key)
+                    )
                 ),
             };
 
@@ -60,9 +62,8 @@ export default class AliasManager {
             } else if (builtins.has(name)) {
                 trackedAliases.set(name, 1);
                 timeline.state = {
-                    aliases: timeline.state.aliases.concat({
-                        name: name,
-                        value: builtins.get(name)!,
+                    aliases: Object.assign({}, timeline.state.aliases, {
+                        [name]: builtins.get(name)!,
                     }),
                 };
                 emit("display-message", {
@@ -81,8 +82,10 @@ export default class AliasManager {
             } else {
                 trackedAliases.delete(name);
                 timeline.state = {
-                    aliases: timeline.state.aliases.filter(
-                        (alias) => alias.name !== name
+                    aliases: Object.fromEntries(
+                        Object.entries(timeline.state.aliases).filter(
+                            ([key]) => key !== name
+                        )
                     ),
                 };
                 emit("display-message", {
@@ -154,11 +157,11 @@ async function loadTimelineAliases(
     const varNames = (await Promise.all(promises)).flat();
 
     return new Map(
-        timeline.state.aliases.map((alias) => {
+        Object.entries(timeline.state.aliases).map(([key]) => {
             const refCount = varNames.reduce((count, value) => {
-                return value === alias.name ? count + 1 : count;
+                return value === key ? count + 1 : count;
             }, 0);
-            return [alias.name, refCount];
+            return [key, refCount];
         })
     );
 }

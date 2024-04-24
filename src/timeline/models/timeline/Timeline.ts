@@ -9,7 +9,7 @@ import {
 } from "../../../architecture/state-hierarchy-utils";
 
 export interface TimelineState extends ParentState<VoiceGroup> {
-    aliases: ValueAlias[];
+    aliases: Record<string, string>;
 }
 
 export type ValueAlias = { name: string; value: string };
@@ -22,7 +22,7 @@ export default class Timeline extends Stateful<TimelineState> {
     constructor() {
         super({
             children: [],
-            aliases: [],
+            aliases: {},
         });
 
         const voiceGroups = Array.from({ length: 3 }, () => {

@@ -348,10 +348,13 @@ export default class Generator {
 
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
-                        const result = await this._evaluateWithAliases(
-                            itemState.content,
-                            { x: i }
-                        );
+                        const args = { ...this._timeline.state.aliases, x: i };
+                        const jsonArgs = JSON.stringify(args);
+
+                        const result = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                        });
+
                         return Math.round(Number(result));
                     })();
                     promises.push(promise);
@@ -395,10 +398,13 @@ export default class Generator {
 
                 for (let i = 0; i < ownedNotes.length; i++) {
                     const promise = (async () => {
-                        const result = await this._evaluateWithAliases(
-                            itemState.content,
-                            { x: i }
-                        );
+                        const args = { ...this._timeline.state.aliases, x: i };
+                        const jsonArgs = JSON.stringify(args);
+
+                        const result: string = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                        });
+
                         return result.trim();
                     })();
                     promises.push(promise);
@@ -456,10 +462,12 @@ export default class Generator {
                 const newNotes: NoteBuilder[] = [];
 
                 while (beat < itemState.end) {
-                    const result = await this._evaluateWithAliases(
-                        itemState.content,
-                        { x: index }
-                    );
+                    const args = { ...this._timeline.state.aliases, x: index };
+                    const jsonArgs = JSON.stringify(args);
+
+                    const result = await invoke("evaluate", {
+                        task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                    });
 
                     index++;
 
@@ -529,14 +537,18 @@ export default class Generator {
 
                     if (!prevNote.state.pitch || !nextNote.state.pitch) return;
 
-                    const promise = this._evaluateWithAliases(
-                        itemState.content,
-                        {
-                            prev_pitch: prevNote.state.pitch,
-                            next_pitch: nextNote.state.pitch,
-                            scale: [0, 2, 4, 5, 7, 9, 11],
-                        }
-                    );
+                    const args = {
+                        ...this._timeline.state.aliases,
+                        prev_pitch: prevNote.state.pitch,
+                        next_pitch: nextNote.state.pitch,
+                        scale: [0, 2, 4, 5, 7, 9, 11],
+                    };
+                    const jsonArgs = JSON.stringify(args);
+
+                    const promise: Promise<string> = invoke("evaluate", {
+                        task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                    });
+
                     promises.push(promise);
                 }
 
@@ -605,23 +617,6 @@ export default class Generator {
                 break;
             }
         }
-    }
-
-    private async _evaluateWithAliases(
-        code: string,
-        args: Record<string, any>
-    ): Promise<string> {
-        const combined_args: any = {};
-
-        for (const key in args) combined_args[key] = args[key];
-
-        this._timeline.state.aliases.forEach(
-            ({ name, value }) => (combined_args[name] = value)
-        );
-
-        return await invoke("evaluate", {
-            task: `eval ||| ${code} ||| ${JSON.stringify(combined_args)}`,
-        });
     }
 
     private async _remakePropertiesForNotes(
