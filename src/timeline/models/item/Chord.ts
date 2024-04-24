@@ -319,7 +319,10 @@ export class ChordBuilder {
     }
 }
 
-function getDecimalFromRootAndPitches(root: Pitch, pitches: PitchMap): number {
+export function getDecimalFromRootAndPitches(
+    root: Pitch,
+    pitches: PitchMap
+): number {
     const rootIndex = pitchNames.indexOf(root);
 
     let binary = Object.values(pitches)
@@ -347,7 +350,10 @@ function getDecimalFromRootAndPitches(root: Pitch, pitches: PitchMap): number {
     return parseInt(binary, 2);
 }
 
-function getPitchesFromRootAndDecimal(root: Pitch, decimal: number): PitchMap {
+export function getPitchesFromRootAndDecimal(
+    root: Pitch,
+    decimal: number
+): PitchMap {
     const rootIndex = pitchNames.indexOf(root);
 
     let binary = decimal.toString(2);

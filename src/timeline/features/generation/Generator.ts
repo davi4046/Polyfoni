@@ -8,12 +8,17 @@ import {
     getChildren,
     getGrandparent,
     getIndex,
+    getLastAncestor,
     getParent,
     getPosition,
     isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import purifyArrays from "../../../utils/purifyArrays";
-import { Chord } from "../../models/item/Chord";
+import {
+    Chord,
+    ChordBuilder,
+    getPitchesFromRootAndDecimal,
+} from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
@@ -220,22 +225,21 @@ export default class Generator {
                     return;
                 }
 
-                if (
-                    note.state.pitch === undefined ||
-                    nextNote.state.pitch === undefined
-                ) {
+                try {
+                    assertRequired(note.state);
+                    assertRequired(nextNote.state);
+
+                    createDecoration(
+                        trackGroup,
+                        note.state,
+                        nextNote.state
+                    ).then((decoration) => {
+                        if (decoration) decorations.set(note, decoration);
+                    });
+                } catch {
                     decorations.delete(note);
                     return;
                 }
-
-                createDecoration(
-                    trackGroup,
-                    note.state.start,
-                    note.state.pitch,
-                    nextNote.state.pitch
-                ).then((decoration) => {
-                    if (decoration) decorations.set(note, decoration);
-                });
             });
         });
 
@@ -730,13 +734,15 @@ type StateChange<TState extends object> = {
 
 type ItemChange = StateChange<ItemState<any>>;
 
-class NoteBuilder extends Stateful<{
+type NoteBuilderState = {
     start: number;
     end: number;
     degree?: number;
     pitch?: number;
     isRest?: boolean;
-}> {}
+};
+
+class NoteBuilder extends Stateful<NoteBuilderState> {}
 
 class FrameworkMap extends Stateful<{
     [key: string]: readonly NoteBuilder[];
@@ -785,19 +791,30 @@ function isIntegerArray(value: any): boolean {
     return true;
 }
 
+function assertRequired<T>(obj: T): asserts obj is Required<T> {
+    // Check if all properties are defined
+    for (const key in obj) {
+        if (obj[key as keyof T] === undefined) {
+            throw new Error(`Property '${key}' is not defined.`);
+        }
+    }
+}
+
 async function createDecoration(
     trackGroup: TrackGroup,
-    prevStart: number,
-    prevPitch: number,
-    nextPitch: number
+    prevNote: Required<NoteBuilderState>,
+    nextNote: Required<NoteBuilderState>
 ): Promise<Decoration | undefined> {
     const [pitchesTrack] = getTracksOfType(trackGroup, "decorationPitches");
     const [fractionTrack] = getTracksOfType(trackGroup, "decorationFraction");
     const [skipTrack] = getTracksOfType(trackGroup, "decorationSkip");
-    const [harmonyTrack] = getTracksOfType(trackGroup, "decorationHarmony");
+    const [harmonyTrack] = getTracksOfType(
+        trackGroup,
+        "decorationHarmony"
+    ) as Track<"ChordItem">[];
 
     const isPrevStartWithinItem = (item: Item<any>) => {
-        return isPointWithinInterval(prevStart, item.state);
+        return isPointWithinInterval(prevNote.start, item.state);
     };
 
     const pitchesItem = getChildren(pitchesTrack).find(isPrevStartWithinItem);
@@ -807,7 +824,100 @@ async function createDecoration(
 
     if (!pitchesItem) return;
 
-    // Do stuff
+    const timeline = getLastAncestor(trackGroup);
+
+    const harmony = (() => {
+        if (
+            harmonyItem &&
+            harmonyItem.state.content.chordStatus instanceof Chord
+        ) {
+            return harmonyItem.state.content.chordStatus;
+        }
+
+        const scaleItem = getChildren(timeline.scaleTrack).find(
+            isPrevStartWithinItem
+        );
+
+        if (scaleItem && scaleItem.state.content.chordStatus instanceof Chord) {
 
     return { notes: [], skip: false };
+        const parsedResult = JSON.parse(result);
+
+        if (
+            parsedResult !== null &&
+            !Number.isInteger(parsedResult) &&
+            !isIntegerArray(parsedResult)
+        ) {
+            throw new Error("Failed to evaluate pitches");
+        }
+
+        return parsedResult
+            ? ([parsedResult].flat() as number[]) // In case pitches evaluate to a single integer
+            : (parsedResult as null);
+    })();
+
+    if (pitches === null) return;
+
+    const fraction = fractionItem
+        ? await (async () => {
+              const args = {
+                  ...timeline.state.aliases,
+                  prev_pitch: prevNote.pitch,
+                  next_pitch: nextNote.pitch,
+                  pitches: pitches,
+              };
+
+              const jsonArgs = JSON.stringify(args);
+
+              const result: string = await invoke("evaluate", {
+                  task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+              });
+
+              const parsedResult = JSON.parse(result);
+
+              if (isNaN(parsedResult)) {
+                  throw new Error("Failed to evaluate fraction");
+              }
+
+              return Math.round(parsedResult);
+          })()
+        : 1;
+
+    const prevNoteDuration = prevNote.end - prevNote.start;
+    const subdivisions = fraction * pitches.length + 1;
+    const beatsPerSubdivision = prevNoteDuration / subdivisions;
+
+    if (beatsPerSubdivision < MIN_DURATION) return;
+
+    const duration = beatsPerSubdivision * fraction;
+
+    const skip = skipItem
+        ? await (async () => {
+              const args = {
+                  ...timeline.state.aliases,
+                  prev_pitch: prevNote.pitch,
+                  next_pitch: nextNote.pitch,
+                  pitches: pitches,
+              };
+
+              const jsonArgs = JSON.stringify(args);
+
+              const result: string = await invoke("evaluate", {
+                  task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+              });
+
+              if (result != "true" && result != "false") {
+                  throw new Error("Failed to evaluate skip");
+              }
+
+              return result == "true";
+          })()
+        : false;
+
+    return {
+        notes: pitches.map((pitch) => {
+            return { pitch, duration };
+        }),
+        skip: skip,
+    };
 }
