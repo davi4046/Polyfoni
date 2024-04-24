@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { sum, uniqBy } from "lodash";
+import { sum } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
@@ -14,11 +14,7 @@ import {
     isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import purifyArrays from "../../../utils/purifyArrays";
-import {
-    Chord,
-    ChordBuilder,
-    getPitchesFromRootAndDecimal,
-} from "../../models/item/Chord";
+import { Chord, getPitchesFromRootAndDecimal } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
@@ -234,7 +230,11 @@ export default class Generator {
                         note.state,
                         nextNote.state
                     ).then((decoration) => {
-                        if (decoration) decorations.set(note, decoration);
+                        if (decoration) {
+                            decorations.set(note, decoration);
+                        } else {
+                            decorations.delete(note);
+                        }
                     });
                 } catch {
                     decorations.delete(note);
@@ -529,6 +529,9 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
+                const trackGroup = getParent(itemState.parent);
+                const decorations = this._getDecorations(trackGroup);
+
                 const indeces = ownedNotes
                     .slice(0, -1)
                     .map((note) => voiceNotes.indexOf(note));
@@ -539,73 +542,28 @@ export default class Generator {
                     const prevNote = voiceNotes[index];
                     const nextNote = voiceNotes[index + 1];
 
-                    if (!prevNote.state.pitch || !nextNote.state.pitch) return;
+                    try {
+                        assertRequired(prevNote.state);
+                        assertRequired(nextNote.state);
+                    } catch {
+                        continue;
+                    }
 
-                    const args = {
-                        ...this._timeline.state.aliases,
-                        prev_pitch: prevNote.state.pitch,
-                        next_pitch: nextNote.state.pitch,
-                        scale: [0, 2, 4, 5, 7, 9, 11],
-                    };
-                    const jsonArgs = JSON.stringify(args);
-
-                    const promise: Promise<string> = invoke("evaluate", {
-                        task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                    const promise = createDecoration(
+                        trackGroup,
+                        prevNote.state,
+                        nextNote.state
+                    ).then((decoration) => {
+                        if (decoration) {
+                            decorations.set(prevNote, decoration);
+                        } else {
+                            decorations.delete(prevNote);
+                        }
                     });
 
                     promises.push(promise);
                 }
-
-                const results = await Promise.all(promises);
-                const parsedResults: (number[] | null)[] = [];
-
-                for (const result of results) {
-                    try {
-                        const parsedResult = JSON.parse(result);
-                        if (
-                            parsedResult !== null &&
-                            !Number.isInteger(parsedResult) &&
-                            !isIntegerArray(parsedResult)
-                        ) {
-                            throw new Error();
-                        }
-                        parsedResults.push(
-                            parsedResult ? [parsedResult].flat() : parsedResult
-                        );
-                    } catch {
-                        return "Failed to evaluate to pitches";
-                    }
-                }
-
-                const decorations = this._getDecorations(
-                    getParent(itemState.parent)
-                );
-
-                for (let i = 0; i < indeces.length; i++) {
-                    const pitches = parsedResults[i];
-
-                    if (pitches === null) continue;
-
-                    const prevNote = voiceNotes[indeces[i]];
-
-                    const fraction = 1;
-
-                    const subdivisions = fraction * pitches.length + 1;
-                    const totalDuration =
-                        prevNote.state.end - prevNote.state.start;
-                    const beatsPerSubdivision = totalDuration / subdivisions;
-
-                    if (beatsPerSubdivision < MIN_DURATION) continue;
-
-                    const duration = beatsPerSubdivision * fraction;
-
-                    decorations.set(prevNote, {
-                        notes: pitches.map((pitch) => {
-                            return { pitch, duration };
-                        }),
-                        skip: false,
-                    });
-                }
+                await Promise.all(promises);
                 break;
             }
             case "decorationFraction": {
@@ -839,8 +797,32 @@ async function createDecoration(
         );
 
         if (scaleItem && scaleItem.state.content.chordStatus instanceof Chord) {
+            return scaleItem.state.content.chordStatus;
+        }
 
-    return { notes: [], skip: false };
+        const root = "A";
+        const decimal = 4095;
+        const pitches = getPitchesFromRootAndDecimal(root, decimal);
+
+        return new Chord(root, decimal, pitches);
+    })();
+
+    const scale = harmony.getMidiValues().sort((a, b) => a - b);
+
+    const pitches = await (async () => {
+        const args = {
+            ...timeline.state.aliases,
+            prev_pitch: prevNote.pitch,
+            next_pitch: nextNote.pitch,
+            scale: scale,
+        };
+
+        const jsonArgs = JSON.stringify(args);
+
+        const result: string = await invoke("evaluate", {
+            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+        });
+
         const parsedResult = JSON.parse(result);
 
         if (
@@ -851,37 +833,37 @@ async function createDecoration(
             throw new Error("Failed to evaluate pitches");
         }
 
-        return parsedResult
+        return parsedResult !== null
             ? ([parsedResult].flat() as number[]) // In case pitches evaluate to a single integer
-            : (parsedResult as null);
+            : null;
     })();
 
     if (pitches === null) return;
 
-    const fraction = fractionItem
-        ? await (async () => {
-              const args = {
-                  ...timeline.state.aliases,
-                  prev_pitch: prevNote.pitch,
-                  next_pitch: nextNote.pitch,
-                  pitches: pitches,
-              };
+    const fraction = await (async () => {
+        if (!fractionItem) return 1;
 
-              const jsonArgs = JSON.stringify(args);
+        const args = {
+            ...timeline.state.aliases,
+            prev_pitch: prevNote.pitch,
+            next_pitch: nextNote.pitch,
+            pitches: pitches,
+        };
 
-              const result: string = await invoke("evaluate", {
-                  task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
-              });
+        const jsonArgs = JSON.stringify(args);
 
-              const parsedResult = JSON.parse(result);
+        const result: string = await invoke("evaluate", {
+            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+        });
 
-              if (isNaN(parsedResult)) {
-                  throw new Error("Failed to evaluate fraction");
-              }
+        const parsedResult = JSON.parse(result);
 
-              return Math.round(parsedResult);
-          })()
-        : 1;
+        if (isNaN(parsedResult)) {
+            throw new Error("Failed to evaluate fraction");
+        }
+
+        return Math.round(parsedResult);
+    })();
 
     const prevNoteDuration = prevNote.end - prevNote.start;
     const subdivisions = fraction * pitches.length + 1;
@@ -891,28 +873,28 @@ async function createDecoration(
 
     const duration = beatsPerSubdivision * fraction;
 
-    const skip = skipItem
-        ? await (async () => {
-              const args = {
-                  ...timeline.state.aliases,
-                  prev_pitch: prevNote.pitch,
-                  next_pitch: nextNote.pitch,
-                  pitches: pitches,
-              };
+    const skip = await (async () => {
+        if (!skipItem) return false;
 
-              const jsonArgs = JSON.stringify(args);
+        const args = {
+            ...timeline.state.aliases,
+            prev_pitch: prevNote.pitch,
+            next_pitch: nextNote.pitch,
+            pitches: pitches,
+        };
 
-              const result: string = await invoke("evaluate", {
-                  task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
-              });
+        const jsonArgs = JSON.stringify(args);
 
-              if (result != "true" && result != "false") {
-                  throw new Error("Failed to evaluate skip");
-              }
+        const result: string = await invoke("evaluate", {
+            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+        });
 
-              return result == "true";
-          })()
-        : false;
+        if (result != "true" && result != "false") {
+            throw new Error("Failed to evaluate skip");
+        }
+
+        return result == "true";
+    })();
 
     return {
         notes: pitches.map((pitch) => {
