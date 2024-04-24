@@ -198,34 +198,37 @@ export default class Generator {
             change.obj.state = { error };
         }
 
-        console.log("updated notes:", updatedNotes);
+        subscriptions.forEach((unsubscribe) => unsubscribe());
 
-        this._decorationsMap.forEach((decorations, trackGroup) => {
+        const decorationMapEntries = this._decorationsMap.entries();
+        const promises = [];
+
+        for (const [trackGroup, decorations] of decorationMapEntries) {
             const voice = getParent(trackGroup);
             const framework = this._frameworkMap.state[voice.id];
 
-            if (!framework) return;
+            if (!framework) continue;
 
-            updatedNotes.forEach((note) => {
+            for (const note of updatedNotes) {
                 const index = framework.indexOf(note);
 
                 if (index === -1) {
                     decorations.delete(note);
-                    return;
+                    continue;
                 }
 
                 const nextNote = framework[index + 1];
 
                 if (!nextNote) {
                     decorations.delete(note);
-                    return;
+                    continue;
                 }
 
                 try {
                     assertRequired(note.state);
                     assertRequired(nextNote.state);
 
-                    createDecoration(
+                    const promise = createDecoration(
                         trackGroup,
                         note.state,
                         nextNote.state
@@ -236,14 +239,14 @@ export default class Generator {
                             decorations.delete(note);
                         }
                     });
+                    promises.push(promise);
                 } catch {
                     decorations.delete(note);
-                    return;
+                    continue;
                 }
-            });
-        });
-
-        subscriptions.forEach((unsubscribe) => unsubscribe());
+            }
+        }
+        await Promise.all(promises);
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
