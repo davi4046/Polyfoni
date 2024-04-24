@@ -45,7 +45,7 @@ export class Chord {
             .filter(([_, value]) => value)
             .map(([pitch]) => {
                 const index = pitchNames.indexOf(pitch as Pitch);
-                const midiValue = (index - 3) % 12;
+                const midiValue = (index + 9) % 12;
                 return index < rootIndex ? midiValue + 12 : midiValue; // Raise an octave if below root
             });
 
