@@ -535,6 +535,11 @@ export default class Generator {
                 const trackGroup = getParent(itemState.parent);
                 const decorations = this._getDecorations(trackGroup);
 
+                const [harmonyTrack] = getTracksOfType(
+                    trackGroup,
+                    "decorationHarmony"
+                );
+
                 const indeces = ownedNotes
                     .slice(0, -1)
                     .map((note) => voiceNotes.indexOf(note));
@@ -545,28 +550,85 @@ export default class Generator {
                     const prevNote = voiceNotes[index];
                     const nextNote = voiceNotes[index + 1];
 
-                    try {
-                        assertRequired(prevNote.state);
-                        assertRequired(nextNote.state);
-                    } catch {
+                    if (
+                        prevNote.state.pitch === undefined ||
+                        nextNote.state.pitch === undefined ||
+                        prevNote.state.isRest ||
+                        nextNote.state.isRest
+                    ) {
                         continue;
                     }
 
-                    const promise = createDecoration(
-                        trackGroup,
-                        prevNote.state,
-                        nextNote.state
-                    ).then((decoration) => {
-                        if (decoration) {
-                            decorations.set(prevNote, decoration);
-                        } else {
-                            decorations.delete(prevNote);
+                    const harmonyItem = getChildren(harmonyTrack).find((item) =>
+                        isPointWithinInterval(prevNote.state.start, item.state)
+                    );
+
+                    const harmony = (() => {
+                        if (
+                            harmonyItem &&
+                            harmonyItem.state.content.chordStatus instanceof
+                                Chord
+                        ) {
+                            return harmonyItem.state.content
+                                .chordStatus as Chord;
                         }
+
+                        const root = "A";
+                        const decimal = 4095;
+                        const pitches = getPitchesFromRootAndDecimal(
+                            root,
+                            decimal
+                        );
+
+                        return new Chord(root, decimal, pitches);
+                    })();
+
+                    const prevDegree = harmony.midiToDegree(
+                        prevNote.state.pitch
+                    );
+                    const nextDegree = harmony.midiToDegree(
+                        nextNote.state.pitch
+                    );
+
+                    const args = JSON.stringify({
+                        ...this._timeline.state.aliases,
+                        prev_degree: prevDegree,
+                        next_degree: nextDegree,
+                    });
+
+                    const promise = await invoke("evaluate", {
+                        task: `eval ||| ${itemState.content} ||| ${args}`,
                     });
 
                     promises.push(promise);
                 }
-                await Promise.all(promises);
+
+                const results = (await Promise.all(promises)) as string[];
+
+                const parsedResults: number[][] = results.map((result) => {
+                    const parsedResult = JSON.parse(result);
+
+                    if (
+                        !Number.isInteger(parsedResult) &&
+                        !isIntegerArray(parsedResult) &&
+                        parsedResult !== null
+                    ) {
+                        throw new Error("Failed to evaluate pitches");
+                    }
+
+                    return parsedResult !== null
+                        ? [parsedResult].flat() // In case pitches evaluate to a single integer
+                        : [];
+                });
+
+                for (let i = 0; i < parsedResults.length; i++) {
+                    const degrees = parsedResults[i];
+                    const decoration = decorations.get(ownedNotes[i]);
+                    decorations.set(
+                        ownedNotes[i],
+                        decoration ? { ...decoration, degrees } : { degrees }
+                    );
+                }
                 break;
             }
             case "decorationFraction": {
@@ -710,8 +772,9 @@ class FrameworkMap extends Stateful<{
 }> {}
 
 type Decoration = {
-    notes: { pitch: number; duration: number }[];
-    skip: boolean;
+    degrees?: number[];
+    harmony?: Chord;
+    skip?: boolean;
 };
 
 function isPointWithinInterval(point: number, interval: Interval): boolean {
