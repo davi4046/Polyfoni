@@ -1,20 +1,17 @@
 import { invoke } from "@tauri-apps/api";
 
-import { sum } from "lodash";
-
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
 import {
     getChildren,
     getGrandparent,
     getIndex,
-    getLastAncestor,
     getParent,
     getPosition,
     isPositionOnPath,
 } from "../../../architecture/state-hierarchy-utils";
 import purifyArrays from "../../../utils/purifyArrays";
-import { Chord, getPitchesFromRootAndDecimal } from "../../models/item/Chord";
+import { Chord } from "../../models/item/Chord";
 import type { ItemState } from "../../models/item/Item";
 import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
@@ -201,13 +198,19 @@ export default class Generator {
         subscriptions.forEach((unsubscribe) => unsubscribe());
 
         const decorationMapEntries = this._decorationsMap.entries();
-        const promises = [];
+        const owningItems = new Set<Item<any>>();
 
         for (const [trackGroup, decorations] of decorationMapEntries) {
             const voice = getParent(trackGroup);
             const framework = this._frameworkMap.state[voice.id];
 
             if (!framework) continue;
+
+            const tracks = [
+                getTracksOfType(trackGroup, "decorationPitches")[0],
+                getTracksOfType(trackGroup, "decorationFraction")[0],
+                getTracksOfType(trackGroup, "decorationSkip")[0],
+            ];
 
             for (const note of updatedNotes) {
                 const index = framework.indexOf(note);
@@ -224,10 +227,23 @@ export default class Generator {
                     continue;
                 }
 
-                // Compile list of items to reapply (Pitches, Fraction, Skip)
-                // TODO
+                tracks
+                    .map((track) =>
+                        getChildren(track).find((item) =>
+                            isPointWithinInterval(note.state.start, item.state)
+                        )
+                    )
+                    .filter((value): value is Item<any> => value !== undefined)
+                    .forEach((item) => owningItems.add(item));
             }
         }
+
+        const promises = [];
+
+        for (const item of owningItems) {
+            promises.push(this._applyItemStateEffect(item.state));
+        }
+
         await Promise.all(promises);
     }
 
@@ -743,12 +759,12 @@ export default class Generator {
 
                 const trackGroup = getParent(itemState.parent);
 
-                const decorations = this._getDecorations(trackGroup);
-
                 const [pitchesTrack] = getTracksOfType(
                     trackGroup,
                     "decorationPitches"
                 );
+
+                const promises = [];
 
                 for (const note of ownedNotes.slice(0, -1)) {
                     const pitchesItem = pitchesTrack.state.children.find(
@@ -756,9 +772,13 @@ export default class Generator {
                             isPointWithinInterval(note.state.start, item.state)
                     );
                     if (pitchesItem) {
-                        this._applyItemStateEffect(pitchesItem.state);
+                        const promise = this._applyItemStateEffect(
+                            pitchesItem.state
+                        );
+                        promises.push(promise);
                     }
                 }
+                await Promise.all(promises);
                 break;
             }
         }
@@ -839,7 +859,7 @@ export default class Generator {
                 const totalDuration =
                     noteBuilder.state.end - noteBuilder.state.start;
 
-                if (decoration) {
+                if (decoration && decoration.pitches.length > 0) {
                     const splitPercentage =
                         1 / (Math.abs(decoration.fraction) + 1);
 
