@@ -461,82 +461,126 @@ export default class Generator {
                     voiceNotes.splice(voiceNotes.indexOf(note), 1);
                 });
 
-                const firstOverlappingNote = voiceNotes.find((note) => {
-                    return (
-                        note.state.start < itemState.start &&
-                        note.state.end > itemState.start
-                    );
-                });
-
-                let beat = firstOverlappingNote
-                    ? Math.max(itemState.start, firstOverlappingNote.state.end)
-                    : itemState.start;
-                let index = 0;
-                let skippedIndeces = 0;
-
                 const newNotes: NoteBuilder[] = [];
 
-                while (beat < itemState.end) {
-                    const args = { ...this._timeline.state.aliases, x: index };
-                    const jsonArgs = JSON.stringify(args);
-
-                    const result = await invoke("evaluate", {
-                        task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                // Construct new notes
+                {
+                    const firstOverlappingNote = voiceNotes.find((note) => {
+                        return (
+                            note.state.start < itemState.start &&
+                            note.state.end > itemState.start
+                        );
                     });
 
-                    index++;
+                    let beat = firstOverlappingNote
+                        ? Math.max(
+                              itemState.start,
+                              firstOverlappingNote.state.end
+                          )
+                        : itemState.start;
+                    let index = 0;
+                    let skippedIndeces = 0;
 
-                    const parsedResult = Number(result);
+                    while (beat < itemState.end) {
+                        const args = {
+                            ...this._timeline.state.aliases,
+                            x: index,
+                        };
+                        const jsonArgs = JSON.stringify(args);
 
-                    if (isNaN(parsedResult)) {
-                        return "Failed to evaluate to a number";
-                    }
+                        const result = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${jsonArgs}`,
+                        });
 
-                    const duration = roundToNearestMultiple(
-                        Math.abs(parsedResult),
-                        2
-                    );
+                        index++;
 
-                    if (duration < MIN_DURATION) {
-                        if (skippedIndeces === 3) {
-                            return "Failed to return a large enough value too many times";
-                        } else {
-                            skippedIndeces++;
-                            continue;
+                        const parsedResult = Number(result);
+
+                        if (isNaN(parsedResult)) {
+                            return "Failed to evaluate to a number";
                         }
+
+                        const duration = roundToNearestMultiple(
+                            Math.abs(parsedResult),
+                            2
+                        );
+
+                        if (duration < MIN_DURATION) {
+                            if (skippedIndeces === 3) {
+                                return "Failed to return a large enough value too many times";
+                            } else {
+                                skippedIndeces++;
+                                continue;
+                            }
+                        }
+                        skippedIndeces = 0;
+
+                        newNotes.push(
+                            new NoteBuilder({
+                                start: beat,
+                                end: beat + duration,
+                            })
+                        );
+                        beat += duration;
                     }
-                    skippedIndeces = 0;
 
-                    newNotes.push(
-                        new NoteBuilder({
-                            start: beat,
-                            end: beat + duration,
-                        })
+                    voiceNotes.push(...newNotes);
+                    voiceNotes.sort((a, b) => a.state.start - b.state.end);
+                    this._frameworkMap.state = { [voice.id]: voiceNotes };
+                }
+
+                // Reapply following duration items
+                {
+                    const durationItems = getChildren(itemState.parent).slice();
+                    durationItems.sort((a, b) => a.state.start - b.state.start);
+
+                    // TODO: Use binary search here instead
+                    const nextDurationItem = durationItems.find(
+                        (item) => item.state.start >= itemState.end
                     );
-                    beat += duration;
+
+                    if (nextDurationItem) {
+                        nextDurationItem.state = {
+                            error: await this._applyItemStateEffect(
+                                nextDurationItem.state
+                            ),
+                        };
+                    }
                 }
 
-                voiceNotes.push(...newNotes);
-                voiceNotes.sort((a, b) => a.state.start - b.state.end);
-                this._frameworkMap.state = { [voice.id]: voiceNotes };
+                // Reapply items that own one of the new notes
+                {
+                    const owningItems = new Set<Item<any>>();
 
-                const durationItems = getChildren(itemState.parent).slice();
-                durationItems.sort((a, b) => a.state.start - b.state.start);
+                    const tracks = [
+                        getTracksOfType(voice, "frameworkPitch")[0],
+                        getTracksOfType(voice, "frameworkRest")[0],
+                        getTracksOfType(voice, "frameworkHarmony")[0],
+                    ];
 
-                // TODO: Use binary search here instead
-                const nextDurationItem = durationItems.find(
-                    (item) => item.state.start >= itemState.end
-                );
+                    for (const note of newNotes) {
+                        tracks.forEach((track) => {
+                            const owningItem = getChildren(track).find((item) =>
+                                isPointWithinInterval(
+                                    note.state.start,
+                                    item.state
+                                )
+                            );
+                            if (owningItem) owningItems.add(owningItem);
+                        });
+                    }
 
-                if (nextDurationItem) {
-                    nextDurationItem.state = {
-                        error: await this._applyItemStateEffect(
-                            nextDurationItem.state
-                        ),
-                    };
+                    const promises = Array.from(owningItems).map(
+                        async (item) => {
+                            item.state = {
+                                error: await this._applyItemStateEffect(
+                                    item.state
+                                ),
+                            };
+                        }
+                    );
+                    await Promise.all(promises);
                 }
-
-                await this._remakePropertiesForNotes(voice, newNotes);
                 break;
             }
             case "decorationPitches": {
@@ -784,36 +828,6 @@ export default class Generator {
                 break;
             }
         }
-    }
-
-    private async _remakePropertiesForNotes(
-        voice: Voice,
-        notes: NoteBuilder[]
-    ) {
-        const [pitchTrack] = getTracksOfType(voice, "frameworkPitch");
-        const [restTrack] = getTracksOfType(voice, "frameworkRest");
-        const [harmonyTrack] = getTracksOfType(voice, "frameworkHarmony");
-
-        // Find all pitch, rest, and harmony items that "own" one or more of the notes
-        const items = [pitchTrack, restTrack, harmonyTrack].flatMap((track) => {
-            return getChildren(track).filter((item) => {
-                return notes.find((note) => {
-                    return isPointWithinInterval(note.state.start, item.state);
-                });
-            });
-        });
-
-        const promises = [];
-
-        for (const item of items) {
-            const promise = (async () => {
-                item.state = {
-                    error: await this._applyItemStateEffect(item.state),
-                };
-            })();
-            promises.push(promise);
-        }
-        await Promise.all(promises);
     }
 
     private _renderOutput(voice: Voice) {
