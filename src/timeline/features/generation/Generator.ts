@@ -867,7 +867,7 @@ export default class Generator {
                     decoration.pitches.length > 0
                 ) {
                     const splitPercentage =
-                        1 / (Math.abs(decoration.fraction) + 1);
+                        1 / (Math.abs(decoration.fraction) + 2);
 
                     const smaller = totalDuration * splitPercentage;
                     const greater = totalDuration * (1 - splitPercentage);
@@ -946,7 +946,7 @@ type Decoration = {
 };
 
 const DECORATION_DEFAULTS = {
-    fraction: 1,
+    fraction: 0,
     skip: false,
 };
 
