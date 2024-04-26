@@ -45,7 +45,7 @@ export class Chord {
             .filter(([_, value]) => value)
             .map(([pitch]) => {
                 const index = pitchNames.indexOf(pitch as Pitch);
-                const midiValue = (index + 9) % 12;
+                const midiValue = (index - 3) % 12;
                 return index < rootIndex ? midiValue + 12 : midiValue; // Raise an octave if below root
             });
 
@@ -368,3 +368,15 @@ export function getPitchesFromRootAndDecimal(
         })
     ) as PitchMap;
 }
+
+const testBuilder = new ChordBuilder();
+testBuilder.decimal = 137;
+testBuilder.root = "A";
+console.log(
+    (testBuilder.build() as Chord).getMidiValues().sort((a, b) => a - b)
+);
+testBuilder.decimal = 289;
+testBuilder.root = "E";
+console.log(
+    (testBuilder.build() as Chord).getMidiValues().sort((a, b) => a - b)
+);

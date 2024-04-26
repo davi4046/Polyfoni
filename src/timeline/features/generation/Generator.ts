@@ -810,7 +810,10 @@ async function createDecoration(
         return new Chord(root, decimal, pitches);
     })();
 
-    const scale = harmony.getMidiValues().sort((a, b) => a - b);
+    const scale = harmony
+        .getMidiValues()
+        .sort((a, b) => a - b)
+        .map((value) => value + 12);
 
     const pitches = await (async () => {
         const args = {
@@ -856,7 +859,7 @@ async function createDecoration(
         const jsonArgs = JSON.stringify(args);
 
         const result: string = await invoke("evaluate", {
-            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+            task: `eval ||| ${fractionItem.state.content} ||| ${jsonArgs}`,
         });
 
         const parsedResult = JSON.parse(result);
@@ -889,7 +892,7 @@ async function createDecoration(
         const jsonArgs = JSON.stringify(args);
 
         const result: string = await invoke("evaluate", {
-            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
+            task: `eval ||| ${skipItem.state.content} ||| ${jsonArgs}`,
         });
 
         if (result != "true" && result != "false") {
