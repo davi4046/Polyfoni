@@ -795,14 +795,6 @@ async function createDecoration(
             return harmonyItem.state.content.chordStatus;
         }
 
-        const scaleItem = getChildren(timeline.scaleTrack).find(
-            isPrevStartWithinItem
-        );
-
-        if (scaleItem && scaleItem.state.content.chordStatus instanceof Chord) {
-            return scaleItem.state.content.chordStatus;
-        }
-
         const root = "A";
         const decimal = 4095;
         const pitches = getPitchesFromRootAndDecimal(root, decimal);
@@ -810,21 +802,18 @@ async function createDecoration(
         return new Chord(root, decimal, pitches);
     })();
 
-    const scale = harmony
-        .getMidiValues()
-        .sort((a, b) => a - b)
-        .map((value) => value + 12);
+    const prevDegree = harmony.midiToDegree(prevNote.pitch);
+    const nextDegree = harmony.midiToDegree(nextNote.pitch);
 
-    const pitches = await (async () => {
-        const args = {
-            ...timeline.state.aliases,
-            prev_pitch: prevNote.pitch,
-            next_pitch: nextNote.pitch,
-            scale: scale,
-        };
+    const args = {
+        ...timeline.state.aliases,
+        prev_degree: prevDegree,
+        next_degree: nextDegree,
+    };
 
-        const jsonArgs = JSON.stringify(args);
+    const jsonArgs = JSON.stringify(args);
 
+    const degrees = await (async () => {
         const result: string = await invoke("evaluate", {
             task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
         });
@@ -844,16 +833,15 @@ async function createDecoration(
             : null;
     })();
 
-    if (pitches === null) return;
+    if (degrees === null) return;
 
     const fraction = await (async () => {
         if (!fractionItem) return 1;
 
         const args = {
             ...timeline.state.aliases,
-            prev_pitch: prevNote.pitch,
-            next_pitch: nextNote.pitch,
-            pitches: pitches,
+            prev_degree: prevDegree,
+            next_degree: nextDegree,
         };
 
         const jsonArgs = JSON.stringify(args);
@@ -872,7 +860,7 @@ async function createDecoration(
     })();
 
     const prevNoteDuration = prevNote.end - prevNote.start;
-    const subdivisions = fraction * pitches.length + 1;
+    const subdivisions = fraction * degrees.length + 1;
     const beatsPerSubdivision = prevNoteDuration / subdivisions;
 
     if (beatsPerSubdivision < MIN_DURATION) return;
@@ -884,9 +872,8 @@ async function createDecoration(
 
         const args = {
             ...timeline.state.aliases,
-            prev_pitch: prevNote.pitch,
-            next_pitch: nextNote.pitch,
-            pitches: pitches,
+            prev_degree: prevDegree,
+            next_degree: nextDegree,
         };
 
         const jsonArgs = JSON.stringify(args);
@@ -903,7 +890,8 @@ async function createDecoration(
     })();
 
     return {
-        notes: pitches.map((pitch) => {
+        notes: degrees.map((degree) => {
+            const pitch = harmony.degreeToMidi(degree);
             return { pitch, duration };
         }),
         skip: skip,

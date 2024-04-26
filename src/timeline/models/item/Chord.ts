@@ -3,12 +3,12 @@ import chroma from "chroma-js";
 import pitchNames from "../../utils/pitchNames";
 import { circWrap } from "../../../utils/math-utils";
 
+const BASE_OCTAVE = 5;
+
 export type Pitch = (typeof pitchNames)[number];
 export type PitchMap = { [K in Pitch]: boolean };
 
 export type Filter = { chord: Chord; isDisabled: boolean };
-
-const baseOctave = 5;
 
 export function createEmptyPitchMap(): PitchMap {
     return Object.fromEntries(
@@ -75,7 +75,7 @@ export class Chord {
 
     degreeToMidi(degree: number): number {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
-        const octave = Math.floor(degree / midiValues.length) + baseOctave;
+        const octave = Math.floor(degree / midiValues.length) + BASE_OCTAVE;
         let index = degree % midiValues.length;
         while (index < 0) index += midiValues.length;
         return midiValues[index] + octave * 12;
@@ -85,7 +85,7 @@ export class Chord {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
 
         // 1.
-        const octave = Math.floor(midiValue / 12) + baseOctave;
+        const octave = Math.floor(midiValue / 12) - BASE_OCTAVE;
         // 2.
         midiValue = midiValue % 12;
 
@@ -368,15 +368,3 @@ export function getPitchesFromRootAndDecimal(
         })
     ) as PitchMap;
 }
-
-const testBuilder = new ChordBuilder();
-testBuilder.decimal = 137;
-testBuilder.root = "A";
-console.log(
-    (testBuilder.build() as Chord).getMidiValues().sort((a, b) => a - b)
-);
-testBuilder.decimal = 289;
-testBuilder.root = "E";
-console.log(
-    (testBuilder.build() as Chord).getMidiValues().sort((a, b) => a - b)
-);
