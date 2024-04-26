@@ -224,26 +224,8 @@ export default class Generator {
                     continue;
                 }
 
-                try {
-                    assertRequired(note.state);
-                    assertRequired(nextNote.state);
-
-                    const promise = createDecoration(
-                        trackGroup,
-                        note.state,
-                        nextNote.state
-                    ).then((decoration) => {
-                        if (decoration) {
-                            decorations.set(note, decoration);
-                        } else {
-                            decorations.delete(note);
-                        }
-                    });
-                    promises.push(promise);
-                } catch {
-                    decorations.delete(note);
-                    continue;
-                }
+                // Compile list of items to reapply (Pitches, Fraction, Skip)
+                // TODO
             }
         }
         await Promise.all(promises);
@@ -318,7 +300,7 @@ export default class Generator {
             }
             case "decorationPitches": {
                 getOwnedDecorations().forEach((decoration) => {
-                    decoration.degrees = undefined;
+                    decoration.pitches = undefined;
                 });
                 break;
             }
@@ -336,7 +318,7 @@ export default class Generator {
             }
             case "decorationHarmony": {
                 getOwnedDecorations().forEach((decoration) => {
-                    decoration.harmony = undefined;
+                    decoration.pitches = undefined;
                 });
                 break;
             }
@@ -356,18 +338,6 @@ export default class Generator {
         );
 
         if (itemState.content === "") return;
-
-        const getOwnedDecorations = () => {
-            const decorations = this._getDecorations(
-                getParent(itemState.parent)
-            );
-            return ownedNotes
-                .slice(0, -1)
-                .map((note) => decorations.get(note))
-                .filter((value): value is Decoration => {
-                    return value !== undefined;
-                });
-        };
 
         switch (trackType) {
             case "frameworkPitch": {
@@ -583,24 +553,15 @@ export default class Generator {
                         isPointWithinInterval(prevNote.state.start, item.state)
                     );
 
-                    const harmony = (() => {
+                    const harmony = ((): Chord => {
                         if (
                             harmonyItem &&
                             harmonyItem.state.content.chordStatus instanceof
                                 Chord
                         ) {
-                            return harmonyItem.state.content
-                                .chordStatus as Chord;
+                            return harmonyItem.state.content.chordStatus;
                         }
-
-                        const root = "A";
-                        const decimal = 4095;
-                        const pitches = getPitchesFromRootAndDecimal(
-                            root,
-                            decimal
-                        );
-
-                        return new Chord(root, decimal, pitches);
+                        return Chord.fromDecimal("A", 4095);
                     })();
 
                     const prevDegree = harmony.midiToDegree(
@@ -616,56 +577,188 @@ export default class Generator {
                         next_degree: nextDegree,
                     });
 
-                    const promise = await invoke("evaluate", {
-                        task: `eval ||| ${itemState.content} ||| ${args}`,
-                    });
+                    const promise = (async () => {
+                        const result: string = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${args}`,
+                        });
+
+                        const parsedResult: number | number[] | null =
+                            JSON.parse(result);
+
+                        if (
+                            !Number.isInteger(parsedResult) &&
+                            !isIntegerArray(parsedResult) &&
+                            parsedResult !== null
+                        ) {
+                            throw new Error("Failed to evaluate pitches");
+                        }
+
+                        const degrees =
+                            parsedResult !== null
+                                ? [parsedResult].flat() // In case pitches evaluate to a single integer
+                                : [];
+
+                        const pitches = degrees.map((degree) =>
+                            harmony.degreeToMidi(degree)
+                        );
+
+                        return pitches;
+                    })();
 
                     promises.push(promise);
                 }
 
-                const results = (await Promise.all(promises)) as string[];
+                const results = await Promise.all(promises);
 
-                const parsedResults: number[][] = results.map((result) => {
-                    const parsedResult = JSON.parse(result);
+                for (let i = 0; i < results.length; i++) {
+                    const pitches = results[i];
 
-                    if (
-                        !Number.isInteger(parsedResult) &&
-                        !isIntegerArray(parsedResult) &&
-                        parsedResult !== null
-                    ) {
-                        throw new Error("Failed to evaluate pitches");
-                    }
-
-                    return parsedResult !== null
-                        ? [parsedResult].flat() // In case pitches evaluate to a single integer
-                        : [];
-                });
-
-                for (let i = 0; i < parsedResults.length; i++) {
-                    const degrees = parsedResults[i];
                     const decoration = decorations.get(ownedNotes[i]);
+
                     decorations.set(
                         ownedNotes[i],
-                        decoration ? { ...decoration, degrees } : { degrees }
+                        decoration ? { ...decoration, pitches } : { pitches }
                     );
                 }
                 break;
             }
             case "decorationFraction": {
-                // recalculate durations of notes in owned decorations
+                const trackGroup = getParent(itemState.parent);
+                const decorations = this._getDecorations(trackGroup);
+
+                const indeces = ownedNotes
+                    .slice(0, -1)
+                    .map((note) => voiceNotes.indexOf(note));
+
+                const promises = [];
+
+                for (const index of indeces) {
+                    const prevNote = voiceNotes[index];
+                    const nextNote = voiceNotes[index + 1];
+
+                    if (
+                        prevNote.state.pitch === undefined ||
+                        nextNote.state.pitch === undefined ||
+                        prevNote.state.isRest ||
+                        nextNote.state.isRest
+                    ) {
+                        continue;
+                    }
+
+                    const args = JSON.stringify({
+                        ...this._timeline.state.aliases,
+                    });
+
+                    const promise = (async () => {
+                        const result: string = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${args}`,
+                        });
+
+                        const parsedResult = JSON.parse(result);
+
+                        if (isNaN(parsedResult)) {
+                            throw new Error("Failed to evaluate fraction");
+                        }
+
+                        return Math.round(parsedResult);
+                    })();
+
+                    promises.push(promise);
+                }
+
+                const results = await Promise.all(promises);
+
+                for (let i = 0; i < results.length; i++) {
+                    const fraction = results[i];
+
+                    const decoration = decorations.get(ownedNotes[i]);
+
+                    decorations.set(
+                        ownedNotes[i],
+                        decoration ? { ...decoration, fraction } : { fraction }
+                    );
+                }
                 break;
             }
             case "decorationSkip": {
-                // recalculate skip for owned decorations
+                const trackGroup = getParent(itemState.parent);
+                const decorations = this._getDecorations(trackGroup);
+
+                const indeces = ownedNotes
+                    .slice(0, -1)
+                    .map((note) => voiceNotes.indexOf(note));
+
+                const promises = [];
+
+                for (const index of indeces) {
+                    const prevNote = voiceNotes[index];
+                    const nextNote = voiceNotes[index + 1];
+
+                    if (
+                        prevNote.state.pitch === undefined ||
+                        nextNote.state.pitch === undefined ||
+                        prevNote.state.isRest ||
+                        nextNote.state.isRest
+                    ) {
+                        continue;
+                    }
+
+                    const args = JSON.stringify({
+                        ...this._timeline.state.aliases,
+                    });
+
+                    const promise = (async () => {
+                        const result: string = await invoke("evaluate", {
+                            task: `eval ||| ${itemState.content} ||| ${args}`,
+                        });
+
+                        const parsedResult = JSON.parse(result);
+
+                        if (parsedResult != "true" && parsedResult != "false") {
+                            throw new Error("Failed to evaluate skip");
+                        }
+
+                        return parsedResult == "true";
+                    })();
+
+                    promises.push(promise);
+                }
+
+                const results = await Promise.all(promises);
+
+                for (let i = 0; i < results.length; i++) {
+                    const skip = results[i];
+
+                    const decoration = decorations.get(ownedNotes[i]);
+
+                    decorations.set(
+                        ownedNotes[i],
+                        decoration ? { ...decoration, skip } : { skip }
+                    );
+                }
                 break;
             }
             case "decorationHarmony": {
-                const isChord = itemState.content.chordStatus instanceof Chord;
-                getOwnedDecorations().forEach((decoration) => {
-                    decoration.harmony = isChord
-                        ? itemState.content.chordStatus
-                        : undefined;
-                });
+                // Reapply "pitches" items for owned decorations
+
+                const trackGroup = getParent(itemState.parent);
+
+                const decorations = this._getDecorations(trackGroup);
+
+                const [pitchesTrack] = getTracksOfType(
+                    trackGroup,
+                    "decorationPitches"
+                );
+
+                for (const note of ownedNotes.slice(0, -1)) {
+                    const pitchesItem = pitchesTrack.state.children.find(
+                        (item) =>
+                            isPointWithinInterval(note.state.start, item.state)
+                    );
+                    if (pitchesItem) {
+                        this._applyItemStateEffect(pitchesItem.state);
+                    }
+                }
                 break;
             }
         }
@@ -720,7 +813,7 @@ export default class Generator {
             for (const decorations of decorationOutput) {
                 const decoration = decorations.get(note);
 
-                if (!decoration || decoration.degrees === undefined) {
+                if (!decoration || decoration.pitches === undefined) {
                     continue;
                 }
 
@@ -767,9 +860,9 @@ export default class Generator {
             const notes = [
                 { pitch: noteBuilder.state.pitch, duration: noteDuration },
                 ...(decoration && decoDuration > MIN_DURATION
-                    ? decoration.degrees.map((degree) => ({
-                          pitch: decoration.harmony.degreeToMidi(degree),
-                          duration: decoDuration / decoration.degrees.length,
+                    ? decoration.pitches.map((pitch) => ({
+                          pitch: pitch,
+                          duration: decoDuration / decoration.pitches.length,
                       }))
                     : []),
             ];
@@ -821,15 +914,13 @@ class FrameworkMap extends Stateful<{
 }> {}
 
 type Decoration = {
-    degrees?: number[];
+    pitches?: number[];
     fraction?: number;
-    harmony?: Chord;
     skip?: boolean;
 };
 
 const DECORATION_DEFAULTS = {
     fraction: 1,
-    harmony: new Chord("A", 4095, getPitchesFromRootAndDecimal("A", 4095)),
     skip: false,
 };
 
@@ -869,150 +960,4 @@ function isIntegerArray(value: any): boolean {
     if (!Array.isArray(value)) return false;
     if (value.some((item) => !Number.isInteger(item))) return false;
     return true;
-}
-
-function assertRequired<T>(obj: T): asserts obj is Required<T> {
-    // Check if all properties are defined
-    for (const key in obj) {
-        if (obj[key as keyof T] === undefined) {
-            throw new Error(`Property '${key}' is not defined.`);
-        }
-    }
-}
-
-async function createDecoration(
-    trackGroup: TrackGroup,
-    prevNote: Required<NoteBuilderState>,
-    nextNote: Required<NoteBuilderState>
-): Promise<Decoration | undefined> {
-    const [pitchesTrack] = getTracksOfType(trackGroup, "decorationPitches");
-    const [fractionTrack] = getTracksOfType(trackGroup, "decorationFraction");
-    const [skipTrack] = getTracksOfType(trackGroup, "decorationSkip");
-    const [harmonyTrack] = getTracksOfType(
-        trackGroup,
-        "decorationHarmony"
-    ) as Track<"ChordItem">[];
-
-    const isPrevStartWithinItem = (item: Item<any>) => {
-        return isPointWithinInterval(prevNote.start, item.state);
-    };
-
-    const pitchesItem = getChildren(pitchesTrack).find(isPrevStartWithinItem);
-    const fractionItem = getChildren(fractionTrack).find(isPrevStartWithinItem);
-    const skipItem = getChildren(skipTrack).find(isPrevStartWithinItem);
-    const harmonyItem = getChildren(harmonyTrack).find(isPrevStartWithinItem);
-
-    if (!pitchesItem) return;
-
-    const timeline = getLastAncestor(trackGroup);
-
-    const harmony = (() => {
-        if (
-            harmonyItem &&
-            harmonyItem.state.content.chordStatus instanceof Chord
-        ) {
-            return harmonyItem.state.content.chordStatus;
-        }
-
-        const root = "A";
-        const decimal = 4095;
-        const pitches = getPitchesFromRootAndDecimal(root, decimal);
-
-        return new Chord(root, decimal, pitches);
-    })();
-
-    const prevDegree = harmony.midiToDegree(prevNote.pitch);
-    const nextDegree = harmony.midiToDegree(nextNote.pitch);
-
-    const args = {
-        ...timeline.state.aliases,
-        prev_degree: prevDegree,
-        next_degree: nextDegree,
-    };
-
-    const jsonArgs = JSON.stringify(args);
-
-    const degrees = await (async () => {
-        const result: string = await invoke("evaluate", {
-            task: `eval ||| ${pitchesItem.state.content} ||| ${jsonArgs}`,
-        });
-
-        const parsedResult = JSON.parse(result);
-
-        if (
-            parsedResult !== null &&
-            !Number.isInteger(parsedResult) &&
-            !isIntegerArray(parsedResult)
-        ) {
-            throw new Error("Failed to evaluate pitches");
-        }
-
-        return parsedResult !== null
-            ? ([parsedResult].flat() as number[]) // In case pitches evaluate to a single integer
-            : null;
-    })();
-
-    if (degrees === null) return;
-
-    const fraction = await (async () => {
-        if (!fractionItem) return 1;
-
-        const args = {
-            ...timeline.state.aliases,
-            prev_degree: prevDegree,
-            next_degree: nextDegree,
-        };
-
-        const jsonArgs = JSON.stringify(args);
-
-        const result: string = await invoke("evaluate", {
-            task: `eval ||| ${fractionItem.state.content} ||| ${jsonArgs}`,
-        });
-
-        const parsedResult = JSON.parse(result);
-
-        if (isNaN(parsedResult)) {
-            throw new Error("Failed to evaluate fraction");
-        }
-
-        return Math.round(parsedResult);
-    })();
-
-    const prevNoteDuration = prevNote.end - prevNote.start;
-    const subdivisions = fraction * degrees.length + 1;
-    const beatsPerSubdivision = prevNoteDuration / subdivisions;
-
-    if (beatsPerSubdivision < MIN_DURATION) return;
-
-    const duration = beatsPerSubdivision * fraction;
-
-    const skip = await (async () => {
-        if (!skipItem) return false;
-
-        const args = {
-            ...timeline.state.aliases,
-            prev_degree: prevDegree,
-            next_degree: nextDegree,
-        };
-
-        const jsonArgs = JSON.stringify(args);
-
-        const result: string = await invoke("evaluate", {
-            task: `eval ||| ${skipItem.state.content} ||| ${jsonArgs}`,
-        });
-
-        if (result != "true" && result != "false") {
-            throw new Error("Failed to evaluate skip");
-        }
-
-        return result == "true";
-    })();
-
-    return {
-        notes: degrees.map((degree) => {
-            const pitch = harmony.degreeToMidi(degree);
-            return { pitch, duration };
-        }),
-        skip: skip,
-    };
 }
