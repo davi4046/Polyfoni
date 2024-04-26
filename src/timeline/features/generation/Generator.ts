@@ -1,5 +1,7 @@
 import { invoke } from "@tauri-apps/api";
 
+import { isBoolean } from "lodash";
+
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
 import {
@@ -730,11 +732,11 @@ export default class Generator {
 
                         const parsedResult = JSON.parse(result);
 
-                        if (parsedResult != "true" && parsedResult != "false") {
+                        if (!isBoolean(parsedResult)) {
                             throw new Error("Failed to evaluate skip");
                         }
 
-                        return parsedResult == "true";
+                        return parsedResult;
                     })();
 
                     promises.push(promise);
@@ -859,7 +861,11 @@ export default class Generator {
                 const totalDuration =
                     noteBuilder.state.end - noteBuilder.state.start;
 
-                if (decoration && decoration.pitches.length > 0) {
+                if (
+                    decoration &&
+                    !decoration.skip &&
+                    decoration.pitches.length > 0
+                ) {
                     const splitPercentage =
                         1 / (Math.abs(decoration.fraction) + 1);
 
