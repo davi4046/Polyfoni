@@ -261,6 +261,18 @@ export default class Generator {
 
         if (ownedNotes.length === 0) return;
 
+        const getOwnedDecorations = () => {
+            const decorations = this._getDecorations(
+                getParent(itemState.parent)
+            );
+            return ownedNotes
+                .slice(0, -1)
+                .map((note) => decorations.get(note))
+                .filter((value): value is Decoration => {
+                    return value !== undefined;
+                });
+        };
+
         switch (trackType) {
             case "frameworkPitch": {
                 ownedNotes.forEach((note) => {
@@ -305,31 +317,27 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
-                const decorations = this._getDecorations(
-                    getParent(itemState.parent)
-                );
-                const ownedDecorations = ownedNotes
-                    .slice(0, -1)
-                    .map((note) => decorations.get(note))
-                    .filter((value): value is Decoration => {
-                        return value !== undefined;
-                    });
-
-                ownedDecorations.forEach((decoration) => {
-                    decoration.notes.length = 0;
+                getOwnedDecorations().forEach((decoration) => {
+                    decoration.degrees = undefined;
                 });
                 break;
             }
             case "decorationFraction": {
-                // recalculate duration of notes in owned decorations
+                getOwnedDecorations().forEach((decoration) => {
+                    decoration.fraction = undefined;
+                });
                 break;
             }
             case "decorationSkip": {
-                // set owned decorations to skipped some way
+                getOwnedDecorations().forEach((decoration) => {
+                    decoration.skip = undefined;
+                });
                 break;
             }
             case "decorationHarmony": {
-                // recalculate pitches for owned decorations
+                getOwnedDecorations().forEach((decoration) => {
+                    decoration.harmony = undefined;
+                });
                 break;
             }
         }
@@ -348,6 +356,18 @@ export default class Generator {
         );
 
         if (itemState.content === "") return;
+
+        const getOwnedDecorations = () => {
+            const decorations = this._getDecorations(
+                getParent(itemState.parent)
+            );
+            return ownedNotes
+                .slice(0, -1)
+                .map((note) => decorations.get(note))
+                .filter((value): value is Decoration => {
+                    return value !== undefined;
+                });
+        };
 
         switch (trackType) {
             case "frameworkPitch": {
@@ -640,7 +660,12 @@ export default class Generator {
                 break;
             }
             case "decorationHarmony": {
-                // recalculate pitches for owned decorations
+                const isChord = itemState.content.chordStatus instanceof Chord;
+                getOwnedDecorations().forEach((decoration) => {
+                    decoration.harmony = isChord
+                        ? itemState.content.chordStatus
+                        : undefined;
+                });
                 break;
             }
         }
@@ -694,13 +719,15 @@ export default class Generator {
         const getFirstValidDecoration = (note: NoteBuilder) => {
             for (const decorations of decorationOutput) {
                 const decoration = decorations.get(note);
-                if (
-                    decoration &&
-                    decoration.notes.length > 0 &&
-                    !decoration.skip
-                ) {
-                    return decoration;
+
+                if (!decoration || decoration.degrees === undefined) {
+                    continue;
                 }
+
+                return {
+                    ...DECORATION_DEFAULTS,
+                    ...decoration,
+                } as Required<Decoration>;
             }
         };
 
@@ -714,31 +741,53 @@ export default class Generator {
             }
 
             const decoration = getFirstValidDecoration(noteBuilder);
-            const decorationDuration = decoration
-                ? sum(decoration.notes.map(({ duration }) => duration))
-                : 0;
 
-            const note = {
-                pitch: noteBuilder.state.pitch,
-                duration:
-                    noteBuilder.state.end -
-                    noteBuilder.state.start -
-                    decorationDuration,
-            };
+            const { noteDuration, decoDuration } = (() => {
+                const totalDuration =
+                    noteBuilder.state.end - noteBuilder.state.start;
 
-            const notes = decoration ? [note, ...decoration.notes] : [note];
+                if (decoration) {
+                    const splitPercentage =
+                        1 / (Math.abs(decoration.fraction) + 1);
 
-            let start = noteBuilder.state.start;
+                    const smaller = totalDuration * splitPercentage;
+                    const greater = totalDuration * (1 - splitPercentage);
+
+                    const isFractionPositive = decoration.fraction >= 0;
+
+                    const noteDuration = isFractionPositive ? smaller : greater;
+                    const decoDuration = isFractionPositive ? greater : smaller;
+
+                    return { noteDuration, decoDuration };
+                } else {
+                    return { noteDuration: totalDuration, decoDuration: 0 };
+                }
+            })();
+
+            const notes = [
+                { pitch: noteBuilder.state.pitch, duration: noteDuration },
+                ...(decoration && decoDuration > MIN_DURATION
+                    ? decoration.degrees.map((degree) => ({
+                          pitch: decoration.harmony.degreeToMidi(degree),
+                          duration: decoDuration / decoration.degrees.length,
+                      }))
+                    : []),
+            ];
+
+            let nextStart = noteBuilder.state.start;
 
             return notes.map((note) => {
-                const end = start + note.duration;
+                const end = nextStart + note.duration;
+
                 const noteItem = new Item("NoteItem", {
                     parent: outputTrack,
-                    start: start,
+                    start: nextStart,
                     end: end,
                     content: note.pitch,
                 });
-                start = end;
+
+                nextStart = end;
+
                 return noteItem;
             });
         });
@@ -773,8 +822,15 @@ class FrameworkMap extends Stateful<{
 
 type Decoration = {
     degrees?: number[];
+    fraction?: number;
     harmony?: Chord;
     skip?: boolean;
+};
+
+const DECORATION_DEFAULTS = {
+    fraction: 1,
+    harmony: new Chord("A", 4095, getPitchesFromRootAndDecimal("A", 4095)),
+    skip: false,
 };
 
 function isPointWithinInterval(point: number, interval: Interval): boolean {
