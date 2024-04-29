@@ -44,16 +44,13 @@ export default class Generator {
         return framework;
     }
 
-    private _decorationsMap = new Map<
-        TrackGroup,
-        Map<NoteBuilder, Decoration>
-    >();
+    private _decorationsMap = new Map<Voice, Map<NoteBuilder, Decoration>>();
 
-    private _getDecorations(trackGroup: TrackGroup) {
-        let decorations = this._decorationsMap.get(trackGroup);
+    private _getDecorations(voice: Voice) {
+        let decorations = this._decorationsMap.get(voice);
         if (!decorations) {
             decorations = new Map();
-            this._decorationsMap.set(trackGroup, decorations);
+            this._decorationsMap.set(voice, decorations);
         }
         return decorations;
     }
@@ -214,16 +211,15 @@ export default class Generator {
             const decorationMapEntries = this._decorationsMap.entries();
             const owningItems = new Set<Item<any>>();
 
-            for (const [trackGroup, decorations] of decorationMapEntries) {
-                const voice = getParent(trackGroup);
+            for (const [voice, decorations] of decorationMapEntries) {
                 const framework = this._frameworkMap.state[voice.id];
 
                 if (!framework) continue;
 
                 const tracks = [
-                    getTracksOfType(trackGroup, "decorationPitches")[0],
-                    getTracksOfType(trackGroup, "decorationFraction")[0],
-                    getTracksOfType(trackGroup, "decorationSkip")[0],
+                    getTracksOfType(voice, "decorationPitches")[0],
+                    getTracksOfType(voice, "decorationFraction")[0],
+                    getTracksOfType(voice, "decorationSkip")[0],
                 ];
 
                 for (const note of updatedNotes) {
@@ -282,9 +278,8 @@ export default class Generator {
         if (ownedNotes.length === 0) return;
 
         const getOwnedDecorations = () => {
-            const decorations = this._getDecorations(
-                getParent(itemState.parent)
-            );
+            const decorations = this._getDecorations(voice);
+
             return ownedNotes
                 .slice(0, -1)
                 .map((note) => decorations.get(note))
@@ -632,11 +627,10 @@ export default class Generator {
                 break;
             }
             case "decorationPitches": {
-                const trackGroup = getParent(itemState.parent);
-                const decorations = this._getDecorations(trackGroup);
+                const decorations = this._getDecorations(voice);
 
                 const [harmonyTrack] = getTracksOfType(
-                    trackGroup,
+                    voice,
                     "decorationHarmony"
                 );
 
@@ -723,8 +717,7 @@ export default class Generator {
                 break;
             }
             case "decorationFraction": {
-                const trackGroup = getParent(itemState.parent);
-                const decorations = this._getDecorations(trackGroup);
+                const decorations = this._getDecorations(voice);
 
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
@@ -775,8 +768,7 @@ export default class Generator {
                 break;
             }
             case "decorationSkip": {
-                const trackGroup = getParent(itemState.parent);
-                const decorations = this._getDecorations(trackGroup);
+                const decorations = this._getDecorations(voice);
 
                 const indeces = ownedNotes
                     .slice(0, -1)
@@ -872,29 +864,7 @@ export default class Generator {
 
         const [outputTrack] = getTracksOfType(voice, "output");
 
-        const decorationGroups = getChildren(voice).filter(
-            (trackGroup) => getIndex(trackGroup) !== 0
-        );
-        const decorationOutput = decorationGroups
-            .map((trackGroup) => this._decorationsMap.get(trackGroup))
-            .filter((value): value is Map<NoteBuilder, Decoration> => {
-                return value !== undefined;
-            });
-
-        const getFirstValidDecoration = (note: NoteBuilder) => {
-            for (const decorations of decorationOutput) {
-                const decoration = decorations.get(note);
-
-                if (!decoration || decoration.pitches === undefined) {
-                    continue;
-                }
-
-                return {
-                    ...DECORATION_DEFAULTS,
-                    ...decoration,
-                } as Required<Decoration>;
-            }
-        };
+        const decorations = this._getDecorations(voice);
 
         const noteItems = voiceNotes.flatMap((noteBuilder) => {
             if (
@@ -905,17 +875,29 @@ export default class Generator {
                 return [];
             }
 
-            const decoration = getFirstValidDecoration(noteBuilder);
+            const decoration = {
+                ...DECORATION_DEFAULTS,
+                ...decorations.get(noteBuilder),
+            };
 
-            const { noteDuration, decoDuration } = (() => {
+            const notes = (() => {
                 const totalDuration =
                     noteBuilder.state.end - noteBuilder.state.start;
 
                 if (
-                    decoration &&
-                    !decoration.skip &&
-                    decoration.pitches.length > 0
+                    decoration === undefined ||
+                    decoration.pitches === undefined ||
+                    decoration.fraction === undefined ||
+                    decoration.skip === undefined ||
+                    decoration.pitches.length === 0
                 ) {
+                    return [
+                        {
+                            pitch: noteBuilder.state.pitch,
+                            duration: totalDuration,
+                        },
+                    ];
+                } else {
                     const splitPercentage =
                         1 / (Math.abs(decoration.fraction) + 2);
 
@@ -925,23 +907,31 @@ export default class Generator {
                     const isFractionPositive = decoration.fraction >= 0;
 
                     const noteDuration = isFractionPositive ? smaller : greater;
-                    const decoDuration = isFractionPositive ? greater : smaller;
+                    const decoDuration =
+                        (isFractionPositive ? greater : smaller) /
+                        decoration.pitches.length;
 
-                    return { noteDuration, decoDuration };
-                } else {
-                    return { noteDuration: totalDuration, decoDuration: 0 };
+                    return Math.min(noteDuration, decoDuration) > MIN_DURATION
+                        ? [
+                              {
+                                  pitch: noteBuilder.state.pitch,
+                                  duration: noteDuration,
+                              },
+                              ...decoration.pitches.map((pitch) => {
+                                  return {
+                                      pitch: pitch,
+                                      duration: decoDuration,
+                                  };
+                              }),
+                          ]
+                        : [
+                              {
+                                  pitch: noteBuilder.state.pitch,
+                                  duration: totalDuration,
+                              },
+                          ];
                 }
             })();
-
-            const notes = [
-                { pitch: noteBuilder.state.pitch, duration: noteDuration },
-                ...(decoration && decoDuration > MIN_DURATION
-                    ? decoration.pitches.map((pitch) => ({
-                          pitch: pitch,
-                          duration: decoDuration / decoration.pitches.length,
-                      }))
-                    : []),
-            ];
 
             let nextStart = noteBuilder.state.start;
 

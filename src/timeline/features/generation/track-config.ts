@@ -26,10 +26,10 @@ export const pathToTrackTypeMap = new Map<string, TrackType>([
     ["1,*,1,2", "frameworkRest"],
     ["1,*,1,3", "frameworkHarmony"],
 
-    ["1,*,2-*,0", "decorationPitches"],
-    ["1,*,2-*,1", "decorationFraction"],
-    ["1,*,2-*,2", "decorationSkip"],
-    ["1,*,2-*,3", "decorationHarmony"],
+    ["1,*,2,0", "decorationPitches"],
+    ["1,*,2,1", "decorationFraction"],
+    ["1,*,2,2", "decorationSkip"],
+    ["1,*,2,3", "decorationHarmony"],
 ]);
 
 export const trackTypeToPathMap = new Map<TrackType, string>(
