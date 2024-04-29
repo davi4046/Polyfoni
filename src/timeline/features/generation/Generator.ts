@@ -366,6 +366,8 @@ export default class Generator {
     private async _applyItemStateEffect(
         itemState: ItemState<any>
     ): Promise<string | undefined> {
+        if (itemState.content === "") return;
+
         const trackType = getTrackType(itemState.parent);
         const voice = getGrandparent(itemState.parent);
 
@@ -375,7 +377,33 @@ export default class Generator {
             itemState
         );
 
-        if (itemState.content === "") return;
+        const getAdjacentNotePairs = () => {
+            const indeces = ownedNotes
+                .slice(0, -1)
+                .map((note) => voiceNotes.indexOf(note));
+
+            const pairs = indeces
+                .map((index) => {
+                    const prevNote = voiceNotes[index].build();
+                    const nextNote = voiceNotes[index + 1].build();
+
+                    if (
+                        !prevNote ||
+                        !nextNote ||
+                        prevNote.isRest ||
+                        nextNote.isRest
+                    ) {
+                        return;
+                    }
+
+                    return [prevNote, nextNote];
+                })
+                .filter((value): value is [Note, Note] => {
+                    return value !== undefined;
+                });
+
+            return pairs;
+        };
 
         switch (trackType) {
             case "frameworkPitch": {
@@ -612,27 +640,14 @@ export default class Generator {
                     "decorationHarmony"
                 );
 
-                const indeces = ownedNotes
-                    .slice(0, -1)
-                    .map((note) => voiceNotes.indexOf(note));
-
+                const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (const index of indeces) {
-                    const prevNote = voiceNotes[index];
-                    const nextNote = voiceNotes[index + 1];
-
-                    if (
-                        prevNote.state.pitch === undefined ||
-                        nextNote.state.pitch === undefined ||
-                        prevNote.state.isRest ||
-                        nextNote.state.isRest
-                    ) {
-                        continue;
-                    }
+                for (let i = 0; i < pairs.length; i++) {
+                    const [prevNote, nextNote] = pairs[i];
 
                     const harmonyItem = getChildren(harmonyTrack).find((item) =>
-                        isPointWithinInterval(prevNote.state.start, item.state)
+                        isPointWithinInterval(prevNote.start, item.state)
                     );
 
                     const harmony = ((): Chord => {
@@ -646,17 +661,14 @@ export default class Generator {
                         return Chord.fromDecimal("A", 4095);
                     })();
 
-                    const prevDegree = harmony.midiToDegree(
-                        prevNote.state.pitch
-                    );
-                    const nextDegree = harmony.midiToDegree(
-                        nextNote.state.pitch
-                    );
+                    const prevDegree = harmony.midiToDegree(prevNote.pitch);
+                    const nextDegree = harmony.midiToDegree(nextNote.pitch);
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
                         prev_degree: prevDegree,
                         next_degree: nextDegree,
+                        x: i,
                     });
 
                     const promise = (async () => {
@@ -708,27 +720,15 @@ export default class Generator {
                 const trackGroup = getParent(itemState.parent);
                 const decorations = this._getDecorations(trackGroup);
 
-                const indeces = ownedNotes
-                    .slice(0, -1)
-                    .map((note) => voiceNotes.indexOf(note));
-
+                const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (const index of indeces) {
-                    const prevNote = voiceNotes[index];
-                    const nextNote = voiceNotes[index + 1];
-
-                    if (
-                        prevNote.state.pitch === undefined ||
-                        nextNote.state.pitch === undefined ||
-                        prevNote.state.isRest ||
-                        nextNote.state.isRest
-                    ) {
-                        continue;
-                    }
+                for (let i = 0; i < pairs.length; i++) {
+                    const [prevNote, nextNote] = pairs[i];
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
+                        x: i,
                     });
 
                     const promise = (async () => {
@@ -770,23 +770,15 @@ export default class Generator {
                     .slice(0, -1)
                     .map((note) => voiceNotes.indexOf(note));
 
+                const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (const index of indeces) {
-                    const prevNote = voiceNotes[index];
-                    const nextNote = voiceNotes[index + 1];
-
-                    if (
-                        prevNote.state.pitch === undefined ||
-                        nextNote.state.pitch === undefined ||
-                        prevNote.state.isRest ||
-                        nextNote.state.isRest
-                    ) {
-                        continue;
-                    }
+                for (let i = 0; i < pairs.length; i++) {
+                    const [prevNote, nextNote] = pairs[i];
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
+                        x: i,
                     });
 
                     const promise = (async () => {
@@ -830,20 +822,24 @@ export default class Generator {
                     "decorationPitches"
                 );
 
-                const promises = [];
+                const pairs = getAdjacentNotePairs();
 
-                for (const note of ownedNotes.slice(0, -1)) {
+                const owningItems = new Set<Item<any>>();
+
+                for (let i = 0; i < pairs.length; i++) {
+                    const [prevNote] = pairs[i];
+
                     const pitchesItem = pitchesTrack.state.children.find(
                         (item) =>
-                            isPointWithinInterval(note.state.start, item.state)
+                            isPointWithinInterval(prevNote.start, item.state)
                     );
-                    if (pitchesItem) {
-                        const promise = this._applyItemStateEffect(
-                            pitchesItem.state
-                        );
-                        promises.push(promise);
-                    }
+
+                    if (pitchesItem) owningItems.add(pitchesItem);
                 }
+
+                const promises = Array.from(owningItems).map((item) =>
+                    this._applyItemStateEffect(item.state)
+                );
                 await Promise.all(promises);
                 break;
             }
@@ -967,7 +963,20 @@ type NoteBuilderState = {
     isRest?: boolean;
 };
 
-class NoteBuilder extends Stateful<NoteBuilderState> {}
+class NoteBuilder extends Stateful<NoteBuilderState> {
+    build(): Note | undefined {
+        if (
+            this.state.degree === undefined ||
+            this.state.pitch === undefined ||
+            this.state.isRest === undefined
+        ) {
+            return;
+        }
+        return this.state as Required<NoteBuilderState>;
+    }
+}
+
+type Note = Required<NoteBuilderState>;
 
 class FrameworkMap extends Stateful<{
     [key: string]: readonly NoteBuilder[];
