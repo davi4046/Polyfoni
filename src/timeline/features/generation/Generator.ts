@@ -638,28 +638,15 @@ export default class Generator {
                 for (let index = 0; index < pairs.length; index++) {
                     const [prevNote, nextNote] = pairs[index];
 
-                    const harmonyItem = getChildren(harmonyTrack).find((item) =>
-                        isPointWithinInterval(prevNote.start, item.state)
+                    const harmony = getDecorationHarmony(
+                        prevNote,
+                        harmonyTrack
                     );
-
-                    const harmony = ((): Chord => {
-                        if (
-                            harmonyItem &&
-                            harmonyItem.state.content.chordStatus instanceof
-                                Chord
-                        ) {
-                            return harmonyItem.state.content.chordStatus;
-                        }
-                        return Chord.fromDecimal("A", 4095);
-                    })();
-
-                    const prevDegree = harmony.midiToDegree(prevNote.pitch);
-                    const nextDegree = harmony.midiToDegree(nextNote.pitch);
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        prev_degree: prevDegree,
-                        next_degree: nextDegree,
+                        prev_degree: harmony.midiToDegree(prevNote.pitch),
+                        next_degree: harmony.midiToDegree(nextNote.pitch),
                         x: index,
                     });
 
@@ -717,14 +704,26 @@ export default class Generator {
             case "decorationFraction": {
                 const decorations = this._getDecorations(voice);
 
+                const [harmonyTrack] = getTracksOfType(
+                    voice,
+                    "decorationHarmony"
+                );
+
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
 
                 for (let index = 0; index < pairs.length; index++) {
                     const [prevNote, nextNote] = pairs[index];
 
+                    const harmony = getDecorationHarmony(
+                        prevNote,
+                        harmonyTrack
+                    );
+
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
+                        prev_degree: harmony.midiToDegree(prevNote.pitch),
+                        next_degree: harmony.midiToDegree(nextNote.pitch),
                         x: index,
                     });
 
@@ -768,9 +767,10 @@ export default class Generator {
             case "decorationSkip": {
                 const decorations = this._getDecorations(voice);
 
-                const indeces = ownedNotes
-                    .slice(0, -1)
-                    .map((note) => voiceNotes.indexOf(note));
+                const [harmonyTrack] = getTracksOfType(
+                    voice,
+                    "decorationHarmony"
+                );
 
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
@@ -778,8 +778,15 @@ export default class Generator {
                 for (let index = 0; index < pairs.length; index++) {
                     const [prevNote, nextNote] = pairs[index];
 
+                    const harmony = getDecorationHarmony(
+                        prevNote,
+                        harmonyTrack
+                    );
+
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
+                        prev_degree: harmony.midiToDegree(prevNote.pitch),
+                        next_degree: harmony.midiToDegree(nextNote.pitch),
                         x: index,
                     });
 
@@ -1037,4 +1044,22 @@ function isIntegerArray(value: any): boolean {
     if (!Array.isArray(value)) return false;
     if (value.some((item) => !Number.isInteger(item))) return false;
     return true;
+}
+
+function getDecorationHarmony(
+    note: Note,
+    harmonyTrack: Track<"ChordItem">
+): Chord {
+    const harmonyItem = getChildren(harmonyTrack).find((item) =>
+        isPointWithinInterval(note.start, item.state)
+    );
+
+    if (
+        !harmonyItem ||
+        !(harmonyItem.state.content.chordStatus instanceof Chord)
+    ) {
+        return Chord.fromDecimal("A", 4095);
+    }
+
+    return harmonyItem.state.content.chordStatus;
 }
