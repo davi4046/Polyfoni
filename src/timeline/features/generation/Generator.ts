@@ -880,10 +880,20 @@ export default class Generator {
                 return [];
             }
 
-            const decoration = {
-                ...DECORATION_DEFAULTS,
-                ...decorations.get(noteBuilder),
-            };
+            const decoration = (() => {
+                const decoration = decorations.get(noteBuilder);
+
+                if (!decoration) return;
+
+                const filteredEntries = Object.entries(decoration).filter(
+                    ([_, value]) => value !== undefined
+                );
+
+                return {
+                    ...DECORATION_DEFAULTS,
+                    ...Object.fromEntries(filteredEntries),
+                } as Decoration;
+            })();
 
             const notes = (() => {
                 const totalDuration =
@@ -894,6 +904,7 @@ export default class Generator {
                     decoration.pitches === undefined ||
                     decoration.fraction === undefined ||
                     decoration.skip === undefined ||
+                    decoration.skip ||
                     decoration.pitches.length === 0
                 ) {
                     return [
