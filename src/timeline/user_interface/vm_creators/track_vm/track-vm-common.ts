@@ -75,11 +75,6 @@ function createVoiceMenu(voice: Voice, context: TimelineContext): Menu {
             },
             { disabled: voiceIndex === maxIndex }
         ),
-        new MenuItem("Create Decoration Pass", () => {
-            context.history.startAction();
-            createDecorationPass(voice);
-            context.history.endAction("Created Decoration Pass");
-        }),
         new MenuItem(
             "Change instrument",
             new Menu(

@@ -69,6 +69,10 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
         parent: voice,
         children: [],
     });
+    const decorationGroup = new TrackGroup({
+        parent: voice,
+        children: [],
+    });
 
     const tracks: Track<any>[] = [];
 
@@ -92,6 +96,22 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
         new Track("ChordItem", {
             parent: frameworkGroup,
             children: [],
+        }),
+        new Track("StringItem", {
+            parent: decorationGroup,
+            children: [],
+        }),
+        new Track("StringItem", {
+            parent: decorationGroup,
+            children: [],
+        }),
+        new Track("StringItem", {
+            parent: decorationGroup,
+            children: [],
+        }),
+        new Track("ChordItem", {
+            parent: decorationGroup,
+            children: [],
         })
     );
 
@@ -102,8 +122,9 @@ function createDefaultTrackGroups(voice: Voice): TrackGroup[] {
 
     addChildren(outputGroup, tracks[0]);
     addChildren(frameworkGroup, ...tracks.slice(1, 5));
+    addChildren(decorationGroup, ...tracks.slice(5));
 
-    return [outputGroup, frameworkGroup];
+    return [outputGroup, frameworkGroup, decorationGroup];
 }
 
 function mapRange(

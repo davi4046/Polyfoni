@@ -124,7 +124,7 @@ const positionLabelMap = new Map<string, string>([
 const positionMenuMap = new Map<
     string,
     (model: TrackGroup, context: TimelineContext) => Menu
->([["1,*,2-*", createTrackGroupMenu]]);
+>([]);
 
 function createTrackGroupMenu(
     model: TrackGroup,
