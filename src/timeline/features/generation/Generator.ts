@@ -115,6 +115,8 @@ export default class Generator {
             }
 
             if (this._itemChanges.length > 0 && !this._isHandlingChanges) {
+                const watcher = this._watchNoteChanges();
+
                 const handleNextChangeLoop = () => {
                     const nextChange = this._itemChanges.shift();
 
@@ -124,11 +126,16 @@ export default class Generator {
                         );
                     } else {
                         this._isHandlingChanges = false;
-                        //render output
-                        const voices = getChildren(
-                            getChildren(this._timeline)[1]
-                        );
-                        for (const voice of voices) this._renderOutput(voice);
+
+                        watcher.updateDecorations().then(() => {
+                            //render output
+                            const voices = getChildren(
+                                getChildren(this._timeline)[1]
+                            );
+                            for (const voice of voices) {
+                                this._renderOutput(voice);
+                            }
+                        });
                     }
                 };
                 this._isHandlingChanges = true;
@@ -138,6 +145,18 @@ export default class Generator {
     }
 
     private async _handleChange(change: ItemChange) {
+        if (change.oldState) {
+            await this._clearItemStateEffect(change.oldState);
+        }
+        if (change.newState) {
+            const error = await this._applyItemStateEffect(change.newState);
+            change.obj.state = { error };
+        }
+    }
+
+    private _watchNoteChanges(): {
+        updateDecorations: () => Promise<void>;
+    } {
         const subscriptions: UnsubscribeFn[] = [];
 
         const updatedNotes = new Set<NoteBuilder>();
@@ -189,64 +208,65 @@ export default class Generator {
             })
         );
 
-        if (change.oldState) {
-            await this._clearItemStateEffect(change.oldState);
-        }
-        if (change.newState) {
-            const error = await this._applyItemStateEffect(change.newState);
-            change.obj.state = { error };
-        }
+        const updateDecorations = async () => {
+            subscriptions.forEach((unsubscribe) => unsubscribe());
 
-        subscriptions.forEach((unsubscribe) => unsubscribe());
+            const decorationMapEntries = this._decorationsMap.entries();
+            const owningItems = new Set<Item<any>>();
 
-        const decorationMapEntries = this._decorationsMap.entries();
-        const owningItems = new Set<Item<any>>();
+            for (const [trackGroup, decorations] of decorationMapEntries) {
+                const voice = getParent(trackGroup);
+                const framework = this._frameworkMap.state[voice.id];
 
-        for (const [trackGroup, decorations] of decorationMapEntries) {
-            const voice = getParent(trackGroup);
-            const framework = this._frameworkMap.state[voice.id];
+                if (!framework) continue;
 
-            if (!framework) continue;
+                const tracks = [
+                    getTracksOfType(trackGroup, "decorationPitches")[0],
+                    getTracksOfType(trackGroup, "decorationFraction")[0],
+                    getTracksOfType(trackGroup, "decorationSkip")[0],
+                ];
 
-            const tracks = [
-                getTracksOfType(trackGroup, "decorationPitches")[0],
-                getTracksOfType(trackGroup, "decorationFraction")[0],
-                getTracksOfType(trackGroup, "decorationSkip")[0],
-            ];
+                for (const note of updatedNotes) {
+                    const index = framework.indexOf(note);
 
-            for (const note of updatedNotes) {
-                const index = framework.indexOf(note);
+                    if (index === -1) {
+                        decorations.delete(note);
+                        continue;
+                    }
 
-                if (index === -1) {
-                    decorations.delete(note);
-                    continue;
-                }
+                    const nextNote = framework[index + 1];
 
-                const nextNote = framework[index + 1];
+                    if (!nextNote) {
+                        decorations.delete(note);
+                        continue;
+                    }
 
-                if (!nextNote) {
-                    decorations.delete(note);
-                    continue;
-                }
-
-                tracks
-                    .map((track) =>
-                        getChildren(track).find((item) =>
-                            isPointWithinInterval(note.state.start, item.state)
+                    tracks
+                        .map((track) =>
+                            getChildren(track).find((item) =>
+                                isPointWithinInterval(
+                                    note.state.start,
+                                    item.state
+                                )
+                            )
                         )
-                    )
-                    .filter((value): value is Item<any> => value !== undefined)
-                    .forEach((item) => owningItems.add(item));
+                        .filter(
+                            (value): value is Item<any> => value !== undefined
+                        )
+                        .forEach((item) => owningItems.add(item));
+                }
             }
-        }
 
-        const promises = [];
+            const promises = [];
 
-        for (const item of owningItems) {
-            promises.push(this._applyItemStateEffect(item.state));
-        }
+            for (const item of owningItems) {
+                promises.push(this._applyItemStateEffect(item.state));
+            }
 
-        await Promise.all(promises);
+            await Promise.all(promises);
+        };
+
+        return { updateDecorations };
     }
 
     private async _clearItemStateEffect(itemState: ItemState<any>) {
