@@ -58,9 +58,8 @@ export default class Generator {
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         this._timeline = watcher.root;
 
-        watcher.subscribe((obj, oldState) => {
+        watcher.subscribe((obj, oldState, newState) => {
             const position = getPosition(obj);
-            const newState = obj.state as any;
 
             if (!isPositionOnPath(position, "1")) return; // Return if object not in second VoiceGroup
 
