@@ -5,7 +5,7 @@ import ast
 
 from func_timeout import func_set_timeout, FunctionTimedOut
 
-class VariableVisitor(ast.NodeVisitor):
+class NameCollector(ast.NodeVisitor):
     def __init__(self):
         self.nodes = []
     
@@ -46,7 +46,7 @@ def evaluate(args: list[str]):
     non_str_vars = {key: value for key, value in vars.items() if key not in str_vars}
     
     tree = ast.parse(expr, mode="eval")
-    visitor = VariableVisitor()
+    visitor = NameCollector()
     visitor.visit(tree)
         
     nodes = [node for node in visitor.nodes if node.id in str_vars]
@@ -64,17 +64,17 @@ def evaluate(args: list[str]):
             
     return eval(fmt_expr, {**GLOBALS, **non_str_vars})
 
-def find_vars(args: list[str]):
+def get_names(args: list[str]):
     tree = ast.parse(args[0], mode="eval")
     
-    visitor = VariableVisitor()
+    visitor = NameCollector()
     visitor.visit(tree)
     
     return [node.id for node in visitor.nodes]
 
 COMMANDS = {
     "eval": evaluate, 
-    "find_vars": find_vars
+    "get_names": get_names
 }
 
 if __name__ == "__main__":

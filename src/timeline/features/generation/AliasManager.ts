@@ -168,7 +168,7 @@ async function loadTimelineAliases(
 
 async function getVariableNames(pythonString: string): Promise<string[]> {
     return invoke("evaluate", {
-        task: `find_vars ||| ${pythonString}`,
+        task: `get_names ||| ${pythonString}`,
     }).then((result) => {
         try {
             const parsedResult = JSON.parse(
