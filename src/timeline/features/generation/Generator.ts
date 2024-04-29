@@ -702,7 +702,13 @@ export default class Generator {
                     promises.push(promise);
                 }
 
-                const results = await Promise.all(promises);
+                let results: any[];
+
+                try {
+                    results = await Promise.all(promises);
+                } catch {
+                    return "Failed to evaluate to an integer, a list of integers, or None";
+                }
 
                 for (let i = 0; i < results.length; i++) {
                     const pitches = results[i];
@@ -748,7 +754,13 @@ export default class Generator {
                     promises.push(promise);
                 }
 
-                const results = await Promise.all(promises);
+                let results: any[];
+
+                try {
+                    results = await Promise.all(promises);
+                } catch {
+                    return "Failed to evaluate to a number";
+                }
 
                 for (let i = 0; i < results.length; i++) {
                     const fraction = results[i];
@@ -798,7 +810,13 @@ export default class Generator {
                     promises.push(promise);
                 }
 
-                const results = await Promise.all(promises);
+                let results: any[];
+
+                try {
+                    results = await Promise.all(promises);
+                } catch {
+                    return "Failed to evaluate to a boolean";
+                }
 
                 for (let i = 0; i < results.length; i++) {
                     const skip = results[i];
@@ -838,7 +856,9 @@ export default class Generator {
                 }
 
                 const promises = Array.from(owningItems).map((item) =>
-                    this._applyItemStateEffect(item.state)
+                    this._applyItemStateEffect(item.state).then((error) => {
+                        item.state = { error };
+                    })
                 );
                 await Promise.all(promises);
                 break;
