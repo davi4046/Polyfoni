@@ -7,7 +7,6 @@ import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
 import {
     getChildren,
     getGrandparent,
-    getIndex,
     getParent,
     getPosition,
     isPositionOnPath,
@@ -19,7 +18,6 @@ import Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
 import type Track from "../../models/track/Track";
-import type TrackGroup from "../../models/track_group/TrackGroup";
 import type Voice from "../../models/voice/Voice";
 import type Interval from "../../../utils/interval/Interval";
 
@@ -637,8 +635,8 @@ export default class Generator {
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (let i = 0; i < pairs.length; i++) {
-                    const [prevNote, nextNote] = pairs[i];
+                for (let index = 0; index < pairs.length; index++) {
+                    const [prevNote, nextNote] = pairs[index];
 
                     const harmonyItem = getChildren(harmonyTrack).find((item) =>
                         isPointWithinInterval(prevNote.start, item.state)
@@ -662,7 +660,7 @@ export default class Generator {
                         ...this._timeline.state.aliases,
                         prev_degree: prevDegree,
                         next_degree: nextDegree,
-                        x: i,
+                        x: index,
                     });
 
                     const promise = (async () => {
@@ -722,12 +720,12 @@ export default class Generator {
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (let i = 0; i < pairs.length; i++) {
-                    const [prevNote, nextNote] = pairs[i];
+                for (let index = 0; index < pairs.length; index++) {
+                    const [prevNote, nextNote] = pairs[index];
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        x: i,
+                        x: index,
                     });
 
                     const promise = (async () => {
@@ -777,12 +775,12 @@ export default class Generator {
                 const pairs = getAdjacentNotePairs();
                 const promises = [];
 
-                for (let i = 0; i < pairs.length; i++) {
-                    const [prevNote, nextNote] = pairs[i];
+                for (let index = 0; index < pairs.length; index++) {
+                    const [prevNote, nextNote] = pairs[index];
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        x: i,
+                        x: index,
                     });
 
                     const promise = (async () => {
