@@ -4,35 +4,6 @@ import { z } from "zod";
 
 import type Timeline from "../../models/timeline/Timeline";
 
-function stringToNumber(val: string, ctx: z.RefinementCtx) {
-    const parsed = Number(val);
-
-    if (isNaN(parsed)) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Not a number",
-        });
-
-        return z.NEVER;
-    }
-
-    return parsed;
-}
-
-function stringToDecimal(val: string, ctx: z.RefinementCtx) {
-    const parsed = Number(val);
-
-    if (!Number.isInteger(parsed)) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Not an integer",
-        });
-
-        return z.NEVER;
-    }
-    if (parsed < 0) return parsed;
-}
-
 const ChordSchema = z.object({
     "@root": z
         .enum(["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"])
@@ -79,6 +50,21 @@ const ChordSchema = z.object({
         return parsed;
     }),
 });
+
+function stringToNumber(val: string, ctx: z.RefinementCtx) {
+    const parsed = Number(val);
+
+    if (isNaN(parsed)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Not a number",
+        });
+
+        return z.NEVER;
+    }
+
+    return parsed;
+}
 
 const ChordItemSchema = z.object({
     "@start": z.string().transform(stringToNumber),
