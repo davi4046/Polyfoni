@@ -90,6 +90,10 @@
         timelineContext.history.redoAction();
     });
 
+    registerShortcut("ctrl+s", () => {
+        emit("save");
+    });
+
     const unlistenExportToMidi = listen("export_to_midi", async (_) => {
         const path = await save({
             title: "Export to MIDI",
@@ -106,7 +110,7 @@
 
     async function saveAs() {
         const path = await save({
-            title: "Save as",
+            title: "Save Project",
             filters: [{ name: "Polyfoni Project", extensions: ["plfn"] }],
             defaultPath: projectPath,
         });
