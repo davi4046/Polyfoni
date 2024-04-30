@@ -34,6 +34,7 @@ export default function createXMLFileFromTimeline(timeline: Timeline): string {
     root.scaleTrack = {
         item: getChildren(timeline.scaleTrack).map(convertItem),
     };
+    root.aliases = timeline.state.aliases;
 
     root.voice = getChildren(getChildren(timeline)[1]).map((voice) => {
         const tracks = getChildren(voice)
