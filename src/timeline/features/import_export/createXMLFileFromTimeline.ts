@@ -7,7 +7,7 @@ import type Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
 
-export default function createXMLFileFromTimeline(timeline: Timeline) {
+export default function createXMLFileFromTimeline(timeline: Timeline): string {
     const root: any = {};
 
     function convertItem(item: Item<any>) {
