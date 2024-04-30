@@ -19,6 +19,7 @@
         "js-yaml": "^4.1.0",
         "lodash-es": "^4.17.21",
         "tippy.js": "^6.3.7",
+        "to-xml": "^0.1.11",
         "ts-essentials": "^9.4.1",
         "vite-plugin-wasm": "^3.3.0"
     },

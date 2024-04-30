@@ -18,22 +18,22 @@ type TrackType =
     | "decorationSkip"
     | "decorationHarmony";
 
-export const pathToTrackTypeMap = new Map<string, TrackType>([
-    ["1,*,0,0", "output"],
+export const trackTypeToPathMap = new Map<TrackType, string>([
+    ["output", "1,*,0,0"],
 
-    ["1,*,1,0", "frameworkPitch"],
-    ["1,*,1,1", "frameworkDuration"],
-    ["1,*,1,2", "frameworkRest"],
-    ["1,*,1,3", "frameworkHarmony"],
+    ["frameworkPitch", "1,*,1,0"],
+    ["frameworkDuration", "1,*,1,1"],
+    ["frameworkRest", "1,*,1,2"],
+    ["frameworkHarmony", "1,*,1,3"],
 
-    ["1,*,2,0", "decorationPitches"],
-    ["1,*,2,1", "decorationFraction"],
-    ["1,*,2,2", "decorationSkip"],
-    ["1,*,2,3", "decorationHarmony"],
+    ["decorationPitches", "1,*,2,0"],
+    ["decorationFraction", "1,*,2,1"],
+    ["decorationSkip", "1,*,2,2"],
+    ["decorationHarmony", "1,*,2,3"],
 ]);
 
-export const trackTypeToPathMap = new Map<TrackType, string>(
-    Array.from(pathToTrackTypeMap.entries()).map(([position, trackType]) => [
+export const pathToTrackTypeMap = new Map<string, TrackType>(
+    Array.from(trackTypeToPathMap.entries()).map(([position, trackType]) => [
         trackType,
         position,
     ])
