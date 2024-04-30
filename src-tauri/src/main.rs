@@ -3,7 +3,7 @@
 
 use midi_player::MidiPlayer;
 use oxisynth::MidiEvent;
-use tauri::{CustomMenuItem, Menu, Submenu, Manager};
+use tauri::{CustomMenuItem, Menu, MenuItem, Submenu, Manager};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
 
@@ -13,14 +13,13 @@ mod midi_player;
 fn create_menu() -> Menu {
     return Menu::new()
         .add_submenu(Submenu::new("File",Menu::new()
-            .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
+            .add_item(CustomMenuItem::new("save_as".to_string(), "Save as"))
+            .add_item(CustomMenuItem::new("save".to_string(), "Save"))
+            .add_native_item(MenuItem::Separator)
             .add_item(CustomMenuItem::new("export_to_midi".to_string(), "Export to MIDI"))
+            .add_native_item(MenuItem::Separator)
+            .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
             )
-        )
-        .add_submenu(Submenu::new("Selection", Menu::new()
-            .add_item(CustomMenuItem::new("insert".to_string(), "Insert Empty Item(s)").accelerator("CmdOrCtrl+I"))
-            .add_item(CustomMenuItem::new("delete".to_string(), "Delete").accelerator("Delete"))
-            )  
         )
 }
 
@@ -50,17 +49,17 @@ fn main() {
         .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
-                "quit" => {
-                    std::process::exit(0);
+                "save_as" => {
+                    event.window().emit("save_as", {}).unwrap();
                 }
-                "insert" => {
-                    event.window().emit("insert", {}).unwrap();
-                }
-                "delete" => {
-                    event.window().emit("delete", {}).unwrap();
+                "save" => {
+                    event.window().emit("save", {}).unwrap();
                 }
                 "export_to_midi" => {
                     event.window().emit("export_to_midi", {}).unwrap();
+                }
+                "quit" => {
+                    std::process::exit(0);
                 }
                 _ => {}
             }
