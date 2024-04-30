@@ -8,11 +8,15 @@
     import selectHighlightedItems from "./timeline/user_interface/context/operations/selectHighlightedItems";
     import Generator from "./timeline/features/generation/Generator";
     import HarmonicSumGenerator from "./timeline/features/generation/HarmonicSumGenerator";
-    import { save } from "@tauri-apps/api/dialog";
+    import { open, save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import { onDestroy } from "svelte";
     import createTimelineVM from "./timeline/user_interface/vm_creators/timeline_vm/createTimelineVM";
-    import { writeBinaryFile, writeTextFile } from "@tauri-apps/api/fs";
+    import {
+        readTextFile,
+        writeBinaryFile,
+        writeTextFile,
+    } from "@tauri-apps/api/fs";
     import copyHighlightedItems from "./timeline/user_interface/context/operations/copyHighlightedItems";
     import copySelectedItems from "./timeline/user_interface/context/operations/copySelectedItems";
     import pasteClipboard from "./timeline/user_interface/context/operations/pasteClipboard";
@@ -22,6 +26,7 @@
     import AliasManager from "./timeline/features/generation/AliasManager";
     import StateHierarchyWatcher from "./architecture/StateHierarchyWatcher";
     import createXMLFileFromTimeline from "./timeline/features/import_export/createXMLFileFromTimeline";
+    import createTimelineFromXMLFile from "./timeline/features/import_export/createTimelineFromXMLFile";
 
     const timeline = makeDemoTimeline();
     const timelineContext = new TimelineContext(timeline);
@@ -94,6 +99,20 @@
         emit("save");
     });
 
+    const unlistenOpenProject = listen("open_file", async (_) => {
+        const path = await open({
+            title: "Open File",
+            filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
+            multiple: false,
+        });
+
+        if (!path) return;
+
+        const data = await readTextFile(path as string);
+
+        createTimelineFromXMLFile(data);
+    });
+
     const unlistenExportToMidi = listen("export_to_midi", async (_) => {
         const path = await save({
             title: "Export to MIDI",
@@ -110,8 +129,8 @@
 
     async function saveAs() {
         const path = await save({
-            title: "Save Project",
-            filters: [{ name: "Polyfoni Project", extensions: ["plfn"] }],
+            title: "Save As",
+            filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
             defaultPath: projectPath,
         });
 
@@ -137,6 +156,7 @@
     });
 
     onDestroy(async () => {
+        (await unlistenOpenProject)();
         (await unlistenSaveAs)();
         (await unlistenSave)();
         (await unlistenExportToMidi)();

@@ -13,10 +13,12 @@ mod midi_player;
 fn create_menu() -> Menu {
     return Menu::new()
         .add_submenu(Submenu::new("File",Menu::new()
-            .add_item(CustomMenuItem::new("save_as".to_string(), "Save as"))
+            .add_item(CustomMenuItem::new("open_file".to_string(), "Open File..."))
+            .add_native_item(MenuItem::Separator)
+            .add_item(CustomMenuItem::new("save_as".to_string(), "Save As..."))
             .add_item(CustomMenuItem::new("save".to_string(), "Save"))
             .add_native_item(MenuItem::Separator)
-            .add_item(CustomMenuItem::new("export_to_midi".to_string(), "Export to MIDI"))
+            .add_item(CustomMenuItem::new("export_to_midi".to_string(), "Export to MIDI..."))
             .add_native_item(MenuItem::Separator)
             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
             )
@@ -49,6 +51,9 @@ fn main() {
         .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
+                "open_file" => {
+                    event.window().emit("open_file", {}).unwrap();
+                }
                 "save_as" => {
                     event.window().emit("save_as", {}).unwrap();
                 }

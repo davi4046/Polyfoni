@@ -31,7 +31,7 @@
                 "ask": false,
                 "confirm": false,
                 "message": false,
-                "open": false,
+                "open": true,
                 "save": true
             },
             "path": {

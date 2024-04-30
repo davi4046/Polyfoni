@@ -16,12 +16,14 @@
         "@popperjs/core": "^2.11.8",
         "@tauri-apps/api": "^1.5.0",
         "chroma-js": "^2.4.2",
+        "from-xml": "^0.1.11",
         "js-yaml": "^4.1.0",
         "lodash-es": "^4.17.21",
         "tippy.js": "^6.3.7",
         "to-xml": "^0.1.11",
         "ts-essentials": "^9.4.1",
-        "vite-plugin-wasm": "^3.3.0"
+        "vite-plugin-wasm": "^3.3.0",
+        "zod": "^3.23.5"
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^2.4.2",
