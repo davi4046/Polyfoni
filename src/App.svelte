@@ -44,6 +44,8 @@
                     target,
                     props: { vm: timelineManager.timelineVM! },
                 });
+
+                projectPath = path as string;
             } catch {
                 emit("display-message", { message: "Failed to open file" });
             }
