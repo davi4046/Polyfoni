@@ -41,19 +41,26 @@ export default function createXMLFileFromTimeline(timeline: Timeline): string {
             .slice(1)
             .flatMap((trackGroup) => getChildren(trackGroup));
 
+        const tracksData = Object.fromEntries(
+            tracks.map((track) => {
+                const trackType = getTrackType(track);
+
+                if (trackType === undefined) {
+                    throw new Error("TrackType not defined");
+                }
+
+                const trackData = {
+                    item: getChildren(track).map(convertItem),
+                };
+
+                return [trackType, trackData];
+            })
+        );
+
         return {
             "@label": voice.state.label,
             "@instrument": voice.state.instrument,
-            track: tracks.flatMap((track) => {
-                const trackType = getTrackType(track);
-
-                return [
-                    {
-                        "!": `-- ${trackType} --`,
-                        item: getChildren(track).map(convertItem),
-                    },
-                ];
-            }),
+            ...tracksData,
         };
     });
 
