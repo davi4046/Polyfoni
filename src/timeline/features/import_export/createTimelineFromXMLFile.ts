@@ -211,10 +211,13 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
             ];
 
             const decorationTracks = [
-                createStringTrack(frameworkGroup, voiceData.decorationPitches),
-                createStringTrack(frameworkGroup, voiceData.decorationFraction),
-                createStringTrack(frameworkGroup, voiceData.decorationSkip),
-                createChordTrack(frameworkGroup, voiceData.decorationHarmony),
+                createStringTrack(decorationGroup, voiceData.decorationPitches),
+                createStringTrack(
+                    decorationGroup,
+                    voiceData.decorationFraction
+                ),
+                createStringTrack(decorationGroup, voiceData.decorationSkip),
+                createChordTrack(decorationGroup, voiceData.decorationHarmony),
             ];
 
             addChildren(getParent(frameworkGroup), frameworkGroup);
