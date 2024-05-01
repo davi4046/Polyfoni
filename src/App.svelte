@@ -18,6 +18,7 @@
     const timelineManager = new TimelineManager();
 
     let projectPath: string | undefined = undefined;
+    let timelineComponent: Timeline;
 
     const unlistenPromises = [
         listen("open_file", async (_) => {
@@ -25,6 +26,7 @@
                 title: "Open File",
                 filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
                 multiple: false,
+                defaultPath: projectPath,
             });
 
             if (!path) return;
@@ -33,7 +35,15 @@
                 const data = await readTextFile(path as string);
                 const timeline = createTimelineFromXMLFile(data);
                 await timelineManager.loadTimeline(timeline);
-                vm = timelineManager.timelineVM;
+
+                timelineComponent?.$destroy();
+
+                const target = document.getElementById("main")!;
+
+                timelineComponent = new Timeline({
+                    target,
+                    props: { vm: timelineManager.timelineVM! },
+                });
             } catch {
                 emit("display-message", { message: "Failed to open file" });
             }
@@ -111,10 +121,7 @@
 </script>
 
 {#await loadFonts() then}
-    <main class="h-full">
-        {#if vm}
-            <Timeline bind:vm></Timeline>
-        {/if}
+    <main id="main" class="h-full">
         <div
             class="absolute bottom-64 right-0 z-50 flex flex-col-reverse items-end overflow-clip"
         >
