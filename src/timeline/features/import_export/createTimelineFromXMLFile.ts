@@ -2,7 +2,22 @@ import { fromXML } from "from-xml";
 
 import { z } from "zod";
 
-import type Timeline from "../../models/timeline/Timeline";
+import {
+    addChildren,
+    getChildren,
+    getParent,
+} from "../../../architecture/state-hierarchy-utils";
+import {
+    Chord,
+    createEmptyPitchMap,
+    getPitchesFromDecimal,
+} from "../../models/item/Chord";
+import Item from "../../models/item/Item";
+import Timeline from "../../models/timeline/Timeline";
+import Track from "../../models/track/Track";
+import TrackGroup from "../../models/track_group/TrackGroup";
+import Voice from "../../models/voice/Voice";
+import VoiceGroup from "../../models/voice_group/VoiceGroup";
 
 const ChordSchema = z.object({
     "@root": z
@@ -78,17 +93,17 @@ const StringItemSchema = z.object({
     "#": z.string().optional(),
 });
 
-const StringTrackSchema = z
-    .object({
-        item: z.union([StringItemSchema, z.array(StringItemSchema)]),
-    })
-    .or(z.string());
+const StringTrackSchema = z.object({
+    item: StringItemSchema.transform((item) => [item])
+        .or(z.array(StringItemSchema))
+        .optional(),
+});
 
-const ChordTrackSchema = z
-    .object({
-        item: z.union([ChordItemSchema, z.array(ChordItemSchema)]),
-    })
-    .or(z.string());
+const ChordTrackSchema = z.object({
+    item: ChordItemSchema.transform((item) => [item])
+        .or(z.array(ChordItemSchema))
+        .optional(),
+});
 
 const VoiceSchema = z.object({
     "@label": z.string(),
@@ -125,26 +140,153 @@ const VoiceSchema = z.object({
         return parsed;
     }),
 
-    frameworkPitch: StringTrackSchema,
-    frameworkDuration: StringTrackSchema,
-    frameworkRest: StringTrackSchema,
-    frameworkHarmony: ChordTrackSchema,
-    decorationPitches: StringTrackSchema,
-    decorationFraction: StringTrackSchema,
-    decorationSkip: StringTrackSchema,
-    decorationHarmony: ChordTrackSchema,
+    track: z.tuple([
+        StringTrackSchema,
+        StringTrackSchema,
+        StringTrackSchema,
+        ChordTrackSchema,
+        StringTrackSchema,
+        StringTrackSchema,
+        StringTrackSchema,
+        ChordTrackSchema,
+    ]),
 });
 
-const ProjectSchema = z.object({
-    aliases: z.record(z.string(), z.string()).or(z.string()),
+const TimelineSchema = z.object({
+    aliases: z
+        .record(z.string(), z.string())
+        .or(z.string().transform(() => undefined)),
+
     scaleTrack: ChordTrackSchema,
     tempoTrack: StringTrackSchema,
-    voice: VoiceSchema.or(z.array(VoiceSchema)).or(z.string()),
+
+    voice: VoiceSchema.transform((voice) => [voice])
+        .or(z.array(VoiceSchema))
+        .or(z.string().transform(() => undefined)),
 });
 
-export default function createTimelineFromXMLFile(xml: string): Timeline {
-    const obj = fromXML(xml);
-    const parsed = ProjectSchema.parse(obj);
+type StringTrackType = z.infer<typeof StringTrackSchema>;
+type ChordTrackType = z.infer<typeof ChordTrackSchema>;
 
-    console.log(parsed);
+export default function createTimelineFromXMLFile(xml: string): Timeline {
+    const timelineData = TimelineSchema.parse(fromXML(xml));
+
+    const timeline = new Timeline();
+
+    if (timelineData.voice) {
+        const voices = timelineData.voice.map((voiceData) => {
+            const voice = new Voice({
+                parent: getChildren(timeline)[1],
+                label: voiceData["@label"],
+                instrument: voiceData["@instrument"],
+                children: [],
+            });
+
+            const outputGroup = new TrackGroup({ parent: voice, children: [] });
+            const outputTrack = new Track("NoteItem", {
+                parent: outputGroup,
+                children: [],
+            });
+
+            addChildren(getParent(outputGroup), outputGroup);
+            addChildren(getParent(outputTrack), outputTrack);
+
+            const frameworkGroup = new TrackGroup({
+                parent: voice,
+                children: [],
+            });
+            const decorationGroup = new TrackGroup({
+                parent: voice,
+                children: [],
+            });
+
+            const frameworkTracks = voiceData.track
+                .slice(0, 5)
+                .map((trackData) =>
+                    createTrackFromData(frameworkGroup, trackData)
+                );
+
+            const decorationTracks = voiceData.track
+                .slice(0, 5)
+                .map((trackData) =>
+                    createTrackFromData(decorationGroup, trackData)
+                );
+
+            addChildren(getParent(frameworkGroup), frameworkGroup);
+            addChildren(frameworkGroup, ...frameworkTracks);
+
+            addChildren(getParent(decorationGroup), decorationGroup);
+            addChildren(decorationGroup, ...decorationTracks);
+
+            function createTrackFromData(
+                parent: TrackGroup,
+                trackData: ChordTrackType | StringTrackType
+            ) {
+                const validateStringTrack =
+                    StringTrackSchema.safeParse(trackData);
+
+                const itemType = validateStringTrack.success
+                    ? "StringItem"
+                    : "ChordItem";
+
+                const track = new Track(itemType, {
+                    parent: parent,
+                    children: [],
+                });
+
+                const items = (() => {
+                    if (trackData.item === undefined) return [];
+
+                    if (validateStringTrack.success) {
+                        return (trackData as StringTrackType).item!.map(
+                            (itemData) => {
+                                return new Item("StringItem", {
+                                    parent: track,
+                                    start: itemData["@start"],
+                                    end: itemData["@end"],
+                                    content: itemData["#"] ? itemData["#"] : "",
+                                });
+                            }
+                        );
+                    } else {
+                        return (trackData as ChordTrackType).item!.map(
+                            (itemData) => {
+                                const chordStatus =
+                                    itemData.chord !== undefined
+                                        ? itemData.chord["@root"] !== undefined
+                                            ? Chord.fromDecimal(
+                                                  itemData.chord["@root"],
+                                                  itemData.chord["@decimal"]
+                                              )
+                                            : getPitchesFromDecimal(
+                                                  itemData.chord["@decimal"]
+                                              )
+                                        : createEmptyPitchMap();
+
+                                return new Item("ChordItem", {
+                                    parent: track,
+                                    start: itemData["@start"],
+                                    end: itemData["@end"],
+                                    content: {
+                                        chordStatus: chordStatus,
+                                        filters: [],
+                                    },
+                                });
+                            }
+                        );
+                    }
+                })();
+
+                addChildren(track, ...items);
+
+                return track;
+            }
+
+            return voice;
+        });
+
+        addChildren(getChildren(timeline)[1], ...voices);
+    }
+
+    return timeline;
 }

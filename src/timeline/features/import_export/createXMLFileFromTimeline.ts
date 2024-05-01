@@ -2,7 +2,7 @@ import { toXML } from "to-xml";
 
 import { getTrackType } from "../generation/track-config";
 import { getChildren } from "../../../architecture/state-hierarchy-utils";
-import { Chord, type PitchMap } from "../../models/item/Chord";
+import { Chord, getDecimalFromPitches } from "../../models/item/Chord";
 import type Item from "../../models/item/Item";
 import type { ItemTypes } from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
@@ -41,23 +41,19 @@ export default function createXMLFileFromTimeline(timeline: Timeline): string {
             .slice(1)
             .flatMap((trackGroup) => getChildren(trackGroup));
 
-        const tracksObj = Object.fromEntries(
-            tracks.map((track) => {
-                const trackType = getTrackType(track);
-                const fieldName = trackType ? trackType : "track";
-                return [
-                    fieldName,
-                    {
-                        item: getChildren(track).map(convertItem),
-                    },
-                ];
-            })
-        );
-
         return {
             "@label": voice.state.label,
             "@instrument": voice.state.instrument,
-            ...tracksObj,
+            track: tracks.flatMap((track) => {
+                const trackType = getTrackType(track);
+
+                return [
+                    {
+                        "!": `-- ${trackType} --`,
+                        item: getChildren(track).map(convertItem),
+                    },
+                ];
+            }),
         };
     });
 
@@ -79,25 +75,15 @@ const itemContentConverters: Partial<{
                 },
             };
         } else {
-            const decimal = pitchMapToDecimal(content.chordStatus);
+            const decimal = getDecimalFromPitches(content.chordStatus);
 
             if (decimal === 0) return;
 
             return {
-                scale: {
+                chord: {
                     "@decimal": decimal,
                 },
             };
         }
     },
 };
-
-function pitchMapToDecimal(pitchMap: PitchMap): number {
-    const binary = Object.values(pitchMap)
-        .reverse()
-        .reduce(
-            (binaryString, value) => binaryString + (value ? "1" : "0"),
-            ""
-        );
-    return Number.parseInt(binary, 2);
-}

@@ -128,12 +128,12 @@ export class Chord {
     }
 
     static fromPitches(root: Pitch, pitches: PitchMap): Chord {
-        const decimal = getDecimalFromRootAndPitches(root, pitches);
+        const decimal = getDecimalFromPitches(pitches, root);
         return new Chord(root, decimal, pitches);
     }
 
     static fromDecimal(root: Pitch, decimal: number): Chord {
-        const pitches = getPitchesFromRootAndDecimal(root, decimal);
+        const pitches = getPitchesFromDecimal(decimal, root);
         return new Chord(root, decimal, pitches);
     }
 }
@@ -174,15 +174,15 @@ export class ChordBuilder {
 
         if (this._root) {
             if (this._decimal) {
-                this._pitches = getPitchesFromRootAndDecimal(
-                    this._root,
-                    this._decimal
+                this._pitches = getPitchesFromDecimal(
+                    this._decimal,
+                    this._root
                 );
             } else {
                 this._pitches[this._root] = true;
-                this._decimal = getDecimalFromRootAndPitches(
-                    this._root,
-                    this._pitches
+                this._decimal = getDecimalFromPitches(
+                    this._pitches,
+                    this._root
                 );
             }
         }
@@ -192,10 +192,7 @@ export class ChordBuilder {
         this._decimal = newDecimal;
 
         if (this._root && this._decimal) {
-            this._pitches = getPitchesFromRootAndDecimal(
-                this._root,
-                this._decimal
-            );
+            this._pitches = getPitchesFromDecimal(this._decimal, this._root);
         }
     }
 
@@ -216,9 +213,9 @@ export class ChordBuilder {
         for (const [pitch, value] of pitchEntries) {
             if (value) {
                 this._root = pitch as Pitch;
-                this._decimal = getDecimalFromRootAndPitches(
-                    this._root,
-                    this._pitches
+                this._decimal = getDecimalFromPitches(
+                    this._pitches,
+                    this._root
                 );
                 break;
             }
@@ -260,9 +257,9 @@ export class ChordBuilder {
 
             if (currRotations === rotations) {
                 this._root = pitch as Pitch;
-                this._decimal = getDecimalFromRootAndPitches(
-                    this._root,
-                    this._pitches
+                this._decimal = getDecimalFromPitches(
+                    this._pitches,
+                    this._root
                 );
                 break;
             }
@@ -282,10 +279,7 @@ export class ChordBuilder {
         }
 
         if (this._root) {
-            this._decimal = getDecimalFromRootAndPitches(
-                this._root,
-                this._pitches
-            );
+            this._decimal = getDecimalFromPitches(this._pitches, this._root);
         } else {
             // There is no root so the decimal cannot be told
             this._decimal = undefined;
@@ -319,47 +313,44 @@ export class ChordBuilder {
     }
 }
 
-export function getDecimalFromRootAndPitches(
-    root: Pitch,
-    pitches: PitchMap
-): number {
-    const rootIndex = pitchNames.indexOf(root);
-
+export function getDecimalFromPitches(pitches: PitchMap, root?: Pitch): number {
     let binary = Object.values(pitches)
         .reverse()
         .map((value) => (value ? "1" : "0"))
         .join("");
 
-    // --- Example ---
+    if (root) {
+        const rootIndex = pitchNames.indexOf(root);
 
-    // what we have:
-    // 000000001111
-    //         |
-    //         root (index 3)
+        // --- Example ---
 
-    // what we want: (root must be last)
-    // 111000000001
-    //            |
-    //            root
+        // what we have:
+        // 000000001111
+        //         |
+        //         root (index 3)
 
-    // solution:
-    binary =
-        binary.slice(binary.length - rootIndex) +
-        binary.slice(0, binary.length - rootIndex); // Shift binary according to root
+        // what we want: (root must be last)
+        // 111000000001
+        //            |
+        //            root
+
+        // solution:
+        binary =
+            binary.slice(binary.length - rootIndex) +
+            binary.slice(0, binary.length - rootIndex); // Shift binary according to root
+    }
 
     return parseInt(binary, 2);
 }
 
-export function getPitchesFromRootAndDecimal(
-    root: Pitch,
-    decimal: number
-): PitchMap {
-    const rootIndex = pitchNames.indexOf(root);
-
+export function getPitchesFromDecimal(decimal: number, root?: Pitch): PitchMap {
     let binary = decimal.toString(2);
     while (binary.length < 12) binary = "0" + binary;
 
-    binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Unshift binary according to root
+    if (root) {
+        const rootIndex = pitchNames.indexOf(root);
+        binary = binary.slice(rootIndex) + binary.slice(0, rootIndex); // Unshift binary according to root
+    }
 
     return Object.fromEntries(
         pitchNames.map((pitch, index) => {
