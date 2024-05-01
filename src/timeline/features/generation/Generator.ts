@@ -58,6 +58,19 @@ export default class Generator {
     constructor(watcher: StateHierarchyWatcher<Timeline>) {
         this._timeline = watcher.root;
 
+        const durationTracks = getTracksOfType(
+            this._timeline,
+            "frameworkDuration"
+        );
+
+        this._itemChanges = durationTracks.flatMap((track) =>
+            getChildren(track).map((item) => {
+                return { obj: item, oldState: undefined, newState: item.state };
+            })
+        );
+
+        this._tryHandlingChanges();
+
         watcher.subscribe((obj, oldState, newState) => {
             const position = getPosition(obj);
 
@@ -107,35 +120,36 @@ export default class Generator {
                     break;
                 }
             }
-
-            if (this._itemChanges.length > 0 && !this._isHandlingChanges) {
-                const watcher = this._watchNoteChanges();
-
-                const handleNextChangeLoop = () => {
-                    const nextChange = this._itemChanges.shift();
-
-                    if (nextChange) {
-                        this._handleChange(nextChange).then(
-                            handleNextChangeLoop
-                        );
-                    } else {
-                        this._isHandlingChanges = false;
-
-                        watcher.updateDecorations().then(() => {
-                            //render output
-                            const voices = getChildren(
-                                getChildren(this._timeline)[1]
-                            );
-                            for (const voice of voices) {
-                                this._renderOutput(voice);
-                            }
-                        });
-                    }
-                };
-                this._isHandlingChanges = true;
-                handleNextChangeLoop();
-            }
+            this._tryHandlingChanges();
         });
+    }
+
+    private _tryHandlingChanges() {
+        if (this._itemChanges.length === 0 || this._isHandlingChanges) {
+            return;
+        }
+
+        const noteWatcher = this._watchNoteChanges();
+
+        const handleNextChangeLoop = () => {
+            const nextChange = this._itemChanges.shift();
+
+            if (nextChange) {
+                this._handleChange(nextChange).then(handleNextChangeLoop);
+            } else {
+                this._isHandlingChanges = false;
+
+                noteWatcher.updateDecorations().then(() => {
+                    //render output
+                    const voices = getChildren(getChildren(this._timeline)[1]);
+                    for (const voice of voices) {
+                        this._renderOutput(voice);
+                    }
+                });
+            }
+        };
+        this._isHandlingChanges = true;
+        handleNextChangeLoop();
     }
 
     private async _handleChange(change: ItemChange) {
@@ -155,16 +169,16 @@ export default class Generator {
 
         const updatedNotes = new Set<NoteBuilder>();
 
-        Object.values(this._frameworkMap.state).forEach((framework) =>
-            framework.forEach((note, index) => {
+        Object.values(this._frameworkMap.state).forEach((framework) => {
+            for (const note of framework) {
                 const unsubscribe = note.subscribe(() => {
                     updatedNotes.add(note);
-                    const prevNote = framework[index - 1];
+                    const prevNote = framework[framework.indexOf(note) - 1];
                     if (prevNote) updatedNotes.add(prevNote);
                 });
                 subscriptions.push(unsubscribe);
-            })
-        );
+            }
+        });
 
         subscriptions.push(
             this._frameworkMap.subscribe((oldState, newState) => {
@@ -198,6 +212,8 @@ export default class Generator {
                             newFramework[newFramework.indexOf(note) - 1];
                         if (prevNote) updatedNotes.add(prevNote);
                     });
+
+                    //
                 });
             })
         );

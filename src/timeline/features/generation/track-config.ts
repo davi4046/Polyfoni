@@ -73,14 +73,14 @@ export function getTracksOfType(
     function filterChildrenRecursive(obj: Object, symbols: string[]): any[] {
         const symbol = symbols.shift();
 
-        if (!symbol) return [obj];
+        if (symbol === undefined) return [obj];
 
         const matchingChildren = getChildren(obj as any).filter((child) =>
             doesValueMatchSymbol(getIndex(child as any), symbol)
         );
 
         return matchingChildren.flatMap((child) =>
-            filterChildrenRecursive(child as any, symbols)
+            filterChildrenRecursive(child as any, symbols.slice())
         );
     }
 
