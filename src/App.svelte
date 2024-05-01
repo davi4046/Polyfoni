@@ -18,6 +18,7 @@
     const timelineManager = new TimelineManager();
 
     let projectPath: string | undefined = undefined;
+
     let timelineComponent: Timeline;
 
     const unlistenPromises = [
@@ -118,8 +119,6 @@
         const unlistenFuncs = await Promise.all(unlistenPromises);
         unlistenFuncs.forEach((unlisten) => unlisten());
     });
-
-    let vm: TimelineVM | undefined = undefined;
 </script>
 
 {#await loadFonts() then}
