@@ -17,7 +17,6 @@ import Timeline from "../../models/timeline/Timeline";
 import Track from "../../models/track/Track";
 import TrackGroup from "../../models/track_group/TrackGroup";
 import Voice from "../../models/voice/Voice";
-import VoiceGroup from "../../models/voice_group/VoiceGroup";
 
 const ChordSchema = z.object({
     "@root": z
@@ -152,7 +151,7 @@ const VoiceSchema = z.object({
     decorationPitches: StringTrackSchema,
     decorationFraction: StringTrackSchema,
     decorationSkip: StringTrackSchema,
-    decorationHarmony: StringTrackSchema,
+    decorationHarmony: ChordTrackSchema,
 });
 
 const TimelineSchema = z.object({
