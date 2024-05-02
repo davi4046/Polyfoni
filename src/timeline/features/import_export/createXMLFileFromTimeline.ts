@@ -8,7 +8,7 @@ import type { ItemTypes } from "../../models/item/ItemTypes";
 import type Timeline from "../../models/timeline/Timeline";
 
 export default function createXMLFileFromTimeline(timeline: Timeline): string {
-    const root: any = {};
+    const data: any = {};
 
     function convertItem(item: Item<any>) {
         return {
@@ -28,15 +28,15 @@ export default function createXMLFileFromTimeline(timeline: Timeline): string {
         if (converter) return converter(content);
     }
 
-    root.tempoTrack = {
+    data.tempoTrack = {
         item: getChildren(timeline.tempoTrack).map(convertItem),
     };
-    root.scaleTrack = {
+    data.scaleTrack = {
         item: getChildren(timeline.scaleTrack).map(convertItem),
     };
-    root.aliases = timeline.state.aliases;
+    data.aliases = timeline.state.aliases;
 
-    root.voice = getChildren(getChildren(timeline)[1]).map((voice) => {
+    data.voice = getChildren(getChildren(timeline)[1]).map((voice) => {
         const tracks = getChildren(voice)
             .slice(1)
             .flatMap((trackGroup) => getChildren(trackGroup));
@@ -64,7 +64,7 @@ export default function createXMLFileFromTimeline(timeline: Timeline): string {
         };
     });
 
-    return toXML(root, undefined, 2);
+    return toXML({ timeline: data }, undefined, 2);
 }
 
 const itemContentConverters: Partial<{

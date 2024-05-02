@@ -155,23 +155,25 @@ const VoiceSchema = z.object({
 });
 
 const TimelineSchema = z.object({
-    aliases: z
-        .record(z.string(), z.string())
-        .or(z.string().transform(() => undefined)),
+    timeline: z.object({
+        aliases: z
+            .record(z.string(), z.string())
+            .or(z.string().transform(() => undefined)),
 
-    scaleTrack: ChordTrackSchema,
-    tempoTrack: StringTrackSchema,
+        scaleTrack: ChordTrackSchema,
+        tempoTrack: StringTrackSchema,
 
-    voice: VoiceSchema.transform((voice) => [voice])
-        .or(z.array(VoiceSchema))
-        .or(z.string().transform(() => undefined)),
+        voice: VoiceSchema.transform((voice) => [voice])
+            .or(z.array(VoiceSchema))
+            .or(z.string().transform(() => undefined)),
+    }),
 });
 
 type StringTrackData = z.infer<typeof StringTrackSchema>;
 type ChordTrackData = z.infer<typeof ChordTrackSchema>;
 
 export default function createTimelineFromXMLFile(xml: string): Timeline {
-    const timelineData = TimelineSchema.parse(fromXML(xml));
+    const timelineData = TimelineSchema.parse(fromXML(xml)).timeline;
 
     const timeline = new Timeline();
 

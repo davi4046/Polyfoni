@@ -1,0 +1,77 @@
+<timeline>
+  <tempoTrack>
+  </tempoTrack>
+  <scaleTrack>
+  </scaleTrack>
+  <aliases>
+    <APPOGIATURA>floor(next_degree) + 1 if prev_degree &lt; next_degree else ceil(next_degree) - 1</APPOGIATURA>
+    <PASSING_TONE>list( range(floor(prev_degree) + 1, ceil(next_degree)) if prev_degree &lt; next_degree else range(ceil(prev_degree) - 1, floor(next_degree), -1))</PASSING_TONE>
+    <ESCAPE_TONE>ceil(prev_degree) - 1 if prev_degree &lt; next_degree else floor(prev_degree) + 1</ESCAPE_TONE>
+  </aliases>
+  <voice label="Voice 0" instrument="48">
+    <frameworkPitch>
+      <item start="0" end="24">(sin(x*pi/4)*sin(x*pi/2)+sin(x*pi/4*0.02))</item>
+    </frameworkPitch>
+    <frameworkDuration>
+      <item start="0" end="24">0.5</item>
+    </frameworkDuration>
+    <frameworkRest>
+      <item start="0" end="24">False</item>
+    </frameworkRest>
+    <frameworkHarmony>
+      <item start="0" end="8">
+        <chord root="A" decimal="145"/>
+      </item>
+      <item start="8" end="16">
+        <chord root="A#" decimal="145"/>
+      </item>
+      <item start="16" end="24">
+        <chord root="D" decimal="137"/>
+      </item>
+    </frameworkHarmony>
+    <decorationPitches>
+      <item start="0" end="24">[APPOGIATURA, PASSING_TONE, ESCAPE_TONE][x%3]</item>
+    </decorationPitches>
+    <decorationFraction>
+      <item start="0" end="24"/>
+    </decorationFraction>
+    <decorationSkip>
+      <item start="0" end="24"/>
+    </decorationSkip>
+    <decorationHarmony>
+      <item start="0" end="24">
+        <chord root="A" decimal="1459"/>
+      </item>
+    </decorationHarmony>
+  </voice>
+  <voice label="Voice 1" instrument="0">
+    <frameworkPitch>
+      <item start="0" end="24">-(sin(x*pi/4)*sin(x*pi/2)+sin(x*pi/4*0.02))-3</item>
+    </frameworkPitch>
+    <frameworkDuration>
+      <item start="0" end="24">0.5</item>
+    </frameworkDuration>
+    <frameworkRest>
+      <item start="0" end="24">False</item>
+    </frameworkRest>
+    <frameworkHarmony>
+      <item start="0" end="8">
+        <chord root="A" decimal="145"/>
+      </item>
+      <item start="8" end="16">
+        <chord root="A#" decimal="145"/>
+      </item>
+      <item start="16" end="24">
+        <chord root="D" decimal="137"/>
+      </item>
+    </frameworkHarmony>
+    <decorationPitches>
+    </decorationPitches>
+    <decorationFraction>
+    </decorationFraction>
+    <decorationSkip>
+    </decorationSkip>
+    <decorationHarmony>
+    </decorationHarmony>
+  </voice>
+</timeline>

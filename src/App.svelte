@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Timeline from "./timeline/user_interface/visuals/views/timeline/Timeline.svelte";
+    import TimelineComponent from "./timeline/user_interface/visuals/views/timeline/Timeline.svelte";
     import { open, save } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import {
@@ -13,13 +13,60 @@
     import createTimelineFromXMLFile from "./timeline/features/import_export/createTimelineFromXMLFile";
     import { TimelineManager } from "./timeline/utils/TimelineManager";
     import { onDestroy } from "svelte";
-    import TimelineVM from "./timeline/user_interface/view_models/TimelineVM";
+    import type Timeline from "./timeline/models/timeline/Timeline";
+    import { resolveResource } from "@tauri-apps/api/path";
 
     const timelineManager = new TimelineManager();
 
     let projectPath: string | undefined = undefined;
 
-    let timelineComponent: Timeline;
+    let timelineComponent: TimelineComponent;
+
+    async function loadTimeline(timeline: Timeline) {
+        await timelineManager.loadTimeline(timeline);
+
+        timelineComponent?.$destroy();
+
+        const target = document.getElementById("timeline-target")!;
+
+        timelineComponent = new TimelineComponent({
+            target: target,
+            props: { vm: timelineManager.timelineVM! },
+        });
+    }
+
+    async function loadDemoTimeline() {
+        try {
+            const demoPath = await resolveResource("res/demo_project.plfn");
+            const demoData = await readTextFile(demoPath);
+            const demoTimeline = createTimelineFromXMLFile(demoData);
+            loadTimeline(demoTimeline);
+        } catch (error) {
+            emit("display-message", {
+                message: `Failed to load demo project`,
+            });
+        }
+    }
+
+    async function saveAs() {
+        if (!timelineManager.timeline) return;
+
+        const path = await save({
+            title: "Save As",
+            filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
+            defaultPath: projectPath,
+        });
+
+        if (!path) return;
+
+        const xml = createXMLFileFromTimeline(timelineManager.timeline);
+        writeTextFile(path, xml);
+        projectPath = path;
+
+        emit("display-message", { message: `Saved project to "${path}"` });
+    }
+
+    let messages: string[] = [];
 
     const unlistenPromises = [
         listen("open_file", async (_) => {
@@ -35,17 +82,7 @@
             try {
                 const data = await readTextFile(path as string);
                 const timeline = createTimelineFromXMLFile(data);
-                await timelineManager.loadTimeline(timeline);
-
-                timelineComponent?.$destroy();
-
-                const target = document.getElementById("main")!;
-
-                timelineComponent = new Timeline({
-                    target,
-                    props: { vm: timelineManager.timelineVM! },
-                });
-
+                loadTimeline(timeline);
                 projectPath = path as string;
             } catch {
                 emit("display-message", { message: "Failed to open file" });
@@ -83,37 +120,21 @@
             );
             writeBinaryFile(path, buffer);
         }),
+
+        listen("display-message", (event) => {
+            const payload = event.payload as { message: string };
+
+            messages = [payload.message, ...messages];
+
+            setTimeout(() => {
+                messages = messages.toSpliced(-1, 1);
+            }, 3000);
+        }),
     ];
 
-    async function saveAs() {
-        if (!timelineManager.timeline) return;
+    const loadFontsPromise = loadFonts();
 
-        const path = await save({
-            title: "Save As",
-            filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
-            defaultPath: projectPath,
-        });
-
-        if (!path) return;
-
-        const xml = createXMLFileFromTimeline(timelineManager.timeline);
-        writeTextFile(path, xml);
-        projectPath = path;
-
-        emit("display-message", { message: `Saved project to "${path}"` });
-    }
-
-    let messages: string[] = [];
-
-    listen("display-message", (event) => {
-        const payload = event.payload as { message: string };
-
-        messages = [payload.message, ...messages];
-
-        setTimeout(() => {
-            messages = messages.toSpliced(-1, 1);
-        }, 3000);
-    });
+    loadFontsPromise.then(loadDemoTimeline);
 
     onDestroy(async () => {
         const unlistenFuncs = await Promise.all(unlistenPromises);
@@ -121,8 +142,8 @@
     });
 </script>
 
-{#await loadFonts() then}
-    <main id="main" class="h-full">
+{#await loadFontsPromise then}
+    <main id="timeline-target" class="h-full">
         <div
             class="absolute bottom-64 right-0 z-50 flex flex-col-reverse items-end overflow-clip"
         >
