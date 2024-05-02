@@ -212,8 +212,6 @@ export default class Generator {
                             newFramework[newFramework.indexOf(note) - 1];
                         if (prevNote) updatedNotes.add(prevNote);
                     });
-
-                    //
                 });
             })
         );
@@ -251,16 +249,9 @@ export default class Generator {
                     }
 
                     tracks
-                        .map((track) =>
-                            getChildren(track).find((item) =>
-                                isPointWithinInterval(
-                                    note.state.start,
-                                    item.state
-                                )
-                            )
-                        )
-                        .filter(
-                            (value): value is Item<any> => value !== undefined
+                        .flatMap((track) => getChildren(track))
+                        .filter((item) =>
+                            isPointWithinInterval(note.state.start, item.state)
                         )
                         .forEach((item) => owningItems.add(item));
                 }
@@ -326,6 +317,7 @@ export default class Generator {
                 });
 
                 this._frameworkMap.state = { [voice.id]: voiceNotes };
+                this._getDecorations(voice); // Create decorations entry for voice if not already created
 
                 const durationItems = getChildren(itemState.parent).slice();
                 durationItems.sort((a, b) => a.state.start - b.state.start);
@@ -583,6 +575,7 @@ export default class Generator {
                     voiceNotes.push(...newNotes);
                     voiceNotes.sort((a, b) => a.state.start - b.state.end);
                     this._frameworkMap.state = { [voice.id]: voiceNotes };
+                    this._getDecorations(voice); // Create decorations entry for voice if not already created
                 }
 
                 // Reapply following duration items

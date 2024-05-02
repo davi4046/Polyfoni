@@ -176,6 +176,12 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
 
     const timeline = new Timeline();
 
+    if (timelineData.aliases) {
+        timeline.state = {
+            aliases: timelineData.aliases,
+        };
+    }
+
     if (timelineData.voice) {
         const voices = timelineData.voice.map((voiceData) => {
             const voice = new Voice({
