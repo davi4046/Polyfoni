@@ -206,6 +206,20 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
         };
     }
 
+    if (timelineData.tempoTrack && timelineData.tempoTrack.item) {
+        const tempoItems = timelineData.tempoTrack.item.map((itemData) =>
+            createStringItem(timeline.tempoTrack, itemData)
+        );
+        addChildren(timeline.tempoTrack, ...tempoItems);
+    }
+
+    if (timelineData.scaleTrack && timelineData.scaleTrack.item) {
+        const scaleItems = timelineData.scaleTrack.item.map((itemData) =>
+            createChordItem(timeline.scaleTrack, itemData)
+        );
+        addChildren(timeline.scaleTrack, ...scaleItems);
+    }
+
     if (timelineData.voice) {
         const voices = timelineData.voice.map((voiceData) => {
             const voice = new Voice({
