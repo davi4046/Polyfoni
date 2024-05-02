@@ -18,53 +18,6 @@ import Track from "../../models/track/Track";
 import TrackGroup from "../../models/track_group/TrackGroup";
 import Voice from "../../models/voice/Voice";
 
-const ChordSchema = z.object({
-    "@root": z
-        .enum(["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"])
-        .optional(),
-    "@decimal": z.string().transform((val, ctx) => {
-        const parsed = Number(val);
-
-        if (!Number.isInteger(parsed)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Must be an integer",
-            });
-
-            return z.NEVER;
-        }
-
-        if (parsed < 1) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Must be greater than zero",
-            });
-
-            return z.NEVER;
-        }
-
-        if (parsed > 4095) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Must be less than 4096",
-            });
-
-            return z.NEVER;
-        }
-
-        if (parsed % 2 !== 1) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Must be uneven",
-            });
-
-            return z.NEVER;
-        }
-
-        return parsed;
-    }),
-});
-
 function stringToNumber(val: string, ctx: z.RefinementCtx) {
     const parsed = Number(val);
 
@@ -79,6 +32,73 @@ function stringToNumber(val: string, ctx: z.RefinementCtx) {
 
     return parsed;
 }
+
+function mustBeInteger(val: number, ctx: z.RefinementCtx) {
+    if (!Number.isInteger(val)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Must be an integer",
+        });
+
+        return z.NEVER;
+    }
+    return val;
+}
+
+function mustBeInRange(val: number, ctx: z.RefinementCtx) {
+    if (val < 1) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Must be greater than zero",
+        });
+
+        return z.NEVER;
+    }
+    if (val > 4095) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Must be less than 4096",
+        });
+
+        return z.NEVER;
+    }
+    return val;
+}
+
+function mustBeUneven(val: number, ctx: z.RefinementCtx) {
+    if (val % 2 !== 1) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Must be uneven",
+        });
+
+        return z.NEVER;
+    }
+    return val;
+}
+
+const ChordSchema = z.object({
+    "@root": z.enum([
+        "A",
+        "A#",
+        "B",
+        "C",
+        "C#",
+        "D",
+        "D#",
+        "E",
+        "F",
+        "F#",
+        "G",
+        "G#",
+    ]),
+    "@decimal": z
+        .string()
+        .transform(stringToNumber)
+        .transform(mustBeInteger)
+        .transform(mustBeInRange)
+        .transform(mustBeUneven),
+});
 
 const ChordItemSchema = z.object({
     "@start": z.string().transform(stringToNumber),
@@ -169,6 +189,9 @@ const TimelineSchema = z.object({
     }),
 });
 
+type StringItemData = z.infer<typeof StringItemSchema>;
+type ChordItemData = z.infer<typeof ChordItemSchema>;
+
 type StringTrackData = z.infer<typeof StringTrackSchema>;
 type ChordTrackData = z.infer<typeof ChordTrackSchema>;
 
@@ -242,6 +265,47 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
     return timeline;
 }
 
+function createStringItem(
+    parent: Track<"StringItem">,
+    data: StringItemData
+): Item<"StringItem"> {
+    return new Item("StringItem", {
+        parent: parent,
+        start: data["@start"],
+        end: data["@end"],
+        content: data["#"] ? data["#"] : "",
+    });
+}
+
+function createChordItem(
+    parent: Track<"ChordItem">,
+    data: ChordItemData
+): Item<"ChordItem"> {
+    const chordStatus = (() => {
+        if (data.chord === undefined) {
+            return createEmptyPitchMap();
+        }
+
+        data.chord["@root"];
+
+        if (data.chord["@root"] === undefined) {
+            return getPitchesFromDecimal(data.chord["@decimal"]);
+        }
+
+        return Chord.fromDecimal(data.chord["@root"], data.chord["@decimal"]);
+    })();
+
+    return new Item("ChordItem", {
+        parent: parent,
+        start: data["@start"],
+        end: data["@end"],
+        content: {
+            chordStatus: chordStatus,
+            filters: [],
+        },
+    });
+}
+
 function createStringTrack(
     parent: TrackGroup,
     data: StringTrackData
@@ -254,14 +318,7 @@ function createStringTrack(
     if (data === undefined) return track;
 
     const items = data.item
-        ? data.item.map((itemData) => {
-              return new Item("StringItem", {
-                  parent: track,
-                  start: itemData["@start"],
-                  end: itemData["@end"],
-                  content: itemData["#"] ? itemData["#"] : "",
-              });
-          })
+        ? data.item.map((itemData) => createStringItem(track, itemData))
         : [];
 
     addChildren(track, ...items);
@@ -280,36 +337,9 @@ function createChordTrack(
 
     if (data === undefined) return track;
 
-    const items = (() => {
-        if (data.item === undefined) return [];
-
-        return data.item.map((itemData) => {
-            const chordStatus = (() => {
-                if (itemData.chord === undefined) {
-                    return createEmptyPitchMap();
-                }
-
-                if (itemData.chord["@root"] === undefined) {
-                    return getPitchesFromDecimal(itemData.chord["@decimal"]);
-                }
-
-                return Chord.fromDecimal(
-                    itemData.chord["@root"],
-                    itemData.chord["@decimal"]
-                );
-            })();
-
-            return new Item("ChordItem", {
-                parent: track,
-                start: itemData["@start"],
-                end: itemData["@end"],
-                content: {
-                    chordStatus: chordStatus,
-                    filters: [],
-                },
-            });
-        });
-    })();
+    const items = data.item
+        ? data.item.map((itemData) => createChordItem(track, itemData))
+        : [];
 
     addChildren(track, ...items);
 
