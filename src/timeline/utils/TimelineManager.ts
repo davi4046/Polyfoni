@@ -51,18 +51,6 @@ export class TimelineManager {
 }
 
 function setupShortcuts(timelineContext: TimelineContext) {
-    registerShortcut("delete", () => {
-        timelineContext.history.startAction();
-
-        if (timelineContext.state.highlights.length > 0) {
-            cropHighlightedItems(timelineContext);
-            timelineContext.history.endAction("Cropped selection");
-        } else {
-            deleteSelectedItems(timelineContext);
-            timelineContext.history.endAction("Deleted selected items");
-        }
-    });
-
     registerShortcut("insert", () => {
         timelineContext.history.startAction();
 
@@ -77,6 +65,20 @@ function setupShortcuts(timelineContext: TimelineContext) {
 
     registerShortcut("enter", () => {
         selectHighlightedItems(timelineContext);
+    });
+
+    registerShortcut("ctrl+x", () => {
+        timelineContext.history.startAction();
+
+        if (timelineContext.state.highlights.length > 0) {
+            copyHighlightedItems(timelineContext);
+            cropHighlightedItems(timelineContext);
+        } else {
+            copySelectedItems(timelineContext);
+            deleteSelectedItems(timelineContext);
+        }
+
+        timelineContext.history.endAction("Cut selection");
     });
 
     registerShortcut("ctrl+c", () => {
