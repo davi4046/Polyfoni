@@ -78,26 +78,14 @@ function mustBeUneven(val: number, ctx: z.RefinementCtx) {
 }
 
 const ChordSchema = z.object({
-    "@root": z.enum([
-        "A",
-        "A#",
-        "B",
-        "C",
-        "C#",
-        "D",
-        "D#",
-        "E",
-        "F",
-        "F#",
-        "G",
-        "G#",
-    ]),
+    "@root": z
+        .enum(["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"])
+        .optional(),
     "@decimal": z
         .string()
         .transform(stringToNumber)
         .transform(mustBeInteger)
-        .transform(mustBeInRange)
-        .transform(mustBeUneven),
+        .transform(mustBeInRange),
 });
 
 const ChordItemSchema = z.object({
@@ -296,17 +284,16 @@ function createChordItem(
     data: ChordItemData
 ): Item<"ChordItem"> {
     const chordStatus = (() => {
-        if (data.chord === undefined) {
-            return createEmptyPitchMap();
-        }
+        if (data.chord === undefined) return createEmptyPitchMap();
 
-        data.chord["@root"];
-
-        if (data.chord["@root"] === undefined) {
+        if (data.chord["@root"]) {
+            return Chord.fromDecimal(
+                data.chord["@root"],
+                data.chord["@decimal"]
+            );
+        } else {
             return getPitchesFromDecimal(data.chord["@decimal"]);
         }
-
-        return Chord.fromDecimal(data.chord["@root"], data.chord["@decimal"]);
     })();
 
     return new Item("ChordItem", {
