@@ -377,30 +377,34 @@ export default class Generator {
             itemState
         );
 
-        const getAdjacentNotePairs = () => {
-            const indeces = ownedNotes
-                .slice(0, -1)
-                .map((note) => voiceNotes.indexOf(note));
+        const getPairsOfAdjacentNotes = () => {
+            const isFinishedNote = (note: NoteBuilder) => {
+                return (
+                    note.state.degree !== undefined &&
+                    note.state.pitch !== undefined &&
+                    note.state.isRest !== undefined &&
+                    !note.state.isRest
+                );
+            };
 
-            const pairs = indeces
-                .map((index) => {
-                    const prevNote = voiceNotes[index].build();
-                    const nextNote = voiceNotes[index + 1].build();
+            if (ownedNotes.length < 2) return [];
 
-                    if (
-                        !prevNote ||
-                        !nextNote ||
-                        prevNote.isRest ||
-                        nextNote.isRest
-                    ) {
-                        return;
-                    }
+            let prevNote = isFinishedNote(ownedNotes[0])
+                ? ownedNotes[0]
+                : undefined;
 
-                    return [prevNote, nextNote];
-                })
-                .filter((value): value is [Note, Note] => {
-                    return value !== undefined;
-                });
+            const pairs = [];
+
+            for (let i = 1; i < ownedNotes.length; i++) {
+                const nextNote = ownedNotes[i];
+
+                if (prevNote !== undefined && isFinishedNote(nextNote)) {
+                    // 1.
+                    pairs.push([prevNote, nextNote]);
+                    // 2.
+                    prevNote = nextNote;
+                }
+            }
 
             return pairs;
         };
@@ -640,7 +644,7 @@ export default class Generator {
                     "decorationHarmony"
                 );
 
-                const pairs = getAdjacentNotePairs();
+                const pairs = getPairsOfAdjacentNotes();
                 const promises = [];
 
                 for (let index = 0; index < pairs.length; index++) {
@@ -653,8 +657,12 @@ export default class Generator {
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        prev_degree: harmony.midiToDegree(prevNote.pitch),
-                        next_degree: harmony.midiToDegree(nextNote.pitch),
+                        prev_degree: harmony.midiToDegree(
+                            prevNote.state.pitch!
+                        ),
+                        next_degree: harmony.midiToDegree(
+                            nextNote.state.pitch!
+                        ),
                         x: index,
                     });
 
@@ -699,11 +707,11 @@ export default class Generator {
 
                 for (let i = 0; i < results.length; i++) {
                     const pitches = results[i];
-
-                    const decoration = decorations.get(ownedNotes[i]);
+                    const owningNote = pairs[i][0];
+                    const decoration = decorations.get(owningNote);
 
                     decorations.set(
-                        ownedNotes[i],
+                        owningNote,
                         decoration ? { ...decoration, pitches } : { pitches }
                     );
                 }
@@ -717,7 +725,7 @@ export default class Generator {
                     "decorationHarmony"
                 );
 
-                const pairs = getAdjacentNotePairs();
+                const pairs = getPairsOfAdjacentNotes();
                 const promises = [];
 
                 for (let index = 0; index < pairs.length; index++) {
@@ -730,8 +738,12 @@ export default class Generator {
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        prev_degree: harmony.midiToDegree(prevNote.pitch),
-                        next_degree: harmony.midiToDegree(nextNote.pitch),
+                        prev_degree: harmony.midiToDegree(
+                            prevNote.state.pitch!
+                        ),
+                        next_degree: harmony.midiToDegree(
+                            nextNote.state.pitch!
+                        ),
                         x: index,
                     });
 
@@ -762,11 +774,11 @@ export default class Generator {
 
                 for (let i = 0; i < results.length; i++) {
                     const fraction = results[i];
-
-                    const decoration = decorations.get(ownedNotes[i]);
+                    const owningNote = pairs[i][0];
+                    const decoration = decorations.get(owningNote);
 
                     decorations.set(
-                        ownedNotes[i],
+                        owningNote,
                         decoration ? { ...decoration, fraction } : { fraction }
                     );
                 }
@@ -780,7 +792,7 @@ export default class Generator {
                     "decorationHarmony"
                 );
 
-                const pairs = getAdjacentNotePairs();
+                const pairs = getPairsOfAdjacentNotes();
                 const promises = [];
 
                 for (let index = 0; index < pairs.length; index++) {
@@ -793,8 +805,12 @@ export default class Generator {
 
                     const args = JSON.stringify({
                         ...this._timeline.state.aliases,
-                        prev_degree: harmony.midiToDegree(prevNote.pitch),
-                        next_degree: harmony.midiToDegree(nextNote.pitch),
+                        prev_degree: harmony.midiToDegree(
+                            prevNote.state.pitch!
+                        ),
+                        next_degree: harmony.midiToDegree(
+                            nextNote.state.pitch!
+                        ),
                         x: index,
                     });
 
@@ -825,11 +841,11 @@ export default class Generator {
 
                 for (let i = 0; i < results.length; i++) {
                     const skip = results[i];
-
-                    const decoration = decorations.get(ownedNotes[i]);
+                    const owningNote = pairs[i][0];
+                    const decoration = decorations.get(owningNote);
 
                     decorations.set(
-                        ownedNotes[i],
+                        owningNote,
                         decoration ? { ...decoration, skip } : { skip }
                     );
                 }
@@ -845,7 +861,7 @@ export default class Generator {
                     "decorationPitches"
                 );
 
-                const pairs = getAdjacentNotePairs();
+                const pairs = getPairsOfAdjacentNotes();
 
                 const owningItems = new Set<Item<any>>();
 
@@ -854,7 +870,10 @@ export default class Generator {
 
                     const pitchesItem = pitchesTrack.state.children.find(
                         (item) =>
-                            isPointWithinInterval(prevNote.start, item.state)
+                            isPointWithinInterval(
+                                prevNote.state.start,
+                                item.state
+                            )
                     );
 
                     if (pitchesItem) owningItems.add(pitchesItem);
@@ -997,20 +1016,7 @@ type NoteBuilderState = {
     isRest?: boolean;
 };
 
-class NoteBuilder extends Stateful<NoteBuilderState> {
-    build(): Note | undefined {
-        if (
-            this.state.degree === undefined ||
-            this.state.pitch === undefined ||
-            this.state.isRest === undefined
-        ) {
-            return;
-        }
-        return this.state as Required<NoteBuilderState>;
-    }
-}
-
-type Note = Required<NoteBuilderState>;
+class NoteBuilder extends Stateful<NoteBuilderState> {}
 
 class FrameworkMap extends Stateful<{
     [key: string]: readonly NoteBuilder[];
@@ -1066,11 +1072,11 @@ function isIntegerArray(value: any): boolean {
 }
 
 function getDecorationHarmony(
-    note: Note,
+    note: NoteBuilder,
     harmonyTrack: Track<"ChordItem">
 ): Chord {
     const harmonyItem = getChildren(harmonyTrack).find((item) =>
-        isPointWithinInterval(note.start, item.state)
+        isPointWithinInterval(note.state.start, item.state)
     );
 
     if (
