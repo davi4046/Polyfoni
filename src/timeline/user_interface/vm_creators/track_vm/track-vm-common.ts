@@ -1,5 +1,4 @@
 import type TimelineContext from "../../context/TimelineContext";
-import createDecorationPass from "../../../utils/createDecorationPass";
 import {
     getChildren,
     getGrandparent,

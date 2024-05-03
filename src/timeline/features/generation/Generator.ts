@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { isBoolean } from "lodash";
+import { isBoolean, merge } from "lodash";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
@@ -922,25 +922,34 @@ export default class Generator {
                 } as Decoration;
             })();
 
-            const notes = (() => {
-                const totalDuration =
-                    noteBuilder.state.end - noteBuilder.state.start;
-
-                if (
-                    decoration === undefined ||
-                    decoration.pitches === undefined ||
-                    decoration.fraction === undefined ||
-                    decoration.skip === undefined ||
-                    decoration.skip ||
-                    decoration.pitches.length === 0
-                ) {
-                    return [
-                        {
+            function createItemFromNoteBuilder() {
+                return [
+                    new Item("NoteItem", {
+                        parent: outputTrack,
+                        start: noteBuilder.state.start,
+                        end: noteBuilder.state.end,
+                        content: {
                             pitch: noteBuilder.state.pitch,
-                            duration: totalDuration,
+                            type: "Framework",
                         },
-                    ];
-                } else {
+                    }),
+                ];
+            }
+
+            if (
+                decoration === undefined ||
+                decoration.pitches === undefined ||
+                decoration.fraction === undefined ||
+                decoration.skip === undefined ||
+                decoration.skip ||
+                decoration.pitches.length === 0
+            ) {
+                return createItemFromNoteBuilder();
+            } else {
+                const [frameworkDur, decorationDur] = (() => {
+                    const totalDuration =
+                        noteBuilder.state.end - noteBuilder.state.start;
+
                     const splitPercentage =
                         1 / (Math.abs(decoration.fraction) + 2);
 
@@ -949,49 +958,51 @@ export default class Generator {
 
                     const isFractionPositive = decoration.fraction >= 0;
 
-                    const noteDuration = isFractionPositive ? smaller : greater;
-                    const decoDuration =
+                    const frameworkDur = isFractionPositive ? smaller : greater;
+                    const decorationDur =
                         (isFractionPositive ? greater : smaller) /
                         decoration.pitches.length;
 
-                    return Math.min(noteDuration, decoDuration) > MIN_DURATION
-                        ? [
-                              {
-                                  pitch: noteBuilder.state.pitch,
-                                  duration: noteDuration,
-                              },
-                              ...decoration.pitches.map((pitch) => {
-                                  return {
-                                      pitch: pitch,
-                                      duration: decoDuration,
-                                  };
-                              }),
-                          ]
-                        : [
-                              {
-                                  pitch: noteBuilder.state.pitch,
-                                  duration: totalDuration,
-                              },
-                          ];
+                    return [frameworkDur, decorationDur];
+                })();
+
+                if (Math.min(frameworkDur, decorationDur) < MIN_DURATION) {
+                    return createItemFromNoteBuilder();
                 }
-            })();
 
-            let nextStart = noteBuilder.state.start;
+                const decorationStart = noteBuilder.state.start + frameworkDur;
 
-            return notes.map((note) => {
-                const end = nextStart + note.duration;
+                const decorationNotes = decoration.pitches.map(
+                    (pitch, index) => {
+                        const start = decorationStart + decorationDur * index;
 
-                const noteItem = new Item("NoteItem", {
-                    parent: outputTrack,
-                    start: nextStart,
-                    end: end,
-                    content: note.pitch,
-                });
+                        const end = start + decorationDur;
 
-                nextStart = end;
+                        return new Item("NoteItem", {
+                            parent: outputTrack,
+                            start: start,
+                            end: end,
+                            content: {
+                                pitch: pitch,
+                                type: "Decoration",
+                            },
+                        });
+                    }
+                );
 
-                return noteItem;
-            });
+                return [
+                    new Item("NoteItem", {
+                        parent: outputTrack,
+                        start: noteBuilder.state.start,
+                        end: noteBuilder.state.start + frameworkDur,
+                        content: {
+                            pitch: noteBuilder.state.pitch,
+                            type: "Framework",
+                        },
+                    }),
+                    ...decorationNotes,
+                ];
+            }
         });
 
         outputTrack.state = {

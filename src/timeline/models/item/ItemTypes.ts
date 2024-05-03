@@ -16,7 +16,10 @@ export type ItemTypes = {
         chordStatus: Chord | PitchMap;
         filters: Filter[];
     };
-    NoteItem: number;
+    NoteItem: {
+        pitch: number;
+        type: "Framework" | "Decoration";
+    };
 };
 
 export const itemInitialContentFunctions: {
@@ -26,7 +29,12 @@ export const itemInitialContentFunctions: {
     ChordItem: () => {
         return { chordStatus: createEmptyPitchMap(), filters: [] };
     },
-    NoteItem: () => Math.round(Math.random() * 12 + 36), // TEST
+    NoteItem: () => {
+        return {
+            pitch: Math.round(Math.random() * 12 + 36),
+            type: "Framework",
+        };
+    }, // TEST
 };
 
 export const itemInitFunctions: Partial<{

@@ -28,9 +28,9 @@ export default function createNoteVM(
         return {
             tooltip: {
                 content: `${
-                    getPitchName(model.state.content) +
-                    getPitchOctave(model.state.content)
-                } (${model.state.content})`,
+                    getPitchName(model.state.content.pitch) +
+                    getPitchOctave(model.state.content.pitch)
+                } (${model.state.content.pitch}) - ${model.state.content.type}`,
                 theme: "default",
             },
         };

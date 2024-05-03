@@ -195,7 +195,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             const startTimeout = setTimeout(() => {
                 invoke("midi_note_on", {
                     channel: channel,
-                    key: note.state.content,
+                    key: note.state.content.pitch,
                     vel: 100,
                 });
                 this.state = {
@@ -206,7 +206,7 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             const endTimeout = setTimeout(() => {
                 invoke("midi_note_off", {
                     channel: channel,
-                    key: note.state.content,
+                    key: note.state.content.pitch,
                 });
                 this.state = {
                     playingNotes: this.state.playingNotes.filter(

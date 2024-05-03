@@ -22,7 +22,7 @@ export default function createNoteTrackVM(
 
     function updateItems() {
         const pitches = getChildren(model).map(
-            (noteItem) => noteItem.state.content
+            (noteItem) => noteItem.state.content.pitch
         );
         const uniquePitches = Array.from(new Set(pitches));
         uniquePitches.sort((a, b) => a - b);
@@ -32,7 +32,7 @@ export default function createNoteTrackVM(
         items = model.state.children.map((item) => {
             const noteVM = createNoteVM(item, context);
 
-            const pitchIndex = uniquePitches.indexOf(item.state.content);
+            const pitchIndex = uniquePitches.indexOf(item.state.content.pitch);
             const top = (uniquePitches.length - pitchIndex - 1) * height;
 
             const newStyles = Object.assign({}, noteVM.state.innerDivStyles);
