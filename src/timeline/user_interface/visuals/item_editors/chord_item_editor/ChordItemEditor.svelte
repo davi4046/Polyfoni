@@ -77,10 +77,12 @@
         return isAllowedChord(Chord.fromDecimal(builder.root, decimal));
     }
 
-    function updateDecimal(decimal: number) {
+    function updateDecimal(decimal: number): number {
+        if (!builder.root) return 0;
+
         const startValue = builder.decimal ? builder.decimal : 0;
 
-        if (decimal === startValue) return;
+        if (decimal === startValue) return startValue;
 
         const isIncrement = decimal > startValue;
 
@@ -93,11 +95,12 @@
             decimal += isIncrement ? 2 : -2;
             while (decimal >= 4096) decimal -= 4096;
             while (decimal < 0) decimal += 4096;
-            if (decimal === startValue) return; // No new decimal was found
+            if (decimal === startValue) return startValue; // No new decimal was found
         }
 
         builder.decimal = decimal;
         builder = builder; // Reactivity hack
+        return decimal;
     }
 
     let playbackTimeout: NodeJS.Timeout;
@@ -230,8 +233,13 @@
                 title="Decimal"
                 value={builder.decimal ? builder.decimal : 0}
                 on:change={(e) => {
-                    // @ts-ignore
-                    updateDecimal(Number(e.target.value));
+                    if (!e.currentTarget) return;
+
+                    const newDecimal = updateDecimal(
+                        Number(e.currentTarget.value)
+                    );
+
+                    e.currentTarget.value = String(newDecimal);
                 }}
             />
             <div class="text-sm font-medium">Pitches</div>
