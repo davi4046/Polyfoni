@@ -1,10 +1,17 @@
+import { emit } from "@tauri-apps/api/event";
+
 import type TimelineContext from "../TimelineContext";
 import { ChordBuilder } from "../../../models/item/Chord";
 import Item from "../../../models/item/Item";
 import type { ItemTypes } from "../../../models/item/ItemTypes";
 
 export default function pasteClipboard(context: TimelineContext) {
-    if (context.state.clipboard.length === 1) {
+    if (
+        context.state.clipboard.length === 1 &&
+        context.state.selectedItems.length > 0
+    ) {
+        context.history.startAction();
+
         const clipboardItem = context.state.clipboard[0];
 
         for (const item of context.state.selectedItems) {
@@ -29,6 +36,8 @@ export default function pasteClipboard(context: TimelineContext) {
                 ),
             };
         }
+
+        context.history.endAction("Pasted item content");
     } else {
         const newGhostPairs = context.state.clipboard.map((item) => {
             return [
@@ -44,6 +53,10 @@ export default function pasteClipboard(context: TimelineContext) {
         context.state = {
             ghostPairs: newGhostPairs,
         };
+
+        emit("display-message", {
+            message: "Pasted clipboard items",
+        });
     }
 }
 

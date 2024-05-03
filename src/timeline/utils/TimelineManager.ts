@@ -94,9 +94,6 @@ function setupShortcuts(timelineContext: TimelineContext) {
 
     registerShortcut("ctrl+v", () => {
         pasteClipboard(timelineContext);
-        emit("display-message", {
-            message: "Pasted clipboard",
-        });
     });
 
     registerShortcut("ctrl+z", () => {
