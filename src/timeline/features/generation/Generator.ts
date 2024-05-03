@@ -398,9 +398,9 @@ export default class Generator {
             for (let i = 1; i < ownedNotes.length; i++) {
                 const nextNote = ownedNotes[i];
 
-                if (prevNote !== undefined && isFinishedNote(nextNote)) {
+                if (isFinishedNote(nextNote)) {
                     // 1.
-                    pairs.push([prevNote, nextNote]);
+                    if (prevNote) pairs.push([prevNote, nextNote]);
                     // 2.
                     prevNote = nextNote;
                 }
