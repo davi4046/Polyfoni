@@ -38,10 +38,11 @@ impl Worker for Evaluator {
         self.stdin.write_all(input.as_bytes()).unwrap();
         self.stdin.write_all(b"\n").unwrap();
         self.stdin.flush().unwrap();
-        let mut result = String::new();
-        self.stdout.read_line(&mut result).unwrap();
-        result.pop(); // exclude newline
-        return result;
+        let mut result = Vec::new();
+        self.stdout.read_until(b'\n',&mut result).unwrap();
+        let mut parsed_result = String::from_utf8_lossy(&result).to_string();
+        parsed_result.pop(); // exclude newline
+        return parsed_result;
     }
 }
 
