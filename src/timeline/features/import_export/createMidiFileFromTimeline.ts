@@ -2,7 +2,10 @@ import * as midi from "@perry-rylance/midi";
 
 import { getTracksOfType } from "../generation/track-config";
 import { deriveTempoChangesFromItems } from "../../utils/tempo-utils";
-import { getChildren } from "../../../architecture/state-hierarchy-utils";
+import {
+    getChildren,
+    getGrandparent,
+} from "../../../architecture/state-hierarchy-utils";
 import type Timeline from "../../models/timeline/Timeline";
 
 export default async function createMidiFileFromTimeline(
@@ -48,6 +51,11 @@ export default async function createMidiFileFromTimeline(
 
     outputTracks.forEach((track) => {
         const midiTrack = new midi.Track();
+
+        const programChangeEvent = new midi.ProgramChangeEvent();
+        programChangeEvent.program = getGrandparent(track).state.instrument;
+
+        midiTrack.events.push(programChangeEvent);
 
         const notes = getChildren(track).slice();
         notes.sort((a, b) => a.state.start - b.state.start);
