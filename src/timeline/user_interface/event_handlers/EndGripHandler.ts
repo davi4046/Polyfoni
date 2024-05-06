@@ -19,7 +19,7 @@ export default class EndGripHandler implements GlobalEventHandler {
 
     private _isMouseDown = false;
     private _grippedItems: Item<any>[] = [];
-    private _grippedPoint: number = 0;
+    private _grippedPoint: number | undefined = undefined;
 
     getIsOverwritable(): boolean {
         return !this._isMouseDown;
@@ -28,6 +28,7 @@ export default class EndGripHandler implements GlobalEventHandler {
     handleMouseDown(event: MouseEvent) {
         this._isMouseDown = true;
 
+        this._grippedPoint = this.item.state.end;
         this._grippedItems = [this.item];
         this._updateGrips();
     }
@@ -58,30 +59,34 @@ export default class EndGripHandler implements GlobalEventHandler {
     handleMouseUp(event: MouseEvent) {
         this._isMouseDown = false;
 
-        this.context.history.startAction();
+        // Should always be true at this place
+        if (this._grippedPoint !== undefined) {
+            this.context.history.startAction();
 
-        this._grippedItems.forEach((item) => {
-            const track = getParent(item);
+            for (const item of this._grippedItems) {
+                const track = getParent(item);
 
-            const siblings = getChildren(track).filter(
-                (child) => child !== item
-            );
+                const siblings = getChildren(track).filter(
+                    (child) => child !== item
+                );
 
-            // 1.
-            track.state = {
-                children: cropItemsByInterval(siblings, item.state).concat(
-                    item
-                ),
-            };
+                // 1.
+                track.state = {
+                    children: cropItemsByInterval(siblings, {
+                        start: item.state.start,
+                        end: this._grippedPoint,
+                    }).concat(item),
+                };
 
-            // 2.
-            item.state = { end: this._grippedPoint };
+                // 2.
+                item.state = { end: this._grippedPoint };
 
-            // (sequence is important for correct generation)
-        });
+                // (sequence is important for correct generation)
+            }
+            this.context.history.endAction("Adjusted item end");
+        }
 
-        this.context.history.endAction("Adjusted item end");
-
+        this._grippedPoint = undefined;
         this._grippedItems = [];
         this._updateGrips();
     }
@@ -108,10 +113,14 @@ export default class EndGripHandler implements GlobalEventHandler {
     }
 
     private _updateGrips() {
-        this.context.state = {
-            visualEndOverrideMap: new Map(
-                this._grippedItems.map((item) => [item, this._grippedPoint])
-            ),
-        };
+        let entries: [Item<any>, number][] = [];
+
+        if (this._grippedPoint !== undefined) {
+            entries = this._grippedItems.map((item) => {
+                return [item, this._grippedPoint!];
+            });
+        }
+
+        this.context.state = { visualEndOverrideMap: new Map(entries) };
     }
 }
