@@ -63,10 +63,23 @@ export default class StartGripHandler implements GlobalEventHandler {
         this.context.history.startAction();
 
         this._grippedItems.forEach((item) => {
-            item.state = {
-                start: this._grippedPoint,
+            const track = getParent(item);
+
+            const siblings = getChildren(track).filter(
+                (child) => child !== item
+            );
+
+            // 1.
+            track.state = {
+                children: cropItemsByInterval(siblings, {
+                    start: this._grippedPoint,
+                    end: item.state.end,
+                }).concat(item),
             };
-            cropItemInterval(item);
+            // 2.
+            item.state = { start: this._grippedPoint };
+
+            // (sequence is important for correct generation)
         });
 
         this.context.history.endAction("Adjusted item start");
@@ -103,12 +116,4 @@ export default class StartGripHandler implements GlobalEventHandler {
             ),
         };
     }
-}
-
-function cropItemInterval(item: Item<any>) {
-    const track = getParent(item);
-    const siblings = getChildren(track).filter((child) => child !== item);
-    track.state = {
-        children: cropItemsByInterval(siblings, item.state).concat(item),
-    };
 }

@@ -61,10 +61,23 @@ export default class EndGripHandler implements GlobalEventHandler {
         this.context.history.startAction();
 
         this._grippedItems.forEach((item) => {
-            item.state = {
-                end: this._grippedPoint,
+            const track = getParent(item);
+
+            const siblings = getChildren(track).filter(
+                (child) => child !== item
+            );
+
+            // 1.
+            track.state = {
+                children: cropItemsByInterval(siblings, item.state).concat(
+                    item
+                ),
             };
-            cropItemInterval(item);
+
+            // 2.
+            item.state = { end: this._grippedPoint };
+
+            // (sequence is important for correct generation)
         });
 
         this.context.history.endAction("Adjusted item end");
@@ -101,12 +114,4 @@ export default class EndGripHandler implements GlobalEventHandler {
             ),
         };
     }
-}
-
-function cropItemInterval(item: Item<any>) {
-    const track = getParent(item);
-    const siblings = getChildren(track).filter((child) => child !== item);
-    track.state = {
-        children: cropItemsByInterval(siblings, item.state).concat(item),
-    };
 }
