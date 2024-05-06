@@ -292,7 +292,7 @@
     </div>
     <!-- CENTER TRACKS -->
     <div
-        class="h-scroll col-start-2 row-start-3 h-full overflow-hidden"
+        class="h-scroll relative col-start-2 row-start-3 h-full overflow-hidden"
         id={vm.state.idPrefix + "-center-tracks"}
         role="none"
         bind:this={centerDiv}
@@ -314,6 +314,74 @@
             vScroll = 0;
         }}
     >
+        <div
+            class="pointer-events-none absolute h-full bg-transparent"
+            style="width: {vm.state.length * 64}px;"
+            id="hejmeddig"
+        >
+            <!-- RESIZE BUTTONS -->
+            <div
+                class="pointer-events-auto absolute right-0 top-0 z-40 m-2 flex gap-2 font-mono text-sm font-bold"
+            >
+                <button
+                    class="btn-default h-9 w-9 p-1"
+                    title="Remove 64 Beats"
+                    hidden={vm.state.length - 64 < 64}
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length - 64)}
+                >
+                    -64
+                </button>
+                <button
+                    class="btn-default h-9 w-9 p-1"
+                    title="Remove 16 Beats"
+                    hidden={vm.state.length - 16 < 64}
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length - 16)}
+                >
+                    -16
+                </button>
+                <button
+                    class="btn-default h-9 w-9 p-1"
+                    title="Remove 4 Beats"
+                    hidden={vm.state.length - 4 < 64}
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length - 4)}
+                >
+                    -4
+                </button>
+                <button
+                    class="btn-default h-9 w-9 p-1 font-mono"
+                    title="Add 4 Beats"
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length + 4)}
+                >
+                    +4
+                </button>
+                <button
+                    title="Add 16 Beats"
+                    class="btn-default h-9 w-9 p-1 font-mono"
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length + 16)}
+                >
+                    +16
+                </button>
+                <button
+                    title="Add 64 Beats"
+                    class="btn-default h-9 w-9 p-1 font-mono"
+                    on:mousemove={vm.state.handleMouseMove}
+                    on:click={(_) =>
+                        vm.state.setTimelineLength(vm.state.length + 64)}
+                >
+                    +64
+                </button>
+            </div>
+        </div>
         <div
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
             style="width: {vm.state.length * 64}px;"

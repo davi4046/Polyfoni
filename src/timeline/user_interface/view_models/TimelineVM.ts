@@ -30,6 +30,8 @@ interface TimelineVMState {
     createItemEditor?: (target: Element) => SvelteComponent;
 
     onAddVoiceButtonClick: (event: MouseEvent) => void;
+
+    setTimelineLength: (newLength: number) => void;
 }
 
 export default class TimelineVM extends Stateful<TimelineVMState> {}

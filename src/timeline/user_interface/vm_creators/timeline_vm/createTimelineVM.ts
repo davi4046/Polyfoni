@@ -1,3 +1,5 @@
+import { emit } from "@tauri-apps/api/event";
+
 import { itemEditors } from "../../item-type-config";
 import createVoiceGroupVM from "../voice_group_vm/createVoiceGroupVM";
 import createVoiceVM from "../voice_vm/createVoiceVM";
@@ -142,6 +144,12 @@ export default function createTimelineVM(
             });
 
             addChildren(midVoiceGroup, voice);
+        },
+
+        setTimelineLength(newLength) {
+            context.history.startAction();
+            model.state = { length: newLength };
+            context.history.endAction("Updated timeline length");
         },
     });
 
