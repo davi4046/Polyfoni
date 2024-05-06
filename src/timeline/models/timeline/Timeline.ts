@@ -64,7 +64,7 @@ export default class Timeline extends Stateful<TimelineState> {
             parent: trackGroup,
             children: [],
         });
-        addChildren(track.state.parent, track);
+        // addChildren(track.state.parent, track);
         this.scaleTrack = track;
 
         voice = new Voice({
