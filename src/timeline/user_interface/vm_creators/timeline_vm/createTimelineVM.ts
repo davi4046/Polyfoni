@@ -6,12 +6,15 @@ import TimelineHandler from "../../event_handlers/TimelineHandler";
 import TimelineVM from "../../view_models/TimelineVM";
 import { globalEventListener } from "../../../../architecture/GlobalEventListener";
 import {
+    addChildren,
     getChildren,
     getParent,
 } from "../../../../architecture/state-hierarchy-utils";
 import getHarmonyOfNotes from "../../../features/generation/getHarmonyOfNotes";
+import { createVoice } from "../../../features/import_export/createTimelineFromXMLFile";
 import { type ItemTypes } from "../../../models/item/ItemTypes";
 import Timeline from "../../../models/timeline/Timeline";
+import Voice from "../../../models/voice/Voice";
 import isOverlapping from "../../../../utils/interval/is_overlapping/isOverlapping";
 
 export default function createTimelineVM(
@@ -100,6 +103,8 @@ export default function createTimelineVM(
     }
 
     const vm = new TimelineVM({
+        idPrefix: model.id,
+
         ...compileSections(),
         ...compilePlaybackMotion(),
         ...compileIsPlaying(),
@@ -119,7 +124,18 @@ export default function createTimelineVM(
         onPauseButtonClick: (_) => context.player.pausePlayback(),
         onStopButtonClick: (_) => context.player.resetPlayback(),
 
-        idPrefix: model.id,
+        onAddVoiceButtonClick: (_) => {
+            const midVoiceGroup = getChildren(model)[1];
+
+            const voiceCount = getChildren(midVoiceGroup).length;
+
+            const voice = createVoice(midVoiceGroup, {
+                "@label": `Voice ${voiceCount}`,
+                "@instrument": 0,
+            });
+
+            addChildren(midVoiceGroup, voice);
+        },
     });
 
     model.subscribe((oldState, newState) => {

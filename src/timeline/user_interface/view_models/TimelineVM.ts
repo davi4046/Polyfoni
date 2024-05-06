@@ -7,6 +7,8 @@ import type { Chord } from "../../models/item/Chord";
 import type VoiceGroupVM from "./VoiceGroupVM";
 
 interface TimelineVMState {
+    idPrefix: string;
+
     top: VoiceGroupVM;
     center: VoiceGroupVM;
     bottom: VoiceGroupVM;
@@ -25,7 +27,7 @@ interface TimelineVMState {
 
     createItemEditor?: (target: Element) => SvelteComponent;
 
-    idPrefix: string;
+    onAddVoiceButtonClick: (event: MouseEvent) => void;
 }
 
 export default class TimelineVM extends Stateful<TimelineVMState> {}

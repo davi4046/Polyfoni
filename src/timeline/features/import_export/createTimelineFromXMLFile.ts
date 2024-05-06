@@ -17,6 +17,7 @@ import Timeline from "../../models/timeline/Timeline";
 import Track from "../../models/track/Track";
 import TrackGroup from "../../models/track_group/TrackGroup";
 import Voice from "../../models/voice/Voice";
+import type VoiceGroup from "../../models/voice_group/VoiceGroup";
 
 function stringToNumber(val: string, ctx: z.RefinementCtx) {
     const parsed = Number(val);
@@ -183,6 +184,8 @@ type ChordItemData = z.infer<typeof ChordItemSchema>;
 type StringTrackData = z.infer<typeof StringTrackSchema>;
 type ChordTrackData = z.infer<typeof ChordTrackSchema>;
 
+type VoiceData = z.infer<typeof VoiceSchema>;
+
 export default function createTimelineFromXMLFile(xml: string): Timeline {
     const timelineData = TimelineSchema.parse(fromXML(xml)).timeline;
 
@@ -209,62 +212,65 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
     }
 
     if (timelineData.voice) {
-        const voices = timelineData.voice.map((voiceData) => {
-            const voice = new Voice({
-                parent: getChildren(timeline)[1],
-                label: voiceData["@label"],
-                instrument: voiceData["@instrument"],
-                children: [],
-            });
+        const midVoiceGroup = getChildren(timeline)[1];
 
-            const outputGroup = new TrackGroup({ parent: voice, children: [] });
-            const outputTrack = new Track("NoteItem", {
-                parent: outputGroup,
-                children: [],
-            });
+        const voices = timelineData.voice.map((voiceData) =>
+            createVoice(midVoiceGroup, voiceData)
+        );
 
-            addChildren(getParent(outputGroup), outputGroup);
-            addChildren(getParent(outputTrack), outputTrack);
-
-            const frameworkGroup = new TrackGroup({
-                parent: voice,
-                children: [],
-            });
-            const decorationGroup = new TrackGroup({
-                parent: voice,
-                children: [],
-            });
-
-            const frameworkTracks = [
-                createStringTrack(frameworkGroup, voiceData.frameworkPitch),
-                createStringTrack(frameworkGroup, voiceData.frameworkDuration),
-                createStringTrack(frameworkGroup, voiceData.frameworkRest),
-                createChordTrack(frameworkGroup, voiceData.frameworkHarmony),
-            ];
-
-            const decorationTracks = [
-                createStringTrack(decorationGroup, voiceData.decorationPitches),
-                createStringTrack(
-                    decorationGroup,
-                    voiceData.decorationFraction
-                ),
-                createStringTrack(decorationGroup, voiceData.decorationSkip),
-                createChordTrack(decorationGroup, voiceData.decorationHarmony),
-            ];
-
-            addChildren(getParent(frameworkGroup), frameworkGroup);
-            addChildren(frameworkGroup, ...frameworkTracks);
-
-            addChildren(getParent(decorationGroup), decorationGroup);
-            addChildren(decorationGroup, ...decorationTracks);
-
-            return voice;
-        });
-
-        addChildren(getChildren(timeline)[1], ...voices);
+        addChildren(midVoiceGroup, ...voices);
     }
 
     return timeline;
+}
+
+export function createVoice(parent: VoiceGroup, data: VoiceData): Voice {
+    const voice = new Voice({
+        parent: parent,
+        label: data["@label"],
+        instrument: data["@instrument"],
+        children: [],
+    });
+
+    const outputGroup = new TrackGroup({ parent: voice, children: [] });
+    const outputTrack = new Track("NoteItem", {
+        parent: outputGroup,
+        children: [],
+    });
+
+    addChildren(getParent(outputGroup), outputGroup);
+    addChildren(getParent(outputTrack), outputTrack);
+
+    const frameworkGroup = new TrackGroup({
+        parent: voice,
+        children: [],
+    });
+    const decorationGroup = new TrackGroup({
+        parent: voice,
+        children: [],
+    });
+
+    const frameworkTracks = [
+        createStringTrack(frameworkGroup, data.frameworkPitch),
+        createStringTrack(frameworkGroup, data.frameworkDuration),
+        createStringTrack(frameworkGroup, data.frameworkRest),
+        createChordTrack(frameworkGroup, data.frameworkHarmony),
+    ];
+
+    const decorationTracks = [
+        createStringTrack(decorationGroup, data.decorationPitches),
+        createStringTrack(decorationGroup, data.decorationFraction),
+        createStringTrack(decorationGroup, data.decorationSkip),
+        createChordTrack(decorationGroup, data.decorationHarmony),
+    ];
+
+    addChildren(getParent(frameworkGroup), frameworkGroup);
+    addChildren(frameworkGroup, ...frameworkTracks);
+
+    addChildren(getParent(decorationGroup), decorationGroup);
+    addChildren(decorationGroup, ...decorationTracks);
+
+    return voice;
 }
 
 function createStringItem(

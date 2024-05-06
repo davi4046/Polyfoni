@@ -1,6 +1,4 @@
 <script lang="ts">
-    import Voice from "../voice/Voice.svelte";
-    import VoiceHeader from "../voice_header/VoiceHeader.svelte";
     import TimelineVM from "../../../view_models/TimelineVM";
     import { onMount } from "svelte";
     import MarkerBig from "./assets/MarkerBig.svelte";
@@ -14,6 +12,7 @@
     import DynamicComponent from "../../utils/DynamicComponent.svelte";
     import VoiceGroupHeader from "../voicegroup_header/VoiceGroupHeader.svelte";
     import VoiceGroup from "../voicegroup/VoiceGroup.svelte";
+    import AddIcon from "./assets/icons/AddIcon.svelte";
 
     export let vm: TimelineVM;
 
@@ -244,6 +243,17 @@
         role="none"
     >
         <VoiceGroupHeader vm={vm.state.center}></VoiceGroupHeader>
+        <div class="z-20 mt-4 h-12">
+            <button
+                class="flex h-full w-full items-center justify-center bg-gray-300 text-gray-500 hover:brightness-105 active:brightness-100"
+                title="Add Voice"
+                on:click={vm.state.onAddVoiceButtonClick}
+            >
+                <div class="h-full">
+                    <AddIcon />
+                </div>
+            </button>
+        </div>
     </div>
     <!-- BOTTOM HEADERS -->
     <div
@@ -303,6 +313,7 @@
             style="width: 4096px;"
         >
             <VoiceGroup vm={vm.state.center}></VoiceGroup>
+            <div class="z-20 h-12 flex-shrink-0" />
         </div>
     </div>
     <!-- BOTTOM TRACKS -->
