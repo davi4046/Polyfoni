@@ -67,8 +67,8 @@ export default async function createMidiFileFromTimeline(
             noteOnEvent.delta = Math.round(startDeltaBeat * 480);
             noteOffEvent.delta = Math.round(endDeltaBeat * 480);
 
-            noteOnEvent.key = currNote.state.content;
-            noteOffEvent.key = currNote.state.content;
+            noteOnEvent.key = currNote.state.content.pitch;
+            noteOffEvent.key = currNote.state.content.pitch;
 
             midiTrack.events.push(noteOnEvent, noteOffEvent);
         }
