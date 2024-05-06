@@ -165,6 +165,10 @@ const VoiceSchema = z.object({
 
 const TimelineSchema = z.object({
     timeline: z.object({
+        "@length": z
+            .string()
+            .transform(stringToNumber)
+            .transform(mustBeInteger),
         aliases: z
             .record(z.string(), z.string())
             .or(z.string().transform(() => undefined)),
@@ -193,6 +197,7 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
 
     if (timelineData.aliases) {
         timeline.state = {
+            length: timelineData["@length"],
             aliases: timelineData.aliases,
         };
     }
