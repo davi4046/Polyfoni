@@ -59,11 +59,15 @@
 
         if (!path) return;
 
-        const xml = createXMLFileFromTimeline(timelineManager.timeline);
-        writeTextFile(path, xml);
-        projectPath = path;
+        try {
+            const xml = createXMLFileFromTimeline(timelineManager.timeline);
+            writeTextFile(path, xml);
+            projectPath = path;
 
-        emit("display-message", { message: `Saved project to "${path}"` });
+            emit("display-message", { message: `Saved project to "${path}"` });
+        } catch {
+            emit("display-message", { message: `Failed to save project"` });
+        }
     }
 
     let messages: string[] = [];
@@ -98,11 +102,17 @@
                 saveAs();
                 return;
             }
-            const xml = createXMLFileFromTimeline(timelineManager.timeline);
-            writeTextFile(projectPath, xml);
-            emit("display-message", {
-                message: `Your changes have been saved`,
-            });
+
+            try {
+                const xml = createXMLFileFromTimeline(timelineManager.timeline);
+                writeTextFile(projectPath, xml);
+
+                emit("display-message", {
+                    message: "Your changes have been saved",
+                });
+            } catch {
+                emit("display-message", { message: "Failed to save changes" });
+            }
         }),
 
         listen("export_to_midi", async (_) => {
@@ -115,10 +125,16 @@
 
             if (!path) return;
 
-            const buffer = await createMidiFileFromTimeline(
-                timelineManager.timeline
-            );
-            writeBinaryFile(path, buffer);
+            try {
+                const buffer = await createMidiFileFromTimeline(
+                    timelineManager.timeline
+                );
+                writeBinaryFile(path, buffer);
+            } catch {
+                emit("display-message", {
+                    message: "Failed to export file to MIDI",
+                });
+            }
         }),
 
         listen("display-message", (event) => {
