@@ -102,9 +102,16 @@ export default function createTimelineVM(
         return { createItemEditor: createItemEditor };
     }
 
+    function compileLength() {
+        return {
+            length: model.state.length,
+        };
+    }
+
     const vm = new TimelineVM({
         idPrefix: model.id,
 
+        ...compileLength(),
         ...compileSections(),
         ...compilePlaybackMotion(),
         ...compileIsPlaying(),
@@ -143,6 +150,7 @@ export default function createTimelineVM(
             ...(oldState.children !== newState.children
                 ? compileSections()
                 : {}),
+            ...(oldState.length !== newState.length ? compileLength() : {}),
         };
     });
 

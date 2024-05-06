@@ -146,7 +146,10 @@
     <div
         class="h-scroll pointer-events-none col-start-2 row-span-3 row-start-2 h-full overflow-hidden"
     >
-        <div class="relative z-40 h-full overflow-clip" style="width: 4096px;">
+        <div
+            class="relative z-40 h-full overflow-clip"
+            style="width: {vm.state.length * 64}px;"
+        >
             <div
                 class="absolute h-full text-black"
                 style="left: {$playbackPosition + 1}px"
@@ -212,8 +215,11 @@
     </div>
     <!-- MARKERS -->
     <div class="h-scroll col-start-2 row-start-1 h-6 overflow-hidden">
-        <div class="relative h-full overflow-clip" style="width: 4096px;">
-            {#each Array(64) as _, index}
+        <div
+            class="relative h-full overflow-clip"
+            style="width: {vm.state.length * 64}px;"
+        >
+            {#each Array(vm.state.length) as _, index}
                 <div
                     class="absolute bottom-0 flex h-6 space-x-1.5"
                     style="left: {index * 64 + 1}px"
@@ -279,7 +285,7 @@
     >
         <div
             class="flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-clip"
-            style="width: 4096px;"
+            style="width: {vm.state.length * 64}px;"
         >
             <VoiceGroup vm={vm.state.top}></VoiceGroup>
         </div>
@@ -310,7 +316,7 @@
     >
         <div
             class="v-scroll flex h-full flex-col gap-y-[var(--timeline-voice-gap)] overflow-hidden py-4"
-            style="width: 4096px;"
+            style="width: {vm.state.length * 64}px;"
         >
             <VoiceGroup vm={vm.state.center}></VoiceGroup>
             <div class="z-20 h-12 flex-shrink-0" />
@@ -332,7 +338,7 @@
     >
         <div
             class="flex h-full flex-col space-y-[var(--timeline-voice-gap)] overflow-hidden"
-            style="width: 4096px;"
+            style="width: {vm.state.length * 64}px;"
         >
             <VoiceGroup vm={vm.state.bottom}></VoiceGroup>
         </div>
@@ -341,8 +347,11 @@
     <div
         class="h-scroll pointer-events-none col-start-2 col-end-2 row-start-2 row-end-5 overflow-hidden"
     >
-        <div class="relative h-full overflow-clip" style="width: 4096px;">
-            {#each Array(64) as _, index}
+        <div
+            class="relative h-full overflow-clip"
+            style="width: {vm.state.length * 64}px;"
+        >
+            {#each Array(vm.state.length) as _, index}
                 <div
                     class="absolute h-full text-[var(--timeline-vline-color)]"
                     style="left: {index * 64 + 1}px"

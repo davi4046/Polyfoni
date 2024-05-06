@@ -13,6 +13,8 @@ interface TimelineVMState {
     center: VoiceGroupVM;
     bottom: VoiceGroupVM;
 
+    length: number;
+
     handleMouseMove: (event: MouseEvent) => void;
     handleMouseMove_tracks: (event: MouseEvent) => void;
 
