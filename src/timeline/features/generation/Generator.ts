@@ -243,7 +243,7 @@ export default class Generator {
 
                     const nextNote = framework[index + 1];
 
-                    if (!nextNote) {
+                    if (!nextNote || nextNote.state.isRest) {
                         decorations.delete(note);
                         continue;
                     }
@@ -403,6 +403,8 @@ export default class Generator {
                     if (prevNote) pairs.push([prevNote, nextNote]);
                     // 2.
                     prevNote = nextNote;
+                } else {
+                    prevNote = undefined;
                 }
             }
 
