@@ -3,7 +3,7 @@
 
 use midi_player::MidiPlayer;
 use oxisynth::MidiEvent;
-use tauri::{CustomMenuItem, Menu, MenuItem, Submenu, Manager};
+use tauri::{api::shell::open, CustomMenuItem, Manager, Menu, MenuItem, Submenu};
 use workerpool::Pool;
 use std::{env, sync::Mutex};
 
@@ -23,6 +23,23 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("quit".to_string(), "Quit"))
             )
         )
+        .add_submenu(Submenu::new("Edit", Menu::new()
+            .add_item(CustomMenuItem::new("create_items".to_string(), "Create Item(s)").accelerator("F12"))
+            .add_native_item(MenuItem::Separator)
+            .add_item(CustomMenuItem::new("cut".to_string(), "Cut").accelerator("CmdOrCtrl+X"))
+            .add_item(CustomMenuItem::new("copy".to_string(), "Copy").accelerator("CmdOrCtrl+C"))
+            .add_item(CustomMenuItem::new("paste".to_string(), "Paste").accelerator("CmdOrCtrl+V"))
+            .add_native_item(MenuItem::Separator)
+            .add_item(CustomMenuItem::new("undo".to_string(), "Undo").accelerator("CmdOrCtrl+Z"))
+            .add_item(CustomMenuItem::new("redo".to_string(), "Redo").accelerator("CmdOrCtrl+Shift+Z"))
+            )
+        )
+        .add_submenu(Submenu::new("Community", Menu::new()
+            .add_item(CustomMenuItem::new("website".to_string(), "Website"))
+            .add_item(CustomMenuItem::new("discord_server".to_string(), "Discord Server"))
+            )
+        )
+        .add_item(CustomMenuItem::new("donation".to_string(), "Donation"))
 }
 
 fn main() {
@@ -65,6 +82,15 @@ fn main() {
                 }
                 "quit" => {
                     std::process::exit(0);
+                }
+                "website" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com", None);
+                }
+                "discord_server" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/discord-server", None);
+                }
+                "donation" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/donation", None);
                 }
                 _ => {}
             }
