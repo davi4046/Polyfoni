@@ -94,7 +94,7 @@
     let messages: string[] = [];
 
     const unlistenPromises = [
-        listen("open_file", async (_) => {
+        listen("open-file", async (_) => {
             const path = await open({
                 title: "Open File",
                 filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
@@ -115,7 +115,7 @@
             }
         }),
 
-        listen("save_as", saveAs),
+        listen("save-as", saveAs),
 
         listen("save", async (_) => {
             if (!timelineManager.timeline) return;
@@ -142,7 +142,7 @@
             }
         }),
 
-        listen("export_to_midi", async (_) => {
+        listen("export-to-midi", async (_) => {
             if (!timelineManager.timeline) return;
 
             const path = await save({

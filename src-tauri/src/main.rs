@@ -70,16 +70,16 @@ fn main() {
             match event.menu_item_id() {
                 // File
                 "open_file" => {
-                    let _ = event.window().emit("open_file", {});
+                    let _ = event.window().emit("open-file", {});
                 }
                 "save_as" => {
-                    let _ = event.window().emit("save_as", {});
+                    let _ = event.window().emit("save-as", {});
                 }
                 "save" => {
                     let _ = event.window().emit("save", {});
                 }
                 "export_to_midi" => {
-                    let _ = event.window().emit("export_to_midi", {});
+                    let _ = event.window().emit("export-to-midi", {});
                 }
                 "quit" => {
                     std::process::exit(0);
