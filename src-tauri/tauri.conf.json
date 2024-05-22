@@ -7,8 +7,8 @@
         "withGlobalTauri": false
     },
     "package": {
-        "productName": "revolution",
-        "version": "0.0.0"
+        "productName": "Polyfoni",
+        "version": "1.0.0"
     },
     "tauri": {
         "allowlist": {
@@ -60,11 +60,12 @@
         },
         "windows": [
             {
+                "title": "Polyfoni",
+                "width": 800,
+                "height": 600,
                 "fullscreen": false,
                 "resizable": true,
-                "title": "revolution",
-                "width": 800,
-                "height": 600
+                "maximized": true
             }
         ]
     }
