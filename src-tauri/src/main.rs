@@ -26,12 +26,12 @@ fn create_menu() -> Menu {
         .add_submenu(Submenu::new("Edit", Menu::new()
             .add_item(CustomMenuItem::new("create_items".to_string(), "Create Item(s)").accelerator("F12"))
             .add_native_item(MenuItem::Separator)
-            .add_item(CustomMenuItem::new("cut".to_string(), "Cut").accelerator("CmdOrCtrl+X"))
-            .add_item(CustomMenuItem::new("copy".to_string(), "Copy").accelerator("CmdOrCtrl+C"))
-            .add_item(CustomMenuItem::new("paste".to_string(), "Paste").accelerator("CmdOrCtrl+V"))
+            .add_item(CustomMenuItem::new("cut_items".to_string(), "Cut").accelerator("CmdOrCtrl+X"))
+            .add_item(CustomMenuItem::new("copy_items".to_string(), "Copy").accelerator("CmdOrCtrl+C"))
+            .add_item(CustomMenuItem::new("paste_items".to_string(), "Paste").accelerator("CmdOrCtrl+V"))
             .add_native_item(MenuItem::Separator)
-            .add_item(CustomMenuItem::new("undo".to_string(), "Undo").accelerator("CmdOrCtrl+Z"))
-            .add_item(CustomMenuItem::new("redo".to_string(), "Redo").accelerator("CmdOrCtrl+Shift+Z"))
+            .add_item(CustomMenuItem::new("undo_action".to_string(), "Undo").accelerator("CmdOrCtrl+Z"))
+            .add_item(CustomMenuItem::new("redo_action".to_string(), "Redo").accelerator("CmdOrCtrl+Shift+Z"))
             )
         )
         .add_submenu(Submenu::new("Community", Menu::new()
@@ -68,21 +68,42 @@ fn main() {
         .menu(create_menu())
         .on_menu_event(|event| {
             match event.menu_item_id() {
+                // File
                 "open_file" => {
-                    event.window().emit("open_file", {}).unwrap();
+                    let _ = event.window().emit("open_file", {});
                 }
                 "save_as" => {
-                    event.window().emit("save_as", {}).unwrap();
+                    let _ = event.window().emit("save_as", {});
                 }
                 "save" => {
-                    event.window().emit("save", {}).unwrap();
+                    let _ = event.window().emit("save", {});
                 }
                 "export_to_midi" => {
-                    event.window().emit("export_to_midi", {}).unwrap();
+                    let _ = event.window().emit("export_to_midi", {});
                 }
                 "quit" => {
                     std::process::exit(0);
                 }
+                // Edit
+                "create_items" => {
+                    let _ = event.window().emit("create-items", {});
+                }
+                "cut_items" => {
+                    let _ = event.window().emit("cut-items", {});
+                }
+                "copy_items" => {
+                    let _ = event.window().emit("copy-items", {});
+                }
+                "paste_items" => {
+                    let _ = event.window().emit("paste-items", {});
+                }
+                "undo_action" => {
+                    let _ = event.window().emit("undo-action", {});
+                }
+                "redo_action" => {
+                    let _ = event.window().emit("redo-action", {});
+                }
+                // Links
                 "website" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com", None);
                 }

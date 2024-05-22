@@ -234,6 +234,6 @@ class PasteItemsHandler implements GlobalEventHandler {
     handleMouseDown(event: MouseEvent) {
         this.context.history.startAction();
         placeGhostItems(this.context);
-        this.context.history.endAction("Inserted pasted items");
+        this.context.history.endAction("Pasted clipboard");
     }
 }

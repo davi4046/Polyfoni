@@ -1,5 +1,3 @@
-import { emit } from "@tauri-apps/api/event";
-
 import type TimelineContext from "../TimelineContext";
 import { ChordBuilder } from "../../../models/item/Chord";
 import Item from "../../../models/item/Item";
@@ -53,10 +51,6 @@ export default function pasteClipboard(context: TimelineContext) {
         context.state = {
             ghostPairs: newGhostPairs,
         };
-
-        emit("display-message", {
-            message: "Pasted clipboard items",
-        });
     }
 }
 
