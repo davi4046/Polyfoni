@@ -15,10 +15,15 @@
     import { onDestroy } from "svelte";
     import type Timeline from "./timeline/models/timeline/Timeline";
     import { resolveResource } from "@tauri-apps/api/path";
+    import { appWindow } from "@tauri-apps/api/window";
+    import type { Event } from "@tauri-apps/api/event";
 
     const timelineManager = new TimelineManager();
 
     let projectPath: string | undefined = undefined;
+
+    let currActionIndex = 0;
+    let lastSavedAction = 0;
 
     let timelineComponent: TimelineComponent;
 
@@ -41,11 +46,22 @@
             const demoData = await readTextFile(demoPath);
             const demoTimeline = createTimelineFromXMLFile(demoData);
             loadTimeline(demoTimeline);
+            updateWindowTitle();
         } catch (error) {
             emit("display-message", {
                 message: `Failed to load demo project`,
             });
         }
+    }
+
+    function updateWindowTitle() {
+        const hasUnsavedChanges = currActionIndex !== lastSavedAction;
+
+        appWindow.setTitle(
+            `Polyfoni - ${projectPath ? projectPath : "unsaved project"}${
+                hasUnsavedChanges ? "*" : ""
+            }`
+        );
     }
 
     async function saveAs() {
@@ -63,6 +79,11 @@
             const xml = createXMLFileFromTimeline(timelineManager.timeline);
             writeTextFile(path, xml);
             projectPath = path;
+
+            // 1.
+            lastSavedAction = currActionIndex;
+            // 2.
+            updateWindowTitle();
 
             emit("display-message", { message: `Saved project to "${path}"` });
         } catch {
@@ -88,6 +109,7 @@
                 const timeline = createTimelineFromXMLFile(data);
                 loadTimeline(timeline);
                 projectPath = path as string;
+                updateWindowTitle();
             } catch {
                 emit("display-message", { message: "Failed to open file" });
             }
@@ -106,6 +128,11 @@
             try {
                 const xml = createXMLFileFromTimeline(timelineManager.timeline);
                 writeTextFile(projectPath, xml);
+
+                // 1.
+                lastSavedAction = currActionIndex;
+                // 2.
+                updateWindowTitle();
 
                 emit("display-message", {
                     message: "Your changes have been saved",
@@ -145,6 +172,11 @@
             setTimeout(() => {
                 messages = messages.toSpliced(-1, 1);
             }, 3000);
+        }),
+
+        listen("report-action-index", (event: Event<{ index: number }>) => {
+            currActionIndex = event.payload.index;
+            updateWindowTitle();
         }),
     ];
 

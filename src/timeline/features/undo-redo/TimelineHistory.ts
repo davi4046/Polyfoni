@@ -1,5 +1,4 @@
 import { emit } from "@tauri-apps/api/event";
-import { message } from "@tauri-apps/api/dialog";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import type Stateful from "../../../architecture/Stateful";
@@ -15,6 +14,10 @@ export default class TimelineHistory {
             const newState = obj.state;
 
             this._currAction.changes.push({ obj, oldState, newState });
+        });
+
+        emit("report-action-index", {
+            index: this._undoableActions.length,
         });
     }
 
@@ -44,7 +47,12 @@ export default class TimelineHistory {
         if (this._currAction.changes.length > 0) {
             this._currAction.title = title;
             this._undoableActions.push(this._currAction);
+
             emit("display-message", { message: this._currAction.title });
+
+            emit("report-action-index", {
+                index: this._undoableActions.length,
+            });
         }
 
         this._currAction = undefined;
@@ -60,7 +68,12 @@ export default class TimelineHistory {
         });
 
         this._redoableActions.push(lastAction);
+
         emit("display-message", { message: `Undo "${lastAction.title}"` });
+
+        emit("report-action-index", {
+            index: this._undoableActions.length,
+        });
     }
 
     redoAction() {
@@ -73,7 +86,12 @@ export default class TimelineHistory {
         });
 
         this._undoableActions.push(lastAction);
+
         emit("display-message", { message: `Redo "${lastAction.title}"` });
+
+        emit("report-action-index", {
+            index: this._undoableActions.length,
+        });
     }
 }
 
