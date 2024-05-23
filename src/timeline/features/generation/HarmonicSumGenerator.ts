@@ -1,11 +1,9 @@
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import {
-    countAncestors,
     getChildren,
     getGreatGrandparent,
-    getIndex,
     getLastAncestor,
     getParent,
     getPosition,
