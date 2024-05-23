@@ -1,4 +1,4 @@
-import { clamp } from "lodash";
+import { clamp } from "lodash-es";
 
 import type TimelineContext from "../context/TimelineContext";
 import placeGhostItems from "../context/operations/placeGhostItems";
