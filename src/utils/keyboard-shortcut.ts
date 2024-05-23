@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 
 type Modifiers = { alt: boolean; ctrl: boolean; shift: boolean };
 type Shortcut = {
