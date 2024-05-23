@@ -8,7 +8,7 @@
     import { Chord, ChordBuilder } from "../../../../models/item/Chord";
     import { invoke } from "@tauri-apps/api";
     import type { ItemTypes } from "../../../../models/item/ItemTypes";
-    import { isEqual } from "lodash";
+    import { isEqual } from "lodash-es";
 
     export let value: ItemTypes["ChordItem"];
     export let update: (value: ItemTypes["ChordItem"]) => void;
