@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-import { isBoolean, merge } from "lodash";
+import { isBoolean } from "lodash-es";
 
 import StateHierarchyWatcher from "../../../architecture/StateHierarchyWatcher";
 import Stateful, { type UnsubscribeFn } from "../../../architecture/Stateful";
