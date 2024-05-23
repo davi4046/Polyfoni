@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { uniqueId } from "lodash";
+    import { uniqueId } from "lodash-es";
     import PopupMenuItem from "./PopupMenuItem.svelte";
     import { Menu } from "./popup-menu-types";
     import { createEventDispatcher } from "svelte";

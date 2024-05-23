@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import { uniqueId } from "lodash-es";
 
 export class Menu {
     constructor(
