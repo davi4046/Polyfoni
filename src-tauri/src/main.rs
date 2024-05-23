@@ -13,6 +13,7 @@ mod midi_player;
 fn create_menu() -> Menu {
     return Menu::new()
         .add_submenu(Submenu::new("File",Menu::new()
+            .add_item(CustomMenuItem::new("new_file".to_string(), "New File"))
             .add_item(CustomMenuItem::new("open_file".to_string(), "Open File..."))
             .add_native_item(MenuItem::Separator)
             .add_item(CustomMenuItem::new("save_as".to_string(), "Save As..."))
@@ -69,6 +70,9 @@ fn main() {
         .on_menu_event(|event| {
             match event.menu_item_id() {
                 // File
+                "new_file" => {
+                    let _ = event.window().emit("new-file", {});
+                }
                 "open_file" => {
                     let _ = event.window().emit("open-file", {});
                 }

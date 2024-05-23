@@ -46,6 +46,7 @@
             const demoData = await readTextFile(demoPath);
             const demoTimeline = createTimelineFromXMLFile(demoData);
             loadTimeline(demoTimeline);
+            projectPath = undefined;
             updateWindowTitle();
         } catch (error) {
             emit("display-message", {
@@ -94,6 +95,10 @@
     let messages: string[] = [];
 
     const unlistenPromises = [
+        listen("new-file", () => {
+            loadDemoTimeline();
+        }),
+
         listen("open-file", async (_) => {
             const path = await open({
                 title: "Open File",
