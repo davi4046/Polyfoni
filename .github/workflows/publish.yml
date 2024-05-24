@@ -61,7 +61,7 @@ jobs:
             - name: print directory tree
               run: |
                   echo "directory tree:"
-                  tree
+                  tree -L 5
 
             - uses: tauri-apps/tauri-action@v0.5.3
               env:
