@@ -10,7 +10,7 @@
         "check": "svelte-check --tsconfig ./tsconfig.json",
         "tauri": "tauri",
         "test": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js --verbose",
-        "create-python-venv": "cd src-tauri/res/python/ && python -m venv venv && source venv/bin/activate || .\\venv\\Scripts\\activate && python -m pip install --upgrade pip && pip install -r requirements.txt && echo * > venv/.gitignore"
+        "create-python-venv": "cd src-tauri/res/python/ && python -m venv venv && echo * > venv/.gitignore && source venv/bin/activate || source venv/bin/activate.csh || .\\venv\\Scripts\\activate && python -m pip install -r requirements.txt"
     },
     "dependencies": {
         "@perry-rylance/midi": "^1.0.6",
