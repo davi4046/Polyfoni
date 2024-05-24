@@ -1,4 +1,5 @@
 use std::io::{Write, BufReader, BufRead};
+use std::os::windows::process::CommandExt;
 use std::process::{Command, Stdio, ChildStdin, ChildStdout};
 use std::env;
 use std::sync::Mutex;
@@ -16,7 +17,15 @@ impl Default for Evaluator {
         let python = env::var("PYTHON_PATH").expect("PYTHON_PATH not found");
         let script = env::var("SCRIPT_PATH").expect("SCRIPT_PATH not found");
 
-        let child = Command::new(python)
+        let mut cmd = Command::new(python);
+
+        #[cfg(target_os = "windows")]
+        {
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            cmd.creation_flags(CREATE_NO_WINDOW);
+        }
+       
+        let child = cmd
             .arg(script)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
