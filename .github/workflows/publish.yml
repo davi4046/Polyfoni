@@ -58,11 +58,6 @@ jobs:
             - name: create Python virtual environment
               run: npm run create-python-venv
 
-            - name: print directory tree
-              run: |
-                  echo "directory tree:"
-                  tree -L 5
-
             - uses: tauri-apps/tauri-action@v0.5.3
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
