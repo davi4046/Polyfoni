@@ -196,10 +196,11 @@ export default function createTimelineFromXMLFile(xml: string): Timeline {
     const timeline = new Timeline();
 
     if (timelineData.aliases) {
-        timeline.state = {
-            length: timelineData["@length"],
-            aliases: timelineData.aliases,
-        };
+        timeline.state = { aliases: timelineData.aliases };
+    }
+
+    if (timelineData["@length"]) {
+        timeline.state = { length: timelineData["@length"] };
     }
 
     if (timelineData.tempoTrack && timelineData.tempoTrack.item) {
