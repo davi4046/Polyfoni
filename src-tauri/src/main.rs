@@ -63,9 +63,9 @@ fn main() {
                 .expect("Failed to resolve resource")
             );
 
-            // let pool = Pool::<eval::Evaluator>::new(4);
+            let pool = Pool::<eval::Evaluator>::new(4);
 
-            // app.manage(Mutex::new(pool));
+            app.manage(Mutex::new(pool));
 
             let midi_player = MidiPlayer::new();
 
