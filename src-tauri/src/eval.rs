@@ -13,10 +13,9 @@ pub struct Evaluator {
 
 impl Default for Evaluator {
     fn default() -> Self {
-        let python = env::var("PYTHON_PATH").expect("PYTHON_PATH not found");
-        let script = env::var("SCRIPT_PATH").expect("SCRIPT_PATH not found");
+        let evaluator_path = env::var("EVALUATOR_PATH").unwrap();
 
-        let mut cmd = Command::new(python);
+        let mut cmd = Command::new(evaluator_path);
 
         #[cfg(target_os = "windows")]
         {
@@ -26,7 +25,6 @@ impl Default for Evaluator {
         }
        
         let child = cmd
-            .arg(script)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()

@@ -46,20 +46,15 @@ fn create_menu() -> Menu {
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            #[cfg(target_os = "windows")]
-            env::set_var("PYTHON_PATH", app.path_resolver()
-                .resolve_resource("res/python/venv/Scripts/python.exe")
-                .expect("Failed to resolve resource")
-            );
 
-            #[cfg(not(target_os = "windows"))]
-            env::set_var("PYTHON_PATH", app.path_resolver()
-                .resolve_resource("res/python/venv/bin/python.exe")
-                .expect("Failed to resolve resource")
-            );
+            let evaluator_path = if cfg!(target_os = "windows") {
+                "res/evaluator.exe"
+            } else {
+                "res/evaluator"
+            };
 
-            env::set_var("SCRIPT_PATH", app.path_resolver()
-                .resolve_resource("res/python/evaluator.py")
+            env::set_var("EVALUATOR_PATH", app.path_resolver()
+                .resolve_resource(evaluator_path)
                 .expect("Failed to resolve resource")
             );
 
