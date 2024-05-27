@@ -62,7 +62,9 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
             const nextItem = tempoChanges[i + 1];
 
             const startBeat = currItem.beat;
-            const endBeat = nextItem ? nextItem.beat : 64;
+            const endBeat = nextItem
+                ? nextItem.beat
+                : this._timeline.state.length;
 
             const duration = ((endBeat - startBeat) / currItem.tempo) * 60000;
 
@@ -105,7 +107,12 @@ export default class TimelinePlayer extends Stateful<TimelinePlayerState> {
         const voices = getChildren(getChildren(this._timeline)[1]);
 
         voices.forEach((voice) =>
-            this._schedulePlayback(voice, currBeat, 64, tempoChanges)
+            this._schedulePlayback(
+                voice,
+                currBeat,
+                this._timeline.state.length,
+                tempoChanges
+            )
         );
 
         this.state = {
