@@ -4,3 +4,6 @@
 
 /python/venv/
 /python/build/
+
+/res/evaluator
+/res/evaluator.exe
