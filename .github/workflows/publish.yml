@@ -58,8 +58,8 @@ jobs:
             - name: install frontend dependencies
               run: npm install
 
-            - name: create Python virtual environment
-              run: npm run create-python-venv
+            - name: build python dependencies
+              run: npm run build-python
 
             - uses: tauri-apps/tauri-action@v0.5.3
               env:
