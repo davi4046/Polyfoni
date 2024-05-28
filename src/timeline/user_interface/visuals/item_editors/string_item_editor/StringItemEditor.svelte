@@ -29,6 +29,7 @@
     <input
         class="w-full p-1 font-mono text-lg font-semibold focus:outline-none"
         type="text"
+        spellcheck="false"
         placeholder="Input..."
         on:keydown={handleKeyDown}
         bind:this={inputField}
