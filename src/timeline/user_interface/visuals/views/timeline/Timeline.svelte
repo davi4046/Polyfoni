@@ -62,7 +62,9 @@
             element.addEventListener("wheel", (event) => {
                 const wheelEvent = event as WheelEvent;
                 for (const element of hScrollElements) {
-                    element.scrollLeft += wheelEvent.deltaX;
+                    element.scrollLeft += wheelEvent.shiftKey
+                        ? wheelEvent.deltaY
+                        : wheelEvent.deltaX;
                 }
             });
         }
@@ -70,7 +72,9 @@
             element.addEventListener("wheel", (event) => {
                 const wheelEvent = event as WheelEvent;
                 for (const element of vScrollElememts) {
-                    element.scrollTop += wheelEvent.deltaY;
+                    element.scrollTop += wheelEvent.shiftKey
+                        ? wheelEvent.deltaX
+                        : wheelEvent.deltaY;
                 }
             });
         }
