@@ -41,6 +41,7 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("user_manual".to_string(), "User-Manual"))
             )
         )
+        .add_item(CustomMenuItem::new("license".to_string(), "License"))
         .add_item(CustomMenuItem::new("donation".to_string(), "Donation"))
 }
 
@@ -123,6 +124,9 @@ fn main() {
                 // Other
                 "donation" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/donation", None);
+                }
+                "license" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/eula?v=1.0.0", None);
                 }
                 _ => {}
             }
