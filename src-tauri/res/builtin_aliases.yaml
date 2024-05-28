@@ -16,5 +16,3 @@ SUSPENSION: >-
     prev_degree if prev_degree % 1 == 0 else None
 ANTICIPATION: >-
     next_degree if next_degree % 1 == 0 else None
-TEST_ALIAS: >-
-    sin( x / pi * 8 ) + x % 8
