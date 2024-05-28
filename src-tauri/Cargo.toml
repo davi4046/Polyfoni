@@ -18,6 +18,7 @@ itertools = "0.12.0"
 open = "5.1.3"
 oxisynth = "0.0.5"
 tauri = { version = "1.5", features = [ "window-set-title", "dialog-open", "fs-read-file", "protocol-asset", "path-all", "fs-read-dir", "fs-write-file", "dialog-save", "global-shortcut-all", "shell-open"] }
+tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 web-sys = "0.3.69"
 workerpool = "1.2.0"
 

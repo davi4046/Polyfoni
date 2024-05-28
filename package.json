@@ -21,6 +21,7 @@
         "from-xml": "^0.1.11",
         "js-yaml": "^4.1.0",
         "lodash-es": "^4.17.21",
+        "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#v1",
         "tippy.js": "^6.3.7",
         "to-xml": "^0.1.11",
         "ts-essentials": "^9.4.1",
