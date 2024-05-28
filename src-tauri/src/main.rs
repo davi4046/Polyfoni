@@ -25,7 +25,7 @@ fn create_menu() -> Menu {
             )
         )
         .add_submenu(Submenu::new("Edit", Menu::new()
-            .add_item(CustomMenuItem::new("create_items".to_string(), "Create Item(s)").accelerator("F12"))
+            .add_item(CustomMenuItem::new("create_items".to_string(), "Create Item(s)"))
             .add_native_item(MenuItem::Separator)
             .add_item(CustomMenuItem::new("cut_items".to_string(), "Cut").accelerator("CmdOrCtrl+X"))
             .add_item(CustomMenuItem::new("copy_items".to_string(), "Copy").accelerator("CmdOrCtrl+C"))
