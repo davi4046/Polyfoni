@@ -35,9 +35,10 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("redo_action".to_string(), "Redo").accelerator("CmdOrCtrl+Shift+Z"))
             )
         )
-        .add_submenu(Submenu::new("Community", Menu::new()
+        .add_submenu(Submenu::new("Help", Menu::new()
             .add_item(CustomMenuItem::new("website".to_string(), "Website"))
             .add_item(CustomMenuItem::new("discord_server".to_string(), "Discord Server"))
+            .add_item(CustomMenuItem::new("user_manual".to_string(), "User-Manual"))
             )
         )
         .add_item(CustomMenuItem::new("donation".to_string(), "Donation"))
@@ -109,13 +110,17 @@ fn main() {
                 "redo_action" => {
                     let _ = event.window().emit("redo-action", {});
                 }
-                // Links
+                // Help
                 "website" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com", None);
                 }
                 "discord_server" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/discord-server", None);
                 }
+                "user_manual" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/user-manual", None);
+                }
+                // Other
                 "donation" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/donation", None);
                 }
