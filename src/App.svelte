@@ -42,7 +42,7 @@
 
     async function loadDemoTimeline() {
         try {
-            const demoPath = await resolveResource("res/demo_project.plfn");
+            const demoPath = await resolveResource("res/empty_project.plfn");
             const demoData = await readTextFile(demoPath);
             const demoTimeline = createTimelineFromXMLFile(demoData);
             loadTimeline(demoTimeline);
@@ -50,7 +50,7 @@
             updateWindowTitle();
         } catch (error) {
             emit("display-message", {
-                message: `Failed to load demo project`,
+                message: `Failed to load starter project`,
             });
         }
     }

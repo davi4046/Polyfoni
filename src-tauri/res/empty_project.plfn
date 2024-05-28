@@ -1,0 +1,25 @@
+<timeline length="64">
+  <tempoTrack>
+  </tempoTrack>
+  <scaleTrack>
+  </scaleTrack>
+  <aliases></aliases>
+  <voice label="Voice 0" instrument="0">
+    <frameworkPitch>
+    </frameworkPitch>
+    <frameworkDuration>
+    </frameworkDuration>
+    <frameworkRest>
+    </frameworkRest>
+    <frameworkHarmony>
+    </frameworkHarmony>
+    <decorationPitches>
+    </decorationPitches>
+    <decorationFraction>
+    </decorationFraction>
+    <decorationSkip>
+    </decorationSkip>
+    <decorationHarmony>
+    </decorationHarmony>
+  </voice>
+</timeline>
