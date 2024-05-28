@@ -17,6 +17,7 @@
     import { resolveResource } from "@tauri-apps/api/path";
     import { appWindow } from "@tauri-apps/api/window";
     import type { Event } from "@tauri-apps/api/event";
+    import { Store } from "tauri-plugin-store-api";
 
     const timelineManager = new TimelineManager();
 
@@ -46,12 +47,36 @@
             const demoData = await readTextFile(demoPath);
             const demoTimeline = createTimelineFromXMLFile(demoData);
             loadTimeline(demoTimeline);
+
             projectPath = undefined;
+
             updateWindowTitle();
+
+            const mainStore = new Store(".main.dat");
+            mainStore.set("last-project-path", null);
+            mainStore.save();
         } catch (error) {
             emit("display-message", {
                 message: `Failed to load starter project`,
             });
+        }
+    }
+
+    async function openFile(filePath: string) {
+        try {
+            const data = await readTextFile(filePath);
+            const timeline = createTimelineFromXMLFile(data);
+            loadTimeline(timeline);
+
+            projectPath = filePath;
+
+            updateWindowTitle();
+
+            const mainStore = new Store(".main.dat");
+            mainStore.set("last-project-path", filePath);
+            mainStore.save();
+        } catch {
+            emit("display-message", { message: "Failed to open file" });
         }
     }
 
@@ -86,6 +111,10 @@
             // 2.
             updateWindowTitle();
 
+            const mainStore = new Store(".main.dat");
+            mainStore.set("last-project-path", path);
+            mainStore.save();
+
             emit("display-message", { message: `Saved project to "${path}"` });
         } catch {
             emit("display-message", { message: `Failed to save project"` });
@@ -107,17 +136,7 @@
                 defaultPath: projectPath,
             });
 
-            if (!path) return;
-
-            try {
-                const data = await readTextFile(path as string);
-                const timeline = createTimelineFromXMLFile(data);
-                loadTimeline(timeline);
-                projectPath = path as string;
-                updateWindowTitle();
-            } catch {
-                emit("display-message", { message: "Failed to open file" });
-            }
+            if (path) openFile(path as string);
         }),
 
         listen("save-as", saveAs),
@@ -187,7 +206,23 @@
 
     const loadFontsPromise = loadFonts();
 
-    loadFontsPromise.then(loadDemoTimeline);
+    loadFontsPromise.then(async () => {
+        // Try to load the last open project
+        const mainStore = new Store(".main.dat");
+
+        const lastProjectPath =
+            await mainStore.get<string>("last-project-path");
+
+        if (lastProjectPath) {
+            try {
+                openFile(lastProjectPath);
+            } catch {
+                loadDemoTimeline();
+            }
+        } else {
+            loadDemoTimeline();
+        }
+    });
 
     onDestroy(async () => {
         const unlistenFuncs = await Promise.all(unlistenPromises);
