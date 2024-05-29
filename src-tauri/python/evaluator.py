@@ -8,7 +8,11 @@ from func_timeout import func_set_timeout, FunctionTimedOut
 from lib.rand import RAND_FUNCS_DICT
 from lib.wave import WAVE_FUNCS_DICT
 
-MATH_DICT = {name: getattr(math, name) for name in dir(math)}
+MATH_DICT = {
+    name: getattr(math, name) 
+    for name in dir(math) 
+    if not name.startswith('__')
+}
 
 SAFE_BUILTINS = {
     'abs': abs,
