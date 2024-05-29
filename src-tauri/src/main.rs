@@ -30,6 +30,7 @@ fn create_menu() -> Menu {
             .add_item(CustomMenuItem::new("cut_items".to_string(), "Cut").accelerator("CmdOrCtrl+X"))
             .add_item(CustomMenuItem::new("copy_items".to_string(), "Copy").accelerator("CmdOrCtrl+C"))
             .add_item(CustomMenuItem::new("paste_items".to_string(), "Paste").accelerator("CmdOrCtrl+V"))
+            .add_item(CustomMenuItem::new("duplicate_items".to_string(), "Duplicate").accelerator("CmdOrCtrl+D"))
             .add_native_item(MenuItem::Separator)
             .add_item(CustomMenuItem::new("undo_action".to_string(), "Undo").accelerator("CmdOrCtrl+Z"))
             .add_item(CustomMenuItem::new("redo_action".to_string(), "Redo").accelerator("CmdOrCtrl+Shift+Z"))
@@ -104,6 +105,9 @@ fn main() {
                 }
                 "paste_items" => {
                     let _ = event.window().emit("paste-items", {});
+                }
+                "duplicate_items" => {
+                    let _ = event.window().emit("duplicate-items", {});
                 }
                 "undo_action" => {
                     let _ = event.window().emit("undo-action", {});

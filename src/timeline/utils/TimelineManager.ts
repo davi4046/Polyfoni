@@ -11,6 +11,7 @@ import {
     copyItems,
     createItems,
     cutItems,
+    duplicateItems,
     pasteItems,
     redoAction,
     selectItems,
@@ -61,6 +62,7 @@ export class TimelineManager {
         registerShortcut("ctrl+x", () => cutItems(context));
         registerShortcut("ctrl+c", () => copyItems(context));
         registerShortcut("ctrl+v", () => pasteItems(context));
+        registerShortcut("ctrl+d", () => duplicateItems(context));
         registerShortcut("ctrl+z", () => undoAction(context));
         registerShortcut("ctrl+shift+z", () => redoAction(context));
         registerShortcut("ctrl+s", () => emit("save"));
@@ -71,6 +73,7 @@ export class TimelineManager {
             await listen("cut-items", () => cutItems(context)),
             await listen("copy-items", () => copyItems(context)),
             await listen("paste-items", () => pasteItems(context)),
+            await listen("duplicate-items", () => duplicateItems(context)),
             await listen("undo-action", () => undoAction(context)),
             await listen("redo-action", () => redoAction(context)),
         ];

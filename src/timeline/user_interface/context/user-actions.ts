@@ -55,6 +55,15 @@ export function pasteItems(context: TimelineContext) {
     pasteClipboard(context);
 }
 
+export function duplicateItems(context: TimelineContext) {
+    if (context.state.highlights.length > 0) {
+        copyHighlightedItems(context);
+    } else {
+        copySelectedItems(context);
+    }
+    pasteClipboard(context);
+}
+
 export function undoAction(context: TimelineContext) {
     context.history.undoAction();
 }
