@@ -6,6 +6,8 @@ import funcs
 
 from func_timeout import func_set_timeout, FunctionTimedOut
 
+from libs.rand import RAND_FUNCS_DICT
+
 class NameCollector(ast.NodeVisitor):
     def __init__(self):
         self.nodes = []
@@ -38,7 +40,7 @@ SAFE_BUILTINS = {
     'sum': sum
 }
 
-GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT, **FUNCS_DICT}
+GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT, **FUNCS_DICT, **RAND_FUNCS_DICT}
 
 @func_set_timeout(0.1)
 def evaluate(args: list[str]):       
