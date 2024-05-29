@@ -35,7 +35,12 @@ SAFE_BUILTINS = {
     'sum': sum
 }
 
-GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT, **RAND_FUNCS_DICT, **WAVE_FUNCS_DICT}
+GLOBALS = {
+    "__builtins__": SAFE_BUILTINS, 
+    **MATH_DICT, 
+    **RAND_FUNCS_DICT, 
+    **WAVE_FUNCS_DICT
+}
 
 class NameCollector(ast.NodeVisitor):
     def __init__(self):
