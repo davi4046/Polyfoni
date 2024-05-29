@@ -2,22 +2,13 @@ import sys
 import math
 import json
 import ast
-import funcs
 
 from func_timeout import func_set_timeout, FunctionTimedOut
 
-from libs.rand import RAND_FUNCS_DICT
-
-class NameCollector(ast.NodeVisitor):
-    def __init__(self):
-        self.nodes = []
-    
-    def visit_Name(self, node: ast.Name):
-        self.nodes.append(node)
+from lib.rand import RAND_FUNCS_DICT
+from lib.wave import WAVE_FUNCS_DICT
 
 MATH_DICT = {name: getattr(math, name) for name in dir(math)}
-
-FUNCS_DICT = {name: getattr(funcs, name) for name in dir(funcs)}
 
 SAFE_BUILTINS = {
     'abs': abs,
@@ -40,7 +31,14 @@ SAFE_BUILTINS = {
     'sum': sum
 }
 
-GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT, **FUNCS_DICT, **RAND_FUNCS_DICT}
+GLOBALS = {"__builtins__": SAFE_BUILTINS, **MATH_DICT, **RAND_FUNCS_DICT, **WAVE_FUNCS_DICT}
+
+class NameCollector(ast.NodeVisitor):
+    def __init__(self):
+        self.nodes = []
+    
+    def visit_Name(self, node: ast.Name):
+        self.nodes.append(node)
 
 @func_set_timeout(0.1)
 def evaluate(args: list[str]):       
