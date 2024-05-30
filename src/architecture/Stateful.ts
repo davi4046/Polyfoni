@@ -1,4 +1,4 @@
-import { isEqual, uniqueId } from "lodash-es";
+import { uniqueId } from "lodash-es";
 
 import type { GetState, SetState } from "./state-hierarchy-utils";
 
@@ -16,9 +16,6 @@ export default class Stateful<TState extends object>
         const oldState = this._state;
         const stateClone = Object.assign({}, this._state); // Create a clone of the current state
         Object.assign(stateClone, newState);
-
-        if (isEqual(this._state, stateClone)) return;
-
         this._state = stateClone;
         this._callbacks.forEach((callback) => callback(oldState, this._state)); //notify subscribers
     }
