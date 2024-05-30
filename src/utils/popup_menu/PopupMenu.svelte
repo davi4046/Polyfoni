@@ -37,8 +37,9 @@
     {#if menu.options.searchBar && menu.items.length > 0}
         <input
             class="w-full border-b px-2 py-1 text-sm focus:outline-none"
-            bind:this={searchBar}
             placeholder="Search..."
+            spellcheck="false"
+            bind:this={searchBar}
             bind:value={searchText}
         />
     {/if}
