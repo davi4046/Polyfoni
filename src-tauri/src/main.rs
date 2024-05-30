@@ -5,7 +5,7 @@ use midi_player::MidiPlayer;
 use oxisynth::MidiEvent;
 use tauri::{api::shell::open, CustomMenuItem, Manager, Menu, MenuItem, Submenu};
 use workerpool::Pool;
-use std::{env, sync::Mutex};
+use std::{env, process::Command, sync::Mutex};
 
 mod eval;
 mod midi_player;
@@ -44,6 +44,7 @@ fn create_menu() -> Menu {
         )
         .add_item(CustomMenuItem::new("license".to_string(), "License"))
         .add_item(CustomMenuItem::new("donation".to_string(), "Donation"))
+        .add_item(CustomMenuItem::new("reload_app".to_string(), "Reload App"))
 }
 
 fn main() {
@@ -132,6 +133,9 @@ fn main() {
                 "license" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/eula?v=1.0.0", None);
                 }
+                "reload_app" => {
+                    let _ = event.window().emit("reload-app", {});
+                }
                 _ => {}
             }
         })
@@ -140,7 +144,8 @@ fn main() {
             midi_note_on, 
             midi_note_off, 
             midi_program_change,
-            midi_control_change
+            midi_control_change,
+            reload_app
         ])
         .plugin(tauri_plugin_store::Builder::default().build())
         .run(tauri::generate_context!())
@@ -171,4 +176,12 @@ fn midi_program_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8
 fn midi_control_change(midi_player: tauri::State<Mutex<MidiPlayer>>, channel: u8, control: u8, value: u8) {
     let midi_player_locked = midi_player.lock().unwrap();
     midi_player_locked.sender.send(MidiEvent::ControlChange { channel, ctrl: control, value }).ok();
+}
+
+#[tauri::command(async)]
+fn reload_app(app: tauri::AppHandle) -> Result<(), ()> {
+    let current_exe = std::env::current_exe().map_err(|_| ())?;
+    Command::new(current_exe).spawn().map_err(|_| ())?;
+    app.exit(0);
+    Ok(())
 }

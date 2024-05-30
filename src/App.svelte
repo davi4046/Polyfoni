@@ -18,6 +18,7 @@
     import { appWindow } from "@tauri-apps/api/window";
     import type { Event } from "@tauri-apps/api/event";
     import { Store } from "tauri-plugin-store-api";
+    import { invoke } from "@tauri-apps/api/tauri";
 
     const timelineManager = new TimelineManager();
 
@@ -90,7 +91,7 @@
         );
     }
 
-    async function saveAs() {
+    async function saveProjectAs() {
         if (!timelineManager.timeline) return;
 
         const path = await save({
@@ -103,7 +104,7 @@
 
         try {
             const xml = createXMLFileFromTimeline(timelineManager.timeline);
-            writeTextFile(path, xml);
+            await writeTextFile(path, xml);
             projectPath = path;
 
             // 1.
@@ -112,12 +113,37 @@
             updateWindowTitle();
 
             const mainStore = new Store(".main.dat");
-            mainStore.set("last-project-path", path);
-            mainStore.save();
+            await mainStore.set("last-project-path", path);
+            await mainStore.save();
 
             emit("display-message", { message: `Saved project to "${path}"` });
         } catch {
             emit("display-message", { message: `Failed to save project"` });
+        }
+    }
+
+    async function saveProject() {
+        if (!timelineManager.timeline) return;
+
+        if (projectPath === undefined) {
+            await saveProjectAs();
+            return;
+        }
+
+        try {
+            const xml = createXMLFileFromTimeline(timelineManager.timeline);
+            await writeTextFile(projectPath, xml);
+
+            // 1.
+            lastSavedAction = currActionIndex;
+            // 2.
+            updateWindowTitle();
+
+            emit("display-message", {
+                message: "Your changes have been saved",
+            });
+        } catch {
+            emit("display-message", { message: "Failed to save changes" });
         }
     }
 
@@ -139,32 +165,9 @@
             if (path) openFile(path as string);
         }),
 
-        listen("save-as", saveAs),
+        listen("save-as", saveProjectAs),
 
-        listen("save", async (_) => {
-            if (!timelineManager.timeline) return;
-
-            if (projectPath === undefined) {
-                saveAs();
-                return;
-            }
-
-            try {
-                const xml = createXMLFileFromTimeline(timelineManager.timeline);
-                writeTextFile(projectPath, xml);
-
-                // 1.
-                lastSavedAction = currActionIndex;
-                // 2.
-                updateWindowTitle();
-
-                emit("display-message", {
-                    message: "Your changes have been saved",
-                });
-            } catch {
-                emit("display-message", { message: "Failed to save changes" });
-            }
-        }),
+        listen("save", saveProject),
 
         listen("export-to-midi", async (_) => {
             if (!timelineManager.timeline) return;
@@ -201,6 +204,11 @@
         listen("report-action-index", (event: Event<{ index: number }>) => {
             currActionIndex = event.payload.index;
             updateWindowTitle();
+        }),
+
+        listen("reload-app", async () => {
+            await saveProject();
+            invoke("reload_app");
         }),
     ];
 
