@@ -1,5 +1,7 @@
 import { emit } from "@tauri-apps/api/event";
 
+import Item from "../../models/item/Item";
+
 import type TimelineContext from "./TimelineContext";
 
 import copyHighlightedItems from "./operations/copyHighlightedItems";
@@ -61,7 +63,19 @@ export function duplicateItems(context: TimelineContext) {
     } else {
         copySelectedItems(context);
     }
-    pasteClipboard(context);
+    const newGhostPairs = context.state.clipboard.map((item) => {
+        return [
+            item,
+            new Item(item.itemType, {
+                ...item.state,
+                start: item.state.start + 1,
+                end: item.state.end + 1,
+            }),
+        ] as [Item<any>, Item<any>];
+    });
+    context.state = {
+        ghostPairs: newGhostPairs,
+    };
 }
 
 export function undoAction(context: TimelineContext) {
