@@ -61,7 +61,10 @@ export class TimelineManager {
         registerShortcut("enter", () => selectItems(context));
         registerShortcut("ctrl+x", () => cutItems(context));
         registerShortcut("ctrl+c", () => copyItems(context));
-        registerShortcut("ctrl+v", () => pasteItems(context));
+        registerShortcut("ctrl+v", (event) => {
+            pasteItems(context);
+            event.preventDefault();
+        });
         registerShortcut("ctrl+d", () => duplicateItems(context));
         registerShortcut("ctrl+z", () => undoAction(context));
         registerShortcut("ctrl+shift+z", () => redoAction(context));
