@@ -63,7 +63,7 @@ export default class AliasManager {
                 trackedAliases.set(name, 1);
                 timeline.state = {
                     aliases: Object.assign({}, timeline.state.aliases, {
-                        [name]: builtins.get(name)!,
+                        [name]: `(${builtins.get(name)!})`,
                     }),
                 };
                 emit("display-message", {
