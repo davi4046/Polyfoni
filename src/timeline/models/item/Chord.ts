@@ -89,30 +89,12 @@ export class Chord {
         // 2.
         midiValue = midiValue % 12;
 
-        function binarySearch(
-            array: number[],
-            target: number
-        ): [number, boolean] {
-            let left: number = 0;
-            let right: number = array.length - 1;
-
-            while (left <= right) {
-                const mid: number = Math.floor((left + right) / 2);
-
-                if (array[mid] === target) return [mid, true];
-                if (target < array[mid]) right = mid - 1;
-                else left = mid + 1;
-            }
-
-            return [right, false];
-        }
-
         const [index, exact] = binarySearch(midiValues, midiValue);
 
         if (exact) {
             return index + midiValues.length * octave;
         } else {
-            const lowerIndex = index;
+            const lowerIndex = index >= 0 ? index : index + midiValues.length;
             const upperIndex = (lowerIndex + 1) % midiValues.length;
 
             const lowerValue = midiValues[lowerIndex];
@@ -136,6 +118,24 @@ export class Chord {
         const pitches = getPitchesFromDecimal(decimal, root);
         return new Chord(root, decimal, pitches);
     }
+}
+
+export function binarySearch(
+    array: number[],
+    target: number
+): [number, boolean] {
+    let left: number = 0;
+    let right: number = array.length - 1;
+
+    while (left <= right) {
+        const mid: number = Math.floor((left + right) / 2);
+
+        if (array[mid] === target) return [mid, true];
+        if (target < array[mid]) right = mid - 1;
+        else left = mid + 1;
+    }
+
+    return [right, false];
 }
 
 export class ChordBuilder {
