@@ -64,21 +64,17 @@
     }
 
     async function openFile(filePath: string) {
-        try {
-            const data = await readTextFile(filePath);
-            const timeline = createTimelineFromXMLFile(data);
-            loadTimeline(timeline);
+        const data = await readTextFile(filePath);
+        const timeline = createTimelineFromXMLFile(data);
+        loadTimeline(timeline);
 
-            projectPath = filePath;
+        projectPath = filePath;
 
-            updateWindowTitle();
+        updateWindowTitle();
 
-            const mainStore = new Store(".main.dat");
-            mainStore.set("last-project-path", filePath);
-            mainStore.save();
-        } catch {
-            emit("display-message", { message: "Failed to open file" });
-        }
+        const mainStore = new Store(".main.dat");
+        mainStore.set("last-project-path", filePath);
+        mainStore.save();
     }
 
     function updateWindowTitle() {
@@ -162,7 +158,13 @@
                 defaultPath: projectPath,
             });
 
-            if (path) openFile(path as string);
+            if (path === undefined) return;
+
+            try {
+                openFile(path as string);
+            } catch {
+                emit("display-message", { message: "Failed to open file" });
+            }
         }),
 
         listen("save-as", saveProjectAs),
