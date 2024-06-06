@@ -2,7 +2,7 @@ import type Track from "../track/Track";
 import Stateful from "../../../architecture/Stateful";
 import * as stateHierarchyUtils from "../../../architecture/state-hierarchy-utils";
 
-import { itemInitFunctions, type ItemTypes } from "./ItemTypes";
+import { type ItemTypes } from "./ItemTypes";
 
 export interface ItemState<T extends keyof ItemTypes>
     extends stateHierarchyUtils.ChildState<Track<T>> {
@@ -20,7 +20,5 @@ export default class Item<T extends keyof ItemTypes> extends Stateful<
         state: ItemState<T>
     ) {
         super(state);
-
-        if (itemInitFunctions[itemType]) itemInitFunctions[itemType]!(this);
     }
 }
