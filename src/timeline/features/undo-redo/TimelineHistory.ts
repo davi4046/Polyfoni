@@ -8,10 +8,8 @@ export default class TimelineHistory {
     constructor(timeline: Timeline) {
         const watcher = new StateHierarchyWatcher(timeline);
 
-        watcher.subscribe((obj, oldState) => {
+        watcher.subscribe((obj, oldState, newState) => {
             if (!this._currAction) return;
-
-            const newState = obj.state;
 
             this._currAction.changes.push({ obj, oldState, newState });
         });
