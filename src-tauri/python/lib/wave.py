@@ -36,9 +36,3 @@ def tri(t, notespan):
     freq = 1.0 / notespan
     ampl = notespan / 4
     return tri_w(t, freq, ampl)
-        
-@store()
-def saw(t, notespan):
-    freq = 1.0 / notespan
-    ampl = notespan / 2
-    return saw_w(t, freq, ampl)
