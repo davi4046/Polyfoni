@@ -1,9 +1,13 @@
 import chroma from "chroma-js";
 
 import pitchNames from "../../utils/pitchNames";
-import { circWrap } from "../../../utils/math-utils";
+import {
+    circWrap,
+    circClosestIndex,
+    minCircDist,
+} from "../../../utils/math-utils";
 
-const BASE_OCTAVE = 5;
+export const BASE_OCTAVE = 5;
 
 export type Pitch = (typeof pitchNames)[number];
 export type PitchMap = { [K in Pitch]: boolean };
@@ -84,18 +88,31 @@ export class Chord {
     midiToDegree(midiValue: number): number {
         const midiValues = this.getMidiValues().sort((a, b) => a - b);
 
-        // 1.
-        const octave = Math.floor(midiValue / 12) - BASE_OCTAVE;
-        // 2.
-        midiValue = midiValue % 12;
+        const zeroPitch = this.degreeToMidi(0);
+        const octave = Math.floor((midiValue - zeroPitch) / 12);
 
-        const [index, exact] = binarySearch(midiValues, midiValue);
+        const closestIndex = circClosestIndex(midiValue, midiValues, 0, 12);
 
-        if (exact) {
-            return index + midiValues.length * octave;
+        const distToClosest = minCircDist(
+            midiValue,
+            midiValues[closestIndex],
+            0,
+            12
+        );
+
+        if (distToClosest === 0) {
+            return closestIndex + midiValues.length * octave;
         } else {
-            const lowerIndex = index >= 0 ? index : index + midiValues.length;
-            const upperIndex = (lowerIndex + 1) % midiValues.length;
+            const lowerIndex = circWrap(
+                distToClosest > 0 ? closestIndex : closestIndex - 1,
+                0,
+                midiValues.length
+            );
+            const upperIndex = circWrap(
+                distToClosest > 0 ? closestIndex + 1 : closestIndex,
+                0,
+                midiValues.length
+            );
 
             const lowerValue = midiValues[lowerIndex];
             const upperValue = midiValues[upperIndex];
@@ -105,7 +122,7 @@ export class Chord {
 
             const fraction = numerator / denominator;
 
-            return index + fraction + midiValues.length * octave;
+            return lowerIndex + fraction + midiValues.length * octave;
         }
     }
 
@@ -118,24 +135,6 @@ export class Chord {
         const pitches = getPitchesFromDecimal(decimal, root);
         return new Chord(root, decimal, pitches);
     }
-}
-
-export function binarySearch(
-    array: number[],
-    target: number
-): [number, boolean] {
-    let left: number = 0;
-    let right: number = array.length - 1;
-
-    while (left <= right) {
-        const mid: number = Math.floor((left + right) / 2);
-
-        if (array[mid] === target) return [mid, true];
-        if (target < array[mid]) right = mid - 1;
-        else left = mid + 1;
-    }
-
-    return [right, false];
 }
 
 export class ChordBuilder {
