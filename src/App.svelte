@@ -1,6 +1,9 @@
 <script lang="ts">
     import TimelineComponent from "./timeline/user_interface/visuals/views/timeline/Timeline.svelte";
-    import { open, save } from "@tauri-apps/api/dialog";
+    import {
+        open as openDialog,
+        save as saveDialog,
+    } from "@tauri-apps/api/dialog";
     import createMidiFileFromTimeline from "./timeline/features/import_export/createMidiFileFromTimeline";
     import {
         readTextFile,
@@ -90,7 +93,7 @@
     async function saveProjectAs() {
         if (!timelineManager.timeline) return;
 
-        const path = await save({
+        const path = await saveDialog({
             title: "Save As",
             filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
             defaultPath: projectPath,
@@ -151,7 +154,7 @@
         }),
 
         listen("open-file", async (_) => {
-            const path = await open({
+            const path = await openDialog({
                 title: "Open File",
                 filters: [{ name: "Polyfoni project", extensions: ["plfn"] }],
                 multiple: false,
@@ -174,7 +177,7 @@
         listen("export-to-midi", async (_) => {
             if (!timelineManager.timeline) return;
 
-            const path = await save({
+            const path = await saveDialog({
                 title: "Export to MIDI",
                 filters: [{ name: "MIDI", extensions: ["midi"] }],
             });
