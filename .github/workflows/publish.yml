@@ -69,4 +69,6 @@ jobs:
                   releaseName: "Polyfoni v__VERSION__"
                   releaseDraft: true
                   prerelease: false
+                  includeDebug: true
+                  includeRelease: true
                   args: ${{ matrix.args }}
