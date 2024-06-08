@@ -39,7 +39,7 @@ fn create_menu() -> Menu {
         .add_submenu(Submenu::new("Help", Menu::new()
             .add_item(CustomMenuItem::new("website".to_string(), "Website"))
             .add_item(CustomMenuItem::new("discord_server".to_string(), "Discord Server"))
-            .add_item(CustomMenuItem::new("usermanual".to_string(), "User-Manual"))
+            .add_item(CustomMenuItem::new("user_manual".to_string(), "User-Manual"))
             )
         )
         .add_item(CustomMenuItem::new("license".to_string(), "License"))
@@ -123,8 +123,8 @@ fn main() {
                 "discord_server" => {
                     let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/discord-server", None);
                 }
-                "usermanual" => {
-                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/usermanual", None);
+                "user_manual" => {
+                    let _ = open(&event.window().shell_scope(), "https://polyfoni-app.com/user-manual", None);
                 }
                 // Other
                 "donation" => {
